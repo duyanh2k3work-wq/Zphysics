@@ -849,6 +849,18 @@
   </div>
 
   <script>
+    // Tự động làm sạch URL trên trình duyệt (loại bỏ .html và đồng bộ với hash)
+    if (window.location.protocol.startsWith('http') && !window.Capacitor) {
+      const path = window.location.pathname;
+      if (path.endsWith('.html')) {
+        let cleanPath = path.substring(0, path.length - 5);
+        if (cleanPath.endsWith('/index')) {
+          cleanPath = cleanPath.substring(0, cleanPath.length - 5) || '/';
+        }
+        history.replaceState(null, '', cleanPath + window.location.search + window.location.hash);
+      }
+    }
+
     // ══════════════════════════════════════════════
     // CẤU HÌNH & KIỂM TRA ĐĂNG NHẬP
     const SESSION_KEY = 'zphysics_session';
@@ -879,7 +891,31 @@
     // Xác thực quyền Premium
     const currentSession = getSession();
     const urlParams = new URLSearchParams(window.location.search);
-    const demoMode = urlParams.get('demo');
+    let demoMode = urlParams.get('demo');
+    let examId = urlParams.get('exam');
+
+    // Hỗ trợ Hash Routing cho đề thi thử
+    if (!examId && window.location.hash) {
+      const hashVal = window.location.hash.substring(1);
+      const hashParams = new URLSearchParams(hashVal);
+      if (hashParams.has('exam')) {
+        examId = hashParams.get('exam');
+      } else if (hashVal && !hashVal.includes('=')) {
+        examId = hashVal;
+      }
+      if (hashParams.has('demo')) {
+        demoMode = hashParams.get('demo');
+      }
+    }
+    if (!examId) examId = '';
+
+    // Tự động làm đẹp URL bằng cách chuyển đổi từ query sang hash
+    if (window.location.protocol.startsWith('http') && !window.Capacitor) {
+      const cleanPath = window.location.pathname.replace(/\.html$/, '');
+      if (window.location.search.includes('exam=')) {
+        history.replaceState(null, '', cleanPath + '#' + examId + (demoMode ? `?demo=${demoMode}` : ''));
+      }
+    }
 
     if (!currentSession && demoMode !== 'premium') {
       window.location.href = './';
@@ -890,7 +926,6 @@
     }
 
     // Biến toàn cục chứa thông tin đề
-    let examId = urlParams.get('exam') || '';
     let examData = null;
     let timeRemaining = 3000; // 50 phút = 3000 giây
     let timerInterval = null;

@@ -637,6 +637,18 @@
   </div>
 
   <script>
+    // Tự động làm sạch URL trên trình duyệt (loại bỏ .html và đồng bộ với hash)
+    if (window.location.protocol.startsWith('http') && !window.Capacitor) {
+      const path = window.location.pathname;
+      if (path.endsWith('.html')) {
+        let cleanPath = path.substring(0, path.length - 5);
+        if (cleanPath.endsWith('/index')) {
+          cleanPath = cleanPath.substring(0, cleanPath.length - 5) || '/';
+        }
+        history.replaceState(null, '', cleanPath + window.location.search + window.location.hash);
+      }
+    }
+
     function registerPremium(planName) {
       const email = getSavedEmail();
       const message = `Xin chào Thầy/Cô, em muốn đăng ký gói Zphysics Premium: ${planName}.${email ? ` Gmail tài khoản của em là: ${email}` : ''}`;

@@ -1406,9 +1406,9 @@
             const lNum = l.num; // '04'
             
             const autoLinks = { ...l.links };
-            if (!autoLinks.tracNghiem || autoLinks.tracNghiem === '#') autoLinks.tracNghiem = `tracnghiem.html?quiz=cauhoi_${gradeNum}_c${cNum}_b${lNum}`;
-            if (!autoLinks.dungSai || autoLinks.dungSai === '#') autoLinks.dungSai = `tracnghiem.html?quiz=đs_${gradeNum}_c${cNum}_b${lNum}`;
-            if (!autoLinks.traLoiNgan || autoLinks.traLoiNgan === '#') autoLinks.traLoiNgan = `tracnghiem.html?quiz=tln_${gradeNum}_c${cNum}_b${lNum}`;
+            if (!autoLinks.tracNghiem || autoLinks.tracNghiem === '#') autoLinks.tracNghiem = `q.html#cauhoi_${gradeNum}_c${cNum}_b${lNum}`;
+            if (!autoLinks.dungSai || autoLinks.dungSai === '#') autoLinks.dungSai = `q.html#đs_${gradeNum}_c${cNum}_b${lNum}`;
+            if (!autoLinks.traLoiNgan || autoLinks.traLoiNgan === '#') autoLinks.traLoiNgan = `q.html#tln_${gradeNum}_c${cNum}_b${lNum}`;
 
             const createQuizItem = (tUrl, labelSuffix) => {
               const lessonItem = document.createElement('div');
@@ -1421,6 +1421,10 @@
                 quizType = 'forms';
               } else if (tUrl.indexOf('?quiz=') !== -1) {
                 qKey = tUrl.split('?quiz=')[1].split('&')[0];
+              } else if (tUrl.indexOf('q.html#') !== -1) {
+                qKey = tUrl.split('q.html#')[1].split('&')[0];
+              } else if (tUrl.indexOf('q#') !== -1) {
+                qKey = tUrl.split('q#')[1].split('&')[0];
               }
               
               lessonItem.className = 'lesson-item';
@@ -2000,7 +2004,7 @@
       document.getElementById('empty-state').style.display = 'flex';
       
       // Thông báo cách cập nhật baihoc.json
-      alert(`Đã khởi tạo mã đề "${newKey}".\n\nHãy vào file "www/baihoc.json" để cập nhật liên kết của bài học này thành:\n"tracNghiem": "tracnghiem.html?quiz=${newKey}"\n\nBây giờ bạn có thể bắt đầu Thêm câu hỏi cho mã đề này!`);
+      alert(`Đã khởi tạo mã đề "${newKey}".\n\nHãy vào file "www/baihoc.json" để cập nhật liên kết của bài học này thành:\n"tracNghiem": "q.html#${newKey}"\n\nBây giờ bạn có thể bắt đầu Thêm câu hỏi cho mã đề này!`);
     }
 
     // ── TẢI FILE JSON DỰ PHÒNG ──

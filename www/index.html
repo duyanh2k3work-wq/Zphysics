@@ -1378,6 +1378,18 @@
   </div>
 
   <script>
+    // Tự động làm sạch URL trên trình duyệt (loại bỏ .html)
+    if (window.location.protocol.startsWith('http') && !window.Capacitor) {
+      const path = window.location.pathname;
+      if (path.endsWith('.html')) {
+        let cleanPath = path.substring(0, path.length - 5);
+        if (cleanPath.endsWith('/index')) {
+          cleanPath = cleanPath.substring(0, cleanPath.length - 5) || '/';
+        }
+        history.replaceState(null, '', cleanPath + window.location.search + window.location.hash);
+      }
+    }
+
     // ── Định nghĩa label và icon cho từng loại link ──
     const LINK_CONFIG = {
       video: { label: 'Video bài học', cls: 'lnk-video', icon: '▶️' },
@@ -1582,7 +1594,7 @@
             <div class="pill pill-c" style="background:linear-gradient(135deg,#ffffff,#b388ff)"></div>`;
 
           const lessonsHTML = matchingExams.map(exam => {
-            const clickAction = `event.stopPropagation(); const session = getSession(); if (session && session.premium) { window.location.href='luyende.html?exam=${exam.id}'; } else { window.location.href='premium.html'; }`;
+            const clickAction = `event.stopPropagation(); const session = getSession(); if (session && session.premium) { window.location.href='l.html#${exam.id}'; } else { window.location.href='premium.html'; }`;
 
             const videoBtnHTML = (exam.videoUrl && exam.videoUrl !== '#' && exam.videoUrl.trim() !== '')
               ? `<a href="javascript:void(0)" class="lnk lnk-video" onclick="event.stopPropagation(); openVideoModal('${exam.videoUrl}')">▶️ Video chữa</a>`
@@ -1642,9 +1654,9 @@
             const lNum = l.num; // '04'
 
             const autoLinks = { ...l.links };
-            if (!autoLinks.tracNghiem || autoLinks.tracNghiem === '#') autoLinks.tracNghiem = `tracnghiem.html?quiz=cauhoi_${gradeNum}_c${cNum}_b${lNum}`;
-            if (!autoLinks.dungSai || autoLinks.dungSai === '#') autoLinks.dungSai = `tracnghiem.html?quiz=đs_${gradeNum}_c${cNum}_b${lNum}`;
-            if (!autoLinks.traLoiNgan || autoLinks.traLoiNgan === '#') autoLinks.traLoiNgan = `tracnghiem.html?quiz=tln_${gradeNum}_c${cNum}_b${lNum}`;
+            if (!autoLinks.tracNghiem || autoLinks.tracNghiem === '#') autoLinks.tracNghiem = `q.html#cauhoi_${gradeNum}_c${cNum}_b${lNum}`;
+            if (!autoLinks.dungSai || autoLinks.dungSai === '#') autoLinks.dungSai = `q.html#đs_${gradeNum}_c${cNum}_b${lNum}`;
+            if (!autoLinks.traLoiNgan || autoLinks.traLoiNgan === '#') autoLinks.traLoiNgan = `q.html#tln_${gradeNum}_c${cNum}_b${lNum}`;
 
             // Build link buttons
             const linksHTML = Object.entries(autoLinks)
@@ -1652,6 +1664,20 @@
                 const cfg = LINK_CONFIG[key];
                 if (!cfg || url === '#') {
                   return `<span class="lnk ${cfg ? cfg.cls : ''}" style="opacity:0.4;cursor:default">${cfg ? cfg.icon + ' ' + cfg.label : key}</span>`;
+                }
+
+                // Tự động chuẩn hóa link trắc nghiệm/luyện đề sang định dạng q.html và l.html mới
+                let normalizedUrl = url;
+                if (typeof url === 'string') {
+                  if (url.includes('tracnghiem.html')) {
+                    const match = url.match(/quiz=([^&]+)/);
+                    const quizCode = match ? match[1] : 'cauhoi';
+                    normalizedUrl = `q.html#${quizCode}`;
+                  } else if (url.includes('luyende.html')) {
+                    const match = url.match(/exam=([^&]+)/);
+                    const examCode = match ? match[1] : '';
+                    normalizedUrl = `l.html#${examCode}`;
+                  }
                 }
 
                 // Kiểm tra xem phím bấm này có bị giới hạn Premium không (chỉ khóa video, tài liệu bài tập, phiếu đáp án)
@@ -1665,9 +1691,9 @@
                 }
 
                 if (key === 'video') {
-                  return `<a href="javascript:void(0)" class="lnk ${cfg.cls}" onclick="event.stopPropagation(); openVideoModal('${url}')">${cfg.icon} ${cfg.label}</a>`;
+                  return `<a href="javascript:void(0)" class="lnk ${cfg.cls}" onclick="event.stopPropagation(); openVideoModal('${normalizedUrl}')">${cfg.icon} ${cfg.label}</a>`;
                 }
-                return `<a href="${url}" class="lnk ${cfg.cls}" target="_blank" onclick="event.stopPropagation()">${cfg.icon} ${cfg.label}</a>`;
+                return `<a href="${normalizedUrl}" class="lnk ${cfg.cls}" target="_blank" onclick="event.stopPropagation()">${cfg.icon} ${cfg.label}</a>`;
               }).join('');
 
             const isFree = isLessonFree(gradeNum, cNum, lIdx);

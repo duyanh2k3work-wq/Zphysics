@@ -1008,6 +1008,18 @@
   </div>
 
   <script>
+    // Tự động làm sạch URL trên trình duyệt (loại bỏ .html và đồng bộ với hash)
+    if (window.location.protocol.startsWith('http') && !window.Capacitor) {
+      const path = window.location.pathname;
+      if (path.endsWith('.html')) {
+        let cleanPath = path.substring(0, path.length - 5);
+        if (cleanPath.endsWith('/index')) {
+          cleanPath = cleanPath.substring(0, cleanPath.length - 5) || '/';
+        }
+        history.replaceState(null, '', cleanPath + window.location.search + window.location.hash);
+      }
+    }
+
     // ══════════════════════════════════════════════
     // 🔒 CẤU HÌNH API & KIỂM TRA ĐĂNG NHẬP
     // === CẤU HÌNH SUPABASE ===
@@ -1205,7 +1217,27 @@
 
     // ── Google Sheets API (Apps Script Web App) ──
     const params = new URLSearchParams(window.location.search);
-    const quizFile = params.get('quiz') || 'cauhoi';
+    let quizFile = params.get('quiz');
+    
+    // Hỗ trợ Hash Routing cho đề thi trắc nghiệm
+    if (!quizFile && window.location.hash) {
+      const hashVal = window.location.hash.substring(1);
+      const hashParams = new URLSearchParams(hashVal);
+      if (hashParams.has('quiz')) {
+        quizFile = hashParams.get('quiz');
+      } else if (hashVal && !hashVal.includes('=')) {
+        quizFile = hashVal;
+      }
+    }
+    if (!quizFile) quizFile = 'cauhoi';
+
+    // Tự động làm đẹp URL thanh địa chỉ bằng cách chuyển đổi từ query sang hash
+    if (window.location.protocol.startsWith('http') && !window.Capacitor) {
+      const cleanPath = window.location.pathname.replace(/\.html$/, '');
+      if (window.location.search.includes('quiz=')) {
+        history.replaceState(null, '', cleanPath + '#' + quizFile);
+      }
+    }
     // SHEETS_API_URL đã được định nghĩa ở đầu thẻ script
 
     // Tải thông tin bài học từ baihoc.json
