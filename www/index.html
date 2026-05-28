@@ -1,0 +1,2265 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zphysics - Hệ thống Vật lí THPT</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f0f4ff;
+      --card: rgba(255, 255, 255, 0.75);
+      --card-solid: #ffffff;
+      --glass: rgba(255, 255, 255, 0.55);
+      --border: rgba(255, 255, 255, 0.8);
+      --shadow: rgba(120, 140, 200, 0.18);
+      --text: #2d3561;
+      --muted: #8e97c5;
+      --teal: #2ec4b6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 10% 0%, #c8d8ff 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 10%, #ffd6e8 0%, transparent 55%),
+        radial-gradient(ellipse 40% 50% at 80% 90%, #c8f5f2 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 10% 85%, #ffe8cc 0%, transparent 55%),
+        #f0f4ff;
+      pointer-events: none;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 460px;
+      margin: 0 auto;
+      padding: 0 0 48px;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      padding: 52px 24px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left h2 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+
+    .header-left h1 {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--text);
+      margin-top: 2px;
+      line-height: 1.2;
+    }
+
+    .header-left h1 span {
+      color: var(--teal);
+    }
+
+    .avatar-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      background: var(--card);
+      border: 2px solid var(--border);
+      box-shadow: 0 4px 16px var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+      padding: 0;
+      outline: none;
+    }
+
+    .avatar-btn:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+
+    .avatar-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 14px;
+    }
+
+    /* ── GRADE TABS ── */
+    .grade-strip {
+      padding: 10px 20px 20px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .grade-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .grade-pill {
+      flex-shrink: 0;
+      padding: 9px 22px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      background: var(--glass);
+      color: var(--muted);
+      border: 1.5px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+
+    .grade-pill.active {
+      background-size: 200% 200%;
+      animation: shimmer 3s ease infinite;
+    }
+
+    .grade-pill.grade-0.active {
+      background-image: linear-gradient(135deg, #43a047, #81c784, #43a047);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 6px 20px rgba(67, 160, 71, 0.4);
+      transform: scale(1.05);
+    }
+
+    .grade-pill.grade-1.active {
+      background-image: linear-gradient(135deg, #f9a825, #ffd54f, #f9a825);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 6px 20px rgba(249, 168, 37, 0.4);
+      transform: scale(1.05);
+    }
+
+    .grade-pill.grade-2.active {
+      background-image: linear-gradient(135deg, #e53935, #ef9a9a, #e53935);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 6px 20px rgba(229, 57, 53, 0.4);
+      transform: scale(1.05);
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      padding: 4px 24px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-label h3 {
+      font-size: 19px;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    /* ── CHAPTER CARDS ── */
+    .cards-list {
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ch-card {
+      border-radius: 24px;
+      overflow: hidden;
+      background: var(--card-solid);
+      box-shadow: 0 4px 24px var(--shadow);
+      border: 1.5px solid var(--border);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+      animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    .ch-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px var(--shadow);
+    }
+
+    .ch-card:nth-child(1) {
+      animation-delay: 0.04s;
+    }
+
+    .ch-card:nth-child(2) {
+      animation-delay: 0.08s;
+    }
+
+    .ch-card:nth-child(3) {
+      animation-delay: 0.12s;
+    }
+
+    .ch-card:nth-child(4) {
+      animation-delay: 0.16s;
+    }
+
+    .ch-card:nth-child(5) {
+      animation-delay: 0.20s;
+    }
+
+    .ch-card:nth-child(6) {
+      animation-delay: 0.24s;
+    }
+
+    .ch-card:nth-child(7) {
+      animation-delay: 0.28s;
+    }
+
+    .ch-card:active {
+      transform: scale(0.98) translateY(0);
+    }
+
+    .ch-header {
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ch-icon-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: visible;
+    }
+
+    .pill {
+      width: 38px;
+      height: 20px;
+      border-radius: 10px;
+      position: absolute;
+      transform-origin: center;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .pill-a {
+      transform: rotate(-30deg) translate(-4px, -4px);
+      opacity: 0.9;
+    }
+
+    .pill-b {
+      transform: rotate(50deg) translate(4px, 2px);
+      opacity: 0.85;
+      width: 22px;
+      height: 22px;
+      border-radius: 11px;
+    }
+
+    .pill-c {
+      transform: rotate(15deg) translate(0px, 6px);
+      opacity: 0.8;
+      width: 28px;
+      height: 14px;
+      border-radius: 7px;
+    }
+
+    .ch-card:hover .pill-a {
+      transform: rotate(-40deg) translate(-6px, -8px) scale(1.1);
+    }
+
+    .ch-card:hover .pill-b {
+      transform: rotate(65deg) translate(6px, 0px) scale(1.15);
+    }
+
+    .ch-card:hover .pill-c {
+      transform: rotate(5deg) translate(-2px, 8px) scale(1.05);
+    }
+
+    .ch-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .ch-num {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 3px;
+    }
+
+    .ch-title {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tags {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      border: 1.5px solid currentColor;
+      opacity: 0.85;
+    }
+
+    .ch-arrow {
+      flex-shrink: 0;
+    }
+
+    .ch-arrow svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--muted);
+      stroke-width: 2.5;
+      fill: none;
+      transition: 0.3s;
+    }
+
+    .ch-card.open .ch-arrow svg {
+      transform: rotate(180deg);
+    }
+
+    /* ── LESSON LIST ── */
+    .lesson-list {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+      background: rgba(240, 244, 255, 0.55);
+    }
+
+    .ch-card.open .lesson-list {
+      max-height: 4000px;
+      opacity: 1;
+      transition: max-height 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease 0.1s;
+    }
+
+    .lesson-inner {
+      padding: 6px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ── LESSON ROW ── */
+    .lesson-row {
+      background: var(--card-solid);
+      border-radius: 18px;
+      box-shadow: 0 2px 10px rgba(120, 140, 200, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
+
+    .lesson-row:hover {
+      box-shadow: 0 8px 24px var(--shadow);
+      transform: translateY(-2px) scale(1.01);
+    }
+
+    .lesson-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px 6px;
+    }
+
+    .lesson-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .lesson-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .lesson-num {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ── LINK BUTTONS ── */
+    .lesson-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 14px 11px 32px;
+    }
+
+    .lnk {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 11px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+
+    .lnk svg {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
+    }
+
+    .lnk:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+
+    /* Link colour variants */
+    .lnk-video {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .lnk-baiTap {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .lnk-tracNghiem {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    .lnk-dungSai {
+      background: #fce4ec;
+      color: #c62828;
+    }
+
+    .lnk-traLoiNgan {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .lnk-phieuDapAn {
+      background: #ede7f6;
+      color: #4527a0;
+    }
+
+    /* ── GRADE SECTIONS ── */
+    .grade-section {
+      display: none;
+    }
+
+    .grade-section.active {
+      display: block;
+      animation: sectionFadeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes sectionFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* ── LOADING STATE ── */
+    .loading {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .loading-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+      margin: 0 3px;
+      animation: bounce 1.2s infinite;
+    }
+
+    .loading-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .loading-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      80%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.4;
+      }
+
+      40% {
+        transform: translateY(-8px);
+        opacity: 1;
+      }
+    }
+
+    /* ── RESPONSIVE DESIGN ── */
+    @media (min-width: 768px) {
+      .app {
+        max-width: 860px;
+        padding-bottom: 64px;
+      }
+
+      .header {
+        padding: 64px 32px 20px;
+      }
+
+      .header-left h1 {
+        font-size: 36px;
+        margin-top: 4px;
+      }
+
+      .header-left h2 {
+        font-size: 15px;
+      }
+
+      .avatar-btn {
+        width: 56px;
+        height: 56px;
+        border-radius: 20px;
+      }
+
+      .grade-strip {
+        padding: 16px 32px 32px;
+        justify-content: center;
+      }
+
+      .grade-pill {
+        font-size: 16px;
+        padding: 10px 28px;
+      }
+
+      .section-label {
+        padding: 12px 32px 24px;
+      }
+
+      .section-label h3 {
+        font-size: 22px;
+      }
+
+      .cards-list {
+        padding: 0 32px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px;
+        align-items: start;
+      }
+
+      .ch-header {
+        padding: 20px 24px;
+      }
+
+      .ch-title {
+        font-size: 18px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .app {
+        max-width: 1200px;
+      }
+
+      .cards-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 28px;
+      }
+    }
+
+    /* ── LOGIN OVERLAY ── */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(ellipse 60% 50% at 10% 0%, #c8d8ff 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 10%, #ffd6e8 0%, transparent 55%),
+        radial-gradient(ellipse 40% 50% at 80% 90%, #c8f5f2 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 10% 85%, #ffe8cc 0%, transparent 55%),
+        #f0f4ff;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .login-overlay.hiding {
+      animation: fadeOut 0.4s ease forwards;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--card-solid);
+      border-radius: 28px;
+      box-shadow: 0 8px 40px var(--shadow);
+      border: 1.5px solid var(--border);
+      padding: 40px 28px 36px;
+      text-align: center;
+      animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    .login-logo {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .login-logo span {
+      color: var(--teal);
+    }
+
+    .login-subtitle {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .login-input-wrap {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .login-input-wrap .input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      pointer-events: none;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 14px 16px 14px 46px;
+      border-radius: 16px;
+      border: 1.5px solid #e8eaf6;
+      background: rgba(240, 244, 255, 0.5);
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .login-input::placeholder {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .login-input:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.15);
+    }
+
+    .login-input.error {
+      border-color: #e53935;
+    }
+
+    .login-error {
+      font-size: 12px;
+      font-weight: 700;
+      color: #e53935;
+      min-height: 20px;
+      margin-bottom: 8px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .login-error.visible {
+      opacity: 1;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 900;
+      color: #fff;
+      background: linear-gradient(135deg, var(--teal), #26c6da);
+      box-shadow: 0 6px 24px rgba(46, 196, 182, 0.4);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .login-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 32px rgba(46, 196, 182, 0.5);
+    }
+
+    .login-btn:active {
+      transform: scale(0.97);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .login-spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    /* ── USER MENU POPUP ── */
+    .user-popup {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 240px;
+      padding: 16px;
+      background: var(--card-solid);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px var(--shadow);
+      border: 1.5px solid var(--border);
+      z-index: 1000;
+      display: none;
+      animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    .user-popup.visible {
+      display: block;
+    }
+
+    .user-popup-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 2px;
+      word-break: break-word;
+    }
+
+    .user-popup-email {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 14px;
+      word-break: break-all;
+    }
+
+    .logout-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 14px;
+      border: 2px solid #e53935;
+      background: rgba(229, 57, 53, 0.06);
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #e53935;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(229, 57, 53, 0.12);
+      transform: translateY(-1px);
+    }
+
+    /* ── PREMIUM PROMO BANNER & POPUP BUTTON ── */
+    .premium-banner {
+      margin: 10px 20px 20px;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, #121216 0%, #0a0a0c 100%);
+      border: 1.5px solid rgba(212, 175, 55, 0.3);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .premium-banner:hover {
+      transform: translateY(-2px);
+      border-color: #d4af37;
+      box-shadow: 0 8px 24px rgba(212, 175, 55, 0.25);
+    }
+
+    .premium-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .premium-banner-icon {
+      font-size: 24px;
+      animation: float 2s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-4px);
+      }
+    }
+
+    .premium-banner-text {
+      text-align: left;
+    }
+
+    .premium-banner-text h4 {
+      font-size: 14px;
+      font-weight: 900;
+      color: #ffe27a;
+    }
+
+    .premium-banner-text p {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8e97c5;
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+
+    .premium-banner-arrow {
+      background: linear-gradient(135deg, #ffe27a, #d4af37);
+      color: #000;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 50px;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
+    }
+
+    .premium-btn-popup {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #ffe27a, #d4af37);
+      color: #000;
+      font-weight: 800;
+      font-size: 13px;
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+      transition: transform 0.2s;
+    }
+
+    .premium-btn-popup:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    /* ── PREMIUM THEME OVERRIDES (DARK NEON MULTICOLOR GLOW) ── */
+    body.premium-theme {
+      --bg: #0A0A0B;
+      --card: rgba(22, 22, 26, 0.7);
+      --card-solid: #16161a;
+      --glass: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: rgba(0, 0, 0, 0.5);
+      --text: #f5f5f7;
+      --muted: #a1a1aa;
+      --teal: #2ec4b6;
+    }
+
+    body.premium-theme::before {
+      background:
+        radial-gradient(ellipse 60% 50% at 10% 0%, rgba(46, 196, 182, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 10%, rgba(229, 57, 53, 0.08) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 50% at 80% 90%, rgba(124, 77, 255, 0.12) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 10% 85%, rgba(249, 168, 37, 0.08) 0%, transparent 55%),
+        #0A0A0B;
+    }
+
+    body.premium-theme .header-left h1 {
+      color: #ffffff;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    body.premium-theme .header-left h1 span {
+      background: linear-gradient(135deg, #7DD3FC 30%, #06B6D4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent !important;
+      font-weight: 900;
+      text-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+    }
+
+    body.premium-theme #greetingText {
+      color: #a1a1aa !important;
+    }
+
+    /* Golden 'Z' Logo Avatar Button gets the rainbow border in Premium */
+    body.premium-theme .avatar-btn {
+      background: linear-gradient(#16161a, #16161a) padding-box, linear-gradient(135deg, #ffe27a 0%, #d4af37 50%, #ffe27a 100%) border-box !important;
+      border: 2.5px solid transparent !important;
+      border-radius: 18px !important;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.4) !important;
+    }
+
+    /* Grade Pills (Lớp 10, 11, 12) styled with borders in Premium */
+    body.premium-theme .grade-pill {
+      background: rgba(255, 255, 255, 0.04) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+      color: #a1a1aa !important;
+    }
+
+    body.premium-theme .grade-pill.grade-0.active {
+      background: linear-gradient(#0A0A0B, #0A0A0B) padding-box, linear-gradient(135deg, #43a047, #81c784) border-box !important;
+      border: 2px solid transparent !important;
+      color: #81c784 !important;
+      box-shadow: 0 0 15px rgba(67, 160, 71, 0.35) !important;
+      transform: scale(1.05);
+    }
+
+    body.premium-theme .grade-pill.grade-1.active {
+      background: linear-gradient(#0A0A0B, #0A0A0B) padding-box, linear-gradient(135deg, #f9a825, #ffd54f) border-box !important;
+      border: 2px solid transparent !important;
+      color: #ffd54f !important;
+      box-shadow: 0 0 15px rgba(249, 168, 37, 0.35) !important;
+      transform: scale(1.05);
+    }
+
+    body.premium-theme .grade-pill.grade-2.active {
+      background: linear-gradient(#0A0A0B, #0A0A0B) padding-box, linear-gradient(135deg, #e53935, #ef9a9a) border-box !important;
+      border: 2px solid transparent !important;
+      color: #ef9a9a !important;
+      box-shadow: 0 0 15px rgba(229, 57, 53, 0.35) !important;
+      transform: scale(1.05);
+    }
+
+    body.premium-theme .grade-pill.grade-3.active {
+      background: linear-gradient(#0A0A0B, #0A0A0B) padding-box, linear-gradient(135deg, #7c4dff, #b388ff) border-box !important;
+      border: 2px solid transparent !important;
+      color: #b388ff !important;
+      box-shadow: 0 0 15px rgba(124, 77, 255, 0.4) !important;
+      transform: scale(1.05);
+    }
+
+    .premium-only-tab,
+    .premium-only-section {
+      display: none !important;
+    }
+
+    body.premium-theme .premium-only-tab {
+      display: inline-block !important;
+    }
+
+    body.premium-theme .premium-only-section.active {
+      display: block !important;
+    }
+
+    /* Chapter cards with Dynamic Glow - Replicating premium border-gradient style */
+    .ch-card-wrapper {
+      position: relative;
+      width: 100%;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    body.premium-theme .ch-card-wrapper {
+      border-radius: 32px;
+    }
+
+    .ch-card-glow {
+      display: none;
+      position: absolute;
+      inset: 4px;
+      opacity: 0;
+      border-radius: 28px;
+      pointer-events: none;
+      filter: blur(28px);
+      z-index: 0;
+      background: var(--glow-gradient);
+      transition: opacity 0.5s ease;
+    }
+
+    body.premium-theme .ch-card-glow {
+      display: block;
+    }
+
+    body.premium-theme .ch-card-wrapper:hover .ch-card-glow {
+      opacity: 0.75;
+    }
+
+    body.premium-theme .ch-card {
+      position: relative;
+      z-index: 10;
+      background-image: linear-gradient(#000000, #000000), var(--glow-gradient) !important;
+      background-origin: border-box !important;
+      background-clip: padding-box, border-box !important;
+      border: 4.5px solid transparent !important;
+      border-radius: 32px !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s !important;
+    }
+
+    body.premium-theme .ch-card-wrapper:hover {
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    body.premium-theme .ch-card:hover {
+      transform: none !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    body.premium-theme .ch-num {
+      color: var(--glow-color) !important;
+      opacity: 0.9;
+    }
+
+    body.premium-theme .ch-title {
+      color: #ffffff !important;
+    }
+
+    body.premium-theme .ch-arrow svg {
+      stroke: var(--glow-color) !important;
+    }
+
+    body.premium-theme .lesson-list {
+      background: rgba(10, 10, 12, 0.5) !important;
+    }
+
+    body.premium-theme .lesson-row {
+      background: rgba(26, 26, 32, 0.9) !important;
+      border: 1px solid rgba(255, 255, 255, 0.04) !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+      transition: all 0.3s !important;
+    }
+
+    body.premium-theme .lesson-row:hover {
+      border-color: var(--glow-color) !important;
+      box-shadow: 0 4px 15px var(--glow-shadow) !important;
+    }
+
+    body.premium-theme .lesson-title {
+      color: #f5f5f7 !important;
+    }
+
+    body.premium-theme .lesson-num {
+      color: var(--glow-color) !important;
+      opacity: 0.9;
+    }
+
+    body.premium-theme .user-popup {
+      background: rgba(22, 22, 26, 0.96) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    body.premium-theme .user-popup-name {
+      color: #ffffff !important;
+    }
+
+    body.premium-theme .user-popup-email {
+      color: #a1a1aa !important;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+
+      to {
+        opacity: 0;
+      }
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes shakeX {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20%,
+      60% {
+        transform: translateX(-6px);
+      }
+
+      40%,
+      80% {
+        transform: translateX(6px);
+      }
+    }
+
+    /* ── VIDEO MODAL ── */
+    .video-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .video-modal.visible {
+      display: flex;
+    }
+
+    .video-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    .video-modal-container {
+      position: relative;
+      z-index: 10001;
+      width: 100%;
+      max-width: 800px;
+      background: #000;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      transform: scale(0.9) translateY(20px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .video-modal.visible .video-modal-container {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    .video-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 10002;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    .video-modal-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .video-ratio-box {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      /* 16:9 Aspect Ratio */
+    }
+
+    .video-ratio-box iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ── LOGIN OVERLAY ── -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <div class="login-logo">Z<span>physics</span></div>
+      <div class="login-subtitle" id="loginSubtitle">Đăng nhập bằng Gmail để tiếp tục</div>
+      <div class="login-input-wrap">
+        <span class="input-icon">📧</span>
+        <input type="email" class="login-input" id="loginEmail" placeholder="Nhập Gmail của em..." autocomplete="email"
+          onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div id="loginNameWrap" style="display: none; margin-top: 12px;">
+        <div class="login-input-wrap" style="margin-bottom: 0;">
+          <span class="input-icon">👤</span>
+          <input type="text" class="login-input" id="loginName" placeholder="Nhập Họ và Tên của em..."
+            autocomplete="name" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div style="text-align: right; margin-top: 6px; margin-bottom: 12px;">
+          <a href="javascript:void(0)" onclick="cancelRegistration()"
+            style="font-size: 11px; color: var(--muted); text-decoration: none; font-weight: 700;">⬅️ Đổi Gmail khác</a>
+        </div>
+      </div>
+      <div class="login-error" id="loginError"></div>
+      <button class="login-btn" id="loginBtn" onclick="doLogin()">🚀 Đăng nhập</button>
+    </div>
+  </div>
+
+  <!-- ── VIDEO PLAYER MODAL ── -->
+  <div class="video-modal" id="videoModal">
+    <div class="video-modal-backdrop" onclick="closeVideoModal()"></div>
+    <div class="video-modal-container">
+      <button class="video-modal-close" onclick="closeVideoModal()">✕</button>
+      <div class="video-ratio-box">
+        <iframe id="videoPlayer" src="" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+
+    <div class="header">
+      <div class="header-left">
+        <h2 id="greetingText">Xin chào, bạn 👋</h2>
+        <h1>Z<span>physics</span></h1>
+      </div>
+      <div style="position:relative">
+        <button class="avatar-btn" id="avatarBtn">
+          <img src="https://i.postimg.cc/44LHDhL1/avatar.png" alt="Z">
+        </button>
+        <div class="user-popup" id="userPopup">
+          <div class="user-popup-name" id="popupName"></div>
+          <div class="user-popup-email" id="popupEmail" style="margin-bottom: 4px;"></div>
+          <div class="user-popup-status" id="popupStatus" style="font-size: 11px; font-weight: 800; color: var(--muted); margin-bottom: 12px; word-break: break-word;"></div>
+          <a href="premium.html" class="premium-btn-popup">👑 Nâng cấp Premium</a>
+          <button class="logout-btn" id="logoutBtn">🚪 Đăng xuất</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grade-strip" id="gradeTabs">
+      <!-- Tabs được render động từ JSON -->
+    </div>
+
+    <!-- Grade sections được render động từ baihoc.json -->
+    <div id="gradeContent">
+      <div class="loading">
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Định nghĩa label và icon cho từng loại link ──
+    const LINK_CONFIG = {
+      video: { label: 'Video bài học', cls: 'lnk-video', icon: '▶️' },
+      baiTap: { label: 'Tài liệu / Bài tập', cls: 'lnk-baiTap', icon: '📄' },
+      tracNghiem: { label: 'Trắc nghiệm', cls: 'lnk-tracNghiem', icon: '☑️' },
+      dungSai: { label: 'Đúng / Sai', cls: 'lnk-dungSai', icon: '⚖️' },
+      traLoiNgan: { label: 'Trả lời ngắn', cls: 'lnk-traLoiNgan', icon: '✍️' },
+      phieuDapAn: { label: 'Phiếu đáp án', cls: 'lnk-phieuDapAn', icon: '📋' }
+    };
+
+    // ── Danh sách Đề ôn thi thử tốt nghiệp THPT Quốc gia (Premium Only) ──
+    let mockExams = [];
+    const DEFAULT_MOCK_EXAMS = [
+      {
+        id: "de_thi_thu_10_c1",
+        title: "Đề kiểm tra khảo sát Chương I — Lớp 10",
+        desc: "Đề thi thử thách kiến thức mở đầu Vật lí 10",
+        pdfUrl: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+        duration: 45,
+        lop: "10",
+        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      },
+      {
+        id: "de_thi_thu_11_c1",
+        title: "Đề ôn tập giữa học kỳ 1 — Lớp 11",
+        desc: "Đề thi khảo sát chuyên đề Dao động cơ",
+        pdfUrl: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+        duration: 50,
+        lop: "11",
+        videoUrl: "#"
+      },
+      {
+        id: "de_on_nhiet_12",
+        title: "Đề ôn tập chuyên đề Vật lí Nhiệt — Lớp 12",
+        desc: "Đề thi khảo sát cấu trúc mới nhất của Bộ GD&ĐT",
+        pdfUrl: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+        duration: 50,
+        lop: "12",
+        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      },
+      {
+        id: "de_thi_thu_01",
+        title: "Đề luyện thi thử Tốt nghiệp THPT Quốc gia — Số 01",
+        desc: "Đề thi thử thách toàn bộ chương trình lớp 11 & 12",
+        pdfUrl: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+        duration: 50,
+        lop: "12",
+        videoUrl: "#"
+      },
+      {
+        id: "de_thi_thu_02",
+        title: "Đề luyện thi thử Tốt nghiệp THPT Quốc gia — Số 02",
+        desc: "Đề thi phân loại học sinh bứt phá điểm 9, 10",
+        pdfUrl: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+        duration: 50,
+        lop: "12",
+        videoUrl: "#"
+      },
+      {
+        id: "de_minh_hoa_2026",
+        title: "Đề minh họa Tốt nghiệp THPT Quốc gia 2025/2026",
+        desc: "Đề minh họa chính thức công bố bởi Bộ GD&ĐT",
+        pdfUrl: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+        duration: 50,
+        lop: "12",
+        videoUrl: "#"
+      }
+    ];
+
+    let activeGrade = 0;
+
+    // Kiểm tra bài học có được miễn phí xem video & tài liệu không
+    function isLessonFree(gradeNum, cNum, lIdx) {
+      const g = String(gradeNum);
+      if (g === '10') {
+        if (cNum === 1 && lIdx < 3) return true; // 3 bài đầu chương 1
+        if (cNum === 2 && lIdx < 2) return true; // 2 bài đầu chương 2
+      } else if (g === '11' || g === '12') {
+        if (cNum === 1 && lIdx < 3) return true; // 3 bài đầu chương 1
+      }
+      return false;
+    }
+
+    // ── Chuyển lớp ──
+    function switchGrade(idx) {
+      activeGrade = idx;
+      document.querySelectorAll('.grade-pill').forEach((b, i) => {
+        b.classList.toggle('active', i === idx);
+      });
+      document.querySelectorAll('.grade-section').forEach((s, i) => {
+        s.classList.toggle('active', i === idx);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── Toggle card ──
+    function toggleCard(card) {
+      const list = card.querySelector('.lesson-list');
+      const isOpen = card.classList.contains('open');
+      card.closest('.cards-list').querySelectorAll('.ch-card.open').forEach(c => {
+        if (c !== card) {
+          c.classList.remove('open');
+          c.querySelector('.lesson-list').style.maxHeight = '0';
+        }
+      });
+      if (isOpen) {
+        card.classList.remove('open');
+        list.style.maxHeight = '0';
+      } else {
+        card.classList.add('open');
+        list.style.maxHeight = list.scrollHeight + 'px';
+      }
+    }
+
+    // ── Render toàn bộ giao diện từ JSON ──
+    function renderAll(data) {
+      const tabsEl = document.getElementById('gradeTabs');
+      const contentEl = document.getElementById('gradeContent');
+      tabsEl.innerHTML = '';
+      contentEl.innerHTML = '';
+
+      data.forEach((gradeObj, gIdx) => {
+        // --- Tab button ---
+        const btn = document.createElement('button');
+        btn.className = 'grade-pill grade-' + gIdx + (gIdx === 0 ? ' active' : '');
+        btn.textContent = gradeObj.grade;
+        btn.onclick = () => switchGrade(gIdx);
+        tabsEl.appendChild(btn);
+
+        // --- Section container ---
+        const section = document.createElement('div');
+        section.className = 'grade-section' + (gIdx === 0 ? ' active' : '');
+        section.id = gradeObj.id;
+
+        // Section label
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'section-label';
+        labelDiv.innerHTML = `<h3>Danh sách chương — ${gradeObj.grade}</h3>`;
+        section.appendChild(labelDiv);
+
+        // Cards list
+        const cardsList = document.createElement('div');
+        cardsList.className = 'cards-list';
+
+        // Prepend "đề thi/bài tập" card before chapter cards
+        const gradeNum = gradeObj.grade.match(/\d+/) ? gradeObj.grade.match(/\d+/)[0] : '';
+        const examsToRender = mockExams && mockExams.length > 0 ? mockExams : DEFAULT_MOCK_EXAMS;
+        const matchingExams = examsToRender.filter(exam => {
+          let examLop = '';
+          if (exam.lop !== undefined && exam.lop !== null && exam.lop !== '') {
+            examLop = String(exam.lop).match(/\d+/) ? String(exam.lop).match(/\d+/)[0] : '';
+          } else {
+            // Guess grade from title or description
+            const textToSearch = (exam.title + ' ' + (exam.desc || '')).toLowerCase();
+            const match = textToSearch.match(/\b(10|11|12)\b/) || textToSearch.match(/(10|11|12)/);
+            if (match) {
+              examLop = match[1];
+            } else {
+              // Default to 12 if not specified
+              examLop = '12';
+            }
+          }
+          return examLop === gradeNum;
+        });
+
+        if (matchingExams.length > 0) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'ch-card-wrapper';
+
+          const dotColor = '#7c4dff'; // Purple theme color for exams
+          const glowShadow = 'rgba(124, 77, 255, 0.35)';
+          const glowGradient = `linear-gradient(137deg, #7c4dff 0%, #b388ff 50%, #e0aeff 100%)`;
+
+          wrapper.style.setProperty('--glow-color', dotColor);
+          wrapper.style.setProperty('--glow-shadow', glowShadow);
+          wrapper.style.setProperty('--glow-gradient', glowGradient);
+
+          const glow = document.createElement('div');
+          glow.className = 'ch-card-glow';
+          if (document.body.classList.contains('premium-theme')) {
+            glow.style.background = glowGradient;
+          }
+          wrapper.appendChild(glow);
+
+          const card = document.createElement('div');
+          card.className = 'ch-card';
+          card.setAttribute('onclick', 'toggleCard(this)');
+
+          card.style.setProperty('--glow-color', dotColor);
+          card.style.setProperty('--glow-shadow', glowShadow);
+          card.style.setProperty('--glow-gradient', glowGradient);
+
+          if (document.body.classList.contains('premium-theme')) {
+            card.style.backgroundImage = `linear-gradient(#000000, #000000), ${glowGradient}`;
+            card.style.backgroundOrigin = 'border-box';
+            card.style.backgroundClip = 'padding-box, border-box';
+          }
+
+          const pillsHTML = `
+            <div class="pill pill-a" style="background:linear-gradient(135deg,#7c4dff,#b388ff)"></div>
+            <div class="pill pill-b" style="background:linear-gradient(135deg,#9d4edd,#c77dff)"></div>
+            <div class="pill pill-c" style="background:linear-gradient(135deg,#ffffff,#b388ff)"></div>`;
+
+          const lessonsHTML = matchingExams.map(exam => {
+            const clickAction = `event.stopPropagation(); const session = getSession(); if (session && session.premium) { window.location.href='luyende.html?exam=${exam.id}'; } else { window.location.href='premium.html'; }`;
+
+            const videoBtnHTML = (exam.videoUrl && exam.videoUrl !== '#' && exam.videoUrl.trim() !== '')
+              ? `<a href="javascript:void(0)" class="lnk lnk-video" onclick="event.stopPropagation(); openVideoModal('${exam.videoUrl}')">▶️ Video chữa</a>`
+              : `<span class="lnk lnk-video" style="opacity:0.4;cursor:default;pointer-events:none">▶️ Video chữa</span>`;
+
+            const làmBàiBtnHTML = `<a href="javascript:void(0)" class="lnk lnk-tracNghiem" onclick="${clickAction}">📝 Làm bài (${exam.duration || 50} phút)</a>`;
+
+            return `
+              <div class="lesson-row">
+                <div class="lesson-meta">
+                  <span class="lesson-dot" style="background:#7c4dff"></span>
+                  <span class="lesson-title">${exam.title}</span>
+                  <span class="lesson-num" style="color:#b388ff">VIP</span>
+                </div>
+                <div class="lesson-links">${làmBàiBtnHTML} ${videoBtnHTML}</div>
+              </div>`;
+          }).join('');
+
+          card.innerHTML = `
+            <div class="ch-header">
+              <div class="ch-icon-wrap">${pillsHTML}</div>
+              <div class="ch-info">
+                <div class="ch-num" style="color:#b388ff !important">ĐỀ THI / BÀI TẬP</div>
+                <div class="ch-title">👑 Đề thi / Bài tập</div>
+                <div class="tags">
+                  <span class="tag" style="color:#b388ff;border-color:#b388ff30;background:#b388ff0d">Đề thi khảo sát & bài tập tổng hợp</span>
+                </div>
+              </div>
+              <div class="ch-arrow"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            </div>
+            <div class="lesson-list"><div class="lesson-inner">${lessonsHTML}</div></div>`;
+
+          wrapper.appendChild(card);
+          cardsList.appendChild(wrapper);
+        }
+
+        gradeObj.chapters.forEach(ch => {
+          const [p0, p1, p2] = ch.pillColors;
+
+          // Pill icons
+          const pillsHTML = `
+            <div class="pill pill-a" style="background:linear-gradient(135deg,${p0[0]},${p0[1]})"></div>
+            <div class="pill pill-b" style="background:linear-gradient(135deg,${p1[0]},${p1[1]})"></div>
+            <div class="pill pill-c" style="background:linear-gradient(135deg,${p2[0]},${p2[1]})"></div>`;
+
+          // Tags
+          const tagsHTML = ch.tags.map(t =>
+            `<span class="tag" style="color:${t.color};border-color:${t.color}30;background:${t.color}0d">${t.label}</span>`
+          ).join('');
+
+          const lessonsHTML = ch.lessons.map((l, lIdx) => {
+            // Tự động sinh mã đề nếu chưa có, để người dùng không phải deploy lại mỗi khi thêm đề mới
+            const gradeNum = gradeObj.grade.match(/\d+/) ? gradeObj.grade.match(/\d+/)[0] : '10';
+            const romanMap = { 'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10 };
+            let cRaw = ch.num.replace(/chương/i, '').trim().toUpperCase();
+            const cNum = romanMap[cRaw] || parseInt(cRaw) || 1;
+            const lNum = l.num; // '04'
+
+            const autoLinks = { ...l.links };
+            if (!autoLinks.tracNghiem || autoLinks.tracNghiem === '#') autoLinks.tracNghiem = `tracnghiem.html?quiz=cauhoi_${gradeNum}_c${cNum}_b${lNum}`;
+            if (!autoLinks.dungSai || autoLinks.dungSai === '#') autoLinks.dungSai = `tracnghiem.html?quiz=đs_${gradeNum}_c${cNum}_b${lNum}`;
+            if (!autoLinks.traLoiNgan || autoLinks.traLoiNgan === '#') autoLinks.traLoiNgan = `tracnghiem.html?quiz=tln_${gradeNum}_c${cNum}_b${lNum}`;
+
+            // Build link buttons
+            const linksHTML = Object.entries(autoLinks)
+              .map(([key, url]) => {
+                const cfg = LINK_CONFIG[key];
+                if (!cfg || url === '#') {
+                  return `<span class="lnk ${cfg ? cfg.cls : ''}" style="opacity:0.4;cursor:default">${cfg ? cfg.icon + ' ' + cfg.label : key}</span>`;
+                }
+
+                // Kiểm tra xem phím bấm này có bị giới hạn Premium không (chỉ khóa video, tài liệu bài tập, phiếu đáp án)
+                const isRestrictedKey = (key === 'video' || key === 'phieuDapAn' || key === 'baiTap');
+                const session = getSession();
+                const hasAccess = (session && session.premium) || isLessonFree(gradeNum, cNum, lIdx);
+
+                if (isRestrictedKey && !hasAccess) {
+                  const premiumAction = `event.stopPropagation(); window.location.href='premium.html';`;
+                  return `<a href="javascript:void(0)" class="lnk ${cfg.cls}" onclick="${premiumAction}" title="Bài học Premium">${cfg.icon} ${cfg.label} 👑</a>`;
+                }
+
+                if (key === 'video') {
+                  return `<a href="javascript:void(0)" class="lnk ${cfg.cls}" onclick="event.stopPropagation(); openVideoModal('${url}')">${cfg.icon} ${cfg.label}</a>`;
+                }
+                return `<a href="${url}" class="lnk ${cfg.cls}" target="_blank" onclick="event.stopPropagation()">${cfg.icon} ${cfg.label}</a>`;
+              }).join('');
+
+            const isFree = isLessonFree(gradeNum, cNum, lIdx);
+            const numDisplay = isFree
+              ? `<span class="lesson-num">${l.num}</span>`
+              : `<span class="lesson-num" style="color:#b388ff; font-weight:800;">VIP</span>`;
+
+            return `
+              <div class="lesson-row">
+                <div class="lesson-meta">
+                  <span class="lesson-dot" style="background:${ch.dotColor}"></span>
+                  <span class="lesson-title">${l.num}. ${l.title}</span>
+                  ${numDisplay}
+                </div>
+                <div class="lesson-links">${linksHTML}</div>
+              </div>`;
+          }).join('');
+
+          // Wrapper element (used for premium glow layer behind the card)
+          const wrapper = document.createElement('div');
+          wrapper.className = 'ch-card-wrapper';
+
+          const dotColor = ch.dotColor || '#2ec4b6';
+          const glowShadow = dotColor.startsWith('#') ? `${dotColor}4d` : dotColor;
+          const glowGradient = `linear-gradient(137deg, ${p0[0]} 0%, ${p1[1]} 50%, ${p2[1]} 100%)`;
+
+          wrapper.style.setProperty('--glow-color', dotColor);
+          wrapper.style.setProperty('--glow-shadow', glowShadow);
+          wrapper.style.setProperty('--glow-gradient', glowGradient);
+
+          // Glow element
+          const glow = document.createElement('div');
+          glow.className = 'ch-card-glow';
+          if (document.body.classList.contains('premium-theme')) {
+            glow.style.background = glowGradient;
+          }
+          wrapper.appendChild(glow);
+
+          // Card element
+          const card = document.createElement('div');
+          card.className = 'ch-card';
+          card.setAttribute('onclick', 'toggleCard(this)');
+
+          card.style.setProperty('--glow-color', dotColor);
+          card.style.setProperty('--glow-shadow', glowShadow);
+          card.style.setProperty('--glow-gradient', glowGradient);
+
+          if (document.body.classList.contains('premium-theme')) {
+            card.style.backgroundImage = `linear-gradient(#000000, #000000), ${glowGradient}`;
+            card.style.backgroundOrigin = 'border-box';
+            card.style.backgroundClip = 'padding-box, border-box';
+          }
+
+          card.innerHTML = `
+            <div class="ch-header">
+              <div class="ch-icon-wrap">${pillsHTML}</div>
+              <div class="ch-info">
+                <div class="ch-num">${ch.num}</div>
+                <div class="ch-title">${ch.title}</div>
+                <div class="tags">${tagsHTML}</div>
+              </div>
+              <div class="ch-arrow"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            </div>
+            <div class="lesson-list"><div class="lesson-inner">${lessonsHTML}</div></div>`;
+
+          wrapper.appendChild(card);
+          cardsList.appendChild(wrapper);
+        });
+
+        section.appendChild(cardsList);
+        contentEl.appendChild(section);
+      });
+    }
+
+    // ── SESSION / LOGIN ──
+    // === CẤU HÌNH SUPABASE & SHEETS API ===
+    const SUPABASE_URL = 'https://uztfmglzpfrwvamuggwx.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
+    const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
+    // ======================================
+    const SESSION_KEY = 'zphysics_session';
+
+    // ── HÀM TRỢ GIÚP CHO VIDEO PLAYER ──
+    function getYouTubeEmbedUrl(url) {
+      if (!url) return '';
+      let videoId = '';
+
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+
+      if (match && match[2].length === 11) {
+        videoId = match[2];
+      } else {
+        try {
+          const urlObj = new URL(url);
+          if (urlObj.hostname.includes('youtube.com')) {
+            videoId = urlObj.searchParams.get('v');
+          }
+        } catch (e) { }
+      }
+
+      if (videoId) {
+        return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+      }
+      return url;
+    }
+
+    function openVideoModal(url) {
+      const modal = document.getElementById('videoModal');
+      const iframe = document.getElementById('videoPlayer');
+      iframe.src = getYouTubeEmbedUrl(url);
+      modal.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeVideoModal() {
+      const modal = document.getElementById('videoModal');
+      const iframe = document.getElementById('videoPlayer');
+      modal.classList.remove('visible');
+      iframe.src = '';
+      document.body.style.overflow = '';
+    }
+
+    function getSession() {
+      try {
+        const s = localStorage.getItem(SESSION_KEY);
+        if (!s) return null;
+        const session = JSON.parse(s);
+        // Tự động hạ cấp phiên đăng nhập cục bộ nếu đã hết hạn premium
+        if (session.premium && session.premium_until) {
+          const expDate = new Date(session.premium_until);
+          if (expDate < new Date()) {
+            session.premium = false;
+            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+          }
+        }
+        return session;
+      } catch { return null; }
+    }
+
+    function saveSession(gmail, ten, premium, premiumUntil = null) {
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ 
+        gmail, 
+        ten, 
+        premium: !!premium, 
+        premium_until: premiumUntil 
+      }));
+    }
+
+    function clearSession() {
+      localStorage.removeItem(SESSION_KEY);
+    }
+
+    function showApp(ten, premium) {
+      const isPremium = premium !== undefined ? !!premium : (getSession() ? !!getSession().premium : false);
+      const statusEl = document.getElementById('popupStatus');
+
+      if (isPremium) {
+        document.body.classList.add('premium-theme');
+        document.getElementById('greetingText').innerHTML = `Xin chào, ${ten} <span style="background: linear-gradient(135deg, #ffe27a, #d4af37); color: #000; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; margin-left: 6px; box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3); display: inline-block; vertical-align: middle;">PREMIUM</span>`;
+        document.getElementById('popupName').innerHTML = `${ten} <span style="background: linear-gradient(135deg, #ffe27a, #d4af37); color: #000; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 20px; display: inline-block; vertical-align: middle; margin-left: 4px;">PREMIUM</span>`;
+
+        // Hiển thị thời hạn sử dụng Premium
+        const session = getSession();
+        if (statusEl) {
+          if (session && session.premium_until) {
+            const date = new Date(session.premium_until);
+            const dateStr = date.toLocaleDateString('vi-VN');
+            const timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            statusEl.textContent = `Hạn dùng: ${dateStr} ${timeStr}`;
+            statusEl.style.color = '#7dd3fc';
+          } else {
+            statusEl.textContent = 'Hạn dùng: Trọn đời ♾️';
+            statusEl.style.color = '#ffe27a';
+          }
+        }
+
+        // Ẩn banner quảng cáo Premium nếu đã nâng cấp
+        const banner = document.querySelector('.premium-banner');
+        if (banner) banner.style.display = 'none';
+
+        // Đổi trạng thái nút bấm trong popup
+        const pBtn = document.querySelector('.premium-btn-popup');
+        if (pBtn) {
+          pBtn.innerHTML = '💎Premium';
+          pBtn.style.pointerEvents = 'none';
+          pBtn.style.background = 'linear-gradient(135deg, #2d3561, #121216)';
+          pBtn.style.color = '#ffe27a';
+          pBtn.style.border = '1px solid rgba(212,175,55,0.3)';
+          pBtn.style.boxShadow = 'none';
+        }
+
+        // Áp dụng kiểu viền phát sáng inline cho các thẻ chương
+        document.querySelectorAll('.ch-card-wrapper').forEach(wrapper => {
+          const glow = wrapper.querySelector('.ch-card-glow');
+          const card = wrapper.querySelector('.ch-card');
+          const glowGradient = wrapper.style.getPropertyValue('--glow-gradient');
+          if (glow && card && glowGradient) {
+            glow.style.background = glowGradient;
+            card.style.backgroundImage = `linear-gradient(#000000, #000000), ${glowGradient}`;
+            card.style.backgroundOrigin = 'border-box';
+            card.style.backgroundClip = 'padding-box, border-box';
+          }
+        });
+      } else {
+        document.body.classList.remove('premium-theme');
+        document.getElementById('greetingText').textContent = `Xin chào, ${ten} 👋`;
+        document.getElementById('popupName').textContent = ten;
+
+        if (statusEl) {
+          statusEl.textContent = 'Gói: Miễn phí';
+          statusEl.style.color = '#a1a1aa';
+        }
+
+        const banner = document.querySelector('.premium-banner');
+        if (banner) banner.style.display = 'flex';
+
+        const pBtn = document.querySelector('.premium-btn-popup');
+        if (pBtn) {
+          pBtn.innerHTML = '👑 Nâng cấp Premium';
+          pBtn.style.pointerEvents = 'auto';
+          pBtn.style.background = 'linear-gradient(135deg, #ffe27a, #d4af37)';
+          pBtn.style.color = '#000';
+          pBtn.style.border = 'none';
+          pBtn.style.boxShadow = '0 4px 12px rgba(212, 175, 55, 0.25)';
+        }
+
+        // Xóa kiểu viền phát sáng inline để trở về giao diện Free gốc
+        document.querySelectorAll('.ch-card-wrapper').forEach(wrapper => {
+          const glow = wrapper.querySelector('.ch-card-glow');
+          const card = wrapper.querySelector('.ch-card');
+          if (glow) glow.style.background = '';
+          if (card) {
+            card.style.backgroundImage = '';
+            card.style.backgroundOrigin = '';
+            card.style.backgroundClip = '';
+          }
+        });
+      }
+
+      const session = getSession();
+      document.getElementById('popupEmail').textContent = session ? session.gmail : '';
+      const overlay = document.getElementById('loginOverlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.style.display = 'none', 400);
+    }
+
+    function showLogin() {
+      const overlay = document.getElementById('loginOverlay');
+      overlay.style.display = 'flex';
+      overlay.classList.remove('hiding');
+    }
+
+    let isRegistering = false; // Biến đánh dấu đang trong trạng thái đăng ký tài khoản mới
+
+    function cancelRegistration() {
+      isRegistering = false;
+      const emailInput = document.getElementById('loginEmail');
+      const nameInput = document.getElementById('loginName');
+      const nameWrap = document.getElementById('loginNameWrap');
+      const subtitleEl = document.getElementById('loginSubtitle');
+      const btn = document.getElementById('loginBtn');
+      const errorEl = document.getElementById('loginError');
+
+      emailInput.disabled = false;
+      nameWrap.style.display = 'none';
+      nameInput.value = '';
+      errorEl.classList.remove('visible');
+      subtitleEl.textContent = 'Đăng nhập bằng Gmail để tiếp tục';
+      btn.innerHTML = '🚀 Đăng nhập';
+      emailInput.focus();
+    }
+
+    async function doLogin() {
+      const emailInput = document.getElementById('loginEmail');
+      const nameInput = document.getElementById('loginName');
+      const nameWrap = document.getElementById('loginNameWrap');
+      const subtitleEl = document.getElementById('loginSubtitle');
+      const errorEl = document.getElementById('loginError');
+      const btn = document.getElementById('loginBtn');
+      const gmail = emailInput.value.trim().toLowerCase();
+
+      // Reset
+      errorEl.classList.remove('visible');
+      emailInput.classList.remove('error');
+      nameInput.classList.remove('error');
+
+      if (!gmail) {
+        errorEl.textContent = '⚠️ Vui lòng nhập Gmail';
+        errorEl.classList.add('visible');
+        emailInput.classList.add('error');
+        emailInput.style.animation = 'shakeX 0.5s ease';
+        setTimeout(() => emailInput.style.animation = '', 500);
+        emailInput.focus();
+        return;
+      }
+
+      // Xử lý khi đang ở giao diện đăng ký học sinh mới
+      if (isRegistering) {
+        const fullName = nameInput.value.trim();
+        if (!fullName) {
+          errorEl.textContent = '⚠️ Vui lòng nhập Họ và Tên để kích hoạt';
+          errorEl.classList.add('visible');
+          nameInput.classList.add('error');
+          nameInput.style.animation = 'shakeX 0.5s ease';
+          setTimeout(() => nameInput.style.animation = '', 500);
+          nameInput.focus();
+          return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="login-spinner"></span> Đang kích hoạt...';
+
+        try {
+          const regUrl = `${SHEETS_API_URL}?action=registerStudent&gmail=${encodeURIComponent(gmail)}&name=${encodeURIComponent(fullName)}`;
+          const response = await fetch(regUrl);
+          if (!response.ok) throw new Error('Không thể kết nối Web App để kích hoạt');
+          const result = await response.json();
+
+          if (result && result.success) {
+            saveSession(gmail, result.ten || fullName, false); // Mới đăng ký mặc định là Free (premium = false)
+            showApp(result.ten || fullName, false);
+
+            // Khôi phục trạng thái form đăng ký
+            isRegistering = false;
+            nameWrap.style.display = 'none';
+            emailInput.disabled = false;
+            subtitleEl.textContent = 'Đăng nhập bằng Gmail để tiếp tục';
+          } else {
+            throw new Error(result.error || result.message || 'Lỗi xử lý kích hoạt.');
+          }
+        } catch (err) {
+          console.error(err);
+          errorEl.textContent = '❌ Lỗi kích hoạt: ' + (err.message || 'Lỗi mạng, hãy thử lại.');
+          errorEl.classList.add('visible');
+        } finally {
+          btn.disabled = false;
+          if (isRegistering) {
+            btn.innerHTML = '✨ Kích hoạt tài khoản Free';
+          }
+        }
+        return;
+      }
+
+      // Trạng thái đăng nhập kiểm tra thông thường
+      btn.disabled = true;
+      btn.innerHTML = '<span class="login-spinner"></span> Đang kiểm tra...';
+
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/students?email=eq.${encodeURIComponent(gmail)}&select=*`;
+        const res = await fetch(url, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const students = await res.json();
+
+        if (students && students.length > 0) {
+          const student = students[0];
+          const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
+          saveSession(gmail, student.full_name || gmail, isPremium, student.premium_until);
+          showApp(student.full_name || gmail, isPremium);
+        } else {
+          // Gmail chưa tồn tại trong hệ thống -> Mở form đăng ký tự động
+          isRegistering = true;
+          emailInput.disabled = true; // Khóa trường email để tránh đổi khi đang nhập tên
+          nameWrap.style.display = 'block';
+          subtitleEl.innerHTML = '<span style="color:var(--teal); font-weight:800;">TÀI KHOẢN MỚI</span><br>Nhập Họ & Tên của em để kích hoạt tài khoản Free';
+          btn.innerHTML = '✨ Kích hoạt tài khoản Free';
+          btn.disabled = false; // Kích hoạt lại nút bấm để học sinh bấm đăng ký
+          nameInput.focus();
+        }
+      } catch (err) {
+        console.error(err);
+        errorEl.textContent = '⚠️ Lỗi kết nối. Vui lòng thử lại.';
+        errorEl.classList.add('visible');
+      } finally {
+        if (!isRegistering) {
+          btn.disabled = false;
+          btn.innerHTML = '🚀 Đăng nhập';
+        }
+      }
+    }
+
+    function doLogout() {
+      clearSession();
+      document.body.classList.remove('premium-theme');
+      document.getElementById('userPopup').classList.remove('visible');
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginError').classList.remove('visible');
+
+      // Hủy trạng thái đăng ký nếu đang dở dang
+      cancelRegistration();
+
+      switchGrade(0); // Reset về Lớp 10 khi đăng xuất để tránh giao diện trống
+      showLogin();
+    }
+
+    // ── Xử lý popup avatar: chỉ dùng 1 listener duy nhất ──
+    document.addEventListener('click', function (e) {
+      const popup = document.getElementById('userPopup');
+      // Click vào avatar (hoặc bất kỳ phần tử con nào của nó trừ popup)
+      if (e.target.closest('#avatarBtn') && !e.target.closest('#userPopup')) {
+        popup.classList.toggle('visible');
+        return;
+      }
+      // Click vào nút đăng xuất
+      if (e.target.closest('#logoutBtn')) {
+        doLogout();
+        return;
+      }
+      // Click ra ngoài → đóng popup
+      if (!e.target.closest('#userPopup')) {
+        popup.classList.remove('visible');
+      }
+    });
+
+    // ── HỖ TRỢ XEM THỬ DEMO KHÔNG CẦN DEPLOY GOOGLE SHEETS ──
+    const urlParams = new URLSearchParams(window.location.search);
+    const demoMode = urlParams.get('demo');
+
+    if (demoMode === 'premium') {
+      saveSession('demo_premium@zphysics.vn', 'Demo Premium Student', true);
+      showApp('Demo Premium Student', true);
+    } else if (demoMode === 'free') {
+      saveSession('demo_free@zphysics.vn', 'Demo Free Student', false);
+      showApp('Demo Free Student', false);
+    } else {
+      // ── Khởi động thực tế: kiểm tra session và xác thực trực tuyến ──
+      const existingSession = getSession();
+      if (existingSession && existingSession.gmail) {
+        if (existingSession.gmail.startsWith('demo_')) {
+          // Bỏ qua xác thực online với tài khoản demo để dễ dàng kiểm thử
+          showApp(existingSession.ten, existingSession.premium);
+        } else {
+          const emailInput = document.getElementById('loginEmail');
+          const btn = document.getElementById('loginBtn');
+          const errorEl = document.getElementById('loginError');
+
+          // Điền sẵn email và hiển thị trạng thái đang xác thực
+          emailInput.value = existingSession.gmail;
+          emailInput.disabled = true;
+          btn.disabled = true;
+          btn.innerHTML = '<span class="login-spinner"></span> Đang xác thực...';
+
+          const checkUrl = `${SUPABASE_URL}/rest/v1/students?email=eq.${encodeURIComponent(existingSession.gmail)}&select=*`;
+          fetch(checkUrl, {
+            headers: {
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            }
+          })
+            .then(res => {
+              if (!res.ok) throw new Error('HTTP ' + res.status);
+              return res.json();
+            })
+            .then(students => {
+              if (students && students.length > 0) {
+                const student = students[0];
+                const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
+                saveSession(existingSession.gmail, student.full_name || existingSession.gmail, isPremium, student.premium_until);
+                showApp(student.full_name || existingSession.gmail, isPremium);
+              } else {
+                // Không hợp lệ (đã bị xóa khỏi Database)
+                clearSession();
+                emailInput.value = '';
+                emailInput.disabled = false;
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Đăng nhập';
+                errorEl.textContent = '❌ Tài khoản của em đã bị khóa hoặc xóa khỏi hệ thống.';
+                errorEl.classList.add('visible');
+              }
+            })
+            .catch(err => {
+              console.warn('Lỗi kết nối khi xác thực, cho phép sử dụng phiên offline:', err);
+              // Gặp lỗi mạng -> Cho phép vào app bình thường
+              showApp(existingSession.ten, existingSession.premium);
+            });
+        }
+      }
+    }
+    // Nếu chưa login → overlay tự hiện (mặc định display: flex)
+
+    // ── Fetch JSON + Google Sheets links và khởi động ──
+    async function initApp() {
+      try {
+        // Tải baihoc.json trước
+        const baihocPromise = fetch('baihoc.json').then(res => {
+          if (!res.ok) throw new Error('Không thể tải baihoc.json');
+          return res.json();
+        });
+
+        // Tải danh sách đề thi luyện đề VIP từ Supabase
+        const luyendePromise = fetch(`${SUPABASE_URL}/rest/v1/exams?select=*`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        })
+          .then(async res => {
+            if (!res.ok) throw new Error('Không thể tải đề từ Supabase');
+            const data = await res.json();
+            return data.map(item => ({
+              ...item,
+              desc: item.description, // Khớp trường desc mà frontend sử dụng
+              lop: item.grade,         // Khớp trường lop để phân chia theo lớp 10, 11, 12
+              pdfUrl: item.pdf_url,     // Khớp trường pdfUrl
+              videoUrl: item.video_url, // Khớp trường videoUrl
+              mcAnswers: item.mc_answers,
+              tfAnswers: item.tf_answers,
+              saAnswers: item.sa_answers
+            }));
+          })
+          .catch(err => {
+            console.warn('Lỗi tải đề từ Supabase, chuyển sang dùng luyende.json offline:', err);
+            // Fallback sang luyende.json cục bộ
+            return fetch('luyende.json?v=' + Date.now())
+              .then(res => res.json())
+              .catch(() => []);
+          });
+
+        // Tải các link động từ Supabase
+        const linksPromise = fetch(`${SUPABASE_URL}/rest/v1/lessons?select=*`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        })
+          .then(async res => {
+            if (!res.ok) throw new Error('Không thể tải link từ Supabase');
+            const data = await res.json();
+            return data.map(item => ({
+              lop: item.grade,
+              bai: item.title,
+              video: item.video_url,
+              baiTap: item.exercise_url
+            }));
+          })
+          .catch(err => {
+            console.warn('Lỗi tải Supabase lessons links:', err);
+            return [];
+          });
+
+        const [baihocData, sheetLinks, luyendeData] = await Promise.all([baihocPromise, linksPromise, luyendePromise]);
+
+        if (luyendeData && luyendeData.length > 0) {
+          mockExams = luyendeData;
+        }
+
+        // Trộn các link từ Sheet vào cấu trúc baihoc.json
+        if (sheetLinks && sheetLinks.length > 0) {
+          baihocData.forEach(gradeObj => {
+            const gNum = gradeObj.grade.match(/\d+/) ? gradeObj.grade.match(/\d+/)[0] : '';
+
+            gradeObj.chapters.forEach(ch => {
+              ch.lessons.forEach(l => {
+                const matched = sheetLinks.find(sl => {
+                  if (!sl.lop || !sl.bai) return false;
+                  const slLopNum = String(sl.lop).match(/\d+/) ? String(sl.lop).match(/\d+/)[0] : '';
+                  if (slLopNum !== gNum) return false;
+
+                  const slBaiNum = String(sl.bai).match(/\d+/) ? String(sl.bai).match(/\d+/)[0] : '';
+                  const lNumClean = String(l.num).match(/\d+/) ? String(l.num).match(/\d+/)[0] : '';
+                  return slBaiNum && lNumClean && parseInt(slBaiNum, 10) === parseInt(lNumClean, 10);
+                });
+
+                if (matched) {
+                  if (!l.links) l.links = {};
+                  if (matched.video && matched.video.trim() !== '' && matched.video.trim() !== '#') {
+                    l.links.video = matched.video.trim();
+                  }
+                  if (matched.baiTap && matched.baiTap.trim() !== '' && matched.baiTap.trim() !== '#') {
+                    l.links.baiTap = matched.baiTap.trim();
+                  }
+                }
+              });
+            });
+          });
+        }
+
+        renderAll(baihocData);
+      } catch (err) {
+        console.error(err);
+        document.getElementById('gradeContent').innerHTML =
+          `<p style="color:#e53935;text-align:center;padding:40px 24px;font-weight:700">⚠️ Không tải được dữ liệu bài học.<br><small style="font-weight:600;opacity:.7">${err.message || 'Lỗi kết nối'}</small></p>`;
+      }
+    }
+
+    initApp();
+  </script>
+</body>
+
+</html>

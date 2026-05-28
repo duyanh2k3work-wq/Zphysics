@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zphysics - Hệ thống Vật lí THPT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f0f4ff;
+      --card: rgba(255, 255, 255, 0.75);
+      --card-solid: #ffffff;
+      --glass: rgba(255, 255, 255, 0.55);
+      --border: rgba(255, 255, 255, 0.8);
+      --shadow: rgba(120, 140, 200, 0.18);
+      --text: #2d3561;
+      --muted: #8e97c5;
+      --teal: #2ec4b6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text);
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 10% 0%, #c8d8ff 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 10%, #ffd6e8 0%, transparent 55%),
+        radial-gradient(ellipse 40% 50% at 80% 90%, #c8f5f2 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 10% 85%, #ffe8cc 0%, transparent 55%),
+        #f0f4ff;
+      pointer-events: none;
+    }
+
+    .app {
+      position: relative; z-index: 1;
+      max-width: 460px; margin: 0 auto;
+      padding: 0 0 48px;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      padding: 52px 24px 6px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header-left h2 { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; }
+    .header-left h1 { font-size: 28px; font-weight: 900; color: var(--text); margin-top: 2px; line-height: 1.2; }
+    .header-left h1 span { color: var(--teal); }
+
+    .avatar-btn {
+      width: 48px; height: 48px; border-radius: 18px;
+      background: var(--card); border: 2px solid var(--border);
+      box-shadow: 0 4px 16px var(--shadow);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+    }
+    .avatar-btn:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+    .avatar-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
+
+    /* ── GRADE TABS ── */
+    .grade-strip {
+      padding: 10px 20px 20px;
+      display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+    }
+    .grade-strip::-webkit-scrollbar { display: none; }
+
+    .grade-pill {
+      flex-shrink: 0; padding: 9px 22px;
+      border-radius: 50px; cursor: pointer;
+      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      background: var(--glass); color: var(--muted);
+      border: 1.5px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+    .grade-pill.active {
+      background-size: 200% 200%;
+      animation: shimmer 3s ease infinite;
+    }
+    .grade-pill.grade-0.active {
+      background-image: linear-gradient(135deg, #43a047, #81c784, #43a047);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 6px 20px rgba(67, 160, 71, 0.4);
+      transform: scale(1.05);
+    }
+    .grade-pill.grade-1.active {
+      background-image: linear-gradient(135deg, #f9a825, #ffd54f, #f9a825);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 6px 20px rgba(249, 168, 37, 0.4);
+      transform: scale(1.05);
+    }
+    .grade-pill.grade-2.active {
+      background-image: linear-gradient(135deg, #e53935, #ef9a9a, #e53935);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 6px 20px rgba(229, 57, 53, 0.4);
+      transform: scale(1.05);
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      padding: 4px 24px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-label h3 { font-size: 19px; font-weight: 900; color: var(--text); }
+
+    /* ── CHAPTER CARDS ── */
+    .cards-list { padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
+
+    .ch-card {
+      border-radius: 24px; overflow: hidden;
+      background: var(--card-solid);
+      box-shadow: 0 4px 24px var(--shadow);
+      border: 1.5px solid var(--border);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+      animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    .ch-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px var(--shadow);
+    }
+    .ch-card:nth-child(1) { animation-delay: 0.04s; }
+    .ch-card:nth-child(2) { animation-delay: 0.08s; }
+    .ch-card:nth-child(3) { animation-delay: 0.12s; }
+    .ch-card:nth-child(4) { animation-delay: 0.16s; }
+    .ch-card:nth-child(5) { animation-delay: 0.20s; }
+    .ch-card:nth-child(6) { animation-delay: 0.24s; }
+    .ch-card:nth-child(7) { animation-delay: 0.28s; }
+    .ch-card:active { transform: scale(0.98) translateY(0); }
+
+    .ch-header {
+      padding: 16px 18px; display: flex; align-items: center; gap: 14px;
+      cursor: pointer; user-select: none;
+    }
+
+    .ch-icon-wrap {
+      width: 56px; height: 56px; border-radius: 18px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: visible;
+    }
+
+    .pill { width: 38px; height: 20px; border-radius: 10px; position: absolute; transform-origin: center; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .pill-a { transform: rotate(-30deg) translate(-4px, -4px); opacity: 0.9; }
+    .pill-b { transform: rotate(50deg) translate(4px, 2px); opacity: 0.85; width: 22px; height: 22px; border-radius: 11px; }
+    .pill-c { transform: rotate(15deg) translate(0px, 6px); opacity: 0.8; width: 28px; height: 14px; border-radius: 7px; }
+    .ch-card:hover .pill-a { transform: rotate(-40deg) translate(-6px, -8px) scale(1.1); }
+    .ch-card:hover .pill-b { transform: rotate(65deg) translate(6px, 0px) scale(1.15); }
+    .ch-card:hover .pill-c { transform: rotate(5deg) translate(-2px, 8px) scale(1.05); }
+
+    .ch-info { flex: 1; min-width: 0; }
+    .ch-num { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 3px; }
+    .ch-title { font-size: 16px; font-weight: 900; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .tag { padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; border: 1.5px solid currentColor; opacity: 0.85; }
+
+    .ch-arrow { flex-shrink: 0; }
+    .ch-arrow svg { width: 18px; height: 18px; stroke: var(--muted); stroke-width: 2.5; fill: none; transition: 0.3s; }
+    .ch-card.open .ch-arrow svg { transform: rotate(180deg); }
+
+    /* ── LESSON LIST ── */
+    .lesson-list {
+      max-height: 0; overflow: hidden; opacity: 0;
+      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+      background: rgba(240, 244, 255, 0.55);
+    }
+    .ch-card.open .lesson-list {
+      max-height: 4000px; opacity: 1;
+      transition: max-height 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease 0.1s;
+    }
+
+    .lesson-inner { padding: 6px 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+
+    /* ── LESSON ROW ── */
+    .lesson-row {
+      background: var(--card-solid);
+      border-radius: 18px;
+      box-shadow: 0 2px 10px rgba(120, 140, 200, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
+    .lesson-row:hover {
+      box-shadow: 0 8px 24px var(--shadow);
+      transform: translateY(-2px) scale(1.01);
+    }
+
+    .lesson-meta {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px 6px;
+    }
+    .lesson-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .lesson-title { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; line-height: 1.4; }
+    .lesson-num { font-size: 11px; font-weight: 800; color: var(--muted); white-space: nowrap; }
+
+    /* ── LINK BUTTONS ── */
+    .lesson-links {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      padding: 0 14px 11px 32px;
+    }
+    .lnk {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 11px; border-radius: 20px;
+      font-size: 11px; font-weight: 800;
+      text-decoration: none;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .lnk svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .lnk:hover { transform: translateY(-1px); filter: brightness(1.1); }
+
+    /* Link colour variants */
+    .lnk-video       { background: #ffebee; color: #c62828; }
+    .lnk-baiTap      { background: #e3f2fd; color: #1565c0; }
+    .lnk-tracNghiem  { background: #fff3e0; color: #e65100; }
+    .lnk-dungSai     { background: #fce4ec; color: #c62828; }
+    .lnk-traLoiNgan  { background: #e8f5e9; color: #2e7d32; }
+    .lnk-phieuDapAn  { background: #ede7f6; color: #4527a0; }
+
+    /* ── GRADE SECTIONS ── */
+    .grade-section { display: none; }
+    .grade-section.active {
+      display: block;
+      animation: sectionFadeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes sectionFadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ── LOADING STATE ── */
+    .loading {
+      text-align: center; padding: 60px 24px;
+      color: var(--muted); font-size: 15px; font-weight: 700;
+    }
+    .loading-dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--teal); margin: 0 3px;
+      animation: bounce 1.2s infinite;
+    }
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-8px); opacity: 1; }
+    }
+
+    /* ── RESPONSIVE DESIGN ── */
+    @media (min-width: 768px) {
+      .app { max-width: 860px; padding-bottom: 64px; }
+      .header { padding: 64px 32px 20px; }
+      .header-left h1 { font-size: 36px; margin-top: 4px; }
+      .header-left h2 { font-size: 15px; }
+      .avatar-btn { width: 56px; height: 56px; border-radius: 20px; }
+      .grade-strip { padding: 16px 32px 32px; justify-content: center; }
+      .grade-pill { font-size: 16px; padding: 10px 28px; }
+      .section-label { padding: 12px 32px 24px; }
+      .section-label h3 { font-size: 22px; }
+      .cards-list { 
+        padding: 0 32px; 
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 24px; 
+        align-items: start;
+      }
+      .ch-header { padding: 20px 24px; }
+      .ch-title { font-size: 18px; }
+    }
+
+    @media (min-width: 1024px) {
+      .app { max-width: 1200px; }
+      .cards-list { grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <div class="header">
+      <div class="header-left">
+        <h2>Xin chào, bạn 👋</h2>
+        <h1>Z<span>physics</span></h1>
+      </div>
+      <div class="avatar-btn">
+        <img src="https://i.postimg.cc/44LHDhL1/avatar.png" alt="Z">
+      </div>
+    </div>
+
+    <div class="grade-strip" id="gradeTabs">
+      <!-- Tabs được render động từ JSON -->
+    </div>
+
+    <!-- Grade sections được render động từ baihoc.json -->
+    <div id="gradeContent">
+      <div class="loading">
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Định nghĩa label và icon cho từng loại link ──
+    const LINK_CONFIG = {
+      video:      { label: 'Video bài học', cls: 'lnk-video',      icon: '▶️' },
+      baiTap:     { label: 'Bài tập',       cls: 'lnk-baiTap',     icon: '✏️' },
+      tracNghiem: { label: 'Trắc nghiệm',   cls: 'lnk-tracNghiem', icon: '☑️' },
+      dungSai:    { label: 'Đúng / Sai',    cls: 'lnk-dungSai',    icon: '⚖️' },
+      traLoiNgan: { label: 'Trả lời ngắn',  cls: 'lnk-traLoiNgan', icon: '✍️' },
+      phieuDapAn: { label: 'Phiếu đáp án',  cls: 'lnk-phieuDapAn', icon: '📋' }
+    };
+
+    let activeGrade = 0;
+
+    // ── Chuyển lớp ──
+    function switchGrade(idx) {
+      activeGrade = idx;
+      document.querySelectorAll('.grade-pill').forEach((b, i) => {
+        b.classList.toggle('active', i === idx);
+      });
+      document.querySelectorAll('.grade-section').forEach((s, i) => {
+        s.classList.toggle('active', i === idx);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── Toggle card ──
+    function toggleCard(card) {
+      const list = card.querySelector('.lesson-list');
+      const isOpen = card.classList.contains('open');
+      card.closest('.cards-list').querySelectorAll('.ch-card.open').forEach(c => {
+        if (c !== card) {
+          c.classList.remove('open');
+          c.querySelector('.lesson-list').style.maxHeight = '0';
+        }
+      });
+      if (isOpen) {
+        card.classList.remove('open');
+        list.style.maxHeight = '0';
+      } else {
+        card.classList.add('open');
+        list.style.maxHeight = list.scrollHeight + 'px';
+      }
+    }
+
+    // ── Render toàn bộ giao diện từ JSON ──
+    function renderAll(data) {
+      const tabsEl = document.getElementById('gradeTabs');
+      const contentEl = document.getElementById('gradeContent');
+      tabsEl.innerHTML = '';
+      contentEl.innerHTML = '';
+
+      data.forEach((gradeObj, gIdx) => {
+        // --- Tab button ---
+        const btn = document.createElement('button');
+        btn.className = 'grade-pill grade-' + gIdx + (gIdx === 0 ? ' active' : '');
+        btn.textContent = gradeObj.grade;
+        btn.onclick = () => switchGrade(gIdx);
+        tabsEl.appendChild(btn);
+
+        // --- Section container ---
+        const section = document.createElement('div');
+        section.className = 'grade-section' + (gIdx === 0 ? ' active' : '');
+        section.id = gradeObj.id;
+
+        // Section label
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'section-label';
+        labelDiv.innerHTML = `<h3>Danh sách chương — ${gradeObj.grade}</h3>`;
+        section.appendChild(labelDiv);
+
+        // Cards list
+        const cardsList = document.createElement('div');
+        cardsList.className = 'cards-list';
+
+        gradeObj.chapters.forEach(ch => {
+          const [p0, p1, p2] = ch.pillColors;
+
+          // Pill icons
+          const pillsHTML = `
+            <div class="pill pill-a" style="background:linear-gradient(135deg,${p0[0]},${p0[1]})"></div>
+            <div class="pill pill-b" style="background:linear-gradient(135deg,${p1[0]},${p1[1]})"></div>
+            <div class="pill pill-c" style="background:linear-gradient(135deg,${p2[0]},${p2[1]})"></div>`;
+
+          // Tags
+          const tagsHTML = ch.tags.map(t =>
+            `<span class="tag" style="color:${t.color};border-color:${t.color}30;background:${t.color}0d">${t.label}</span>`
+          ).join('');
+
+          // Lesson rows
+          const lessonsHTML = ch.lessons.map(l => {
+            // Build link buttons
+            const linksHTML = Object.entries(l.links || {})
+              .filter(([key, url]) => key !== 'baiTap')
+              .map(([key, url]) => {
+              const cfg = LINK_CONFIG[key];
+              if (!cfg || url === '#') {
+                // Hiện dạng disabled nếu url là '#'
+                return `<span class="lnk ${cfg ? cfg.cls : ''}" style="opacity:0.4;cursor:default">${cfg ? cfg.icon + ' ' + cfg.label : key}</span>`;
+              }
+              return `<a href="${url}" class="lnk ${cfg.cls}" target="_blank" onclick="event.stopPropagation()">${cfg.icon} ${cfg.label}</a>`;
+            }).join('');
+
+            return `
+              <div class="lesson-row">
+                <div class="lesson-meta">
+                  <span class="lesson-dot" style="background:${ch.dotColor}"></span>
+                  <span class="lesson-title">${l.num}. ${l.title}</span>
+                  <span class="lesson-num">${l.num}</span>
+                </div>
+                <div class="lesson-links">${linksHTML}</div>
+              </div>`;
+          }).join('');
+
+          // Card element
+          const card = document.createElement('div');
+          card.className = 'ch-card';
+          card.setAttribute('onclick', 'toggleCard(this)');
+          card.innerHTML = `
+            <div class="ch-header">
+              <div class="ch-icon-wrap">${pillsHTML}</div>
+              <div class="ch-info">
+                <div class="ch-num">${ch.num}</div>
+                <div class="ch-title">${ch.title}</div>
+                <div class="tags">${tagsHTML}</div>
+              </div>
+              <div class="ch-arrow"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            </div>
+            <div class="lesson-list"><div class="lesson-inner">${lessonsHTML}</div></div>`;
+
+          cardsList.appendChild(card);
+        });
+
+        section.appendChild(cardsList);
+        contentEl.appendChild(section);
+      });
+    }
+
+    // ── Fetch JSON và khởi động ──
+    fetch('baihoc.json')
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(data => renderAll(data))
+      .catch(err => {
+        console.error(err);
+        document.getElementById('gradeContent').innerHTML =
+          '<p style="color:#e53935;text-align:center;padding:40px 24px;font-weight:700">⚠️ Không tải được dữ liệu bài học.<br><small style="font-weight:600;opacity:.7">Hãy mở trang qua HTTP server (không phải file://).</small></p>';
+      });
+  </script>
+</body>
+
+</html>

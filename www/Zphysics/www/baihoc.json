@@ -1,0 +1,1420 @@
+[
+  {
+    "grade": "Vật lí 10",
+    "id": "g0",
+    "chapters": [
+      {
+        "num": "Chương I",
+        "title": "Mở đầu",
+        "tags": [
+          {
+            "label": "An toàn",
+            "color": "#607d8b"
+          },
+          {
+            "label": "Sai số",
+            "color": "#607d8b"
+          }
+        ],
+        "pillColors": [
+          [
+            "#b0bec5",
+            "#90a4ae"
+          ],
+          [
+            "#cfd8dc",
+            "#b0bec5"
+          ],
+          [
+            "#eceff1",
+            "#cfd8dc"
+          ]
+        ],
+        "dotColor": "#607d8b",
+        "lessons": [
+          {
+            "num": "01",
+            "title": "Làm quen với Vật lí",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "02",
+            "title": "Các quy tắc an toàn trong phòng thực hành Vật lí",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "03",
+            "title": "Thực hành tính sai số trong phép đo. Ghi kết quả đo",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      },
+      {
+        "num": "Chương II",
+        "title": "Động học",
+        "tags": [
+          {
+            "label": "Vận tốc",
+            "color": "#1e88e5"
+          },
+          {
+            "label": "Gia tốc",
+            "color": "#1e88e5"
+          }
+        ],
+        "pillColors": [
+          [
+            "#42a5f5",
+            "#1e88e5"
+          ],
+          [
+            "#90caf9",
+            "#64b5f6"
+          ],
+          [
+            "#bbdefb",
+            "#90caf9"
+          ]
+        ],
+        "dotColor": "#1e88e5",
+        "lessons": [
+          {
+            "num": "04",
+            "title": "Độ dịch chuyển và quãng đường đi được",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "05",
+            "title": "Tốc độ và vận tốc",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "06",
+            "title": "Thực hành: Đo tốc độ của vật chuyển động",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "07",
+            "title": "Đồ thị độ dịch chuyển - thời gian",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "08",
+            "title": "Chuyển động biến đổi. Gia tốc",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "09",
+            "title": "Chuyển động thẳng biến đổi đều",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "10",
+            "title": "Sự rơi tự do",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "11",
+            "title": "Thực hành: Đo gia tốc rơi tự do",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "12",
+            "title": "Chuyển động ném",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      },
+      {
+        "num": "Chương III",
+        "title": "Động lực học",
+        "tags": [
+          {
+            "label": "Newton",
+            "color": "#e53935"
+          },
+          {
+            "label": "Ma sát",
+            "color": "#e53935"
+          }
+        ],
+        "pillColors": [
+          [
+            "#ef5350",
+            "#e53935"
+          ],
+          [
+            "#ef9a9a",
+            "#e57373"
+          ],
+          [
+            "#ffcdd2",
+            "#ef9a9a"
+          ]
+        ],
+        "dotColor": "#e53935",
+        "lessons": [
+          {
+            "num": "13",
+            "title": "Tổng hợp và phân tích lực. Cân bằng lực",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "14",
+            "title": "Định luật 1 Newton",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "15",
+            "title": "Định luật 2 Newton",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "16",
+            "title": "Định luật 3 Newton",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "17",
+            "title": "Trọng lực và lực căng",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "18",
+            "title": "Lực ma sát",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "19",
+            "title": "Lực cản và lực nâng",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "20",
+            "title": "Một số ví dụ về cách giải bài toán động lực học",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "21",
+            "title": "Moment lực. Cân bằng của vật rắn",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "22",
+            "title": "Thực hành: Tổng hợp lực",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      },
+      {
+        "num": "Chương IV",
+        "title": "Năng lượng, Công, Công suất",
+        "tags": [
+          {
+            "label": "Cơ năng",
+            "color": "#fb8c00"
+          },
+          {
+            "label": "Hiệu suất",
+            "color": "#fb8c00"
+          }
+        ],
+        "pillColors": [
+          [
+            "#ffa726",
+            "#fb8c00"
+          ],
+          [
+            "#ffcc80",
+            "#ffb74d"
+          ],
+          [
+            "#ffe0b2",
+            "#ffcc80"
+          ]
+        ],
+        "dotColor": "#fb8c00",
+        "lessons": [
+          {
+            "num": "23",
+            "title": "Năng lượng. Công cơ học",
+            "links": {
+              "video": "#",
+              "baiTap": "https://docs.google.com/forms/d/1TV9vUg7kqi1rBJ2Y9qRIhuQ5tstlXOdohW0YA9jnIRI/edit#settings",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "24",
+            "title": "Công suất",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "25",
+            "title": "Động năng, thế năng",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "26",
+            "title": "Cơ năng và định luật bảo toàn cơ năng",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "27",
+            "title": "Hiệu suất",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      },
+      {
+        "num": "Chương V",
+        "title": "Động lượng",
+        "tags": [
+          {
+            "label": "Va chạm",
+            "color": "#8e24aa"
+          },
+          {
+            "label": "Bảo toàn",
+            "color": "#8e24aa"
+          }
+        ],
+        "pillColors": [
+          [
+            "#ab47bc",
+            "#8e24aa"
+          ],
+          [
+            "#ce93d8",
+            "#ba68c8"
+          ],
+          [
+            "#e1bee7",
+            "#ce93d8"
+          ]
+        ],
+        "dotColor": "#8e24aa",
+        "lessons": [
+          {
+            "num": "28",
+            "title": "Động lượng",
+            "links": {
+              "video": "#",
+              "baiTap": "https://docs.google.com/forms/d/1mRdNtH9xxuzHzvYcGpu91WU-XyKiUPGZopcIPYIlhtQ/edit",
+              "tracNghiem": "https://docs.google.com/forms/d/1yc7Kg27iXiaZDqXGqRNxuyrm6JKWgtsuDDVyCv-32-M/edit#settings",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "29",
+            "title": "Định luật bảo toàn động lượng",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "30",
+            "title": "Thực hành: Xác định động lượng của vật trước và sau va chạm",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      },
+      {
+        "num": "Chương VI",
+        "title": "Chuyển động tròn",
+        "tags": [
+          {
+            "label": "Hướng tâm",
+            "color": "#00acc1"
+          },
+          {
+            "label": "Gia tốc",
+            "color": "#00acc1"
+          }
+        ],
+        "pillColors": [
+          [
+            "#26c6da",
+            "#00acc1"
+          ],
+          [
+            "#80deea",
+            "#4dd0e1"
+          ],
+          [
+            "#b2ebf2",
+            "#80deea"
+          ]
+        ],
+        "dotColor": "#00acc1",
+        "lessons": [
+          {
+            "num": "31",
+            "title": "Động học của chuyển động tròn đều",
+            "links": {
+              "video": "#",
+              "baiTap": "https://docs.google.com/forms/d/1I8XnLsvedmG1Kb6mFynEIYsc_lJxxyljoRLrB1XFyFk/edit?chromeless=1",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "32",
+            "title": "Lực hướng tâm và gia tốc hướng tâm",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      },
+      {
+        "num": "Chương VII",
+        "title": "Biến dạng. Áp suất",
+        "tags": [
+          {
+            "label": "Vật rắn",
+            "color": "#43a047"
+          },
+          {
+            "label": "Chất lỏng",
+            "color": "#43a047"
+          }
+        ],
+        "pillColors": [
+          [
+            "#66bb6a",
+            "#43a047"
+          ],
+          [
+            "#a5d6a7",
+            "#81c784"
+          ],
+          [
+            "#c8e6c9",
+            "#a5d6a7"
+          ]
+        ],
+        "dotColor": "#43a047",
+        "lessons": [
+          {
+            "num": "33",
+            "title": "Biến dạng của vật rắn",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "34",
+            "title": "Khối lượng riêng. Áp suất chất lỏng",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": "Vật lí 11",
+    "id": "g1",
+    "chapters": [
+      {
+        "num": "Chương 1",
+        "title": "Dao động",
+        "tags": [
+          {
+            "label": "Điều hòa",
+            "color": "#e91e63"
+          },
+          {
+            "label": "Cộng hưởng",
+            "color": "#e91e63"
+          }
+        ],
+        "pillColors": [
+          [
+            "#f06292",
+            "#e91e63"
+          ],
+          [
+            "#f48fb1",
+            "#f06292"
+          ],
+          [
+            "#fce4ec",
+            "#f8bbd0"
+          ]
+        ],
+        "dotColor": "#e91e63",
+        "lessons": [
+          {
+            "num": "01",
+            "title": "Dao động điều hòa",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "02",
+            "title": "Mô tả dao động điều hòa",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "03",
+            "title": "Vận tốc, gia tốc trong dao động điều hòa",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "04",
+            "title": "Bài tập về dao động điều hòa",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "05",
+            "title": "Động năng. Thế năng. Sự chuyển hoá năng lượng",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "06",
+            "title": "Dao động tắt dần. Dao động cưỡng bức. Cộng hưởng",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "07",
+            "title": "Bài tập về sự chuyển năng lượng trong DĐĐH",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      },
+      {
+        "num": "Chương 2",
+        "title": "Sóng",
+        "tags": [
+          {
+            "label": "Giao thoa",
+            "color": "#512da8"
+          },
+          {
+            "label": "Sóng dừng",
+            "color": "#512da8"
+          }
+        ],
+        "pillColors": [
+          [
+            "#7e57c2",
+            "#512da8"
+          ],
+          [
+            "#b39ddb",
+            "#9575cd"
+          ],
+          [
+            "#ede7f6",
+            "#d1c4e9"
+          ]
+        ],
+        "dotColor": "#512da8",
+        "lessons": [
+          {
+            "num": "08",
+            "title": "Mô tả sóng",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "09",
+            "title": "Sóng ngang, sóng dọc, sự truyền năng lượng của sóng cơ",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "10",
+            "title": "Thực hành: Đo tần số của sóng âm",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "11",
+            "title": "Sóng điện từ",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "12",
+            "title": "Giao thoa sóng",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "13",
+            "title": "Sóng dừng",
+            "links": {
+              "video": "#",
+              "baiTap": "https://docs.google.com/forms/d/1H6w732YUjfRFEuj9XxKYq4xM3H7XVpdWDxvvgALbxqs/edit",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "14",
+            "title": "Bài tập về sóng",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "15",
+            "title": "Thực hành: Đo tốc độ truyền âm",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      },
+      {
+        "num": "Chương 3",
+        "title": "Điện trường",
+        "tags": [
+          {
+            "label": "Coulomb",
+            "color": "#00796b"
+          },
+          {
+            "label": "Tụ điện",
+            "color": "#00796b"
+          }
+        ],
+        "pillColors": [
+          [
+            "#26a69a",
+            "#00796b"
+          ],
+          [
+            "#80cbc4",
+            "#4db6ac"
+          ],
+          [
+            "#b2dfdb",
+            "#80cbc4"
+          ]
+        ],
+        "dotColor": "#00796b",
+        "lessons": [
+          {
+            "num": "16",
+            "title": "Lực tương tác giữa hai điện tích",
+            "links": {
+              "video": "#",
+              "baiTap": "https://docs.google.com/forms/d/1MBxaE8q-qdutwqSA-NecStxwp5LrgARQGzgyWJ0F5kw/edit",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "17",
+            "title": "Khái niệm điện trường",
+            "links": {
+              "video": "#",
+              "baiTap": "https://docs.google.com/forms/d/1cFxyj6dqKQXYahNQkOBj7dMj5DekiNvsb4C9I-Cqaa4/edit",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "18",
+            "title": "Điện trường đều",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "19",
+            "title": "Thế năng điện",
+            "links": {
+              "video": "#",
+              "baiTap": "https://docs.google.com/forms/d/11LYzo0Qr29N2lJ-NDVlKki_X23QV2ju-fTZQDU0pjno/edit",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "20",
+            "title": "Điện thế",
+            "links": {
+              "video": "#",
+              "baiTap": "https://docs.google.com/forms/d/1EHnWkmwEbdo2M7F5Y5ySCjVfWoh0WB0i-okzzV9t7c4/edit",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "21",
+            "title": "Tụ điện",
+            "links": {
+              "video": "#",
+              "baiTap": "https://docs.google.com/forms/d/1OhjohvK3pVz_Mjt9kSu4eM_rtJYv5j-zt-XNpAGHzCA/edit",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      },
+      {
+        "num": "Chương 4",
+        "title": "Dòng điện",
+        "tags": [
+          {
+            "label": "Ohm",
+            "color": "#f9a825"
+          },
+          {
+            "label": "Nguồn điện",
+            "color": "#f9a825"
+          }
+        ],
+        "pillColors": [
+          [
+            "#ffca28",
+            "#f9a825"
+          ],
+          [
+            "#ffe082",
+            "#ffd54f"
+          ],
+          [
+            "#fff8e1",
+            "#ffecb3"
+          ]
+        ],
+        "dotColor": "#f9a825",
+        "lessons": [
+          {
+            "num": "22",
+            "title": "Cường độ dòng điện",
+            "links": {
+              "video": "#",
+              "baiTap": "https://docs.google.com/forms/u/1/d/1Eat-pSsPv0W-OsS8XXIijBo2fhrYcsznyOJT8pzdonE/edit",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "23",
+            "title": "Điện trở. Định luật Ohm",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "24",
+            "title": "Nguồn điện",
+            "links": {
+              "video": "#",
+              "baiTap": "https://docs.google.com/forms/d/1rxZkRFlktiSUXMk8yzkr4cfE1oNEAtvIHBBi7qGTnE4/edit",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "25",
+            "title": "Năng lượng điện và công suất điện",
+            "links": {
+              "video": "#",
+              "baiTap": "https://docs.google.com/forms/d/1H_opfn1BSCXt5OY1cudcdI9cv-VF6OLEW-KyYPi3_Rw/edit",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "26",
+            "title": "Thực hành: Đo suất điện động và điện trở trong",
+            "links": {
+              "video": "#",
+              "baiTap": "#",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": "Vật lí 12",
+    "id": "g2",
+    "chapters": [
+      {
+        "num": "Chương I",
+        "title": "Vật lí nhiệt",
+        "tags": [
+          {
+            "label": "Nội năng",
+            "color": "#e64a19"
+          },
+          {
+            "label": "NĐLH",
+            "color": "#e64a19"
+          }
+        ],
+        "pillColors": [
+          [
+            "#ff7043",
+            "#e64a19"
+          ],
+          [
+            "#ff8a65",
+            "#ff7043"
+          ],
+          [
+            "#ffccbc",
+            "#ffab91"
+          ]
+        ],
+        "dotColor": "#e64a19",
+        "lessons": [
+          {
+            "num": "01",
+            "title": "Cấu trúc của chất. Sự chuyển thể",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d74b295fc56c94eb94d5c1",
+              "tracNghiem": "https://docs.google.com/forms/d/1C6YV_DQv9gWr8yBpwk4tUnz6psobdQ17hCS9BjF4hYI/edit#settings",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "02",
+            "title": "Nội năng. Định luật I của nhiệt động lực học",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d74f1f36884771e56fae9b",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "03",
+            "title": "Nhiệt độ. Thang nhiệt độ - nhiệt kế",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d74fe57e5a5a5b961fcac4",
+              "tracNghiem": "tracnghiem.html?quiz=cauhoi_12_c1_b03",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "04",
+            "title": "Nhiệt dung riêng",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d751793e387d1b68e6d7fe",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "05",
+            "title": "Nhiệt nóng chảy riêng",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d752f46deb3ba3edc4653c",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "06",
+            "title": "Nhiệt hoá hơi riêng",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d75491cb3b2665ef7287c3",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "07",
+            "title": "Bài tập về vật lí nhiệt",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7560314341ddbce4dea82",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      },
+      {
+        "num": "Chương II",
+        "title": "Khí lí tưởng",
+        "tags": [
+          {
+            "label": "Boyle",
+            "color": "#689f38"
+          },
+          {
+            "label": "Charles",
+            "color": "#689f38"
+          }
+        ],
+        "pillColors": [
+          [
+            "#9ccc65",
+            "#689f38"
+          ],
+          [
+            "#c5e1a5",
+            "#aed581"
+          ],
+          [
+            "#dcedc8",
+            "#c5e1a5"
+          ]
+        ],
+        "dotColor": "#689f38",
+        "lessons": [
+          {
+            "num": "08",
+            "title": "Mô hình động học phân tử chất khí",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7d8d8485c22497e45c9dd",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "09",
+            "title": "Định luật Boyle",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7dc5d09301c5dd2e9433f",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "10",
+            "title": "Định luật Charles",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7dee696b3150604db3b85",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "11",
+            "title": "Phương trình trạng thái của khí lí tưởng",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7dfe31cd92cce8ad248d2",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "12",
+            "title": "Áp suất khí theo mô hình động học phân tử. Quan hệ giữa động năng phân tử và nhiệt độ",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e23f09301c5dd2ed02b8",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "13",
+            "title": "Bài tập về khí lí tưởng",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e2919da8b13a380dd7bd",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      },
+      {
+        "num": "Chương III",
+        "title": "Từ trường",
+        "tags": [
+          {
+            "label": "Lực từ",
+            "color": "#3949ab"
+          },
+          {
+            "label": "Cảm ứng",
+            "color": "#3949ab"
+          }
+        ],
+        "pillColors": [
+          [
+            "#5c6bc0",
+            "#3949ab"
+          ],
+          [
+            "#9fa8da",
+            "#7986cb"
+          ],
+          [
+            "#e8eaf6",
+            "#c5cae9"
+          ]
+        ],
+        "dotColor": "#3949ab",
+        "lessons": [
+          {
+            "num": "14",
+            "title": "Từ trường",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e3b1d391ef15dfa88664",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "15",
+            "title": "Lực từ tác dụng lên dây dẫn mang dòng điện. Cảm ứng từ",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e3c590368c6fb2ba7a8a",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "16",
+            "title": "Từ thông. Hiện tượng cảm ứng điện từ",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e3b790368c6fb2ba852b",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "17",
+            "title": "Máy phát điện xoay chiều",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e3f790368c6fb2ba9701",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "18",
+            "title": "Ứng dụng hiện tượng cảm ứng điện từ",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e407c8b8f039549f8a6c",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "19",
+            "title": "Điện từ trường. Mô hình sóng điện từ",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e41dd391ef15dfa8c50e",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "20",
+            "title": "Bài tập về từ trường",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e43d8b3c292f679b0a6b",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      },
+      {
+        "num": "Chương IV",
+        "title": "Vật lí hạt nhân",
+        "tags": [
+          {
+            "label": "Phóng xạ",
+            "color": "#00897b"
+          },
+          {
+            "label": "Phân hạch",
+            "color": "#00897b"
+          }
+        ],
+        "pillColors": [
+          [
+            "#26a69a",
+            "#00897b"
+          ],
+          [
+            "#d4e157",
+            "#c0ca33"
+          ],
+          [
+            "#f0f4c3",
+            "#e6ee9c"
+          ]
+        ],
+        "dotColor": "#00897b",
+        "lessons": [
+          {
+            "num": "21",
+            "title": "Cấu trúc hạt nhân",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e450d391ef15dfa8db54",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "22",
+            "title": "Phản ứng hạt nhân và năng lượng liên kết",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e4621868eead959ae9bd",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "23",
+            "title": "Hiện tượng phóng xạ",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e4a2d391ef15dfa90090",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "24",
+            "title": "Công nghiệp hạt nhân",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e4bb9da8b13a380ef6e8",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          },
+          {
+            "num": "25",
+            "title": "Bài tập về vật lí hạt nhân",
+            "links": {
+              "video": "#",
+              "baiTap": "https://www.overleaf.com/project/69d7e4ded391ef15dfa919a5",
+              "tracNghiem": "#",
+              "dungSai": "#",
+              "traLoiNgan": "#"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

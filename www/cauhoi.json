@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "question": "Một vật có khối lượng $m = 2\\,\\text{kg}$ chuyển động với vận tốc $v = 3\\,\\text{m/s}$. Động năng của vật bằng bao nhiêu?",
+    "answers": [
+      {"key": "A", "text": "$W_đ = 3\\,\\text{J}$"},
+      {"key": "B", "text": "$W_đ = 6\\,\\text{J}$"},
+      {"key": "C", "text": "$W_đ = 9\\,\\text{J}$"},
+      {"key": "D", "text": "$W_đ = 12\\,\\text{J}$"}
+    ],
+    "correct": "C",
+    "explanation": "Động năng: $W_đ = \\dfrac{1}{2}mv^2 = \\dfrac{1}{2} \\cdot 2 \\cdot 3^2 = 9\\,\\text{J}$"
+  },
+  {
+    "id": 2,
+    "question": "Một lực $\\vec{F}$ có độ lớn $10\\,\\text{N}$ tác dụng lên vật theo phương ngang, làm vật dịch chuyển $5\\,\\text{m}$ cùng phương lực. Công của lực $\\vec{F}$ là:",
+    "answers": [
+      {"key": "A", "text": "$A = 2\\,\\text{J}$"},
+      {"key": "B", "text": "$A = 15\\,\\text{J}$"},
+      {"key": "C", "text": "$A = 50\\,\\text{J}$"},
+      {"key": "D", "text": "$A = 500\\,\\text{J}$"}
+    ],
+    "correct": "C",
+    "explanation": "Công của lực: $A = F \\cdot d \\cdot \\cos\\alpha = 10 \\cdot 5 \\cdot \\cos 0° = 50\\,\\text{J}$"
+  },
+  {
+    "id": 3,
+    "question": "Gia tốc rơi tự do trên bề mặt Trái Đất xấp xỉ $g \\approx 10\\,\\text{m/s}^2$. Trọng lực tác dụng lên vật có khối lượng $m = 500\\,\\text{g}$ là:",
+    "answers": [
+      {"key": "A", "text": "$P = 0{,}5\\,\\text{N}$"},
+      {"key": "B", "text": "$P = 5\\,\\text{N}$"},
+      {"key": "C", "text": "$P = 50\\,\\text{N}$"},
+      {"key": "D", "text": "$P = 5000\\,\\text{N}$"}
+    ],
+    "correct": "B",
+    "explanation": "Trọng lực: $P = mg = 0{,}5 \\cdot 10 = 5\\,\\text{N}$ (đổi $500\\,\\text{g} = 0{,}5\\,\\text{kg}$)"
+  }
+]

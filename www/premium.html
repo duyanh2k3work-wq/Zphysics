@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zphysics — Nâng cấp Premium</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0A0A0B;
+      --white: #ffffff;
+      --gray-400: #a1a1aa;
+      --card-inner: #1A1A1C;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      color: var(--white);
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px 60px;
+    }
+
+    /* ── PAGE LAYOUT WRAPPER ── */
+    .premium-container {
+      width: 100%;
+      max-width: 936px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      width: 100%;
+      padding: 16px 8px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      align-self: flex-start;
+    }
+
+    .back-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+    }
+
+    .back-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    .back-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--white);
+      stroke-width: 2.5;
+      fill: none;
+    }
+
+    .header-info h1 {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    .header-info h1 span {
+      background: linear-gradient(135deg, #7DD3FC, #06B6D4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-info p {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-400);
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    /* ── TITLE & HERO ── */
+    .hero {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(125, 211, 252, 0.08);
+      border: 1px solid rgba(125, 211, 252, 0.2);
+      font-size: 12px;
+      font-weight: 800;
+      color: #7DD3FC;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      font-size: 32px;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 40%, #7DD3FC 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 15px;
+      color: var(--gray-400);
+      font-weight: 500;
+      line-height: 1.6;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    /* ── FEATURE CARDS GRID ── */
+    .cards-grid {
+      display: grid;
+      grid-cols: 1;
+      width: 100%;
+      gap: 40px;
+      margin-bottom: 56px;
+    }
+
+    @media (min-width: 768px) {
+      .cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .cards-grid {
+        gap: 16px;
+      }
+    }
+
+    /* Reusable FeatureCard Style Wrapper */
+    .feature-card-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      align-items: start;
+      width: 100%;
+      max-width: 280px;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: cardFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes cardFadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Glowing Backdrop overlay (blur 45px, opacity 60%) */
+    .card-glow {
+      position: absolute;
+      width: 100%;
+      height: 280px;
+      opacity: 0.55;
+      border-radius: 40px;
+      pointer-events: none;
+      filter: blur(45px);
+      transition: opacity 0.5s ease;
+      z-index: 0;
+    }
+
+    @media (min-width: 768px) {
+      .feature-card-wrapper, .card-glow, .card-foreground {
+        max-width: 300px;
+        height: 300px;
+      }
+    }
+
+    .feature-card-wrapper:hover .card-glow {
+      opacity: 0.8;
+    }
+
+    /* Foreground card with background-clip border gradient */
+    .card-foreground {
+      align-self: stretch;
+      height: 280px;
+      border-radius: 40px;
+      z-index: 10;
+      overflow: hidden;
+      border: 8px solid transparent;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .feature-card-wrapper:hover .card-foreground {
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    /* Card Content container inside foreground */
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-icon {
+      color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      align-self: flex-start;
+    }
+
+    .card-title {
+      color: var(--white);
+      font-weight: 700;
+      font-size: 20px;
+      margin-bottom: 12px;
+      tracking-content: -0.025em;
+    }
+
+    .card-description {
+      color: var(--gray-400);
+      font-size: 14px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+    
+    .card-description::selection {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ── PRICING SECTIONS (ALSO GLOWING MULTICOLOR) ── */
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--white);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+      margin-top: 16px;
+      align-self: center;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before, .section-title::after {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #06B6D4);
+    }
+
+    .section-title::after {
+      background: linear-gradient(90deg, #06B6D4, transparent);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      width: 100%;
+      gap: 28px;
+      margin-bottom: 48px;
+    }
+
+    @media (min-width: 768px) {
+      .pricing-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+    }
+
+    .price-card-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 768px) {
+      .price-card-wrapper {
+        max-width: 300px;
+      }
+    }
+
+    .price-card-glow {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0.25;
+      border-radius: 36px;
+      pointer-events: none;
+      filter: blur(40px);
+      transition: opacity 0.4s;
+    }
+
+    .price-card-wrapper:hover .price-card-glow {
+      opacity: 0.45;
+    }
+
+    .price-card-foreground {
+      width: 100%;
+      border-radius: 36px;
+      z-index: 10;
+      overflow: hidden;
+      border: 4px solid transparent;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .price-card-wrapper:hover .price-card-foreground {
+      transform: translateY(-4px);
+    }
+
+    .price-inner {
+      width: 100%;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      min-height: 320px;
+    }
+
+    .plan-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--white);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+      opacity: 0.9;
+    }
+
+    .price-box {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .price-amount {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--white);
+    }
+
+    .price-period {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-400);
+    }
+
+    .original-price {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f43f5e;
+      text-decoration: line-through;
+      margin-bottom: 20px;
+    }
+
+    .plan-desc {
+      font-size: 13.5px;
+      color: var(--gray-400);
+      font-weight: 500;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .btn-purchase {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--white);
+      transition: all 0.3s;
+    }
+
+    .price-card-wrapper:hover .btn-purchase {
+      background: var(--white);
+      color: #000;
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+      border-color: var(--white);
+    }
+
+    /* ── FOOTER INFO ── */
+    .footer-faq {
+      width: 100%;
+      max-width: 640px;
+      background: #161618;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      padding: 24px;
+      margin-top: 12px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+
+    .faq-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+
+    .faq-desc {
+      font-size: 13.5px;
+      color: var(--gray-400);
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .guarantee-box {
+      margin-top: 14px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="premium-container">
+
+    <!-- ── HEADER ── -->
+    <div class="header">
+      <a class="back-btn" href="index.html" title="Quay lại">
+        <svg viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </a>
+      <div class="header-info">
+        <h1>Z<span>physics</span></h1>
+        <p>Premium Redesign</p>
+      </div>
+    </div>
+
+    <!-- ── HERO ── -->
+    <div class="hero">
+      <div class="hero-badge">⚡ ĐẶC QUYỀN VIP</div>
+      <h2 class="hero-title">Nâng Tầm Trải Nghiệm<br>Học Vật Lí Cực Đỉnh</h2>
+      <p class="hero-desc">Mở khóa toàn diện các tính năng độc quyền, hỗ trợ đắc lực giúp nâng cao hiệu suất học tập và bứt phá điểm số.</p>
+    </div>
+
+    <!-- ── FEATURE CARDS GRID (REPLICATED FROM REACT COMPONENT PROMPT) ── -->
+    <div class="cards-grid">
+      
+      <!-- Card 1: Hardware/Solutions -->
+      <div class="feature-card-wrapper" style="animation-delay: 0.1s;">
+        <div class="card-glow" style="background: linear-gradient(137deg, #FF3D77 0%, #FFB1CE 45%, #FF9D3C 100%);"></div>
+        <div class="card-foreground" style="background: linear-gradient(#1A1A1C, #1A1A1C) padding-box, linear-gradient(137deg, #FF3D77 0%, #FFB1CE 45%, #FF9D3C 100%) border-box;">
+          <div class="card-inner">
+            <div class="card-icon">
+              <!-- Monitor/Eye Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+            </div>
+            <div>
+              <h3 class="card-title">Lời Giải Chi Tiết</h3>
+              <p class="card-description">Mở khóa toàn bộ lời giải và phương pháp tư duy từng bước bằng ký tự KaTeX chuẩn hóa.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Studio/Exam -->
+      <div class="feature-card-wrapper" style="animation-delay: 0.2s;">
+        <div class="card-glow" style="background: linear-gradient(137deg, #FFFFFF 0%, #7DD3FC 45%, #06B6D4 100%);"></div>
+        <div class="card-foreground" style="background: linear-gradient(#1A1A1C, #1A1A1C) padding-box, linear-gradient(137deg, #FFFFFF 0%, #7DD3FC 45%, #06B6D4 100%) border-box;">
+          <div class="card-inner">
+            <div class="card-icon">
+              <!-- Palette/Check Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"></path>
+                <path d="M12 8V16"></path>
+                <path d="M8 12H16"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="card-title">Đúng / Sai Cấu Trúc</h3>
+              <p class="card-description">Đề thi biên soạn bám sát cấu trúc mới nhất của Bộ GD&ĐT (Đúng/Sai và Trả lời ngắn).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Motion/AI -->
+      <div class="feature-card-wrapper" style="animation-delay: 0.3s;">
+        <div class="card-glow" style="background: linear-gradient(137deg, #4361EE 0%, #E0AEFF 45%, #F72585 100%);"></div>
+        <div class="card-foreground" style="background: linear-gradient(#1A1A1C, #1A1A1C) padding-box, linear-gradient(137deg, #4361EE 0%, #E0AEFF 45%, #F72585 100%) border-box;">
+          <div class="card-inner">
+            <div class="card-icon">
+              <!-- Zap Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <div>
+              <h3 class="card-title">Gia Sư AI Vật Lí</h3>
+              <p class="card-description">Hỗ trợ giải đáp bài tập, hướng dẫn lập công thức và ôn tập lý thuyết tức thời 24/7 cùng AI.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── PRICING ── -->
+    <div class="section-title">Chọn gói của em</div>
+    
+    <div class="pricing-grid">
+      
+      <!-- Basic Pack: Pink-Orange -->
+      <div class="price-card-wrapper">
+        <div class="price-card-glow" style="background: linear-gradient(137deg, #FF3D77 0%, #FF9D3C 100%);"></div>
+        <div class="price-card-foreground" style="background: linear-gradient(#161618, #161618) padding-box, linear-gradient(137deg, #FF3D77 0%, #FF9D3C 100%) border-box;">
+          <div class="price-inner">
+            <div>
+              <div class="plan-name" style="color: #FF9D3C;">Cơ Bản</div>
+              <div class="price-box">
+                <span class="price-amount">19k</span>
+                <span class="price-period">/ 1 Tháng</span>
+              </div>
+              <div class="original-price">49.000 đ</div>
+              <p class="plan-desc">Học thử nghiệm đầy đủ các tính năng Premium, lời giải chi tiết và ôn luyện trong 30 ngày.</p>
+            </div>
+            <button class="btn-purchase" onclick="registerPremium('Cơ Bản (1 Tháng - 19k)')">Đăng ký ngay</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Semester Pack: White-Cyan (Popular) -->
+      <div class="price-card-wrapper">
+        <div class="price-card-glow" style="background: linear-gradient(137deg, #FFFFFF 0%, #06B6D4 100%);"></div>
+        <div class="price-card-foreground" style="background: linear-gradient(#161618, #161618) padding-box, linear-gradient(137deg, #FFFFFF 0%, #06B6D4 100%) border-box;">
+          <div class="price-inner">
+            <div>
+              <div class="plan-name" style="color: #06B6D4;">Học Kỳ</div>
+              <div class="price-box">
+                <span class="price-amount">79k</span>
+                <span class="price-period">/ 1 Học Kỳ</span>
+              </div>
+              <div class="original-price">199.000 đ</div>
+              <p class="plan-desc">Đồng hành trọn vẹn 1 học kỳ (5 tháng). Giải pháp tiết kiệm và hiệu quả hàng đầu.</p>
+            </div>
+            <button class="btn-purchase" onclick="registerPremium('Học Kỳ (5 Tháng - 79k)')">Đăng ký gói</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lifetime VIP: Blue-Purple-Pink -->
+      <div class="price-card-wrapper">
+        <div class="price-card-glow" style="background: linear-gradient(137deg, #4361EE 0%, #F72585 100%);"></div>
+        <div class="price-card-foreground" style="background: linear-gradient(#161618, #161618) padding-box, linear-gradient(137deg, #4361EE 0%, #F72585 100%) border-box;">
+          <div class="price-inner">
+            <div>
+              <div class="plan-name" style="color: #F72585;">VIP Trọn Đời</div>
+              <div class="price-box">
+                <span class="price-amount">149k</span>
+                <span class="price-period">/ Vô Hạn</span>
+              </div>
+              <div class="original-price">399.000 đ</div>
+              <p class="plan-desc">Sử dụng trọn đời cho đến khi tốt nghiệp THPT. Nhận toàn bộ cập nhật đề mới tự động.</p>
+            </div>
+            <button class="btn-purchase" onclick="registerPremium('VIP Trọn Đời (Vô hạn - 149k)')">Đăng ký ngay</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── FOOTER FAQ ── -->
+    <div class="footer-faq">
+      <div class="faq-title">Kích hoạt tài khoản nhanh chóng</div>
+      <p class="faq-desc">Sau khi đăng ký, hệ thống sẽ kết nối trực tiếp với Thầy/Cô hỗ trợ qua Telegram hoặc Zalo. Em chỉ cần xác nhận gói cước và cung cấp Gmail của em để thầy cô mở khóa tài khoản Premium trên hệ thống trong vòng 5 phút!</p>
+      <div class="guarantee-box">
+        <span>🛡️</span> Cam kết hỗ trợ nhiệt tình và đồng hành cùng em suốt kỳ thi tốt nghiệp
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function registerPremium(planName) {
+      const email = getSavedEmail();
+      const message = `Xin chào Thầy/Cô, em muốn đăng ký gói Zphysics Premium: ${planName}.${email ? ` Gmail tài khoản của em là: ${email}` : ''}`;
+      const telegramUrl = `https://t.me/zphysics_support?text=${encodeURIComponent(message)}`;
+      window.open(telegramUrl, '_blank');
+    }
+
+    function getSavedEmail() {
+      try {
+        const session = localStorage.getItem('zphysics_session');
+        if (session) {
+          const parsed = JSON.parse(session);
+          return parsed.gmail || '';
+        }
+      } catch (e) {}
+      return '';
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,194 @@
+[
+  {
+    "id": 1,
+    "question": "Phát biểu nào sau đây là đúng khi nói về trạng thái cân bằng nhiệt giữa hai vật?",
+    "answers": [
+      {"key": "A", "text": "Hai vật có nhiệt độ bằng nhau thì không còn sự truyền nhiệt khối giữa chúng."},
+      {"key": "B", "text": "Vật có thể tích lớn hơn sẽ truyền nhiệt cho vật có thể tích nhỏ hơn."},
+      {"key": "C", "text": "Vật có khối lượng lớn hơn sẽ truyền nhiệt cho vật có khối lượng nhỏ hơn."},
+      {"key": "D", "text": "Sự truyền nhiệt dừng lại khi một trong hai vật hết nhiệt năng."}
+    ],
+    "correct": "A",
+    "explanation": "Hai vật ở trạng thái cân bằng nhiệt khi chúng có cùng nhiệt độ, lúc đó không còn sự truyền nhiệt giữa chúng."
+  },
+  {
+    "id": 2,
+    "question": "Trong thang nhiệt độ Celsius, nhiệt độ của điểm đóng băng và điểm sôi của nước tinh khiết ở áp suất chuẩn được quy ước lần lượt là bao nhiêu?",
+    "answers": [
+      {"key": "A", "text": "$0^\\circ\\text{C}$ và $100^\\circ\\text{C}$"},
+      {"key": "B", "text": "$32^\\circ\\text{C}$ và $212^\\circ\\text{C}$"},
+      {"key": "C", "text": "$0^\\circ\\text{C}$ và $273^\\circ\\text{C}$"},
+      {"key": "D", "text": "$-100^\\circ\\text{C}$ và $100^\\circ\\text{C}$"}
+    ],
+    "correct": "A",
+    "explanation": "Thang Celsius lấy $0^\\circ\\text{C}$ là điểm đóng băng và $100^\\circ\\text{C}$ là điểm sôi của nước tinh khiết ở áp suất 1 atm."
+  },
+  {
+    "id": 3,
+    "question": "Công thức nào sau đây thể hiện đúng mối liên hệ giữa nhiệt độ tuyệt đối $T$ (Kelvin) và nhiệt độ $t$ (Celsius)?",
+    "answers": [
+      {"key": "A", "text": "$T = t + 273{,}15$"},
+      {"key": "B", "text": "$T = t - 273{,}15$"},
+      {"key": "C", "text": "$t = T + 273{,}15$"},
+      {"key": "D", "text": "$T = \\dfrac{5}{9}(t - 32)$"}
+    ],
+    "correct": "A",
+    "explanation": "Mối liên hệ giữa thang Kelvin và Celsius: $T = t + 273{,}15$"
+  },
+  {
+    "id": 4,
+    "question": "Nhiệt độ phòng hiện tại đo được là $25^\\circ\\text{C}$. Giá trị nhiệt độ này trong thang Kelvin là bao nhiêu?",
+    "answers": [
+      {"key": "A", "text": "$298{,}15\\text{ K}$"},
+      {"key": "B", "text": "$248{,}15\\text{ K}$"},
+      {"key": "C", "text": "$25\\text{ K}$"},
+      {"key": "D", "text": "$300\\text{ K}$"}
+    ],
+    "correct": "A",
+    "explanation": "$T = t + 273{,}15 = 25 + 273{,}15 = 298{,}15\\text{ K}$"
+  },
+  {
+    "id": 5,
+    "question": "Một vật tăng nhiệt độ thêm $\\Delta t = 15^\\circ\\text{C}$. Độ tăng nhiệt độ tương ứng trong thang Kelvin ($\\Delta T$) là bao nhiêu?",
+    "answers": [
+      {"key": "A", "text": "$15\\text{ K}$"},
+      {"key": "B", "text": "$288{,}15\\text{ K}$"},
+      {"key": "C", "text": "$258{,}15\\text{ K}$"},
+      {"key": "D", "text": "$27\\text{ K}$"}
+    ],
+    "correct": "A",
+    "explanation": "Độ chênh lệch nhiệt độ 1°C tương ứng 1 K, nên $\\Delta T = \\Delta t = 15\\text{ K}$."
+  },
+  {
+    "id": 6,
+    "question": "Nhiệt kế chất lỏng hoạt động dựa trên hiện tượng vật lý nào sau đây?",
+    "answers": [
+      {"key": "A", "text": "Sự nở vì nhiệt của chất lỏng."},
+      {"key": "B", "text": "Sự thay đổi điện trở của kim loại theo nhiệt độ."},
+      {"key": "C", "text": "Sự phát xạ nhiệt của các vật nóng."},
+      {"key": "D", "text": "Hiện tượng dòng nhiệt điện ở cặp nhiệt ngẫu."}
+    ],
+    "correct": "A",
+    "explanation": "Nhiệt kế chất lỏng dựa trên sự nở vì nhiệt: khi nhiệt độ tăng, chất lỏng giãn nở và dâng lên trong ống mao dẫn."
+  },
+  {
+    "id": 7,
+    "question": "Loại nhiệt kế nào thường được sử dụng trong y tế để đo nhiệt độ cơ thể người một cách nhanh chóng mà không cần tiếp xúc trực tiếp quá lâu?",
+    "answers": [
+      {"key": "A", "text": "Nhiệt kế hồng ngoại."},
+      {"key": "B", "text": "Nhiệt kế rượu."},
+      {"key": "C", "text": "Nhiệt kế điện trở bán dẫn loại lớn."},
+      {"key": "D", "text": "Hỏa kế quang học."}
+    ],
+    "correct": "A",
+    "explanation": "Nhiệt kế hồng ngoại đo nhiệt độ bằng cách thu bức xạ hồng ngoại, cho kết quả nhanh và không cần tiếp xúc."
+  },
+  {
+    "id": 8,
+    "question": "Độ không tuyệt đối ($0\\text{ K}$) tương ứng với giá trị nào sau đây trong thang nhiệt độ Fahrenheit?",
+    "answers": [
+      {"key": "A", "text": "$-459{,}67^\\circ\\text{F}$"},
+      {"key": "B", "text": "$-273{,}15^\\circ\\text{F}$"},
+      {"key": "C", "text": "$0^\\circ\\text{F}$"},
+      {"key": "D", "text": "$-32^\\circ\\text{F}$"}
+    ],
+    "correct": "A",
+    "explanation": "$0\\text{ K} = -273{,}15^\\circ\\text{C}$. Đổi sang Fahrenheit: $t_F = \\dfrac{9}{5}(-273{,}15) + 32 = -459{,}67^\\circ\\text{F}$"
+  },
+  {
+    "id": 9,
+    "question": "Tại sao người ta không dùng nước để làm nhiệt kế chất lỏng đo nhiệt độ thông thường trong đời sống?",
+    "answers": [
+      {"key": "A", "text": "Nước có sự nở vì nhiệt không đều đặn (co lại từ $0^\\circ\\text{C}$ đến $4^\\circ\\text{C}$) và dải nhiệt độ lỏng hẹp."},
+      {"key": "B", "text": "Nước có khối lượng riêng quá lớn so với thủy ngân."},
+      {"key": "C", "text": "Nước làm bằng chất lỏng không thể nhuộm màu để quan sát."},
+      {"key": "D", "text": "Nước bay hơi quá nhanh trong mọi điều kiện kín."}
+    ],
+    "correct": "A",
+    "explanation": "Nước nở bất thường ở khoảng $0^\\circ\\text{C}$ - $4^\\circ\\text{C}$ (co lại khi tăng nhiệt), nên không đo chính xác. Dải lỏng ($0^\\circ\\text{C}$ - $100^\\circ\\text{C}$) cũng hẹp."
+  },
+  {
+    "id": 10,
+    "question": "Khi hai vật tiếp xúc nhau mà không có sự truyền nhiệt năng giữa chúng, ta kết luận điều gì?",
+    "answers": [
+      {"key": "A", "text": "Hai vật đang ở trạng thái cân bằng nhiệt."},
+      {"key": "B", "text": "Hai vật có nội năng bằng nhau."},
+      {"key": "C", "text": "Hai vật có mật độ phân tử như nhau."},
+      {"key": "D", "text": "Một trong hai vật phải có nhiệt độ bằng $0\\text{ K}$."}
+    ],
+    "correct": "A",
+    "explanation": "Cân bằng nhiệt là trạng thái mà hai vật có cùng nhiệt độ, khi đó không còn sự truyền nhiệt năng giữa chúng."
+  },
+  {
+    "id": 11,
+    "question": "Nhiệt độ của một chất khí lý tưởng liên quan trực tiếp đến đại lượng nào của các phân tử khí?",
+    "answers": [
+      {"key": "A", "text": "Động năng trung bình của chuyển động tịnh tiến của các phân tử."},
+      {"key": "B", "text": "Thế năng tương tác trung bình giữa các phân tử khí."},
+      {"key": "C", "text": "Khối lượng của từng phân tử khí."},
+      {"key": "D", "text": "Kích thước hình học của các phân tử."}
+    ],
+    "correct": "A",
+    "explanation": "Nhiệt độ tuyệt đối tỉ lệ thuận với động năng trung bình chuyển động tịnh tiến của phân tử: $\\overline{W_đ} = \\dfrac{3}{2}k_BT$"
+  },
+  {
+    "id": 12,
+    "question": "Thang nhiệt độ nào được sử dụng phổ biến trong các tính toán khoa học và vật lý lý thuyết vì nó không có giá trị âm?",
+    "answers": [
+      {"key": "A", "text": "Thang Kelvin."},
+      {"key": "B", "text": "Thang Celsius."},
+      {"key": "C", "text": "Thang Fahrenheit."},
+      {"key": "D", "text": "Thang Reaumur."}
+    ],
+    "correct": "A",
+    "explanation": "Thang Kelvin bắt đầu từ 0 K (độ không tuyệt đối), không có giá trị âm, rất thuận tiện cho tính toán khoa học."
+  },
+  {
+    "id": 13,
+    "question": "Nhiệt kế y tế thủy ngân có một chỗ eo hẹp ở ống mao dẫn ngay phía trên bầu đựng chất lỏng. Bộ phận này có tác dụng gì?",
+    "answers": [
+      {"key": "A", "text": "Giữ cho mực thủy ngân không bị tụt xuống ngay khi rút nhiệt kế ra khỏi cơ thể."},
+      {"key": "B", "text": "Làm cho thủy ngân dâng lên nhanh hơn khi tiếp xúc với nguồn nhiệt."},
+      {"key": "C", "text": "Ngăn không cho thủy ngân bay hơi vào không gian trống phía trên."},
+      {"key": "D", "text": "Giảm lượng thủy ngân cần thiết để chế tạo nhiệt kế."}
+    ],
+    "correct": "A",
+    "explanation": "Chỗ eo hẹp ngăn thủy ngân tụt xuống sau khi đo, giúp đọc kết quả chính xác sau khi rút nhiệt kế."
+  },
+  {
+    "id": 14,
+    "question": "Nhiệt độ của một vật tăng thêm $36^\\circ\\text{F}$. Hỏi nhiệt độ của vật đó tăng thêm bao nhiêu độ trong thang Celsius?",
+    "answers": [
+      {"key": "A", "text": "$20^\\circ\\text{C}$"},
+      {"key": "B", "text": "$64{,}8^\\circ\\text{C}$"},
+      {"key": "C", "text": "$2{,}22^\\circ\\text{C}$"},
+      {"key": "D", "text": "$36^\\circ\\text{C}$"}
+    ],
+    "correct": "A",
+    "explanation": "Độ chênh: $\\Delta t_C = \\dfrac{5}{9} \\cdot \\Delta t_F = \\dfrac{5}{9} \\cdot 36 = 20^\\circ\\text{C}$"
+  },
+  {
+    "id": 15,
+    "question": "Thiết bị nào sau đây dựa trên sự thay đổi điện trở của dây kim loại để đo nhiệt độ?",
+    "answers": [
+      {"key": "A", "text": "Nhiệt kế điện trở kim loại."},
+      {"key": "B", "text": "Cặp nhiệt điện."},
+      {"key": "C", "text": "Nhiệt kế lưỡng kim."},
+      {"key": "D", "text": "Nhiệt kế khí thể tích không đổi."}
+    ],
+    "correct": "A",
+    "explanation": "Nhiệt kế điện trở kim loại hoạt động dựa trên nguyên lý điện trở kim loại tăng khi nhiệt độ tăng."
+  },
+  {
+    "id": 16,
+    "question": "Ở nhiệt độ nào thì số đọc trên cả hai thang nhiệt độ Celsius và Fahrenheit có cùng một giá trị số?",
+    "answers": [
+      {"key": "A", "text": "$-40$"},
+      {"key": "B", "text": "$0$"},
+      {"key": "C", "text": "$40$"},
+      {"key": "D", "text": "$-273{,}15$"}
+    ],
+    "correct": "A",
+    "explanation": "Đặt $t_C = t_F = x$. Từ $t_F = \\dfrac{9}{5}t_C + 32$: $x = \\dfrac{9}{5}x + 32 \\Rightarrow -\\dfrac{4}{5}x = 32 \\Rightarrow x = -40$"
+  }
+]

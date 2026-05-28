@@ -1,0 +1,42 @@
+# Workflow tự động deploy thư mục www lên GitHub Pages
+name: Deploy www to GitHub Pages
+
+on:
+  push:
+    branches: ["main", "master"] # Tự động chạy khi push lên nhánh main hoặc master
+
+  # Cho phép chạy thủ công từ tab Actions trên GitHub
+  workflow_dispatch:
+
+# Cấp quyền cho GITHUB_TOKEN để thực hiện deploy
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Tránh xung đột khi deploy nhiều phiên bản cùng lúc
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cấu hình GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Tải thư mục www lên làm Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './www' # Chỉ định thư mục www chứa các file HTML tĩnh của bạn
+
+      - name: Deploy lên GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

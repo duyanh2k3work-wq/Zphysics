@@ -1,0 +1,74 @@
+[
+  {
+    "id": "de_thi_thu_10_c1",
+    "title": "Đề kiểm tra khảo sát Chương I — Lớp 10",
+    "desc": "Đề thi thử thách kiến thức mở đầu Vật lí 10",
+    "pdfUrl": "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+    "duration": 45,
+    "mcAnswers": "A,B,C,D,A,B,C,D,A,B,C,D,A,B,C,D,A,B",
+    "tfAnswers": "Đ,S,Đ,S;S,Đ,S,Đ;Đ,Đ,S,S;S,S,Đ,Đ",
+    "saAnswers": "10;-2.5;300;1.5;20;45",
+    "lop": "10",
+    "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  },
+  {
+    "id": "de_thi_thu_11_c1",
+    "title": "Đề ôn tập giữa học kỳ 1 — Lớp 11",
+    "desc": "Đề thi khảo sát chuyên đề Dao động cơ",
+    "pdfUrl": "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+    "duration": 50,
+    "mcAnswers": "B,C,D,A,B,C,D,A,B,C,D,A,B,C,D,A,B,C",
+    "tfAnswers": "S,Đ,S,Đ;Đ,Đ,S,S;S,S,Đ,Đ;Đ,S,Đ,S",
+    "saAnswers": "5;12.4;-80;0.5;100;15",
+    "lop": "11",
+    "videoUrl": "#"
+  },
+  {
+    "id": "de_on_nhiet_12",
+    "title": "Đề ôn tập chuyên đề Vật lí Nhiệt — Lớp 12",
+    "desc": "Đề thi khảo sát cấu trúc mới nhất của Bộ GD&ĐT",
+    "pdfUrl": "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+    "duration": 50,
+    "mcAnswers": "A,B,C,D,A,B,C,D,A,B,C,D,A,B,C,D,A,B",
+    "tfAnswers": "Đ,S,Đ,S;S,Đ,S,Đ;Đ,Đ,S,S;S,S,Đ,Đ",
+    "saAnswers": "10;-2.5;300;1.5;20;45",
+    "lop": "12",
+    "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  },
+  {
+    "id": "de_thi_thu_01",
+    "title": "Đề luyện thi thử Tốt nghiệp THPT Quốc gia — Số 01",
+    "desc": "Đề thi thử thách toàn bộ chương trình lớp 11 & 12",
+    "pdfUrl": "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+    "duration": 50,
+    "mcAnswers": "B,C,D,A,B,C,D,A,B,C,D,A,B,C,D,A,B,C",
+    "tfAnswers": "S,Đ,S,Đ;Đ,Đ,S,S;S,S,Đ,Đ;Đ,S,Đ,S",
+    "saAnswers": "5;12.4;-80;0.5;100;15",
+    "lop": "12",
+    "videoUrl": "#"
+  },
+  {
+    "id": "de_thi_thu_02",
+    "title": "Đề luyện thi thử Tốt nghiệp THPT Quốc gia — Số 02",
+    "desc": "Đề thi phân loại học sinh bứt phá điểm 9, 10",
+    "pdfUrl": "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+    "duration": 50,
+    "mcAnswers": "C,D,A,B,C,D,A,B,C,D,A,B,C,D,A,B,C,D",
+    "tfAnswers": "Đ,Đ,S,S;S,S,Đ,Đ;Đ,S,Đ,S;S,Đ,S,Đ",
+    "saAnswers": "220;1.2;50;150;-10;0",
+    "lop": "12",
+    "videoUrl": "#"
+  },
+  {
+    "id": "de_minh_hoa_2026",
+    "title": "Đề minh họa Tốt nghiệp THPT Quốc gia 2025/2026",
+    "desc": "Đề minh họa chính thức công bố bởi Bộ GD&ĐT",
+    "pdfUrl": "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+    "duration": 50,
+    "mcAnswers": "D,A,B,C,D,A,B,C,D,A,B,C,D,A,B,C,D,A",
+    "tfAnswers": "S,S,Đ,Đ;Đ,S,Đ,S;S,Đ,S,Đ;Đ,Đ,S,S",
+    "saAnswers": "0.1;1000;20;5.5;9.8;360",
+    "lop": "12",
+    "videoUrl": "#"
+  }
+]
