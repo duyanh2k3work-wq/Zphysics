@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Zphysics - Đang chuyển hướng...</title>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const examCode = params.get('exam') || '';
+    const demoMode = params.get('demo') || '';
+    
+    let hashVal = examCode;
+    if (demoMode) {
+      hashVal += '?demo=' + demoMode;
+    }
+    window.location.replace('l.html#' + hashVal);
+  </script>
+</head>
+<body>
+  <p>Đang chuyển hướng sang trang luyện đề mới...</p>
+</body>
+</html>
