@@ -952,7 +952,7 @@
   <div class="app">
 
     <div class="header">
-      <a class="back-btn" href="index.html" title="Quay lại">
+      <a class="back-btn" href="./" title="Quay lại">
         <svg viewBox="0 0 24 24">
           <polyline points="15 18 9 12 15 6" />
         </svg>
@@ -1035,7 +1035,7 @@
 
     const currentSession = getSession();
     if (!currentSession || !currentSession.gmail) {
-      window.location.href = 'index.html';
+      window.location.href = './';
     } else {
       // Áp dụng chủ đề Premium ngay lập tức nếu session ghi nhận là Premium
       if (currentSession.premium) {
@@ -1070,7 +1070,7 @@
             if (!students || students.length === 0) {
               // Đã bị xóa -> Xóa session và đẩy về trang đăng nhập
               localStorage.removeItem(SESSION_KEY);
-              window.location.href = 'index.html';
+              window.location.href = './';
             } else {
               const student = students[0];
               const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
