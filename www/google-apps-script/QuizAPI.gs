@@ -728,7 +728,134 @@ function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu('Zphysics Tools')
     .addItem('Đồng bộ tất cả dữ liệu sang Supabase', 'syncAllToSupabase')
+    .addItem('Kích hoạt tự động đồng bộ (Auto Sync)', 'setupAutoSyncTrigger')
     .addToUi();
+}
+
+function setupAutoSyncTrigger() {
+  var ui = SpreadsheetApp.getUi();
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // Xóa các trigger cũ để tránh trùng lặp
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'onEditInstalled') {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+  
+  // Tạo trigger cài đặt mới cho sự kiện onEdit
+  ScriptApp.newTrigger('onEditInstalled')
+    .forSpreadsheet(ss)
+    .onEdit()
+    .create();
+  
+  ui.alert('Thành công', 'Đã kích hoạt tự động đồng bộ! Từ bây giờ, mỗi khi bạn sửa dữ liệu trên Sheet, hệ thống sẽ tự động đồng bộ sang Supabase.', ui.ButtonSet.OK);
+}
+
+function onEditInstalled(e) {
+  if (!e) return;
+  try {
+    var range = e.range;
+    var sheet = range.getSheet();
+    var sheetName = sheet.getName().toLowerCase().trim();
+    var row = range.getRow();
+    
+    // Bỏ qua nếu sửa dòng tiêu đề (Header)
+    if (row <= HEADER_ROW) return;
+    
+    if (sheetName === 'hocsinh') {
+      // Đồng bộ thông tin học sinh
+      var vals = sheet.getRange(row, 1, 1, 4).getValues()[0];
+      var gmail = trimCell(vals[0]).toLowerCase();
+      var ten = trimCell(vals[1]);
+      var loai = vals[2] ? trimCell(vals[2]).toLowerCase() : 'free';
+      var premiumUntilISO = parseDateToISO(vals[3]);
+      
+      if (gmail) {
+        var payload = {
+          email: gmail,
+          full_name: ten,
+          role: loai,
+          premium_until: premiumUntilISO
+        };
+        var url = SUPABASE_URL + '/rest/v1/students?on_conflict=email';
+        var headers = {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        };
+        UrlFetchApp.fetch(url, {
+          method: 'POST',
+          headers: headers,
+          payload: JSON.stringify(payload),
+          muteHttpExceptions: true
+        });
+      }
+    } else if (sheetName === 'linkbaihoc') {
+      // Đồng bộ danh sách bài học (đồng bộ toàn bộ vì số dòng ít và tránh lệch chỉ mục)
+      syncLessonsToSupabase();
+    } else if (sheetName === 'luyende') {
+      // Đồng bộ danh sách đề thi VIP
+      var vals = sheet.getRange(row, 1, 1, 10).getValues()[0];
+      var id = trimCell(vals[0]);
+      var title = trimCell(vals[1]);
+      if (id) {
+        var payload = {
+          id: id,
+          title: title,
+          description: trimCell(vals[2]) || "Đề luyện thi VIP",
+          pdf_url: trimCell(vals[3]),
+          mc_answers: trimCell(vals[4]),
+          tf_answers: trimCell(vals[5]),
+          sa_answers: trimCell(vals[6]),
+          duration: vals[7] ? parseInt(vals[7], 10) : 50,
+          grade: trimCell(vals[8]) || "12",
+          video_url: trimCell(vals[9]) || "#"
+        };
+        var url = SUPABASE_URL + '/rest/v1/exams?on_conflict=id';
+        var headers = {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        };
+        UrlFetchApp.fetch(url, {
+          method: 'POST',
+          headers: headers,
+          payload: JSON.stringify(payload),
+          muteHttpExceptions: true
+        });
+      }
+    } else {
+      // Các sheet câu hỏi (tab Chương 1, Chương 2, v.v...)
+      var systemSheets = ['hocsinh', 'linkbaihoc', 'luyende'];
+      if (systemSheets.indexOf(sheetName) !== -1) return;
+      
+      var vals = sheet.getRange(row, 1, 1, 9).getValues()[0];
+      var maDe = trimCell(vals[COL.MADE]);
+      var rawId = vals[COL.ID];
+      
+      if (maDe && !isEmpty(rawId)) {
+        var id = parseInt(rawId, 10);
+        var qData = {
+          question: trimCell(vals[COL.QUESTION]),
+          answers: [
+            { key: 'A', text: trimCell(vals[COL.A]) },
+            { key: 'B', text: trimCell(vals[COL.B]) },
+            { key: 'C', text: trimCell(vals[COL.C]) },
+            { key: 'D', text: trimCell(vals[COL.D]) }
+          ],
+          correct: trimCell(vals[COL.CORRECT]),
+          explanation: trimCell(vals[COL.EXPLANATION])
+        };
+        supabaseUpsertQuestion(maDe, id, qData);
+      }
+    }
+  } catch (err) {
+    console.warn("Lỗi tự động đồng bộ: " + err.message);
+  }
 }
 
 function syncAllToSupabase() {
