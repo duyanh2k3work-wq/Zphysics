@@ -736,21 +736,36 @@ function setupAutoSyncTrigger() {
   var ui = SpreadsheetApp.getUi();
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   
-  // Xóa các trigger cũ để tránh trùng lặp
-  var triggers = ScriptApp.getProjectTriggers();
-  for (var i = 0; i < triggers.length; i++) {
-    if (triggers[i].getHandlerFunction() === 'onEditInstalled') {
-      ScriptApp.deleteTrigger(triggers[i]);
+  try {
+    // Xóa các trigger cũ để tránh trùng lặp
+    var triggers = ScriptApp.getProjectTriggers();
+    for (var i = 0; i < triggers.length; i++) {
+      if (triggers[i].getHandlerFunction() === 'onEditInstalled') {
+        ScriptApp.deleteTrigger(triggers[i]);
+      }
+    }
+    
+    // Tạo trigger cài đặt mới cho sự kiện onEdit
+    ScriptApp.newTrigger('onEditInstalled')
+      .forSpreadsheet(ss)
+      .onEdit()
+      .create();
+    
+    ui.alert('Thành công', 'Đã kích hoạt tự động đồng bộ! Từ bây giờ, mỗi khi bạn sửa dữ liệu trên Sheet, hệ thống sẽ tự động đồng bộ sang Supabase.', ui.ButtonSet.OK);
+  } catch (err) {
+    var errMsg = err.message || String(err);
+    if (errMsg.indexOf("quyền") !== -1 || errMsg.indexOf("permission") !== -1 || errMsg.indexOf("ScriptApp") !== -1 || errMsg.indexOf("sufficient") !== -1) {
+      ui.alert(
+        'Yêu cầu cấp quyền', 
+        'Để kích hoạt Tự động đồng bộ, bạn hãy thực hiện theo 1 trong 2 cách sau:\n\n' +
+        'Cách 1 (Khuyên dùng): Mở trình soạn thảo Apps Script, ở danh sách hàm phía trên chọn "setupAutoSyncTrigger" rồi nhấn nút "Chạy" (Run). Hộp thoại yêu cầu cấp quyền sẽ hiện lên, hãy cấp quyền để hoàn tất.\n\n' +
+        'Cách 2 (Thủ công): Ở thanh bên trái Apps Script, bấm vào biểu tượng Đồng hồ (Kích hoạt/Triggers) -> Chọn "Thêm trình kích hoạt" -> Chọn hàm "onEditInstalled", Nguồn sự kiện "Từ bảng tính", Loại sự kiện "Khi chỉnh sửa" -> Lưu và cấp quyền.',
+        ui.ButtonSet.OK
+      );
+    } else {
+      ui.alert('Lỗi kích hoạt', 'Không thể cài đặt tự động đồng bộ: ' + errMsg, ui.ButtonSet.OK);
     }
   }
-  
-  // Tạo trigger cài đặt mới cho sự kiện onEdit
-  ScriptApp.newTrigger('onEditInstalled')
-    .forSpreadsheet(ss)
-    .onEdit()
-    .create();
-  
-  ui.alert('Thành công', 'Đã kích hoạt tự động đồng bộ! Từ bây giờ, mỗi khi bạn sửa dữ liệu trên Sheet, hệ thống sẽ tự động đồng bộ sang Supabase.', ui.ButtonSet.OK);
 }
 
 function onEditInstalled(e) {
