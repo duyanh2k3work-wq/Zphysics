@@ -944,6 +944,28 @@
         }
       }
 
+      // Xác nhận khi bấm nút thoát
+      const backBtn = document.querySelector('.back-btn');
+      if (backBtn) {
+        backBtn.addEventListener('click', (e) => {
+          if (!submitted) {
+            const confirmExit = confirm('Bạn có chắc chắn muốn thoát? Kết quả làm bài sẽ không được lưu.');
+            if (!confirmExit) {
+              e.preventDefault();
+            }
+          }
+        });
+      }
+
+      // Cảnh báo khi reload hoặc đóng tab
+      window.addEventListener('beforeunload', (e) => {
+        if (!submitted) {
+          e.preventDefault();
+          e.returnValue = 'Bạn có chắc chắn muốn thoát? Kết quả làm bài sẽ không được lưu.';
+        }
+      });
+
+
       // Tải đề từ Supabase đầu tiên, nếu lỗi thì dùng luyende.json offline
       let list = [];
       try {
