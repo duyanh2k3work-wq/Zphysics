@@ -908,6 +908,7 @@
       }
     }
     if (!examId) examId = '';
+    try { examId = decodeURIComponent(examId); } catch(e) {}
 
     // Tự động làm đẹp URL bằng cách chuyển đổi từ query sang hash
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
@@ -1223,6 +1224,32 @@
       }
     }
 
+    function saveProgressToSupabase(email, lessonId, type, score) {
+      try {
+        let dates = JSON.parse(localStorage.getItem('zphysics_activity_dates') || '[]');
+        const today = new Date().toLocaleDateString('en-CA');
+        if (!dates.includes(today)) {
+          dates.push(today);
+          dates.sort((a, b) => new Date(b) - new Date(a));
+          localStorage.setItem('zphysics_activity_dates', JSON.stringify(dates));
+        }
+      } catch(e){}
+
+      if (!currentSession || !currentSession.premium || currentSession.gmail.startsWith('demo_')) return;
+      
+      const payload = { email: email, lesson_id: lessonId, type: type, score: score };
+      fetch(`${SUPABASE_URL}/rest/v1/student_progress?on_conflict=email,lesson_id,type`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Prefer': 'resolution=merge-duplicates, return=minimal'
+        },
+        body: JSON.stringify(payload)
+      }).catch(err => console.error('Lỗi lưu tiến trình:', err));
+    }
+
     // ── NỘP BÀI VÀ CHẤM ĐIỂM ──
     function submitExam(isTimeout = false) {
       if (submitted) return;
@@ -1402,6 +1429,11 @@
 
       // Gửi báo cáo kết quả về Telegram của giáo viên
       sendToTelegram(studentName, totalScore, wrongList);
+
+      // Lưu tiến trình học tập vào Supabase
+      if (currentSession && currentSession.gmail) {
+        saveProgressToSupabase(currentSession.gmail, examId, 'exam', totalScore);
+      }
     }
 
     // ── GỬI BÁO CÁO TELEGRAM ──

@@ -14,9 +14,18 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"
-    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}]});"></script>
 
   <style>
+    .part-header {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--teal);
+      margin-top: 24px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(45, 212, 191, 0.2);
+    }
     :root {
       --bg: #f0f4ff;
       --card: rgba(255, 255, 255, 0.75);
@@ -1251,6 +1260,7 @@
       }
     }
     if (!quizFile) quizFile = 'cauhoi';
+    try { quizFile = decodeURIComponent(quizFile); } catch(e) {}
 
     // Tự động làm đẹp URL thanh địa chỉ bằng cách chuyển đổi từ query sang hash
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
@@ -1289,7 +1299,13 @@
     loadLessonInfo();
 
     function loadQuizFromSupabase() {
-      const url = `${SUPABASE_URL}/rest/v1/questions?made=eq.${encodeURIComponent(quizFile)}&select=*`;
+      let url = `${SUPABASE_URL}/rest/v1/questions?made=eq.${encodeURIComponent(quizFile)}&select=*`;
+      
+      if (quizFile.startsWith('baitap_')) {
+        const rest = quizFile.substring('baitap_'.length);
+        const inVals = `cauhoi_${rest},đs_${rest},tln_${rest}`;
+        url = `${SUPABASE_URL}/rest/v1/questions?made=in.(${encodeURIComponent(inVals)})&select=*`;
+      }
 
       fetch(url, {
         headers: {
@@ -1306,36 +1322,59 @@
             throw new Error('Đề thi trống hoặc mã đề không chính xác');
           }
 
-          // Ánh xạ dữ liệu từ cấu trúc bảng Supabase sang cấu trúc mà frontend yêu cầu
-          let mappedData = data.map(item => ({
-            id: item.question_id,
-            question: item.question,
-            answers: [
-              { key: 'A', text: item.a },
-              { key: 'B', text: item.b },
-              { key: 'C', text: item.c },
-              { key: 'D', text: item.d }
-            ],
-            correct: item.correct,
-            explanation: item.explanation
-          }));
-          
-          // Trộn ngẫu nhiên câu hỏi (Fisher-Yates)
-          for (let i = mappedData.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [mappedData[i], mappedData[j]] = [mappedData[j], mappedData[i]];
+          let part1 = [];
+          let part2 = [];
+          let part3 = [];
+
+          data.forEach(item => {
+            let type = 'cauhoi';
+            if (item.made.startsWith('đs')) type = 'đs';
+            else if (item.made.startsWith('tln')) type = 'tln';
+
+            const q = {
+              id: item.question_id,
+              type: type,
+              question: item.question,
+              answers: [
+                { key: 'A', text: item.a },
+                { key: 'B', text: item.b },
+                { key: 'C', text: item.c },
+                { key: 'D', text: item.d }
+              ],
+              correct: item.correct,
+              explanation: item.explanation
+            };
+
+            if (type === 'cauhoi') part1.push(q);
+            else if (type === 'đs') part2.push(q);
+            else part3.push(q);
+          });
+
+          const shuffle = (arr) => {
+            for (let i = arr.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+          };
+
+          part1 = shuffle(part1);
+          part2 = shuffle(part2);
+          part3 = shuffle(part3);
+
+          if (quizFile.startsWith('baitap_')) {
+            part1 = part1.slice(0, 9);
+            part2 = part2.slice(0, 2);
+            part3 = part3.slice(0, 3);
+          } else if (quizFile.startsWith('cauhoi')) {
+            part1 = part1.slice(0, 18); part2 = []; part3 = [];
+          } else if (quizFile.startsWith('đs')) {
+            part2 = part2.slice(0, 4); part1 = []; part3 = [];
+          } else if (quizFile.startsWith('tln')) {
+            part3 = part3.slice(0, 6); part1 = []; part2 = [];
           }
 
-          // Lấy giới hạn số câu theo dạng đề
-          let targetCount = mappedData.length;
-          if (quizFile.startsWith('cauhoi')) targetCount = 18;
-          else if (quizFile.startsWith('đs')) targetCount = 4;
-          else if (quizFile.startsWith('tln')) targetCount = 6;
-
-          if (mappedData.length > targetCount) {
-            mappedData = mappedData.slice(0, targetCount);
-          }
-
+          let mappedData = [...part1, ...part2, ...part3];
           quizData = mappedData;
           renderQuiz(mappedData);
         })
@@ -1388,7 +1427,24 @@
       container.innerHTML = '';
       document.getElementById('progressText').textContent = `0 / ${data.length}`;
 
+      let p1Count = 0, p2Count = 0, p3Count = 0;
+      data.forEach(q => {
+        if (q.type === 'cauhoi') p1Count++;
+        else if (q.type === 'đs') p2Count++;
+        else p3Count++;
+      });
+
       data.forEach((q, idx) => {
+        if (quizFile.startsWith('baitap_')) {
+          if (idx === 0 && p1Count > 0) {
+            container.insertAdjacentHTML('beforeend', `<div class="part-header">PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn</div>`);
+          } else if (idx === p1Count && p2Count > 0) {
+            container.insertAdjacentHTML('beforeend', `<div class="part-header">PHẦN II. Câu trắc nghiệm đúng sai</div>`);
+          } else if (idx === p1Count + p2Count && p3Count > 0) {
+            container.insertAdjacentHTML('beforeend', `<div class="part-header">PHẦN III. Câu trắc nghiệm trả lời ngắn</div>`);
+          }
+        }
+
         const card = document.createElement('div');
         card.className = 'question-card';
         card.style.animationDelay = (idx * 0.08) + 's';
@@ -1397,7 +1453,7 @@
         const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
         let answersHTML = '';
         
-        if (quizFile.startsWith('đs') && validAnswers.length > 0) {
+        if (q.type === 'đs' && validAnswers.length > 0) {
           answersHTML = validAnswers.map(a => `
             <div class="tf-statement" id="tf-${q.id}-${a.key}">
               <div class="tf-text"><strong>${a.key}.</strong> ${formatText(a.text)}</div>
@@ -1407,7 +1463,7 @@
               </div>
             </div>
           `).join('');
-        } else if (validAnswers.length > 0) {
+        } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
           answersHTML = validAnswers.map(a => `
             <label class="answer-option" data-key="${a.key}" onclick="selectAnswer(this, ${q.id})">
               <span class="radio-dot"></span>
@@ -1445,7 +1501,9 @@
         renderMathInElement(container, {
           delimiters: [
             { left: '$$', right: '$$', display: true },
-            { left: '$', right: '$', display: false }
+            { left: '\\[', right: '\\]', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false }
           ]
         });
       }
@@ -1483,10 +1541,10 @@
       let answered = 0;
       quizData.forEach(q => {
         const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
-        if (quizFile.startsWith('đs') && validAnswers.length > 0) {
+        if (q.type === 'đs' && validAnswers.length > 0) {
           const selectedTf = document.querySelectorAll(`#answers-${q.id} .tf-btn.selected`);
           if (selectedTf.length === validAnswers.length) answered++;
-        } else if (validAnswers.length > 0) {
+        } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
           if (document.querySelector(`#answers-${q.id} .answer-option.selected`)) answered++;
         } else {
           const inp = document.getElementById(`short-answer-${q.id}`);
@@ -1508,6 +1566,32 @@
     function checkAllAnswered() {
       const total = quizData.length;
       document.getElementById('submitBtn').disabled = getAnsweredCount() < total;
+    }
+
+    function saveProgressToSupabase(email, lessonId, type, score) {
+      try {
+        let dates = JSON.parse(localStorage.getItem('zphysics_activity_dates') || '[]');
+        const today = new Date().toLocaleDateString('en-CA');
+        if (!dates.includes(today)) {
+          dates.push(today);
+          dates.sort((a, b) => new Date(b) - new Date(a));
+          localStorage.setItem('zphysics_activity_dates', JSON.stringify(dates));
+        }
+      } catch(e){}
+
+      if (!currentSession || !currentSession.premium || currentSession.gmail.startsWith('demo_')) return;
+      
+      const payload = { email: email, lesson_id: lessonId, type: type, score: score };
+      fetch(`${SUPABASE_URL}/rest/v1/student_progress?on_conflict=email,lesson_id,type`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Prefer': 'resolution=merge-duplicates, return=minimal'
+        },
+        body: JSON.stringify(payload)
+      }).catch(err => console.error('Lỗi lưu tiến trình:', err));
     }
 
     // ── Nộp bài ──
@@ -1543,7 +1627,7 @@
         let isCorrect = false;
         let studentAnsText = '';
 
-        if (quizFile.startsWith('đs') && validAnswers.length > 0) {
+        if (q.type === 'đs' && validAnswers.length > 0) {
           let correctCount = 0;
           let wrongStatements = [];
           const correctKey = q.correct ? q.correct.toString().toUpperCase().trim() : '';
@@ -1592,6 +1676,10 @@
           else if (correctCount === 3) qScore = 0.5;
           else if (correctCount === 4) qScore = 1.0;
           
+          if (!quizFile.startsWith('baitap_')) {
+            qScore = correctCount; // thang điểm cũ (1đ / ý)
+          }
+
           score += qScore;
           isCorrect = (correctCount === validAnswers.length);
           
@@ -1599,7 +1687,7 @@
             wrongAnswersList.push(`Câu ${index + 1}: Sai ${wrongStatements.length} ý. [${wrongStatements.join('; ')}]`);
           }
 
-        } else if (validAnswers.length > 0) {
+        } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
           const selected = answersEl.querySelector('.answer-option.selected');
           const selectedKey = selected ? selected.dataset.key : null;
           isCorrect = selectedKey === q.correct;
@@ -1612,7 +1700,7 @@
           });
           
           if (isCorrect) {
-            score++;
+            score += quizFile.startsWith('baitap_') ? 0.25 : 1;
           } else {
             wrongAnswersList.push(`Câu ${index + 1}: Chọn "${studentAnsText}" (Đáp án đúng: ${q.correct})`);
           }
@@ -1636,7 +1724,7 @@
           }
           
           if (isCorrect) {
-            score++;
+            score += quizFile.startsWith('baitap_') ? 0.25 : 1;
           } else {
             wrongAnswersList.push(`Câu ${index + 1}: Chọn "${studentAnsText}" (Đáp án đúng: ${q.correct})`);
           }
@@ -1660,17 +1748,26 @@
         renderMathInElement(document.getElementById('quizContainer'), {
           delimiters: [
             { left: '$$', right: '$$', display: true },
-            { left: '$', right: '$', display: false }
+            { left: '\\[', right: '\\]', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false }
           ]
         });
       }
 
       // Hiển thị điểm
-      const banner = document.getElementById('scoreBanner');
-      const total = quizData.length;
-      const pct = Math.round((score / total) * 100);
+      let finalScore = score;
+      let maxScore = quizData.length;
+      if (quizFile.startsWith('baitap_')) {
+        finalScore = score * 2; // Nhân 2 để ra thang điểm 10
+        maxScore = 10;
+      }
+      finalScore = parseFloat(finalScore.toFixed(2));
 
-      document.getElementById('scoreValue').textContent = `${score} / ${total}`;
+      const banner = document.getElementById('scoreBanner');
+      const pct = Math.round((finalScore / maxScore) * 100);
+
+      document.getElementById('scoreValue').textContent = `${finalScore} / ${maxScore}`;
       document.getElementById('scoreValue').style.color =
         pct >= 70 ? 'var(--correct)' : pct >= 40 ? '#f9a825' : 'var(--wrong)';
 
@@ -1686,7 +1783,12 @@
 
       // Gửi kết quả về Telegram
       if (TELEGRAM_WEBHOOK_URL && TELEGRAM_WEBHOOK_URL !== 'ĐIỀN_LINK_WEBHOOK_CỦA_BẠN_VÀO_ĐÂY') {
-        sendResultToTelegram(studentName, score, total, wrongAnswersList);
+        sendResultToTelegram(studentName, finalScore, maxScore, wrongAnswersList);
+      }
+
+      // Lưu tiến trình học tập
+      if (currentSession && currentSession.gmail) {
+        saveProgressToSupabase(currentSession.gmail, quizFile, 'quiz', finalScore);
       }
 
       // Ẩn nút nộp, hiện nút làm lại

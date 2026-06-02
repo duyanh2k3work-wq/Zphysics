@@ -1298,6 +1298,199 @@
       height: 100%;
       border: none;
     }
+    /* ── PROGRESS & DASHBOARD STYLES ── */
+    .chapter-progress-wrap {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      margin-top: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+    .chapter-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #2ec4b6, #7c4dff);
+      border-radius: 6px;
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .chapter-progress-text {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-top: 4px;
+      text-align: right;
+    }
+    .lesson-checkmark {
+      display: inline-block;
+      margin-left: 6px;
+      color: #2ec4b6;
+      font-weight: 900;
+      text-shadow: 0 0 8px rgba(46, 196, 182, 0.4);
+      animation: popIn 0.3s ease;
+    }
+    .dashboard-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10005;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .dashboard-modal.visible {
+      display: flex;
+    }
+    .dashboard-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      animation: fadeIn 0.3s ease forwards;
+    }
+    .dashboard-container {
+      position: relative;
+      z-index: 10006;
+      width: 100%;
+      max-width: 400px;
+      background: var(--card);
+      border-radius: 24px;
+      padding: 24px;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      transform: scale(0.9) translateY(20px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      color: var(--text);
+    }
+    body.premium-theme .dashboard-container {
+      background: rgba(22, 22, 26, 0.96);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #f5f5f7;
+    }
+    .dashboard-modal.visible .dashboard-container {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+    .dashboard-header {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .dashboard-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-box {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .stat-val {
+      font-size: 24px;
+      font-weight: 900;
+      color: #ffd54f;
+      margin-bottom: 4px;
+      text-shadow: 0 0 10px rgba(255, 213, 79, 0.3);
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .reminder-settings {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 16px;
+      display: none; /* Chỉ hiện khi có Capacitor */
+    }
+    .reminder-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .reminder-label {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .toggle-switch.active {
+      background: #2ec4b6;
+    }
+    .toggle-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .toggle-switch.active .toggle-knob {
+      transform: translateX(20px);
+    }
+    .time-input {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      outline: none;
+      padding: 4px;
+    }
+    body.premium-theme .time-input {
+      color: #fff;
+      color-scheme: dark;
+    }
+    .close-dashboard {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #7c4dff, #b388ff);
+      color: #fff;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+    }
+    .btn-dashboard-open {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      margin-bottom: 6px;
+      padding: 8px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+    .btn-dashboard-open:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
   </style>
 </head>
 
@@ -1356,6 +1549,7 @@
           <div class="user-popup-name" id="popupName"></div>
           <div class="user-popup-email" id="popupEmail" style="margin-bottom: 4px;"></div>
           <div class="user-popup-status" id="popupStatus" style="font-size: 11px; font-weight: 800; color: var(--muted); margin-bottom: 12px; word-break: break-word;"></div>
+          <a href="javascript:void(0)" class="btn-dashboard-open" id="btnDashboard" onclick="openDashboard()" style="display: none;">📊 Tiến độ học tập</a>
           <a href="premium.html" class="premium-btn-popup">👑 Nâng cấp Premium</a>
           <button class="logout-btn" id="logoutBtn">🚪 Đăng xuất</button>
         </div>
@@ -1377,6 +1571,39 @@
 
   </div>
 
+  <div id="dashboardModal" class="dashboard-modal">
+    <div class="dashboard-backdrop" onclick="closeDashboard()"></div>
+    <div class="dashboard-container">
+      <div class="dashboard-header">Tiến Độ Học Tập 🚀</div>
+      
+      <div class="dashboard-stats">
+        <div class="stat-box">
+          <div class="stat-val" id="statStreak">0</div>
+          <div class="stat-label">Ngày học liên tiếp 🔥</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="statCompleted">0</div>
+          <div class="stat-label">Bài hoàn thành 📚</div>
+        </div>
+      </div>
+
+      <div id="reminderSettings" class="reminder-settings">
+        <div class="reminder-row">
+          <div class="reminder-label">Nhắc nhở học tập hàng ngày</div>
+          <div id="reminderToggle" class="toggle-switch" onclick="toggleReminder()">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+        <div class="reminder-row" id="reminderTimeRow" style="display: none;">
+          <div class="reminder-label">Giờ nhắc:</div>
+          <input type="time" id="reminderTime" class="time-input" value="20:00" onchange="saveReminderTime()">
+        </div>
+      </div>
+
+      <button class="close-dashboard" onclick="closeDashboard()">Đóng</button>
+    </div>
+  </div>
+
   <script>
     // Tự động làm sạch URL trên trình duyệt (loại bỏ .html)
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
@@ -1393,15 +1620,137 @@
     // ── Định nghĩa label và icon cho từng loại link ──
     const LINK_CONFIG = {
       video: { label: 'Video bài học', cls: 'lnk-video', icon: '▶️' },
-      baiTap: { label: 'Tài liệu / Bài tập', cls: 'lnk-baiTap', icon: '📄' },
-      tracNghiem: { label: 'Trắc nghiệm', cls: 'lnk-tracNghiem', icon: '☑️' },
-      dungSai: { label: 'Đúng / Sai', cls: 'lnk-dungSai', icon: '⚖️' },
-      traLoiNgan: { label: 'Trả lời ngắn', cls: 'lnk-traLoiNgan', icon: '✍️' },
+      baiTap: { label: 'Tài liệu / Lý thuyết', cls: 'lnk-baiTap', icon: '📄' },
+      luyenTap: { label: 'Bài tập', cls: 'lnk-tracNghiem', icon: '☑️' },
       phieuDapAn: { label: 'Phiếu đáp án', cls: 'lnk-phieuDapAn', icon: '📋' }
     };
 
     // ── Danh sách Đề ôn thi thử tốt nghiệp THPT Quốc gia (Premium Only) ──
     let mockExams = [];
+    let studentProgressMap = {};
+
+    // ── DASHBOARD & NHẮC NHỞ LOGIC ──
+    function openDashboard() {
+      document.getElementById('dashboardModal').classList.add('visible');
+      
+      // Compute Streak
+      let dates = [];
+      try { dates = JSON.parse(localStorage.getItem('zphysics_activity_dates') || '[]'); } catch(e){}
+      let streak = 0;
+      if (dates.length > 0) {
+        dates.sort((a, b) => new Date(b) - new Date(a));
+        const todayStr = new Date().toLocaleDateString('en-CA');
+        const yesterdayDate = new Date();
+        yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+        const yesterdayStr = yesterdayDate.toLocaleDateString('en-CA');
+        
+        let currentDate = new Date(dates[0]);
+        if (dates[0] === todayStr || dates[0] === yesterdayStr) {
+          streak = 1;
+          for (let i = 1; i < dates.length; i++) {
+            const prevDate = new Date(dates[i]);
+            const diffDays = (currentDate - prevDate) / (1000 * 3600 * 24);
+            if (diffDays === 1) {
+              streak++;
+              currentDate = prevDate;
+            } else if (diffDays > 1) {
+              break;
+            }
+          }
+        }
+      }
+      document.getElementById('statStreak').textContent = streak;
+
+      // Compute Completed
+      const completedCount = Object.keys(studentProgressMap).length;
+      document.getElementById('statCompleted').textContent = completedCount;
+
+      // Init reminder UI if Capacitor
+      if (window.Capacitor) {
+        document.getElementById('reminderSettings').style.display = 'block';
+        const isEnabled = localStorage.getItem('zphysics_reminder_enabled') === 'true';
+        const rTime = localStorage.getItem('zphysics_reminder_time') || '20:00';
+        document.getElementById('reminderTime').value = rTime;
+        if (isEnabled) {
+          document.getElementById('reminderToggle').classList.add('active');
+          document.getElementById('reminderTimeRow').style.display = 'flex';
+        } else {
+          document.getElementById('reminderToggle').classList.remove('active');
+          document.getElementById('reminderTimeRow').style.display = 'none';
+        }
+      }
+    }
+
+    function closeDashboard() {
+      document.getElementById('dashboardModal').classList.remove('visible');
+    }
+
+    async function toggleReminder() {
+      const toggle = document.getElementById('reminderToggle');
+      const timeRow = document.getElementById('reminderTimeRow');
+      const isCurrentlyEnabled = toggle.classList.contains('active');
+      
+      if (!isCurrentlyEnabled) {
+        if (window.Capacitor && window.Capacitor.Plugins.LocalNotifications) {
+          const perm = await window.Capacitor.Plugins.LocalNotifications.requestPermissions();
+          if (perm.display !== 'granted') {
+            alert('Cần cấp quyền thông báo để sử dụng tính năng này!');
+            return;
+          }
+        }
+        toggle.classList.add('active');
+        timeRow.style.display = 'flex';
+        localStorage.setItem('zphysics_reminder_enabled', 'true');
+        scheduleLocalNotification();
+      } else {
+        toggle.classList.remove('active');
+        timeRow.style.display = 'none';
+        localStorage.setItem('zphysics_reminder_enabled', 'false');
+        if (window.Capacitor && window.Capacitor.Plugins.LocalNotifications) {
+          await window.Capacitor.Plugins.LocalNotifications.cancel({ notifications: [{ id: 1 }] });
+        }
+      }
+    }
+
+    async function saveReminderTime() {
+      const timeVal = document.getElementById('reminderTime').value;
+      localStorage.setItem('zphysics_reminder_time', timeVal);
+      if (localStorage.getItem('zphysics_reminder_enabled') === 'true') {
+        scheduleLocalNotification();
+      }
+    }
+
+    async function scheduleLocalNotification() {
+      if (!window.Capacitor || !window.Capacitor.Plugins.LocalNotifications) return;
+      const timeVal = localStorage.getItem('zphysics_reminder_time') || '20:00';
+      const [hours, minutes] = timeVal.split(':').map(Number);
+      
+      await window.Capacitor.Plugins.LocalNotifications.cancel({ notifications: [{ id: 1 }] });
+      await window.Capacitor.Plugins.LocalNotifications.schedule({
+        notifications: [
+          {
+            title: "Đến giờ học Vật lý rồi! 🚀",
+            body: "Hãy vào Zphysics để hoàn thành mục tiêu hôm nay nhé!",
+            id: 1,
+            schedule: {
+              on: { hour: hours, minute: minutes },
+              repeats: true,
+              allowWhileIdle: true
+            },
+            sound: null,
+            attachments: null,
+            actionTypeId: "",
+            extra: null
+          }
+        ]
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.Capacitor && localStorage.getItem('zphysics_reminder_enabled') === 'true') {
+        scheduleLocalNotification();
+      }
+    });
     const DEFAULT_MOCK_EXAMS = [
       {
         id: "de_thi_thu_10_c1",
@@ -1593,6 +1942,7 @@
             <div class="pill pill-b" style="background:linear-gradient(135deg,#9d4edd,#c77dff)"></div>
             <div class="pill pill-c" style="background:linear-gradient(135deg,#ffffff,#b388ff)"></div>`;
 
+          let completedMockCount = 0;
           const lessonsHTML = matchingExams.map(exam => {
             const clickAction = `event.stopPropagation(); const session = getSession(); if (session && session.premium) { window.location.href='l.html#${exam.id}'; } else { window.location.href='premium.html'; }`;
 
@@ -1602,11 +1952,14 @@
 
             const làmBàiBtnHTML = `<a href="javascript:void(0)" class="lnk lnk-tracNghiem" onclick="${clickAction}">📝 Làm bài (${exam.duration || 50} phút)</a>`;
 
+            const isCompleted = studentProgressMap[exam.id];
+            if (isCompleted) completedMockCount++;
+
             return `
-              <div class="lesson-row">
+              <div class="lesson-row ${isCompleted ? 'completed' : ''}">
                 <div class="lesson-meta">
                   <span class="lesson-dot" style="background:#7c4dff"></span>
-                  <span class="lesson-title">${exam.title}</span>
+                  <span class="lesson-title">${exam.title} ${isCompleted ? '<span class="lesson-checkmark">✓</span>' : ''}</span>
                   <span class="lesson-num" style="color:#b388ff">VIP</span>
                 </div>
                 <div class="lesson-links">${làmBàiBtnHTML} ${videoBtnHTML}</div>
@@ -1622,6 +1975,12 @@
                 <div class="tags">
                   <span class="tag" style="color:#b388ff;border-color:#b388ff30;background:#b388ff0d">Đề thi khảo sát & bài tập tổng hợp</span>
                 </div>
+                ${matchingExams.length > 0 ? `
+                <div class="chapter-progress-wrap">
+                  <div class="chapter-progress-bar" style="width: ${Math.round((completedMockCount / matchingExams.length) * 100)}%; background: linear-gradient(135deg, #7c4dff, #b388ff)"></div>
+                </div>
+                <div class="chapter-progress-text" style="color: #b388ff">${completedMockCount}/${matchingExams.length} đề hoàn thành</div>
+                ` : ''}
               </div>
               <div class="ch-arrow"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
             </div>
@@ -1645,6 +2004,9 @@
             `<span class="tag" style="color:${t.color};border-color:${t.color}30;background:${t.color}0d">${t.label}</span>`
           ).join('');
 
+          let completedCount = 0;
+          const totalLessons = ch.lessons.length;
+
           const lessonsHTML = ch.lessons.map((l, lIdx) => {
             // Tự động sinh mã đề nếu chưa có, để người dùng không phải deploy lại mỗi khi thêm đề mới
             const gradeNum = gradeObj.grade.match(/\d+/) ? gradeObj.grade.match(/\d+/)[0] : '10';
@@ -1654,9 +2016,15 @@
             const lNum = l.num; // '04'
 
             const autoLinks = { ...l.links };
-            if (!autoLinks.tracNghiem || autoLinks.tracNghiem === '#') autoLinks.tracNghiem = `q.html#cauhoi_${gradeNum}_c${cNum}_b${lNum}`;
-            if (!autoLinks.dungSai || autoLinks.dungSai === '#') autoLinks.dungSai = `q.html#đs_${gradeNum}_c${cNum}_b${lNum}`;
-            if (!autoLinks.traLoiNgan || autoLinks.traLoiNgan === '#') autoLinks.traLoiNgan = `q.html#tln_${gradeNum}_c${cNum}_b${lNum}`;
+            
+            if (autoLinks.tracNghiem || autoLinks.dungSai || autoLinks.traLoiNgan) {
+              autoLinks.luyenTap = (autoLinks.tracNghiem && autoLinks.tracNghiem !== '#') ? autoLinks.tracNghiem : '#';
+              delete autoLinks.tracNghiem;
+              delete autoLinks.dungSai;
+              delete autoLinks.traLoiNgan;
+            }
+
+            if (!autoLinks.luyenTap || autoLinks.luyenTap === '#') autoLinks.luyenTap = `q.html#baitap_${gradeNum}_c${cNum}_b${lNum}`;
 
             // Build link buttons
             const linksHTML = Object.entries(autoLinks)
@@ -1671,7 +2039,8 @@
                 if (typeof url === 'string') {
                   if (url.includes('tracnghiem.html')) {
                     const match = url.match(/quiz=([^&]+)/);
-                    const quizCode = match ? match[1] : 'cauhoi';
+                    let quizCode = match ? match[1] : 'cauhoi';
+                    if (quizCode.startsWith('cauhoi_')) quizCode = quizCode.replace('cauhoi_', 'baitap_');
                     normalizedUrl = `q.html#${quizCode}`;
                   } else if (url.includes('luyende.html')) {
                     const match = url.match(/exam=([^&]+)/);
@@ -1701,11 +2070,14 @@
               ? `<span class="lesson-num">${l.num}</span>`
               : `<span class="lesson-num" style="color:#b388ff; font-weight:800;">VIP</span>`;
 
+            const isCompleted = studentProgressMap[`baitap_${gradeNum}_c${cNum}_b${lNum}`] || studentProgressMap[`cauhoi_${gradeNum}_c${cNum}_b${lNum}`] || studentProgressMap[`đs_${gradeNum}_c${cNum}_b${lNum}`] || studentProgressMap[`tln_${gradeNum}_c${cNum}_b${lNum}`];
+            if (isCompleted) completedCount++;
+
             return `
-              <div class="lesson-row">
+              <div class="lesson-row ${isCompleted ? 'completed' : ''}">
                 <div class="lesson-meta">
                   <span class="lesson-dot" style="background:${ch.dotColor}"></span>
-                  <span class="lesson-title">${l.num}. ${l.title}</span>
+                  <span class="lesson-title">${l.num}. ${l.title} ${isCompleted ? '<span class="lesson-checkmark">✓</span>' : ''}</span>
                   ${numDisplay}
                 </div>
                 <div class="lesson-links">${linksHTML}</div>
@@ -1754,6 +2126,12 @@
                 <div class="ch-num">${ch.num}</div>
                 <div class="ch-title">${ch.title}</div>
                 <div class="tags">${tagsHTML}</div>
+                ${totalLessons > 0 ? `
+                <div class="chapter-progress-wrap">
+                  <div class="chapter-progress-bar" style="width: ${Math.round((completedCount / totalLessons) * 100)}%"></div>
+                </div>
+                <div class="chapter-progress-text">${completedCount}/${totalLessons} bài hoàn thành</div>
+                ` : ''}
               </div>
               <div class="ch-arrow"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
             </div>
@@ -1850,6 +2228,11 @@
     function showApp(ten, premium) {
       const isPremium = premium !== undefined ? !!premium : (getSession() ? !!getSession().premium : false);
       const statusEl = document.getElementById('popupStatus');
+
+      const btnDashboard = document.getElementById('btnDashboard');
+      if (btnDashboard) {
+        btnDashboard.style.display = isPremium ? 'block' : 'none';
+      }
 
       if (isPremium) {
         document.body.classList.add('premium-theme');
@@ -1959,6 +2342,7 @@
       const errorEl = document.getElementById('loginError');
 
       emailInput.disabled = false;
+      btn.disabled = false;
       nameWrap.style.display = 'none';
       nameInput.value = '';
       errorEl.classList.remove('visible');
@@ -2015,13 +2399,7 @@
 
           if (result && result.success) {
             saveSession(gmail, result.ten || fullName, false); // Mới đăng ký mặc định là Free (premium = false)
-            showApp(result.ten || fullName, false);
-
-            // Khôi phục trạng thái form đăng ký
-            isRegistering = false;
-            nameWrap.style.display = 'none';
-            emailInput.disabled = false;
-            subtitleEl.textContent = 'Đăng nhập bằng Gmail để tiếp tục';
+            window.location.reload();
           } else {
             throw new Error(result.error || result.message || 'Lỗi xử lý kích hoạt.');
           }
@@ -2057,7 +2435,7 @@
           const student = students[0];
           const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
           saveSession(gmail, student.full_name || gmail, isPremium, student.premium_until);
-          showApp(student.full_name || gmail, isPremium);
+          window.location.reload();
         } else {
           // Gmail chưa tồn tại trong hệ thống -> Mở form đăng ký tự động
           isRegistering = true;
@@ -2082,16 +2460,7 @@
 
     function doLogout() {
       clearSession();
-      document.body.classList.remove('premium-theme');
-      document.getElementById('userPopup').classList.remove('visible');
-      document.getElementById('loginEmail').value = '';
-      document.getElementById('loginError').classList.remove('visible');
-
-      // Hủy trạng thái đăng ký nếu đang dở dang
-      cancelRegistration();
-
-      switchGrade(0); // Reset về Lớp 10 khi đăng xuất để tránh giao diện trống
-      showLogin();
+      window.location.reload();
     }
 
     // ── Xử lý popup avatar: chỉ dùng 1 listener duy nhất ──
@@ -2239,10 +2608,29 @@
             return [];
           });
 
-        const [baihocData, sheetLinks, luyendeData] = await Promise.all([baihocPromise, linksPromise, luyendePromise]);
+        const session = getSession();
+        let progressPromise = Promise.resolve([]);
+        if (session && session.premium && session.gmail && !session.gmail.startsWith('demo_')) {
+          progressPromise = fetch(`${SUPABASE_URL}/rest/v1/student_progress?email=eq.${encodeURIComponent(session.gmail)}&select=*`, {
+            headers: {
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            }
+          }).then(res => res.ok ? res.json() : []).catch(() => []);
+        }
+
+        const [baihocData, sheetLinks, luyendeData, progressData] = await Promise.all([baihocPromise, linksPromise, luyendePromise, progressPromise]);
 
         if (luyendeData && luyendeData.length > 0) {
           mockExams = luyendeData;
+        }
+
+        if (progressData && progressData.length > 0) {
+          progressData.forEach(p => {
+            if (p.score == null || p.score >= 7.5) {
+              studentProgressMap[p.lesson_id] = true;
+            }
+          });
         }
 
         // Trộn các link từ Sheet vào cấu trúc baihoc.json
