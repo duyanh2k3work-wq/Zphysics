@@ -749,167 +749,6 @@
         padding: 4px 8px;
         font-size: 12px;
       }
-    }
-
-    /* ── MUSIC CONTROLLER STYLES ── */
-    .music-controller-wrap {
-      position: fixed;
-      left: 20px;
-      bottom: 85px; /* Offset to clear mobile footer */
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-
-    @media (min-width: 768px) {
-      .music-controller-wrap {
-        bottom: 20px; /* Standard bottom for desktop */
-      }
-    }
-
-    .music-btn {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      background: rgba(18, 18, 22, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      padding: 0;
-      color: #fff;
-    }
-
-    .music-btn:hover {
-      transform: scale(1.08);
-      border-color: var(--teal, #2ec4b6);
-      box-shadow: 0 8px 32px rgba(46, 196, 182, 0.2);
-    }
-
-    .music-wave {
-      display: none; /* Only show when playing */
-      align-items: flex-end;
-      gap: 3px;
-      width: 20px;
-      height: 18px;
-    }
-
-    .music-wave.active {
-      display: flex;
-    }
-
-    .music-wave span {
-      display: block;
-      width: 3px;
-      background: var(--teal, #2ec4b6);
-      border-radius: 3px;
-      animation: bounceWave 0.8s ease-in-out infinite alternate;
-    }
-
-    .music-wave span:nth-child(1) { height: 60%; animation-delay: 0.1s; }
-    .music-wave span:nth-child(2) { height: 100%; animation-delay: 0.2s; }
-    .music-wave span:nth-child(3) { height: 40%; animation-delay: 0.3s; }
-    .music-wave span:nth-child(4) { height: 80%; animation-delay: 0.4s; }
-
-    @keyframes bounceWave {
-      from { transform: scaleY(0.3); }
-      to { transform: scaleY(1.1); }
-    }
-
-    .music-icon-fallback {
-      font-size: 20px;
-      display: block;
-      transition: transform 0.3s;
-    }
-
-    .music-wave.active + .music-icon-fallback {
-      display: none;
-    }
-
-    /* Tooltip */
-    .music-tooltip {
-      position: absolute;
-      left: 60px;
-      background: rgba(18, 18, 22, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 12px 14px;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      width: 240px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      font-size: 13px;
-      color: #e2e8f0;
-      line-height: 1.4;
-      pointer-events: none;
-      opacity: 0;
-      transform: translateX(-10px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-
-    .music-tooltip::before {
-      content: '';
-      position: absolute;
-      left: -6px;
-      top: 50%;
-      transform: translateY(-50%) rotate(45deg);
-      width: 10px;
-      height: 10px;
-      background: rgba(18, 18, 22, 0.95);
-      border-left: 1px solid rgba(255, 255, 255, 0.1);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .music-tooltip.visible {
-      opacity: 1;
-      transform: translateX(0);
-      pointer-events: auto;
-    }
-
-    .music-tooltip-btns {
-      display: flex;
-      gap: 8px;
-    }
-
-    .tooltip-btn {
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
-    }
-
-    .tooltip-btn.ok {
-      background: var(--teal, #2ec4b6);
-      color: #fff;
-    }
-
-    .tooltip-btn.ok:hover {
-      background: #25a195;
-    }
-
-    .tooltip-btn.no {
-      background: rgba(255, 255, 255, 0.08);
-      color: #94a3b8;
-    }
-
-    .tooltip-btn.no:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: #fff;
-    }
   </style>
 </head>
 
@@ -1626,30 +1465,10 @@
   </script>
 
   <!-- BACKGROUND MUSIC CONTROLLER -->
-  <div class="music-controller-wrap" id="musicController">
-    <audio id="bgMusic" loop src="assets/alla-turca.mp3"></audio>
-    <button class="music-btn" id="musicBtn" onclick="toggleMusic()" title="Nhạc nền tập trung">
-      <div class="music-wave" id="musicWave">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-      <span class="music-icon-fallback" id="musicIconFallback">🎵</span>
-    </button>
-    <div class="music-tooltip" id="musicTooltip">
-      <span>Bật nhạc nền thư giãn để tập trung hơn?</span>
-      <div class="music-tooltip-btns">
-        <button class="tooltip-btn ok" onclick="acceptMusic()">Bật nhạc</button>
-        <button class="tooltip-btn no" onclick="dismissMusic()">Để sau</button>
-      </div>
-    </div>
-  </div>
+  <audio id="bgMusic" loop src="assets/alla-turca.mp3"></audio>
 
   <script>
     // ── GENTLE BACKGROUND MUSIC SYSTEM ──
-    const musicStateKey = 'zphysics_music_preference';
-    
     function initMusicPlayer() {
       const audio = document.getElementById('bgMusic');
       if (!audio) return;
@@ -1657,85 +1476,22 @@
       // Set volume soft by default
       audio.volume = 0.35;
       
-      // Show tooltip after 3 seconds if no preference exists
-      const pref = localStorage.getItem(musicStateKey);
-      if (!pref) {
-        setTimeout(() => {
-          const tooltip = document.getElementById('musicTooltip');
-          if (tooltip && audio.paused) {
-            tooltip.classList.add('visible');
-          }
-        }, 3000);
-      } else if (pref === 'playing') {
-        playMusic();
-        
-        // Ensure that clicking anywhere on the page triggers playback if autoplay was blocked
-        const playOnFirstInteraction = () => {
-          if (audio.paused) {
-            playMusic();
-          }
-          document.removeEventListener('click', playOnFirstInteraction);
-        };
-        document.addEventListener('click', playOnFirstInteraction);
-      }
-    }
-    
-    function playMusic() {
-      const audio = document.getElementById('bgMusic');
-      const wave = document.getElementById('musicWave');
-      if (audio) {
-        audio.play().then(() => {
-          if (wave) wave.classList.add('active');
-          localStorage.setItem(musicStateKey, 'playing');
-        }).catch(err => {
-          console.warn("Autoplay blocked by browser. Music will play upon user interaction.");
-        });
-      }
-    }
-    
-    function pauseMusic() {
-      const audio = document.getElementById('bgMusic');
-      const wave = document.getElementById('musicWave');
-      if (audio) {
-        audio.pause();
-        if (wave) wave.classList.remove('active');
-        localStorage.setItem(musicStateKey, 'paused');
-      }
-    }
-    
-    function toggleMusic() {
-      const audio = document.getElementById('bgMusic');
-      const tooltip = document.getElementById('musicTooltip');
-      if (tooltip) tooltip.classList.remove('visible');
+      // Play immediately (might be blocked by browser)
+      audio.play().catch(() => {
+        console.warn("Autoplay blocked by browser. Music will play upon user interaction.");
+      });
       
-      if (audio) {
+      // Play on first user interaction (click, scroll, keydown, touchstart)
+      const playOnFirstInteraction = () => {
         if (audio.paused) {
-          playMusic();
-        } else {
-          pauseMusic();
+          audio.play().catch(err => console.log("Play failed on interaction:", err));
         }
-      }
-    }
-    
-    function acceptMusic() {
-      const tooltip = document.getElementById('musicTooltip');
-      if (tooltip) tooltip.classList.remove('visible');
-      playMusic();
-    }
-    
-    // Check if user is clicking outside of the tooltip to close it
-    document.addEventListener('click', (e) => {
-      const controller = document.getElementById('musicController');
-      const tooltip = document.getElementById('musicTooltip');
-      if (tooltip && tooltip.classList.contains('visible') && controller && !controller.contains(e.target)) {
-        tooltip.classList.remove('visible');
-      }
-    });
-
-    function dismissMusic() {
-      const tooltip = document.getElementById('musicTooltip');
-      if (tooltip) tooltip.classList.remove('visible');
-      localStorage.setItem(musicStateKey, 'dismissed');
+        // Remove all listeners once played
+        events.forEach(event => document.removeEventListener(event, playOnFirstInteraction));
+      };
+      
+      const events = ['click', 'touchstart', 'keydown', 'scroll'];
+      events.forEach(event => document.addEventListener(event, playOnFirstInteraction));
     }
     
     // Initialize when page loads
