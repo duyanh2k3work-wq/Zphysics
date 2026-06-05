@@ -912,7 +912,7 @@ function supabaseRequest(path, method, payload) {
     'Content-Type': 'application/json'
   };
   
-  if (method === 'POST' && path.indexOf('questions') !== -1) {
+  if (method === 'POST' && (path.indexOf('questions') !== -1 || path.indexOf('students') !== -1)) {
     headers['Prefer'] = 'resolution=merge-duplicates';
   }
   
@@ -969,12 +969,43 @@ function syncStudentsToSupabase() {
     }
   }
   
-  // 1. Xóa dữ liệu cũ
-  supabaseRequest('students?email=not.is.null', 'DELETE');
+  // 1. Lấy danh sách học sinh hiện tại trên Supabase để tìm những học sinh bị xóa trên Sheet
+  var existingStudents = [];
+  try {
+    existingStudents = supabaseRequest('students?select=email', 'GET') || [];
+  } catch (err) {
+    console.warn("Không thể lấy danh sách học sinh hiện tại từ Supabase: " + err.message);
+  }
   
-  // 2. Insert dữ liệu mới
+  // Tạo bộ tra cứu nhanh cho email học sinh trên Sheet
+  var sheetEmails = {};
+  students.forEach(function(s) {
+    sheetEmails[s.email] = true;
+  });
+  
+  // Tìm các email có trên Supabase nhưng không có trên Sheet để xóa
+  var emailsToDelete = [];
+  existingStudents.forEach(function(s) {
+    if (s.email) {
+      var emailLower = s.email.toLowerCase();
+      if (!sheetEmails[emailLower]) {
+        emailsToDelete.push(emailLower);
+      }
+    }
+  });
+  
+  // Xóa các học sinh không còn trên Sheet (để đồng bộ trạng thái xóa)
+  emailsToDelete.forEach(function(email) {
+    try {
+      supabaseRequest('students?email=eq.' + encodeURIComponent(email), 'DELETE');
+    } catch (err) {
+      console.warn("Lỗi xóa học sinh " + email + ": " + err.message);
+    }
+  });
+  
+  // 2. Upsert (Insert/Update) dữ liệu mới vào Supabase
   if (students.length > 0) {
-    supabaseRequest('students', 'POST', students);
+    supabaseRequest('students?on_conflict=email', 'POST', students);
   }
 }
 
