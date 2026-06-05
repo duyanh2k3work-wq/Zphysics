@@ -1833,11 +1833,17 @@
       
       // Play on first user interaction (click, scroll, keydown, touchstart)
       const playOnFirstInteraction = () => {
-        if (audio.paused) {
-          audio.play().catch(err => console.log("Play failed on interaction:", err));
+        if (!audio.paused) {
+          // Already playing, remove listeners
+          events.forEach(event => document.removeEventListener(event, playOnFirstInteraction));
+          return;
         }
-        // Remove all listeners once played
-        events.forEach(event => document.removeEventListener(event, playOnFirstInteraction));
+        audio.play().then(() => {
+          // Play succeeded! Safe to remove listeners.
+          events.forEach(event => document.removeEventListener(event, playOnFirstInteraction));
+        }).catch(err => {
+          console.warn("Play failed on interaction, will retry on next interaction:", err);
+        });
       };
       
       const events = ['click', 'touchstart', 'keydown', 'scroll'];
