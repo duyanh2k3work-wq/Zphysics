@@ -1952,14 +1952,14 @@
 
             const làmBàiBtnHTML = `<a href="javascript:void(0)" class="lnk lnk-tracNghiem" onclick="${clickAction}">📝 Làm bài (${exam.duration || 50} phút)</a>`;
 
-            const isCompleted = studentProgressMap[exam.id];
-            if (isCompleted) completedMockCount++;
+            const isCompleted = studentProgressMap[exam.id] || 0;
+            if (isCompleted > 0) completedMockCount++;
 
             return `
-              <div class="lesson-row ${isCompleted ? 'completed' : ''}">
+              <div class="lesson-row ${isCompleted > 0 ? 'completed' : ''}">
                 <div class="lesson-meta">
                   <span class="lesson-dot" style="background:#7c4dff"></span>
-                  <span class="lesson-title">${exam.title} ${isCompleted ? '<span class="lesson-checkmark">✓</span>' : ''}</span>
+                  <span class="lesson-title">${exam.title} ${isCompleted > 0 ? `<span class="lesson-checkmark">✓${isCompleted > 1 ? `x${isCompleted}` : ''}</span>` : ''}</span>
                   <span class="lesson-num" style="color:#b388ff">VIP</span>
                 </div>
                 <div class="lesson-links">${làmBàiBtnHTML} ${videoBtnHTML}</div>
@@ -2070,14 +2070,14 @@
               ? `<span class="lesson-num">${l.num}</span>`
               : `<span class="lesson-num" style="color:#b388ff; font-weight:800;">VIP</span>`;
 
-            const isCompleted = studentProgressMap[`baitap_${gradeNum}_c${cNum}_b${lNum}`] || studentProgressMap[`cauhoi_${gradeNum}_c${cNum}_b${lNum}`] || studentProgressMap[`đs_${gradeNum}_c${cNum}_b${lNum}`] || studentProgressMap[`tln_${gradeNum}_c${cNum}_b${lNum}`];
-            if (isCompleted) completedCount++;
+            const isCompleted = (studentProgressMap[`baitap_${gradeNum}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`cauhoi_${gradeNum}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`đs_${gradeNum}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`tln_${gradeNum}_c${cNum}_b${lNum}`] || 0);
+            if (isCompleted > 0) completedCount++;
 
             return `
-              <div class="lesson-row ${isCompleted ? 'completed' : ''}">
+              <div class="lesson-row ${isCompleted > 0 ? 'completed' : ''}">
                 <div class="lesson-meta">
                   <span class="lesson-dot" style="background:${ch.dotColor}"></span>
-                  <span class="lesson-title">${l.num}. ${l.title} ${isCompleted ? '<span class="lesson-checkmark">✓</span>' : ''}</span>
+                  <span class="lesson-title">${l.num}. ${l.title} ${isCompleted > 0 ? `<span class="lesson-checkmark">✓${isCompleted > 1 ? `x${isCompleted}` : ''}</span>` : ''}</span>
                   ${numDisplay}
                 </div>
                 <div class="lesson-links">${linksHTML}</div>
@@ -2627,8 +2627,8 @@
 
         if (progressData && progressData.length > 0) {
           progressData.forEach(p => {
-            if (p.score == null || p.score >= 7.5) {
-              studentProgressMap[p.lesson_id] = true;
+            if (p.score == null || p.score >= 8.0) {
+              studentProgressMap[p.lesson_id] = (studentProgressMap[p.lesson_id] || 0) + 1;
             }
           });
         }
