@@ -1581,7 +1581,8 @@
 
       if (!currentSession || !currentSession.premium || currentSession.gmail.startsWith('demo_')) return;
       
-      const payload = { email: email, lesson_id: lessonId, type: type, score: score };
+      const uniqueType = type + '_' + Date.now();
+      const payload = { email: email, lesson_id: lessonId, type: uniqueType, score: score };
       fetch(`${SUPABASE_URL}/rest/v1/student_progress?on_conflict=email,lesson_id,type`, {
         method: 'POST',
         headers: {
