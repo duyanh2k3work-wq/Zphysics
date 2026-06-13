@@ -1789,7 +1789,11 @@
 
       // Lưu tiến trình học tập
       if (currentSession && currentSession.gmail) {
-        saveProgressToSupabase(currentSession.gmail, quizFile, 'quiz', finalScore);
+        let dbScore = finalScore;
+        if (!quizFile.startsWith('baitap_') && maxScore > 0) {
+          dbScore = (score / maxScore) * 10;
+        }
+        saveProgressToSupabase(currentSession.gmail, quizFile, 'quiz', parseFloat(dbScore.toFixed(2)));
       }
 
       // Ẩn nút nộp, hiện nút làm lại
