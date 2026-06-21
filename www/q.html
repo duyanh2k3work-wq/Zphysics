@@ -1079,6 +1079,7 @@
       background: rgba(0,0,0,0.04);
       border: 1.5px solid rgba(0,0,0,0.08);
       color: var(--muted);
+      font-family: "Segoe UI", Arial, sans-serif;
       font-weight: 800;
       font-size: 14px;
       cursor: pointer;
@@ -1798,7 +1799,7 @@
         answersHTML = `
           <div style="padding: 10px 14px; display: flex; gap: 10px;">
             <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời..." style="flex: 1;" onkeydown="if(event.key === 'Enter') gradeShortAnswer(${q.id})">
-            <button type="button" class="grade-btn" id="grade-btn-${q.id}" onclick="gradeShortAnswer(${q.id})" style="padding: 8px 16px; border-radius: 12px; background: var(--teal); color: white; border: none; font-weight: 800; cursor: pointer;">Gửi</button>
+            <button type="button" class="grade-btn" id="grade-btn-${q.id}" onclick="gradeShortAnswer(${q.id})" style="padding: 8px 16px; border-radius: 12px; background: var(--teal); color: white; border: none; font-weight: 800; font-family: 'Segoe UI', Arial, sans-serif; cursor: pointer;">Gửi</button>
           </div>
         `;
       }
