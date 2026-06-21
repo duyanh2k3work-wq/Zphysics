@@ -491,6 +491,11 @@
       color: #4527a0;
     }
 
+    .lnk-onTap {
+      background: #e0f7fa;
+      color: #00838f;
+    }
+
     /* ── GRADE SECTIONS ── */
     .grade-section {
       display: none;
@@ -1621,7 +1626,8 @@
     const LINK_CONFIG = {
       video: { label: 'Video bài học', cls: 'lnk-video', icon: '▶️' },
       baiTap: { label: 'Tài liệu / Lý thuyết', cls: 'lnk-baiTap', icon: '📄' },
-      luyenTap: { label: 'Bài tập', cls: 'lnk-tracNghiem', icon: '☑️' },
+      luyenTap: { label: 'Bài tập về nhà', cls: 'lnk-tracNghiem', icon: '☑️' },
+      onTap: { label: 'Ôn tập', cls: 'lnk-onTap', icon: '🔄' },
       phieuDapAn: { label: 'Phiếu đáp án', cls: 'lnk-phieuDapAn', icon: '📋' }
     };
 
@@ -2015,16 +2021,19 @@
             const cNum = romanMap[cRaw] || parseInt(cRaw) || 1;
             const lNum = l.num; // '04'
 
-            const autoLinks = { ...l.links };
+            const autoLinks = {};
+            if (l.links && l.links.video) autoLinks.video = l.links.video;
+            if (l.links && l.links.baiTap) autoLinks.baiTap = l.links.baiTap;
             
-            if (autoLinks.tracNghiem || autoLinks.dungSai || autoLinks.traLoiNgan) {
-              autoLinks.luyenTap = (autoLinks.tracNghiem && autoLinks.tracNghiem !== '#') ? autoLinks.tracNghiem : '#';
-              delete autoLinks.tracNghiem;
-              delete autoLinks.dungSai;
-              delete autoLinks.traLoiNgan;
-            }
+            let ltLink = (l.links && (l.links.luyenTap || l.links.tracNghiem)) || '#';
+            if (!ltLink || ltLink === '#') ltLink = `q.html#baitap_${gradeNum}_c${cNum}_b${lNum}`;
+            autoLinks.luyenTap = ltLink;
 
-            if (!autoLinks.luyenTap || autoLinks.luyenTap === '#') autoLinks.luyenTap = `q.html#baitap_${gradeNum}_c${cNum}_b${lNum}`;
+            let otLink = (l.links && l.links.onTap) || '#';
+            if (!otLink || otLink === '#') otLink = `q.html#ontap_${gradeNum}_c${cNum}_b${lNum}`;
+            autoLinks.onTap = otLink;
+
+            if (l.links && l.links.phieuDapAn) autoLinks.phieuDapAn = l.links.phieuDapAn;
 
             // Build link buttons
             const linksHTML = Object.entries(autoLinks)
