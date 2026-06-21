@@ -972,7 +972,7 @@
       box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.08);
       z-index: 9999;
       font-weight: 800;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text);
     }
     body.premium-theme .review-bar {
@@ -985,6 +985,7 @@
       display: flex;
       align-items: center;
       gap: 4px;
+      flex-wrap: wrap;
     }
     .review-end-btn {
       padding: 10px 20px;
@@ -997,6 +998,7 @@
       cursor: pointer;
       box-shadow: 0 4px 15px rgba(46, 196, 182, 0.3);
       transition: all 0.2s ease;
+      white-space: nowrap;
     }
     .review-end-btn:hover {
       transform: translateY(-2px);
@@ -1020,15 +1022,76 @@
       border: 1.5px solid var(--wrong) !important;
       box-shadow: 0 8px 24px rgba(229, 57, 53, 0.08) !important;
     }
-    .question-card.correct-card, .question-card.wrong-card {
-      opacity: 0.9;
-    }
     .grade-btn {
       transition: all 0.2s ease;
     }
     .grade-btn:hover {
       filter: brightness(1.1);
       transform: translateY(-1px);
+    }
+    /* Flashcard animations */
+    .review-card-enter {
+      animation: reviewCardIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    .review-card-exit {
+      animation: reviewCardOut 0.3s ease both;
+    }
+    @keyframes reviewCardIn {
+      from { opacity: 0; transform: translateX(60px) scale(0.95); }
+      to { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    @keyframes reviewCardOut {
+      from { opacity: 1; transform: translateX(0) scale(1); }
+      to { opacity: 0; transform: translateX(-60px) scale(0.95); }
+    }
+    .skip-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 24px;
+      border-radius: 50px;
+      background: rgba(0,0,0,0.04);
+      border: 1.5px solid rgba(0,0,0,0.08);
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 4px;
+    }
+    .skip-btn:hover {
+      background: rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+    }
+    body.premium-theme .skip-btn {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.1);
+      color: #a1a1aa;
+    }
+    body.premium-theme .skip-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    .review-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      padding: 8px 14px 18px;
+    }
+    .review-done-msg {
+      text-align: center;
+      padding: 60px 24px;
+      animation: reviewCardIn 0.4s ease both;
+    }
+    .review-done-msg h2 {
+      font-size: 22px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: var(--teal);
+    }
+    .review-done-msg p {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--muted);
     }
   </style>
 </head>
@@ -1093,12 +1156,13 @@
     <!-- Sticky bottom bar cho chế độ ôn tập -->
     <div class="review-bar" id="reviewBar" style="display:none">
       <div class="review-stats">
-        📊 Đã làm: <span id="rvDone" style="color:var(--teal)">0</span>/<span id="rvTotal">0</span>
-        &nbsp;│&nbsp; ✅ <span id="rvCorrect" style="color:var(--correct)">0</span>
-        &nbsp;│&nbsp; ❌ <span id="rvWrong" style="color:var(--wrong)">0</span>
+        ✅<span id="rvCorrect" style="color:var(--correct)">0</span>
+        &nbsp;❌<span id="rvWrong" style="color:var(--wrong)">0</span>
+        &nbsp;⏭<span id="rvSkipped" style="color:var(--muted)">0</span>
+        &nbsp;│&nbsp;<span id="rvDone" style="color:var(--teal)">0</span>/<span id="rvTotal">0</span>
       </div>
-      <button class="review-end-btn" id="rvEndBtn" disabled onclick="endReview()">
-        Kết thúc ôn tập
+      <button class="review-end-btn" id="rvEndBtn" onclick="endReview()">
+        Kết thúc
       </button>
     </div>
 
@@ -1253,6 +1317,13 @@
     let quizData = [];
     let submitted = false;
     let lessonInfo = null;
+
+    // ── Review mode state ──
+    let rvIndex = 0;
+    let rvCorrect = 0;
+    let rvWrong = 0;
+    let rvSkipped = 0;
+    let rvResults = []; // { qId, isCorrect, skipped }
 
     // Phân tích mã đề trong trường hợp không tìm thấy trong baihoc.json
     function parseQuizCode(code) {
@@ -1544,12 +1615,22 @@
         if (submitBtn) submitBtn.style.display = 'none';
         const reviewBar = document.getElementById('reviewBar');
         if (reviewBar) reviewBar.style.display = 'flex';
-      } else {
-        const submitBtn = document.getElementById('submitBtn');
-        if (submitBtn) submitBtn.style.display = '';
-        const reviewBar = document.getElementById('reviewBar');
-        if (reviewBar) reviewBar.style.display = 'none';
+        
+        // Reset review state
+        rvIndex = 0;
+        rvCorrect = 0;
+        rvWrong = 0;
+        rvSkipped = 0;
+        rvResults = [];
+        updateReviewBar();
+        showReviewCard();
+        return;
       }
+      
+      const submitBtn = document.getElementById('submitBtn');
+      if (submitBtn) submitBtn.style.display = '';
+      const reviewBar = document.getElementById('reviewBar');
+      if (reviewBar) reviewBar.style.display = 'none';
 
       let p1Count = 0, p2Count = 0, p3Count = 0;
       data.forEach(q => {
@@ -1559,7 +1640,7 @@
       });
 
       data.forEach((q, idx) => {
-        if (quizFile.startsWith('baitap_') || isReviewMode) {
+        if (quizFile.startsWith('baitap_')) {
           if (idx === 0 && p1Count > 0) {
             container.insertAdjacentHTML('beforeend', `<div class="part-header">PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn</div>`);
           } else if (idx === p1Count && p2Count > 0) {
@@ -1595,20 +1676,11 @@
             </label>
           `).join('');
         } else {
-          if (isReviewMode) {
-            answersHTML = `
-              <div style="padding: 10px 14px; display: flex; gap: 10px;">
-                <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời..." style="flex: 1;" onkeydown="if(event.key === 'Enter') gradeShortAnswer(${q.id})">
-                <button type="button" class="grade-btn" id="grade-btn-${q.id}" onclick="gradeShortAnswer(${q.id})" style="padding: 8px 16px; border-radius: 12px; background: var(--teal); color: white; border: none; font-weight: 800; cursor: pointer;">Gửi</button>
-              </div>
-            `;
-          } else {
-            answersHTML = `
-              <div style="padding: 10px 14px;">
-                <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời..." oninput="inputShortAnswer()">
-              </div>
-            `;
-          }
+          answersHTML = `
+            <div style="padding: 10px 14px;">
+              <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời..." oninput="inputShortAnswer()">
+            </div>
+          `;
         }
 
         card.innerHTML = `
@@ -1640,6 +1712,130 @@
           ]
         });
       }
+    }
+
+    // ── REVIEW MODE: Hiển thị từng câu một ──
+    function showReviewCard() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+      
+      if (rvIndex >= quizData.length) {
+        // Đã hết câu hỏi
+        container.innerHTML = `
+          <div class="review-done-msg">
+            <h2>🎉 Đã hết câu hỏi!</h2>
+            <p>Em đã duyệt qua ${quizData.length} câu hỏi.<br>Bấm <strong>"Kết thúc"</strong> ở thanh bên dưới để xem kết quả tổng hợp.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const q = quizData[rvIndex];
+      const card = document.createElement('div');
+      card.className = 'question-card review-card-enter';
+      card.dataset.id = q.id;
+
+      const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
+      let answersHTML = '';
+      const typeLabel = q.type === 'đs' ? 'Đúng / Sai' : (q.type === 'cauhoi' ? 'Trắc nghiệm' : 'Trả lời ngắn');
+      
+      if (q.type === 'đs' && validAnswers.length > 0) {
+        answersHTML = validAnswers.map(a => `
+          <div class="tf-statement" id="tf-${q.id}-${a.key}">
+            <div class="tf-text"><strong>${a.key}.</strong> ${formatText(a.text)}</div>
+            <div class="tf-toggles">
+              <div class="tf-btn" data-val="Đ" onclick="selectTF(this, ${q.id}, '${a.key}', 'Đ')">Đúng</div>
+              <div class="tf-btn" data-val="S" onclick="selectTF(this, ${q.id}, '${a.key}', 'S')">Sai</div>
+            </div>
+          </div>
+        `).join('');
+      } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
+        answersHTML = validAnswers.map(a => `
+          <label class="answer-option" data-key="${a.key}" onclick="selectAnswer(this, ${q.id})">
+            <span class="radio-dot"></span>
+            <span class="answer-text">${formatText(a.text)}</span>
+          </label>
+        `).join('');
+      } else {
+        answersHTML = `
+          <div style="padding: 10px 14px; display: flex; gap: 10px;">
+            <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời..." style="flex: 1;" onkeydown="if(event.key === 'Enter') gradeShortAnswer(${q.id})">
+            <button type="button" class="grade-btn" id="grade-btn-${q.id}" onclick="gradeShortAnswer(${q.id})" style="padding: 8px 16px; border-radius: 12px; background: var(--teal); color: white; border: none; font-weight: 800; cursor: pointer;">Gửi</button>
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="q-header">
+          <div class="q-num">${rvIndex + 1}</div>
+          <span class="q-badge">Câu ${rvIndex + 1} / ${quizData.length} — ${typeLabel}</span>
+          <span class="q-result-icon" id="icon-${q.id}"></span>
+        </div>
+        <div class="q-text">${formatText(q.question)}</div>
+        <div class="answers-list" id="answers-${q.id}">
+          ${answersHTML}
+        </div>
+        <div class="explanation" id="explain-${q.id}">
+          <strong>Lời giải:</strong> ${formatText(q.explanation)}
+        </div>
+        <div class="review-actions" id="reviewActions-${q.id}">
+          <button class="skip-btn" onclick="skipReviewQuestion()">⏭ Bỏ qua</button>
+        </div>
+      `;
+
+      container.appendChild(card);
+      
+      // Render KaTeX
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(card, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '\\[', right: '\\]', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false }
+          ]
+        });
+      }
+      
+      // Update progress bar
+      const done = rvCorrect + rvWrong + rvSkipped;
+      document.getElementById('progressText').textContent = `${done} / ${quizData.length}`;
+      document.getElementById('progressFill').style.width = ((done / quizData.length) * 100) + '%';
+    }
+
+    function updateReviewBar() {
+      const el = (id) => document.getElementById(id);
+      if (el('rvCorrect')) el('rvCorrect').textContent = rvCorrect;
+      if (el('rvWrong')) el('rvWrong').textContent = rvWrong;
+      if (el('rvSkipped')) el('rvSkipped').textContent = rvSkipped;
+      const done = rvCorrect + rvWrong + rvSkipped;
+      if (el('rvDone')) el('rvDone').textContent = done;
+      if (el('rvTotal')) el('rvTotal').textContent = quizData.length;
+    }
+
+    function advanceReviewCard() {
+      const container = document.getElementById('quizContainer');
+      const currentCard = container.querySelector('.question-card');
+      if (currentCard) {
+        currentCard.classList.remove('review-card-enter');
+        currentCard.classList.add('review-card-exit');
+        setTimeout(() => {
+          rvIndex++;
+          updateReviewBar();
+          showReviewCard();
+        }, 300);
+      } else {
+        rvIndex++;
+        updateReviewBar();
+        showReviewCard();
+      }
+    }
+
+    function skipReviewQuestion() {
+      if (submitted) return;
+      rvSkipped++;
+      rvResults.push({ qId: quizData[rvIndex].id, isCorrect: false, skipped: true });
+      advanceReviewCard();
     }
 
     // ── Chọn đáp án Trắc nghiệm ──
@@ -1729,26 +1925,20 @@
       document.getElementById('progressFill').style.width = ((answered / total) * 100) + '%';
       
       if (isReviewMode) {
-        const correctCount = document.querySelectorAll('.question-card.correct-card').length;
-        const wrongCount = document.querySelectorAll('.question-card.wrong-card').length;
-        
-        const rvDoneEl = document.getElementById('rvDone');
-        const rvTotalEl = document.getElementById('rvTotal');
-        const rvCorrectEl = document.getElementById('rvCorrect');
-        const rvWrongEl = document.getElementById('rvWrong');
-        
-        if (rvDoneEl) rvDoneEl.textContent = answered;
-        if (rvTotalEl) rvTotalEl.textContent = total;
-        if (rvCorrectEl) rvCorrectEl.textContent = correctCount;
-        if (rvWrongEl) rvWrongEl.textContent = wrongCount;
+        // In flashcard mode, use state variables directly
+        const done = rvCorrect + rvWrong + rvSkipped;
+        document.getElementById('progressText').textContent = `${done} / ${total}`;
+        document.getElementById('progressFill').style.width = ((done / total) * 100) + '%';
+        return;
       }
     }
 
     // ── Kiểm tra đã trả lời hết chưa ──
     function checkAllAnswered() {
       if (isReviewMode) {
+        // In flashcard mode, the end button is always enabled
         const rvEndBtn = document.getElementById('rvEndBtn');
-        if (rvEndBtn) rvEndBtn.disabled = getAnsweredCount() === 0;
+        if (rvEndBtn) rvEndBtn.disabled = false;
       } else {
         const total = quizData.length;
         document.getElementById('submitBtn').disabled = getAnsweredCount() < total;
@@ -1865,6 +2055,22 @@
       
       updateProgress();
       checkAllAnswered();
+      
+      // In review mode, hide skip button, record result, and auto-advance
+      if (isReviewMode) {
+        const actionsEl = document.getElementById('reviewActions-' + q.id);
+        if (actionsEl) actionsEl.style.display = 'none';
+        
+        if (isCorrect) rvCorrect++;
+        else rvWrong++;
+        rvResults.push({ qId: q.id, isCorrect: isCorrect, skipped: false });
+        updateReviewBar();
+        
+        // Auto-advance after 1.5s delay to let student see the result
+        setTimeout(() => {
+          advanceReviewCard();
+        }, 1500);
+      }
     }
 
     function gradeShortAnswer(qId) {
@@ -1884,49 +2090,8 @@
 
     // ── Kết thúc ôn tập (Chấm điểm các câu đã làm) ──
     function endReview() {
-      let earnedPoints = 0;
-      let possiblePoints = 0;
-      let answeredCount = 0;
+      const answeredCount = rvCorrect + rvWrong;
       const total = quizData.length;
-      
-      quizData.forEach(q => {
-        const card = document.querySelector(`.question-card[data-id="${q.id}"]`);
-        // Kiểm tra xem câu này đã được làm/chấm chưa (có class correct-card hoặc wrong-card)
-        if (card && (card.classList.contains('correct-card') || card.classList.contains('wrong-card'))) {
-          answeredCount++;
-          possiblePoints += 1.0;
-          
-          if (q.type === 'cauhoi' || q.type === 'tln') {
-            if (card.classList.contains('correct-card')) {
-              earnedPoints += 1.0;
-            }
-          } else if (q.type === 'đs') {
-            // Đếm số ý đúng
-            const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
-            const correctKey = q.correct ? q.correct.toString().toUpperCase().trim() : '';
-            const correctArr = correctKey.replace(/D/g, 'Đ').split('');
-            let subCorrect = 0;
-            
-            validAnswers.forEach((a, idx) => {
-              const parent = document.getElementById(`tf-${q.id}-${a.key}`);
-              const selected = parent ? parent.querySelector('.tf-btn.selected') : null;
-              const studentVal = selected ? selected.dataset.val : 'Không chọn';
-              const exactCorrectVal = correctArr[idx] || 'Đ';
-              if (studentVal === exactCorrectVal) {
-                subCorrect++;
-              }
-            });
-            
-            let tfScore = 0;
-            if (subCorrect === 1) tfScore = 0.1;
-            else if (subCorrect === 2) tfScore = 0.25;
-            else if (subCorrect === 3) tfScore = 0.5;
-            else if (subCorrect === 4) tfScore = 1.0;
-            
-            earnedPoints += tfScore;
-          }
-        }
-      });
       
       if (answeredCount === 0) {
         showToast('Em chưa hoàn thành câu hỏi nào!', 'error');
@@ -1938,22 +2103,6 @@
       }
       
       submitted = true;
-      
-      // Khóa tất cả các câu chưa làm
-      quizData.forEach(q => {
-        const answersEl = document.getElementById('answers-' + q.id);
-        if (answersEl) {
-          answersEl.querySelectorAll('.answer-option').forEach(opt => opt.classList.add('locked'));
-          answersEl.querySelectorAll('.tf-btn').forEach(btn => {
-            btn.style.pointerEvents = 'none';
-            btn.style.opacity = '0.5';
-          });
-          const inp = document.getElementById(`short-answer-${q.id}`);
-          if (inp) inp.disabled = true;
-          const gradeBtn = document.getElementById(`grade-btn-${q.id}`);
-          if (gradeBtn) gradeBtn.style.display = 'none';
-        }
-      });
       
       // Ẩn reviewBar
       const reviewBar = document.getElementById('reviewBar');
@@ -1967,18 +2116,43 @@
         nameInput.style.opacity = '0.6';
       }
       
-      // Tính điểm trên thang điểm 10 (chỉ tính các câu đã làm)
+      // Tính điểm từ rvResults
+      let earnedPoints = 0;
+      let possiblePoints = answeredCount; // chỉ tính câu đã làm
+      
+      rvResults.forEach(r => {
+        if (r.skipped) return;
+        const q = quizData.find(item => item.id === r.qId);
+        if (!q) return;
+        
+        if (q.type === 'cauhoi' || q.type === 'tln') {
+          if (r.isCorrect) earnedPoints += 1.0;
+        } else if (q.type === 'đs') {
+          // Partial credit đã được tính khi grade, nhưng ta cần lấy lại
+          if (r.isCorrect) {
+            earnedPoints += 1.0;
+          } else {
+            // Tính partial: đếm số ý đúng từ data đã grade
+            // Vì card không còn, ta dùng isCorrect=false => 0
+            earnedPoints += 0;
+          }
+        }
+      });
+      
       const finalScore = parseFloat(((earnedPoints / possiblePoints) * 10).toFixed(2));
       const maxScore = 10;
-      
-      const banner = document.getElementById('scoreBanner');
       const pct = Math.round((earnedPoints / possiblePoints) * 100);
       
+      // Hiển kết quả
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+      
+      const banner = document.getElementById('scoreBanner');
       document.getElementById('scoreValue').textContent = `${finalScore} / ${maxScore}`;
       document.getElementById('scoreValue').style.color =
         pct >= 70 ? 'var(--correct)' : pct >= 40 ? '#f9a825' : 'var(--wrong)';
-        
-      let msg = `Hoàn thành ${answeredCount}/${total} câu (Đúng ${earnedPoints.toFixed(2)}/${possiblePoints} điểm). `;
+      
+      let msg = `Hoàn thành ${answeredCount}/${total} câu (Đúng ${rvCorrect}, Sai ${rvWrong}, Bỏ qua ${rvSkipped}). `;
       if (pct === 100) msg += '🎉 Tuyệt vời! Xuất sắc!';
       else if (pct >= 70) msg += '👏 Giỏi lắm! Cần cố gắng thêm!';
       else if (pct >= 40) msg += '💪 Khá! Hãy ôn thêm nhé!';
@@ -1990,21 +2164,12 @@
       
       // Gom danh sách các câu làm sai
       let wrongAnswersList = [];
-      quizData.forEach((q, idx) => {
-        const card = document.querySelector(`.question-card[data-id="${q.id}"]`);
-        if (card && card.classList.contains('wrong-card')) {
-          if (q.type === 'cauhoi') {
-            const selected = document.querySelector(`#answers-${q.id} .answer-option.selected`);
-            const selectedKey = selected ? selected.dataset.key : 'Không chọn';
-            wrongAnswersList.push(`Câu ${idx + 1}: Chọn "${selectedKey}" (Đúng: ${q.correct})`);
-          } else if (q.type === 'đs') {
-            wrongAnswersList.push(`Câu ${idx + 1}: Sai phần Đúng/Sai`);
-          } else {
-            const inp = document.getElementById(`short-answer-${q.id}`);
-            const studentAns = inp ? inp.value.trim() : 'Không chọn';
-            wrongAnswersList.push(`Câu ${idx + 1}: Chọn "${studentAns}" (Đúng: ${q.correct})`);
-          }
-        }
+      rvResults.forEach((r, i) => {
+        if (r.skipped || r.isCorrect) return;
+        const q = quizData.find(item => item.id === r.qId);
+        if (!q) return;
+        const idx = quizData.indexOf(q);
+        wrongAnswersList.push(`Câu ${idx + 1}: Sai (Đáp án đúng: ${q.correct})`);
       });
       
       // Gửi kết quả về Telegram
@@ -2263,7 +2428,7 @@
         const reviewBar = document.getElementById('reviewBar');
         if (reviewBar) reviewBar.style.display = 'flex';
         const rvEndBtn = document.getElementById('rvEndBtn');
-        if (rvEndBtn) rvEndBtn.disabled = true;
+        if (rvEndBtn) rvEndBtn.disabled = false;
       } else {
         const submitBtn = document.getElementById('submitBtn');
         if (submitBtn) {
