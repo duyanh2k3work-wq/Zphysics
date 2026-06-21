@@ -194,6 +194,32 @@
       white-space: nowrap;
     }
 
+    .quiz-timer {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--teal);
+      background: rgba(46, 196, 182, 0.1);
+      padding: 4px 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    body.premium-theme .quiz-timer {
+      background: rgba(46, 196, 182, 0.2);
+    }
+    .quiz-timer.urgent {
+      color: var(--wrong);
+      background: rgba(229, 57, 53, 0.1);
+      animation: pulseTimer 1s infinite;
+    }
+    @keyframes pulseTimer {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
     .progress-bar {
       flex: 1;
       height: 8px;
@@ -1126,6 +1152,7 @@
       <div class="progress-bar">
         <div class="progress-fill" id="progressFill"></div>
       </div>
+      <div class="quiz-timer" id="quizTimer" style="display:none">⏱ 30:00</div>
     </div>
 
     <div class="score-banner" id="scoreBanner">
@@ -1317,6 +1344,10 @@
     let quizData = [];
     let submitted = false;
     let lessonInfo = null;
+
+    // ── Timer state ──
+    let timerInterval = null;
+    let timeRemaining = 30 * 60; // 30 phút
 
     // ── Review mode state ──
     let rvIndex = 0;
@@ -1566,6 +1597,7 @@
           
           quizData = mappedData;
           renderQuiz(mappedData);
+          startTimer();
         })
         .catch(err => {
           console.error(err);
@@ -2094,8 +2126,40 @@
       gradeQuestion(qId);
     }
 
+    // ── Bắt đầu đếm ngược thời gian ──
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timeRemaining = 30 * 60; // 30 phút
+      const timerEl = document.getElementById('quizTimer');
+      timerEl.style.display = 'flex';
+      timerEl.classList.remove('urgent');
+      
+      const updateDisplay = () => {
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          timerEl.textContent = "⏱ 00:00";
+          showToast('Đã hết thời gian làm bài!', 'error');
+          if (isReviewMode) endReview(true); // force submit
+          else submitQuiz(true); 
+          return;
+        }
+        
+        const m = Math.floor(timeRemaining / 60);
+        const s = timeRemaining % 60;
+        timerEl.textContent = `⏱ ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        
+        if (timeRemaining <= 300) { // 5 phút cuối
+          timerEl.classList.add('urgent');
+        }
+        timeRemaining--;
+      };
+      
+      updateDisplay();
+      timerInterval = setInterval(updateDisplay, 1000);
+    }
+
     // ── Kết thúc ôn tập (Chấm điểm các câu đã làm) ──
-    function endReview() {
+    function endReview(force = false) {
       const answeredCount = rvCorrect + rvWrong;
       const total = quizData.length;
       
@@ -2104,11 +2168,14 @@
         return;
       }
       
-      if (!confirm('Em có chắc chắn muốn kết thúc ôn tập? Hệ thống sẽ chấm điểm các câu đã làm.')) {
-        return;
+      if (!force) {
+        if (!confirm('Em có chắc chắn muốn kết thúc ôn tập? Hệ thống sẽ chấm điểm các câu đã làm.')) {
+          return;
+        }
       }
       
       submitted = true;
+      if (timerInterval) clearInterval(timerInterval);
       
       // Ẩn reviewBar
       const reviewBar = document.getElementById('reviewBar');
@@ -2452,6 +2519,7 @@
         nameInput.style.opacity = '1';
       }
       renderQuiz(quizData);
+      startTimer();
     }
   </script>
 
