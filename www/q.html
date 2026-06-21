@@ -1187,7 +1187,7 @@
         ✅<span id="rvCorrect" style="color:var(--correct)">0</span>
         &nbsp;❌<span id="rvWrong" style="color:var(--wrong)">0</span>
         &nbsp;⏭<span id="rvSkipped" style="color:var(--muted)">0</span>
-        &nbsp;│&nbsp;<span id="rvDone" style="color:var(--teal)">0</span>/<span id="rvTotal">0</span>
+        &nbsp;│&nbsp;Đã làm: <span id="rvDone" style="color:var(--teal)">0</span>
       </div>
       <button class="review-end-btn" id="rvEndBtn" onclick="endReview()">
         Kết thúc
@@ -1725,7 +1725,7 @@
         card.innerHTML = `
           <div class="q-header">
             <div class="q-num">${idx + 1}</div>
-            <span class="q-badge">Câu hỏi ${idx + 1} / ${data.length}</span>
+            <span class="q-badge">Câu hỏi ${idx + 1}</span>
             <span class="q-result-icon" id="icon-${q.id}"></span>
           </div>
           <div class="q-text">${formatText(q.question)}</div>
@@ -1807,7 +1807,7 @@
       card.innerHTML = `
         <div class="q-header">
           <div class="q-num">${rvIndex + 1}</div>
-          <span class="q-badge">Câu ${rvIndex + 1} / ${quizData.length} — ${typeLabel}</span>
+          <span class="q-badge">Câu ${rvIndex + 1} — ${typeLabel}</span>
           <span class="q-result-icon" id="icon-${q.id}"></span>
         </div>
         <div class="q-text">${formatText(q.question)}</div>
@@ -1838,8 +1838,8 @@
       
       // Update progress bar
       const done = rvCorrect + rvWrong + rvSkipped;
-      document.getElementById('progressText').textContent = `${done} / ${quizData.length}`;
-      document.getElementById('progressFill').style.width = ((done / quizData.length) * 100) + '%';
+      document.getElementById('progressText').textContent = `Đã làm: ${done} câu`;
+      document.querySelector('.progress-bar').style.display = 'none';
     }
 
     function updateReviewBar() {
@@ -1849,7 +1849,6 @@
       if (el('rvSkipped')) el('rvSkipped').textContent = rvSkipped;
       const done = rvCorrect + rvWrong + rvSkipped;
       if (el('rvDone')) el('rvDone').textContent = done;
-      if (el('rvTotal')) el('rvTotal').textContent = quizData.length;
     }
 
     function advanceReviewCard() {
@@ -1961,13 +1960,14 @@
       const total = quizData.length;
       const answered = getAnsweredCount();
       document.getElementById('progressText').textContent = `${answered} / ${total}`;
+      document.querySelector('.progress-bar').style.display = 'block';
       document.getElementById('progressFill').style.width = ((answered / total) * 100) + '%';
       
       if (isReviewMode) {
         // In flashcard mode, use state variables directly
         const done = rvCorrect + rvWrong + rvSkipped;
-        document.getElementById('progressText').textContent = `${done} / ${total}`;
-        document.getElementById('progressFill').style.width = ((done / total) * 100) + '%';
+        document.getElementById('progressText').textContent = `Đã làm: ${done} câu`;
+        document.querySelector('.progress-bar').style.display = 'none';
         return;
       }
     }
