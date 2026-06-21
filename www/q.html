@@ -1558,6 +1558,12 @@
           }
 
           let mappedData = [...part1, ...part2, ...part3];
+          
+          // Trộn ngẫu nhiên tất cả các phần nếu là chế độ ôn tập
+          if (quizFile.startsWith('ontap_')) {
+            mappedData = shuffle(mappedData);
+          }
+          
           quizData = mappedData;
           renderQuiz(mappedData);
         })
