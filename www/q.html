@@ -2227,7 +2227,7 @@
       document.getElementById('scoreValue').style.color =
         pct >= 70 ? 'var(--correct)' : pct >= 40 ? '#f9a825' : 'var(--wrong)';
       
-      let msg = `Hoàn thành ${answeredCount}/${total} câu (Đúng ${rvCorrect}, Sai ${rvWrong}, Bỏ qua ${rvSkipped}). `;
+      let msg = `Hoàn thành ${answeredCount} câu (Đúng ${rvCorrect}, Sai ${rvWrong}, Bỏ qua ${rvSkipped}). `;
       if (pct === 100) msg += '🎉 Tuyệt vời! Xuất sắc!';
       else if (pct >= 70) msg += '👏 Giỏi lắm! Cần cố gắng thêm!';
       else if (pct >= 40) msg += '💪 Khá! Hãy ôn thêm nhé!';
