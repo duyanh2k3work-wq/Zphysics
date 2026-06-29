@@ -1280,12 +1280,12 @@ function checkAndSendReminders() {
   // 1. Lấy danh sách học sinh (Gmail -> {Tên, Telegram Chat ID})
   var hocsinhSheet = ss.getSheetByName('hocsinh') || ss.getSheets().find(s => s.getName().toLowerCase() === 'hocsinh');
   if (!hocsinhSheet) {
-    console.log("Không tìm thấy trang tính 'hocsinh'");
+    Logger.log("Không tìm thấy trang tính 'hocsinh'");
     return;
   }
   var hsValues = hocsinhSheet.getDataRange().getValues();
   var studentMap = {};
-  console.log("Đang đọc danh sách học sinh...");
+  Logger.log("Đang đọc danh sách học sinh...");
   for (var r = 1; r < hsValues.length; r++) {
     var gmail = trimCell(hsValues[r][0]).toLowerCase();
     var name = trimCell(hsValues[r][1]);
@@ -1294,12 +1294,12 @@ function checkAndSendReminders() {
       studentMap[gmail] = { name: name, telegramId: telegramId };
     }
   }
-  console.log("Tìm thấy " + Object.keys(studentMap).length + " học sinh trong sheet.");
+  Logger.log("Tìm thấy " + Object.keys(studentMap).length + " học sinh trong sheet.");
   
   // 2. Lấy danh sách hạn nộp từ sheet deadlines
   var deadlinesSheet = ss.getSheetByName('deadlines') || ss.getSheets().find(s => s.getName().toLowerCase() === 'deadlines');
   if (!deadlinesSheet) {
-    console.log("Không tìm thấy trang tính 'deadlines'");
+    Logger.log("Không tìm thấy trang tính 'deadlines'");
     return;
   }
   
@@ -1307,7 +1307,7 @@ function checkAndSendReminders() {
   var deadlineValues = range.getValues();
   var now = new Date().getTime();
   
-  console.log("Tổng số dòng trong sheet deadlines: " + deadlineValues.length);
+  Logger.log("Tổng số dòng trong sheet deadlines: " + deadlineValues.length);
   
   for (var r = 1; r < deadlineValues.length; r++) {
     var gmail = trimCell(deadlineValues[r][0]).toLowerCase();
@@ -1315,16 +1315,16 @@ function checkAndSendReminders() {
     var deadlineVal = deadlineValues[r][2];
     var sentStatus = deadlineValues[r][3] ? trimCell(deadlineValues[r][3]) : '';
     
-    console.log("Đang quét dòng " + (r + 1) + ": Gmail=" + gmail + ", LessonID=" + lessonId + ", Deadline=" + deadlineVal + ", SentStatus=" + sentStatus);
+    Logger.log("Đang quét dòng " + (r + 1) + ": Gmail=" + gmail + ", LessonID=" + lessonId + ", Deadline=" + deadlineVal + ", SentStatus=" + sentStatus);
     
     if (!gmail || !lessonId || !deadlineVal) {
-      console.log("-> Bỏ qua dòng vì thiếu thông tin Gmail, Lesson ID hoặc Deadline");
+      Logger.log("-> Bỏ qua dòng vì thiếu thông tin Gmail, Lesson ID hoặc Deadline");
       continue;
     }
     
     // Bỏ qua nếu đã gửi nhắc nhở trước đó
     if (sentStatus === 'Sent' || sentStatus.indexOf('Đã gửi') !== -1) {
-      console.log("-> Bỏ qua vì trạng thái ghi nhận đã gửi rồi: " + sentStatus);
+      Logger.log("-> Bỏ qua vì trạng thái ghi nhận đã gửi rồi: " + sentStatus);
       continue;
     }
     
@@ -1336,36 +1336,36 @@ function checkAndSendReminders() {
       deadlineTime = Date.parse(deadlineVal);
     }
     if (isNaN(deadlineTime)) {
-      console.log("-> Bỏ qua vì không thể chuyển đổi ngày giờ hết hạn: " + deadlineVal);
+      Logger.log("-> Bỏ qua vì không thể chuyển đổi ngày giờ hết hạn: " + deadlineVal);
       continue;
     }
     
     // Kiểm tra xem thời gian hiện tại có nằm trong khoảng 24h trước hạn nộp
     var diffHours = (deadlineTime - now) / (1000 * 60 * 60);
-    console.log("-> Cách hạn nộp: " + diffHours.toFixed(2) + " giờ");
+    Logger.log("-> Cách hạn nộp: " + diffHours.toFixed(2) + " giờ");
     
     if (diffHours > 0 && diffHours <= 24) {
       // 3. Kiểm tra xem học sinh đã nộp bài (có điểm) trên Supabase chưa
       var completed = false;
       try {
         var progress = supabaseRequest('student_progress?email=eq.' + encodeURIComponent(gmail) + '&lesson_id=eq.' + encodeURIComponent(lessonId) + '&select=score', 'GET');
-        console.log("-> Kiểm tra Supabase cho " + gmail + ", bài " + lessonId + ". Kết quả: " + JSON.stringify(progress));
+        Logger.log("-> Kiểm tra Supabase cho " + gmail + ", bài " + lessonId + ". Kết quả: " + JSON.stringify(progress));
         if (progress && progress.length > 0) {
           if (progress[0].score !== null) {
             completed = true;
           }
         }
       } catch (e) {
-        console.log("Lỗi khi kiểm tra tiến trình học tập của " + gmail + ": " + e.message);
+        Logger.log("Lỗi khi kiểm tra tiến trình học tập của " + gmail + ": " + e.message);
       }
       
       if (completed) {
-        console.log("-> Học sinh đã nộp bài này rồi (đã có điểm trên Supabase).");
+        Logger.log("-> Học sinh đã nộp bài này rồi (đã có điểm trên Supabase).");
         continue;
       }
       
       // Nếu học sinh chưa hoàn thành bài tập, tiến hành gửi thông báo
-      console.log("-> Bắt đầu tiến trình gửi thông báo cho " + gmail);
+      Logger.log("-> Bắt đầu tiến trình gửi thông báo cho " + gmail);
       var student = studentMap[gmail] || { name: "Học sinh", telegramId: "" };
       var title = getLessonTitle(lessonId);
       var formattedDeadline = Utilities.formatDate(new Date(deadlineTime), "GMT+7", "dd/MM/yyyy HH:mm");
@@ -1398,15 +1398,15 @@ function checkAndSendReminders() {
           
           if (response.getResponseCode() === 200) {
             teleSuccess = true;
-            console.log("-> Gửi Telegram nhắc nhở thành công đến: " + gmail);
+            Logger.log("-> Gửi Telegram nhắc nhở thành công đến: " + gmail);
           } else {
-            console.log("-> Lỗi gửi Telegram: " + response.getContentText());
+            Logger.log("-> Lỗi gửi Telegram: " + response.getContentText());
           }
         } catch (teleErr) {
-          console.log("-> Lỗi kết nối Telegram API: " + teleErr.message);
+          Logger.log("-> Lỗi kết nối Telegram API: " + teleErr.message);
         }
       } else {
-        console.log("-> Bỏ qua gửi Telegram vì không tìm thấy Telegram Chat ID của học sinh hoặc thiếu Token.");
+        Logger.log("-> Bỏ qua gửi Telegram vì không tìm thấy Telegram Chat ID của học sinh hoặc thiếu Token.");
       }
       
       // --- 3.2. GỬI EMAIL ---
@@ -1424,9 +1424,9 @@ function checkAndSendReminders() {
         
         MailApp.sendEmail(gmail, emailSubject, emailBody);
         emailSuccess = true;
-        console.log("-> Gửi Gmail nhắc nhở thành công đến: " + gmail);
+        Logger.log("-> Gửi Gmail nhắc nhở thành công đến: " + gmail);
       } catch (mailErr) {
-        console.log("-> Lỗi gửi Gmail: " + mailErr.message);
+        Logger.log("-> Lỗi gửi Gmail: " + mailErr.message);
       }
       
       // 4. Lưu trạng thái đã gửi nhắc nhở lên Sheet tránh gửi trùng lặp ở lần quét sau
@@ -1438,11 +1438,11 @@ function checkAndSendReminders() {
         statusStr += " lúc " + Utilities.formatDate(new Date(), "GMT+7", "HH:mm dd/MM");
         
         deadlinesSheet.getRange(r + 1, 4).setValue(statusStr); // Ghi vào Cột D (r + 1 vì r trong vòng lặp bắt đầu từ 1)
-        console.log("-> Đã cập nhật trạng thái gửi thành công vào Cột D.");
+        Logger.log("-> Đã cập nhật trạng thái gửi thành công vào Cột D.");
       }
     } else {
-      console.log("-> Bỏ qua vì không nằm trong khoảng 24h trước hạn (diffHours = " + diffHours.toFixed(2) + "h)");
+      Logger.log("-> Bỏ qua vì không nằm trong khoảng 24h trước hạn (diffHours = " + diffHours.toFixed(2) + "h)");
     }
   }
-  console.log("Quét hoàn tất!");
+  Logger.log("Quét hoàn tất!");
 }
