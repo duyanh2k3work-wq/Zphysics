@@ -38,7 +38,7 @@ var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 // CẤU HÌNH GỬI THÔNG BÁO NHẮC NHỞ
 // =========================================================================
 var TELEGRAM_BOT_TOKEN = "8764049213:AAEv7ZgWye1GMwAVhz3Rb6HmzLJ4PrqAv5s";
-var WEB_APP_URL = "https://zphysics.vn"; // URL trang web của bạn
+var WEB_APP_URL = "https://zphysics.io.vn"; // URL trang web của bạn
 // =========================================================================
 
 function doGet(e) {
