@@ -1377,16 +1377,16 @@ function checkAndSendReminders() {
       var teleSuccess = false;
       if (student.telegramId && TELEGRAM_BOT_TOKEN) {
         try {
-          var msg = "⏰ *NHẮC NHỞ HẠN NỘP BÀI TẬP*\n\n" +
-                    "Chào *" + student.name + "*,\n" +
-                    "Bài tập *" + title + "* của em có hạn nộp vào lúc *" + formattedDeadline + "*.\n" +
+          var msg = "⏰ <b>NHẮC NHỞ HẠN NỘP BÀI TẬP</b>\n\n" +
+                    "Chào <b>" + student.name + "</b>,\n" +
+                    "Bài tập <b>" + title + "</b> của em có hạn nộp vào lúc <b>" + formattedDeadline + "</b>.\n" +
                     "Hiện tại hệ thống ghi nhận em vẫn chưa hoàn thành bài này. Em hãy sắp xếp làm bài sớm nhé!\n\n" +
-                    "🔗 *Link làm bài:* " + link;
+                    "🔗 <b>Link làm bài:</b> <a href=\"" + link + "\">Nhấn vào đây để làm bài</a>";
           
           var payload = {
             'chat_id': student.telegramId,
             'text': msg,
-            'parse_mode': 'Markdown'
+            'parse_mode': 'HTML'
           };
           
           var response = UrlFetchApp.fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', {
