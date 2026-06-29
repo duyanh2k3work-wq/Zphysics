@@ -1322,12 +1322,6 @@ function checkAndSendReminders() {
       continue;
     }
     
-    // Bỏ qua nếu đã gửi nhắc nhở trước đó
-    if (sentStatus === 'Sent' || sentStatus.indexOf('Đã gửi') !== -1) {
-      Logger.log("-> Bỏ qua vì trạng thái ghi nhận đã gửi rồi: " + sentStatus);
-      continue;
-    }
-    
     // Parse ngày giờ deadline
     var deadlineTime;
     if (deadlineVal instanceof Date) {
@@ -1340,108 +1334,143 @@ function checkAndSendReminders() {
       continue;
     }
     
-    // Kiểm tra xem thời gian hiện tại có nằm trong khoảng 24h trước hạn nộp
+    // Kiểm tra thời gian hiện tại so với deadline
     var diffHours = (deadlineTime - now) / (1000 * 60 * 60);
     Logger.log("-> Cách hạn nộp: " + diffHours.toFixed(2) + " giờ");
     
-    if (diffHours > 0 && diffHours <= 24) {
-      // 3. Kiểm tra xem học sinh đã nộp bài (có điểm) trên Supabase chưa
-      var completed = false;
-      try {
-        var progress = supabaseRequest('student_progress?email=eq.' + encodeURIComponent(gmail) + '&lesson_id=eq.' + encodeURIComponent(lessonId) + '&select=score', 'GET');
-        Logger.log("-> Kiểm tra Supabase cho " + gmail + ", bài " + lessonId + ". Kết quả: " + JSON.stringify(progress));
-        if (progress && progress.length > 0) {
-          if (progress[0].score !== null) {
-            completed = true;
-          }
-        }
-      } catch (e) {
-        Logger.log("Lỗi khi kiểm tra tiến trình học tập của " + gmail + ": " + e.message);
-      }
-      
-      if (completed) {
-        Logger.log("-> Học sinh đã nộp bài này rồi (đã có điểm trên Supabase).");
+    // Xác định xem cần nhắc nhở mốc nào
+    var targetRemindText = ""; 
+    var newSentStatus = "";
+    
+    if (diffHours > 2 && diffHours <= 24) {
+      // Mốc 24 giờ trước hạn
+      if (sentStatus.indexOf("24h") !== -1 || sentStatus.indexOf("2h") !== -1 || sentStatus.indexOf("1h") !== -1) {
+        Logger.log("-> Đã gửi nhắc nhở mốc 24h (hoặc mốc khẩn cấp hơn) rồi. Bỏ qua.");
         continue;
       }
-      
-      // Nếu học sinh chưa hoàn thành bài tập, tiến hành gửi thông báo
-      Logger.log("-> Bắt đầu tiến trình gửi thông báo cho " + gmail);
-      var student = studentMap[gmail] || { name: "Học sinh", telegramId: "" };
-      var title = getLessonTitle(lessonId);
-      var formattedDeadline = Utilities.formatDate(new Date(deadlineTime), "GMT+7", "dd/MM/yyyy HH:mm");
-      
-      // Tạo đường link truy cập trực tiếp
-      var link = WEB_APP_URL + (lessonId.indexOf('de_') !== -1 ? '/l.html#' + lessonId : '/q.html?quiz=' + lessonId);
-      
-      // --- 3.1. GỬI TIN NHẮN TELEGRAM BOT ---
-      var teleSuccess = false;
-      if (student.telegramId && TELEGRAM_BOT_TOKEN) {
-        try {
-          var msg = "⏰ <b>NHẮC NHỞ HẠN NỘP BÀI TẬP</b>\n\n" +
-                    "Chào <b>" + student.name + "</b>,\n" +
-                    "Bài tập <b>" + title + "</b> của em có hạn nộp vào lúc <b>" + formattedDeadline + "</b>.\n" +
-                    "Hiện tại hệ thống ghi nhận em vẫn chưa hoàn thành bài này. Em hãy sắp xếp làm bài sớm nhé!\n\n" +
-                    "🔗 <b>Link làm bài:</b> <a href=\"" + link + "\">Nhấn vào đây để làm bài</a>";
-          
-          var payload = {
-            'chat_id': student.telegramId,
-            'text': msg,
-            'parse_mode': 'HTML'
-          };
-          
-          var response = UrlFetchApp.fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', {
-            'method': 'post',
-            'contentType': 'application/json',
-            'payload': JSON.stringify(payload),
-            'muteHttpExceptions': true
-          });
-          
-          if (response.getResponseCode() === 200) {
-            teleSuccess = true;
-            Logger.log("-> Gửi Telegram nhắc nhở thành công đến: " + gmail);
-          } else {
-            Logger.log("-> Lỗi gửi Telegram: " + response.getContentText());
-          }
-        } catch (teleErr) {
-          Logger.log("-> Lỗi kết nối Telegram API: " + teleErr.message);
-        }
+      targetRemindText = "24 giờ";
+      newSentStatus = "Đã gửi 24h";
+    } else if (diffHours > 1 && diffHours <= 2) {
+      // Mốc 2 giờ trước hạn
+      if (sentStatus.indexOf("2h") !== -1 || sentStatus.indexOf("1h") !== -1) {
+        Logger.log("-> Đã gửi nhắc nhở mốc 2h (hoặc 1h) rồi. Bỏ qua.");
+        continue;
+      }
+      targetRemindText = "2 giờ";
+      var prefix = sentStatus.indexOf("24h") !== -1 ? "Đã gửi 24h & " : "Đã gửi ";
+      newSentStatus = prefix + "2h";
+    } else if (diffHours > 0 && diffHours <= 1) {
+      // Mốc 1 giờ trước hạn
+      if (sentStatus.indexOf("1h") !== -1) {
+        Logger.log("-> Đã gửi nhắc nhở mốc 1h rồi. Bỏ qua.");
+        continue;
+      }
+      targetRemindText = "1 giờ";
+      var prefix = "";
+      if (sentStatus.indexOf("24h") !== -1 && sentStatus.indexOf("2h") !== -1) {
+        prefix = "Đã gửi 24h, 2h & ";
+      } else if (sentStatus.indexOf("24h") !== -1) {
+        prefix = "Đã gửi 24h & ";
+      } else if (sentStatus.indexOf("2h") !== -1) {
+        prefix = "Đã gửi 2h & ";
       } else {
-        Logger.log("-> Bỏ qua gửi Telegram vì không tìm thấy Telegram Chat ID của học sinh hoặc thiếu Token.");
+        prefix = "Đã gửi ";
       }
-      
-      // --- 3.2. GỬI EMAIL ---
-      var emailSuccess = false;
+      newSentStatus = prefix + "1h";
+    } else {
+      Logger.log("-> Bỏ qua vì không nằm trong các khoảng thời gian cần nhắc nhở (24h, 2h, 1h).");
+      continue;
+    }
+    
+    // 3. Kiểm tra xem học sinh đã nộp bài (có điểm) trên Supabase chưa
+    var completed = false;
+    try {
+      var progress = supabaseRequest('student_progress?email=eq.' + encodeURIComponent(gmail) + '&lesson_id=eq.' + encodeURIComponent(lessonId) + '&select=score', 'GET');
+      Logger.log("-> Kiểm tra Supabase cho " + gmail + ", bài " + lessonId + ". Kết quả: " + JSON.stringify(progress));
+      if (progress && progress.length > 0) {
+        if (progress[0].score !== null) {
+          completed = true;
+        }
+      }
+    } catch (e) {
+      Logger.log("Lỗi khi kiểm tra tiến trình học tập của " + gmail + ": " + e.message);
+    }
+    
+    if (completed) {
+      Logger.log("-> Học sinh đã nộp bài này rồi (đã có điểm trên Supabase).");
+      continue;
+    }
+    
+    // Nếu học sinh chưa hoàn thành bài tập, tiến hành gửi thông báo
+    Logger.log("-> Bắt đầu tiến trình gửi thông báo mốc [" + targetRemindText + "] cho " + gmail);
+    var student = studentMap[gmail] || { name: "Học sinh", telegramId: "" };
+    var title = getLessonTitle(lessonId);
+    var formattedDeadline = Utilities.formatDate(new Date(deadlineTime), "GMT+7", "dd/MM/yyyy HH:mm");
+    
+    // Tạo đường link truy cập trực tiếp
+    var link = WEB_APP_URL + (lessonId.indexOf('de_') !== -1 ? '/l.html#' + lessonId : '/q.html?quiz=' + lessonId);
+    
+    // --- 3.1. GỬI TIN NHẮN TELEGRAM BOT ---
+    var teleSuccess = false;
+    if (student.telegramId && TELEGRAM_BOT_TOKEN) {
       try {
-        var emailSubject = "⏰ [Zphysics] Nhắc nhở hạn nộp bài tập: " + title;
-        var emailBody = "Chào " + student.name + ",\n\n" +
-                        "Hệ thống Zphysics xin thông báo bài tập sau của em sắp đến hạn nộp:\n" +
-                        "- Tên bài học/đề thi: " + title + "\n" +
-                        "- Hạn nộp bài: " + formattedDeadline + "\n\n" +
-                        "Hiện tại hệ thống ghi nhận em chưa làm bài tập này. Vui lòng truy cập đường link dưới đây để hoàn thiện bài sớm nhé:\n" +
-                        link + "\n\n" +
-                        "Chúc em học tập thật tốt!\n" +
-                        "Zphysics Team";
+        var msg = "⏰ <b>NHẮC HẠN NỘP BÀI TẬP (CÒN " + targetRemindText.toUpperCase() + ")</b>\n\n" +
+                  "Chào <b>" + student.name + "</b>,\n" +
+                  "Chỉ còn <b>" + targetRemindText + "</b> nữa là hết hạn nộp bài tập <b>" + title + "</b> (Hạn chót: <b>" + formattedDeadline + "</b>).\n" +
+                  "Hiện tại hệ thống ghi nhận em vẫn chưa hoàn thành bài này. Em hãy tranh thủ làm sớm nhé!\n\n" +
+                  "🔗 <b>Link làm bài:</b> <a href=\"" + link + "\">Nhấn vào đây để làm bài</a>";
         
-        MailApp.sendEmail(gmail, emailSubject, emailBody);
-        emailSuccess = true;
-        Logger.log("-> Gửi Gmail nhắc nhở thành công đến: " + gmail);
-      } catch (mailErr) {
-        Logger.log("-> Lỗi gửi Gmail: " + mailErr.message);
-      }
-      
-      // 4. Lưu trạng thái đã gửi nhắc nhở lên Sheet tránh gửi trùng lặp ở lần quét sau
-      if (teleSuccess || emailSuccess) {
-        var statusStr = "Đã gửi ";
-        if (teleSuccess && emailSuccess) statusStr += "(Telegram & Gmail)";
-        else if (teleSuccess) statusStr += "(Telegram)";
-        else statusStr += "(Gmail)";
-        statusStr += " lúc " + Utilities.formatDate(new Date(), "GMT+7", "HH:mm dd/MM");
+        var payload = {
+          'chat_id': student.telegramId,
+          'text': msg,
+          'parse_mode': 'HTML'
+        };
         
-        deadlinesSheet.getRange(r + 1, 4).setValue(statusStr); // Ghi vào Cột D (r + 1 vì r trong vòng lặp bắt đầu từ 1)
-        Logger.log("-> Đã cập nhật trạng thái gửi thành công vào Cột D.");
+        var response = UrlFetchApp.fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', {
+          'method': 'post',
+          'contentType': 'application/json',
+          'payload': JSON.stringify(payload),
+          'muteHttpExceptions': true
+        });
+        
+        if (response.getResponseCode() === 200) {
+          teleSuccess = true;
+          Logger.log("-> Gửi Telegram nhắc nhở thành công đến: " + gmail);
+        } else {
+          Logger.log("-> Lỗi gửi Telegram: " + response.getContentText());
+        }
+      } catch (teleErr) {
+        Logger.log("-> Lỗi kết nối Telegram API: " + teleErr.message);
       }
     } else {
-      Logger.log("-> Bỏ qua vì không nằm trong khoảng 24h trước hạn (diffHours = " + diffHours.toFixed(2) + "h)");
+      Logger.log("-> Bỏ qua gửi Telegram vì không tìm thấy Telegram Chat ID của học sinh hoặc thiếu Token.");
+    }
+    
+    // --- 3.2. GỬI EMAIL ---
+    var emailSuccess = false;
+    try {
+      var emailSubject = "⏰ [Zphysics] Nhắc nhở hạn nộp bài tập: " + title + " (Còn " + targetRemindText + ")";
+      var emailBody = "Chào " + student.name + ",\n\n" +
+                      "Hệ thống Zphysics xin thông báo chỉ còn " + targetRemindText + " nữa là đến hạn nộp bài tập của em:\n" +
+                      "- Tên bài học/đề thi: " + title + "\n" +
+                      "- Hạn nộp bài: " + formattedDeadline + "\n\n" +
+                      "Hiện tại hệ thống ghi nhận em chưa làm bài tập này. Vui lòng truy cập đường link dưới đây để hoàn thiện bài sớm nhé:\n" +
+                      link + "\n\n" +
+                      "Chúc em học tập thật tốt!\n" +
+                      "Zphysics Team";
+      
+      MailApp.sendEmail(gmail, emailSubject, emailBody);
+      emailSuccess = true;
+      Logger.log("-> Gửi Gmail nhắc nhở thành công đến: " + gmail);
+    } catch (mailErr) {
+      Logger.log("-> Lỗi gửi Gmail: " + mailErr.message);
+    }
+    
+    // 4. Lưu trạng thái đã gửi nhắc nhở lên Sheet tránh gửi trùng lặp ở lần quét sau
+    if (teleSuccess || emailSuccess) {
+      var statusDetail = newSentStatus + " lúc " + Utilities.formatDate(new Date(), "GMT+7", "HH:mm dd/MM");
+      deadlinesSheet.getRange(r + 1, 4).setValue(statusDetail); 
+      Logger.log("-> Đã cập nhật trạng thái gửi [" + statusDetail + "] vào Cột D.");
     }
   }
   Logger.log("Quét hoàn tất!");
