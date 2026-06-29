@@ -93,6 +93,27 @@ function doPost(e) {
       throw new Error("Không tìm thấy dữ liệu POST");
     }
     
+    // ═══ TELEGRAM WEBHOOK ═══
+    // Nếu là tin nhắn từ Telegram Bot (học sinh nhắn lệnh)
+    if (postData.message && postData.message.chat) {
+      try {
+        handleTelegramMessage(postData);
+      } catch (teleErr) {
+        Logger.log("Lỗi xử lý Telegram message: " + teleErr.message);
+      }
+      return ContentService.createTextOutput("OK");
+    }
+    // Nếu là callback query (học sinh bấm nút A/B/C/D trong /cauhoi)
+    if (postData.callback_query) {
+      try {
+        handleCallbackQuery(postData.callback_query);
+      } catch (cbErr) {
+        Logger.log("Lỗi xử lý Telegram callback: " + cbErr.message);
+      }
+      return ContentService.createTextOutput("OK");
+    }
+    
+    // ═══ ADMIN ACTIONS (từ admin.html) ═══
     var action = postData.action;
     var result;
     
@@ -1475,3 +1496,746 @@ function checkAndSendReminders() {
   }
   Logger.log("Quét hoàn tất!");
 }
+
+// =========================================================================
+// TELEGRAM BOT TƯƠNG TÁC — XỬ LÝ LỆNH TỪ HỌC SINH
+// =========================================================================
+
+// --- Hàm tiện ích gửi tin nhắn Telegram ---
+function sendTelegramMessage(chatId, text) {
+  var payload = {
+    'chat_id': chatId,
+    'text': text,
+    'parse_mode': 'HTML'
+  };
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', {
+    'method': 'post',
+    'contentType': 'application/json',
+    'payload': JSON.stringify(payload),
+    'muteHttpExceptions': true
+  });
+}
+
+// --- Gửi tin nhắn kèm Inline Keyboard (các nút bấm) ---
+function sendTelegramMessageWithKeyboard(chatId, text, keyboard) {
+  var payload = {
+    'chat_id': chatId,
+    'text': text,
+    'parse_mode': 'HTML',
+    'reply_markup': JSON.stringify({ 'inline_keyboard': keyboard })
+  };
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', {
+    'method': 'post',
+    'contentType': 'application/json',
+    'payload': JSON.stringify(payload),
+    'muteHttpExceptions': true
+  });
+}
+
+// --- Tìm thông tin học sinh bằng Telegram Chat ID ---
+function findStudentByChatId(chatId) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('hocsinh');
+  if (!sheet) return null;
+  
+  var values = sheet.getDataRange().getValues();
+  for (var r = 1; r < values.length; r++) {
+    var teleId = values[r][4] ? trimCell(values[r][4]).toString() : '';
+    if (teleId === chatId.toString()) {
+      return {
+        email: trimCell(values[r][0]).toLowerCase(),
+        name: trimCell(values[r][1]),
+        grade: trimCell(values[r][2]).toString(), // Cột C = Lớp
+        telegramId: teleId
+      };
+    }
+  }
+  return null;
+}
+
+// --- Router chính: phân luồng lệnh từ tin nhắn ---
+function handleTelegramMessage(update) {
+  var message = update.message;
+  var chatId = message.chat.id;
+  var text = (message.text || '').trim();
+  
+  // Trích lệnh (bỏ @botname nếu có)
+  var command = text.split(' ')[0].toLowerCase();
+  if (command.indexOf('@') !== -1) {
+    command = command.split('@')[0];
+  }
+  
+  switch (command) {
+    case '/start':
+    case '/menu':
+      handleMenu(chatId);
+      break;
+    case '/diem':
+      handleDiem(chatId);
+      break;
+    case '/tiendo':
+      handleTienDo(chatId);
+      break;
+    case '/deadline':
+      handleDeadline(chatId);
+      break;
+    case '/cauhoi':
+      handleCauHoi(chatId);
+      break;
+    default:
+      sendTelegramMessage(chatId, 
+        "❓ Mình không hiểu lệnh <b>\"" + text + "\"</b>.\n\n" +
+        "Gửi /menu để xem danh sách lệnh nhé!");
+      break;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LỆNH /menu — Hiển thị danh sách lệnh
+// ═══════════════════════════════════════════════════════════════
+function handleMenu(chatId) {
+  var msg = "🤖 <b>ZPHYSICS BOT — TRỢ LÝ HỌC TẬP</b>\n\n" +
+    "📊 /diem — Xem bảng điểm cá nhân\n" +
+    "📚 /tiendo — Xem tiến độ học tập theo chương\n" +
+    "📅 /deadline — Xem hạn nộp bài sắp tới\n" +
+    "🧪 /cauhoi — Thử thách nhanh (3 câu/ngày)\n" +
+    "📋 /menu — Hiển thị menu này\n\n" +
+    "Chọn một lệnh để bắt đầu nhé! 🚀";
+  sendTelegramMessage(chatId, msg);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LỆNH /diem — Xem bảng điểm cá nhân
+// ═══════════════════════════════════════════════════════════════
+function handleDiem(chatId) {
+  var student = findStudentByChatId(chatId);
+  if (!student) {
+    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.\nVui lòng liên hệ giáo viên để được thêm Telegram ID vào hệ thống.");
+    return;
+  }
+  
+  try {
+    var progress = supabaseRequest(
+      'student_progress?email=eq.' + encodeURIComponent(student.email) +
+      '&select=lesson_id,score,type,completed_at&order=completed_at.desc&limit=15', 'GET'
+    );
+    
+    if (!progress || progress.length === 0) {
+      sendTelegramMessage(chatId, 
+        "📊 Chào <b>" + student.name + "</b>!\n\n" +
+        "Hiện tại em chưa có kết quả bài tập nào.\nHãy bắt đầu làm bài trên Zphysics nhé! 💪");
+      return;
+    }
+    
+    var msg = "📊 <b>BẢNG ĐIỂM CỦA " + student.name.toUpperCase() + "</b>\n\n";
+    var totalScore = 0;
+    var count = 0;
+    
+    for (var i = 0; i < progress.length; i++) {
+      var p = progress[i];
+      var score = p.score !== null ? parseFloat(p.score) : null;
+      var emoji = score === null ? "⚪" : (score >= 8 ? "🟢" : (score >= 5 ? "🟡" : "🔴"));
+      var title = getLessonTitle(p.lesson_id);
+      var dateStr = "";
+      if (p.completed_at) {
+        var d = new Date(p.completed_at);
+        dateStr = Utilities.formatDate(d, "GMT+7", "dd/MM HH:mm");
+      }
+      
+      msg += (i + 1) + ". " + emoji + " " + title;
+      if (score !== null) {
+        msg += " — <b>" + score + "/10</b>";
+        totalScore += score;
+        count++;
+      }
+      msg += "\n   ⏰ " + dateStr + "\n\n";
+    }
+    
+    if (count > 0) {
+      var avg = (totalScore / count).toFixed(1);
+      msg += "📈 <b>Điểm TB: " + avg + "</b> | Đã làm: " + count + " bài";
+    }
+    
+    sendTelegramMessage(chatId, msg);
+  } catch (e) {
+    sendTelegramMessage(chatId, "⚠️ Có lỗi xảy ra khi truy vấn dữ liệu. Vui lòng thử lại sau.");
+    Logger.log("Lỗi handleDiem: " + e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LỆNH /tiendo — Xem tiến độ học tập theo chương
+// ═══════════════════════════════════════════════════════════════
+function handleTienDo(chatId) {
+  var student = findStudentByChatId(chatId);
+  if (!student) {
+    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.");
+    return;
+  }
+  
+  var grade = student.grade;
+  if (!grade || grade === "undefined" || grade === "0") {
+    sendTelegramMessage(chatId, "⚠️ Chưa có thông tin lớp của em.\nVui lòng liên hệ giáo viên để cập nhật Cột C (Lớp) trong sheet hocsinh.");
+    return;
+  }
+  
+  try {
+    // Lấy tất cả bài đã làm từ Supabase
+    var progress = supabaseRequest(
+      'student_progress?email=eq.' + encodeURIComponent(student.email) +
+      '&score=not.is.null&select=lesson_id', 'GET'
+    );
+    var completedSet = {};
+    if (progress) {
+      for (var i = 0; i < progress.length; i++) {
+        completedSet[progress[i].lesson_id] = true;
+      }
+    }
+    
+    // Quét các tab sheet để tìm tất cả mã đề thuộc lớp của học sinh
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheets = ss.getSheets();
+    var chapterMap = {}; // { "c1": { lessonIds: {}, completed: 0, total: 0 } }
+    
+    for (var s = 0; s < sheets.length; s++) {
+      var sheetName = sheets[s].getName().toLowerCase();
+      if (sheetName === 'hocsinh' || sheetName === 'deadlines' || sheetName === 'gamification' || sheetName === 'luyende') continue;
+      
+      var values = sheets[s].getDataRange().getValues();
+      if (values.length <= HEADER_ROW) continue;
+      
+      for (var r = HEADER_ROW; r < values.length; r++) {
+        var made = trimCell(values[r][COL.MADE]);
+        if (!made) continue;
+        
+        var parts = made.split('_');
+        if (parts.length >= 4 && parts[1] === grade) {
+          var chapter = parts[2]; // "c1", "c2"...
+          if (!chapterMap[chapter]) {
+            chapterMap[chapter] = { lessonIds: {} };
+          }
+          // Mỗi mã đề là 1 bài duy nhất (VD: baitap_12_c1_b03)
+          chapterMap[chapter].lessonIds[made] = true;
+        }
+      }
+    }
+    
+    // Cũng quét sheet luyende
+    var luyendeSheet = ss.getSheetByName('luyende');
+    if (luyendeSheet) {
+      var ldValues = luyendeSheet.getDataRange().getValues();
+      for (var r = 1; r < ldValues.length; r++) {
+        var lessonId = trimCell(ldValues[r][0]);
+        if (!lessonId) continue;
+        var parts = lessonId.split('_');
+        if (parts.length >= 4 && parts[1] === grade) {
+          var chapter = parts[2];
+          if (!chapterMap[chapter]) {
+            chapterMap[chapter] = { lessonIds: {} };
+          }
+          chapterMap[chapter].lessonIds[lessonId] = true;
+        }
+      }
+    }
+    
+    // Đếm số bài đã hoàn thành theo chương
+    var totalAll = 0;
+    var completedAll = 0;
+    var chapters = Object.keys(chapterMap).sort();
+    
+    if (chapters.length === 0) {
+      sendTelegramMessage(chatId, "📚 Chưa có dữ liệu bài tập nào cho lớp " + grade + ".");
+      return;
+    }
+    
+    var msg = "📚 <b>TIẾN ĐỘ HỌC TẬP — LỚP " + grade + "</b>\n";
+    msg += "👤 <b>" + student.name + "</b>\n\n";
+    
+    for (var c = 0; c < chapters.length; c++) {
+      var ch = chapters[c];
+      var ids = Object.keys(chapterMap[ch].lessonIds);
+      var done = 0;
+      for (var j = 0; j < ids.length; j++) {
+        if (completedSet[ids[j]]) done++;
+      }
+      totalAll += ids.length;
+      completedAll += done;
+      
+      var pct = ids.length > 0 ? Math.round(done / ids.length * 100) : 0;
+      var filled = Math.round(pct / 10);
+      var bar = "";
+      for (var b = 0; b < 10; b++) {
+        bar += b < filled ? "█" : "░";
+      }
+      
+      var chNum = ch.toUpperCase().replace('C', '');
+      msg += "<b>Chương " + chNum + ":</b>\n";
+      msg += bar + " " + pct + "% (" + done + "/" + ids.length + " bài)\n\n";
+    }
+    
+    var totalPct = totalAll > 0 ? Math.round(completedAll / totalAll * 100) : 0;
+    msg += "🏆 <b>Tổng tiến độ: " + totalPct + "% (" + completedAll + "/" + totalAll + " bài)</b>";
+    
+    sendTelegramMessage(chatId, msg);
+  } catch (e) {
+    sendTelegramMessage(chatId, "⚠️ Có lỗi xảy ra. Vui lòng thử lại sau.");
+    Logger.log("Lỗi handleTienDo: " + e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LỆNH /deadline — Xem hạn nộp bài sắp tới
+// ═══════════════════════════════════════════════════════════════
+function handleDeadline(chatId) {
+  var student = findStudentByChatId(chatId);
+  if (!student) {
+    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.");
+    return;
+  }
+  
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var deadlinesSheet = ss.getSheetByName('deadlines');
+    if (!deadlinesSheet) {
+      sendTelegramMessage(chatId, "📅 Hiện tại chưa có lịch nộp bài nào.");
+      return;
+    }
+    
+    var values = deadlinesSheet.getDataRange().getValues();
+    var now = new Date().getTime();
+    var deadlines = [];
+    
+    for (var r = 1; r < values.length; r++) {
+      var email = trimCell(values[r][0]).toLowerCase();
+      if (email !== student.email) continue;
+      
+      var lessonId = trimCell(values[r][1]);
+      var deadlineVal = values[r][2];
+      var deadlineTime;
+      if (deadlineVal instanceof Date) {
+        deadlineTime = deadlineVal.getTime();
+      } else {
+        deadlineTime = Date.parse(deadlineVal);
+      }
+      if (isNaN(deadlineTime) || deadlineTime < now) continue;
+      
+      deadlines.push({ lessonId: lessonId, deadline: deadlineTime });
+    }
+    
+    if (deadlines.length === 0) {
+      sendTelegramMessage(chatId, 
+        "📅 Chào <b>" + student.name + "</b>!\n\n" +
+        "Hiện tại không có bài tập nào sắp đến hạn. Tuyệt vời! 🎉");
+      return;
+    }
+    
+    // Sắp xếp theo hạn gần nhất
+    deadlines.sort(function(a, b) { return a.deadline - b.deadline; });
+    
+    // Kiểm tra bài nào đã làm
+    var progress = supabaseRequest(
+      'student_progress?email=eq.' + encodeURIComponent(student.email) +
+      '&score=not.is.null&select=lesson_id,score', 'GET'
+    );
+    var completedMap = {};
+    if (progress) {
+      for (var i = 0; i < progress.length; i++) {
+        completedMap[progress[i].lesson_id] = progress[i].score;
+      }
+    }
+    
+    var msg = "📅 <b>BÀI TẬP SẮP ĐẾN HẠN</b>\n";
+    msg += "👤 <b>" + student.name + "</b>\n\n";
+    var chuaLam = 0;
+    
+    for (var i = 0; i < deadlines.length; i++) {
+      var dl = deadlines[i];
+      var title = getLessonTitle(dl.lessonId);
+      var formattedDate = Utilities.formatDate(new Date(dl.deadline), "GMT+7", "dd/MM/yyyy HH:mm");
+      var diffMs = dl.deadline - now;
+      var diffH = Math.floor(diffMs / (1000 * 60 * 60));
+      var diffM = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      
+      var timeLeft = "";
+      if (diffH >= 24) {
+        timeLeft = "Còn " + Math.floor(diffH / 24) + " ngày " + (diffH % 24) + " giờ";
+      } else {
+        timeLeft = "Còn " + diffH + " giờ " + diffM + " phút";
+      }
+      
+      var isCompleted = completedMap.hasOwnProperty(dl.lessonId);
+      
+      if (isCompleted) {
+        msg += (i + 1) + ". ✅ " + title + "\n";
+        msg += "   ⏰ " + formattedDate + "\n";
+        msg += "   📝 Đã làm — <b>" + completedMap[dl.lessonId] + "/10</b> điểm\n\n";
+      } else {
+        chuaLam++;
+        var urgentEmoji = diffH < 2 ? "🚨" : (diffH < 24 ? "⚠️" : "📌");
+        msg += (i + 1) + ". " + urgentEmoji + " " + title + "\n";
+        msg += "   ⏰ <b>" + timeLeft + "</b> (" + formattedDate + ")\n";
+        msg += "   📝 Chưa làm\n\n";
+      }
+    }
+    
+    msg += "📊 <b>Tổng: " + chuaLam + " bài chưa làm / " + deadlines.length + " bài</b>";
+    sendTelegramMessage(chatId, msg);
+  } catch (e) {
+    sendTelegramMessage(chatId, "⚠️ Có lỗi xảy ra. Vui lòng thử lại sau.");
+    Logger.log("Lỗi handleDeadline: " + e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LỆNH /cauhoi — Thử thách nhanh (3 câu/ngày)
+// ═══════════════════════════════════════════════════════════════
+function handleCauHoi(chatId) {
+  var student = findStudentByChatId(chatId);
+  if (!student) {
+    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.");
+    return;
+  }
+  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // Tạo sheet gamification nếu chưa có
+  var gameSheet = ss.getSheetByName('gamification');
+  if (!gameSheet) {
+    gameSheet = ss.insertSheet('gamification');
+    gameSheet.getRange(1, 1, 1, 7).setValues([
+      ['Email', 'Current Streak', 'Max Streak', 'Total Points', 'Last Active Date', 'Daily Questions', 'Last Question Date']
+    ]);
+    gameSheet.setFrozenRows(1);
+  }
+  
+  var gameValues = gameSheet.getDataRange().getValues();
+  var playerRow = -1;
+  var today = Utilities.formatDate(new Date(), "GMT+7", "yyyy-MM-dd");
+  
+  for (var r = 1; r < gameValues.length; r++) {
+    if (trimCell(gameValues[r][0]).toLowerCase() === student.email) {
+      playerRow = r + 1; // 1-indexed cho getRange
+      break;
+    }
+  }
+  
+  // Kiểm tra giới hạn 3 câu/ngày
+  var dailyCount = 0;
+  if (playerRow > 0) {
+    var lastQDate = trimCell(gameValues[playerRow - 1][6]).toString();
+    if (lastQDate === today) {
+      dailyCount = parseInt(gameValues[playerRow - 1][5]) || 0;
+    }
+  }
+  
+  if (dailyCount >= 3) {
+    // Lấy điểm hiện tại để hiển thị
+    var pts = playerRow > 0 ? (parseInt(gameValues[playerRow - 1][3]) || 0) : 0;
+    var streak = playerRow > 0 ? (parseInt(gameValues[playerRow - 1][1]) || 0) : 0;
+    sendTelegramMessage(chatId, 
+      "🧪 Bạn đã hoàn thành <b>3/3 câu hỏi</b> hôm nay rồi!\n\n" +
+      "⭐ Điểm tích lũy: <b>" + pts + "</b>\n" +
+      "🔥 Chuỗi ngày: <b>" + streak + " ngày</b>\n\n" +
+      "Quay lại ngày mai để tiếp tục thử thách nhé! 💪");
+    return;
+  }
+  
+  try {
+    // Chọn câu hỏi ngẫu nhiên từ Google Sheets theo lớp
+    var grade = student.grade || "12";
+    var allQuestions = [];
+    var sheets = ss.getSheets();
+    
+    for (var s = 0; s < sheets.length; s++) {
+      var sheetName = sheets[s].getName().toLowerCase();
+      if (sheetName === 'hocsinh' || sheetName === 'deadlines' || sheetName === 'gamification' || sheetName === 'luyende') continue;
+      
+      var values = sheets[s].getDataRange().getValues();
+      if (values.length <= HEADER_ROW) continue;
+      
+      for (var r = HEADER_ROW; r < values.length; r++) {
+        var made = trimCell(values[r][COL.MADE]);
+        if (!made) continue;
+        var parts = made.split('_');
+        if (parts.length < 2 || parts[1] !== grade) continue;
+        
+        var q = trimCell(values[r][COL.QUESTION]);
+        var a = trimCell(values[r][COL.A]);
+        var b = trimCell(values[r][COL.B]);
+        var c = trimCell(values[r][COL.C]);
+        var d = trimCell(values[r][COL.D]);
+        var correct = trimCell(values[r][COL.CORRECT]).toUpperCase();
+        
+        // Chỉ lấy câu hỏi đầy đủ 4 đáp án
+        if (q && a && b && c && d && correct) {
+          allQuestions.push({
+            made: made,
+            qid: values[r][COL.ID],
+            question: q, a: a, b: b, c: c, d: d,
+            correct: correct
+          });
+        }
+      }
+    }
+    
+    if (allQuestions.length === 0) {
+      sendTelegramMessage(chatId, "⚠️ Không tìm thấy câu hỏi nào cho lớp " + grade + ".");
+      return;
+    }
+    
+    // Chọn ngẫu nhiên
+    var idx = Math.floor(Math.random() * allQuestions.length);
+    var q = allQuestions[idx];
+    
+    var questionText = "🧪 <b>THỬ THÁCH VẬT LÍ</b> (" + (dailyCount + 1) + "/3 hôm nay)\n\n" +
+                       q.question + "\n\n" +
+                       "<b>A.</b> " + q.a + "\n" +
+                       "<b>B.</b> " + q.b + "\n" +
+                       "<b>C.</b> " + q.c + "\n" +
+                       "<b>D.</b> " + q.d;
+    
+    // Callback data: q|ChosenAnswer|CorrectAnswer|Made|QuestionID
+    var cbBase = q.correct + "|" + q.made + "|" + q.qid;
+    var keyboard = [[
+      { text: "🅰️ A", callback_data: "q|A|" + cbBase },
+      { text: "🅱️ B", callback_data: "q|B|" + cbBase },
+      { text: "©️ C", callback_data: "q|C|" + cbBase },
+      { text: "🅳 D", callback_data: "q|D|" + cbBase }
+    ]];
+    
+    sendTelegramMessageWithKeyboard(chatId, questionText, keyboard);
+    
+    // Cập nhật số câu hỏi trong ngày
+    if (playerRow > 0) {
+      if (trimCell(gameValues[playerRow - 1][6]).toString() === today) {
+        gameSheet.getRange(playerRow, 6).setValue(dailyCount + 1);
+      } else {
+        gameSheet.getRange(playerRow, 6).setValue(1);
+        gameSheet.getRange(playerRow, 7).setValue(today);
+      }
+    } else {
+      // Thêm dòng mới cho học sinh
+      gameSheet.appendRow([student.email, 0, 0, 0, '', 1, today]);
+    }
+    
+  } catch (e) {
+    sendTelegramMessage(chatId, "⚠️ Có lỗi xảy ra. Vui lòng thử lại sau.");
+    Logger.log("Lỗi handleCauHoi: " + e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// XỬ LÝ CALLBACK QUERY — Khi học sinh bấm nút A/B/C/D
+// ═══════════════════════════════════════════════════════════════
+function handleCallbackQuery(callbackQuery) {
+  var chatId = callbackQuery.message.chat.id;
+  var messageId = callbackQuery.message.message_id;
+  var data = callbackQuery.data;
+  var callbackId = callbackQuery.id;
+  
+  // Xóa trạng thái loading trên nút
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/answerCallbackQuery', {
+    'method': 'post',
+    'contentType': 'application/json',
+    'payload': JSON.stringify({ 'callback_query_id': callbackId }),
+    'muteHttpExceptions': true
+  });
+  
+  // Parse: q|Chosen|Correct|Made|QuestionID
+  var parts = data.split('|');
+  if (parts[0] !== 'q' || parts.length < 5) return;
+  
+  var chosen = parts[1];
+  var correct = parts[2];
+  var made = parts[3];
+  var questionId = parts[4];
+  var isCorrect = (chosen === correct);
+  
+  // Tìm lời giải thích từ Google Sheet
+  var explanation = "";
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheets = ss.getSheets();
+    for (var s = 0; s < sheets.length; s++) {
+      var values = sheets[s].getDataRange().getValues();
+      if (values.length <= HEADER_ROW) continue;
+      for (var r = HEADER_ROW; r < values.length; r++) {
+        if (trimCell(values[r][COL.MADE]) === made && String(values[r][COL.ID]) === String(questionId)) {
+          explanation = trimCell(values[r][COL.EXPLANATION]);
+          break;
+        }
+      }
+      if (explanation) break;
+    }
+  } catch (e) {
+    Logger.log("Lỗi tra explanation: " + e.message);
+  }
+  
+  // Cập nhật điểm gamification
+  var student = findStudentByChatId(chatId);
+  var pointsEarned = 0;
+  var totalPoints = 0;
+  var currentStreak = 0;
+  
+  if (student) {
+    if (isCorrect) {
+      pointsEarned = 10;
+      totalPoints = updateGamePoints(student.email, pointsEarned);
+    }
+    currentStreak = updateStreak(student.email);
+  }
+  
+  // Xóa keyboard khỏi tin nhắn cũ
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/editMessageReplyMarkup', {
+    'method': 'post',
+    'contentType': 'application/json',
+    'payload': JSON.stringify({
+      'chat_id': chatId,
+      'message_id': messageId,
+      'reply_markup': JSON.stringify({ 'inline_keyboard': [] })
+    }),
+    'muteHttpExceptions': true
+  });
+  
+  // Gửi kết quả
+  var resultMsg = "";
+  if (isCorrect) {
+    resultMsg = "✅ <b>CHÍNH XÁC!</b> Đáp án <b>" + correct + "</b> 🎉\n\n";
+    if (pointsEarned > 0) {
+      resultMsg += "+" + pointsEarned + " điểm ⭐ (Tổng: <b>" + totalPoints + "</b> điểm)\n";
+    }
+  } else {
+    resultMsg = "❌ <b>SAI RỒI!</b>\nBạn chọn <b>" + chosen + "</b>, đáp án đúng là <b>" + correct + "</b>\n\n";
+  }
+  
+  if (currentStreak > 0) {
+    resultMsg += "🔥 Chuỗi học: <b>" + currentStreak + " ngày</b>\n\n";
+  }
+  
+  if (explanation) {
+    resultMsg += "📖 <b>Giải thích:</b>\n" + explanation;
+  }
+  
+  sendTelegramMessage(chatId, resultMsg);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GAMIFICATION — Cập nhật điểm tích lũy
+// ═══════════════════════════════════════════════════════════════
+function updateGamePoints(email, points) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var gameSheet = ss.getSheetByName('gamification');
+  if (!gameSheet) return 0;
+  
+  var values = gameSheet.getDataRange().getValues();
+  for (var r = 1; r < values.length; r++) {
+    if (trimCell(values[r][0]).toLowerCase() === email) {
+      var currentPoints = parseInt(values[r][3]) || 0;
+      var newPoints = currentPoints + points;
+      gameSheet.getRange(r + 1, 4).setValue(newPoints);
+      return newPoints;
+    }
+  }
+  return points;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GAMIFICATION — Cập nhật chuỗi ngày học & kiểm tra huy hiệu
+// ═══════════════════════════════════════════════════════════════
+function updateStreak(email) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var gameSheet = ss.getSheetByName('gamification');
+  if (!gameSheet) return 0;
+  
+  var today = Utilities.formatDate(new Date(), "GMT+7", "yyyy-MM-dd");
+  var yesterdayDate = new Date(new Date().getTime() - 86400000);
+  var yesterday = Utilities.formatDate(yesterdayDate, "GMT+7", "yyyy-MM-dd");
+  
+  var values = gameSheet.getDataRange().getValues();
+  for (var r = 1; r < values.length; r++) {
+    if (trimCell(values[r][0]).toLowerCase() !== email) continue;
+    
+    var lastActive = trimCell(values[r][4]).toString();
+    if (lastActive === today) {
+      // Đã cập nhật hôm nay rồi, trả về streak hiện tại
+      return parseInt(values[r][1]) || 0;
+    }
+    
+    var currentStreak = parseInt(values[r][1]) || 0;
+    var maxStreak = parseInt(values[r][2]) || 0;
+    
+    if (lastActive === yesterday) {
+      currentStreak++; // Tiếp tục chuỗi
+    } else {
+      currentStreak = 1; // Reset chuỗi
+    }
+    
+    if (currentStreak > maxStreak) maxStreak = currentStreak;
+    
+    gameSheet.getRange(r + 1, 2).setValue(currentStreak);
+    gameSheet.getRange(r + 1, 3).setValue(maxStreak);
+    gameSheet.getRange(r + 1, 5).setValue(today);
+    
+    // Kiểm tra mốc huy hiệu
+    checkBadgeMilestone(email, currentStreak);
+    
+    return currentStreak;
+  }
+  return 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GAMIFICATION — Gửi thông báo huy hiệu khi đạt mốc
+// ═══════════════════════════════════════════════════════════════
+function checkBadgeMilestone(email, streak) {
+  var milestones = [
+    { days: 3,  badge: "🌱", name: "Người mới bắt đầu" },
+    { days: 7,  badge: "⚔️", name: "Chiến binh kiên trì" },
+    { days: 14, badge: "⭐", name: "Ngôi sao đang lên" },
+    { days: 30, badge: "👑", name: "Huyền thoại" }
+  ];
+  
+  var milestone = null;
+  for (var i = 0; i < milestones.length; i++) {
+    if (streak === milestones[i].days) {
+      milestone = milestones[i];
+      break;
+    }
+  }
+  if (!milestone) return;
+  
+  // Tìm chatId và tên học sinh
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hsSheet = ss.getSheetByName('hocsinh');
+  if (!hsSheet) return;
+  
+  var values = hsSheet.getDataRange().getValues();
+  for (var r = 1; r < values.length; r++) {
+    if (trimCell(values[r][0]).toLowerCase() === email) {
+      var chatId = trimCell(values[r][4]);
+      var name = trimCell(values[r][1]);
+      if (chatId) {
+        var msg = "🎉 <b>CHÚC MỪNG " + name.toUpperCase() + "!</b>\n\n" +
+                  "🔥 Chuỗi <b>" + streak + " ngày</b> học liên tục!\n\n" +
+                  milestone.badge + " Bạn đã nhận huy hiệu:\n" +
+                  "<b>\"" + milestone.name + "\"</b>\n\n" +
+                  "Tiếp tục giữ vững phong độ nhé! 💪";
+        sendTelegramMessage(chatId, msg);
+      }
+      return;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// THIẾT LẬP WEBHOOK — Chạy 1 lần duy nhất để kết nối Bot ↔ Apps Script
+// ═══════════════════════════════════════════════════════════════
+function setTelegramWebhook() {
+  // ⚠️ THAY URL DƯỚI ĐÂY BẰNG WEB APP URL CỦA BẠN (lấy từ Deploy > Manage Deployments)
+  var webAppUrl = "ĐIỀN_WEB_APP_URL_CỦA_BẠN_VÀO_ĐÂY";
+  
+  var url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/setWebhook?url=" + encodeURIComponent(webAppUrl);
+  var res = UrlFetchApp.fetch(url);
+  Logger.log("Kết quả đăng ký Webhook: " + res.getContentText());
+}
+
