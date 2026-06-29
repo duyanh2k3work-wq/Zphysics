@@ -959,7 +959,7 @@
     }
 
     /* ── PREMIUM THEME OVERRIDES (DARK NEON MULTICOLOR GLOW) ── */
-    body.premium-theme {
+    body.premium-theme:not(.premium-light) {
       --bg: #0A0A0B;
       --card: rgba(22, 22, 26, 0.7);
       --card-solid: #16161a;
@@ -971,7 +971,7 @@
       --teal: #2ec4b6;
     }
 
-    body.premium-theme::before {
+    body.premium-theme:not(.premium-light)::before {
       background:
         radial-gradient(ellipse 60% 50% at 10% 0%, rgba(46, 196, 182, 0.12) 0%, transparent 60%),
         radial-gradient(ellipse 50% 40% at 90% 10%, rgba(229, 57, 53, 0.08) 0%, transparent 55%),
@@ -980,12 +980,12 @@
         #0A0A0B;
     }
 
-    body.premium-theme .header-left h1 {
+    body.premium-theme:not(.premium-light) .header-left h1 {
       color: #ffffff;
       text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
     }
 
-    body.premium-theme .header-left h1 span {
+    body.premium-theme:not(.premium-light) .header-left h1 span {
       background: linear-gradient(135deg, #7DD3FC 30%, #06B6D4 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -994,12 +994,12 @@
       text-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
     }
 
-    body.premium-theme #greetingText {
+    body.premium-theme:not(.premium-light) #greetingText {
       color: #a1a1aa !important;
     }
 
     /* Golden 'Z' Logo Avatar Button gets the rainbow border in Premium */
-    body.premium-theme .avatar-btn {
+    body.premium-theme:not(.premium-light) .avatar-btn {
       background: linear-gradient(#16161a, #16161a) padding-box, linear-gradient(135deg, #ffe27a 0%, #d4af37 50%, #ffe27a 100%) border-box !important;
       border: 2.5px solid transparent !important;
       border-radius: 18px !important;
@@ -1007,13 +1007,13 @@
     }
 
     /* Grade Pills (Lớp 10, 11, 12) styled with borders in Premium */
-    body.premium-theme .grade-pill {
+    body.premium-theme:not(.premium-light) .grade-pill {
       background: rgba(255, 255, 255, 0.04) !important;
       border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
       color: #a1a1aa !important;
     }
 
-    body.premium-theme .grade-pill.grade-0.active {
+    body.premium-theme:not(.premium-light) .grade-pill.grade-0.active {
       background: linear-gradient(#0A0A0B, #0A0A0B) padding-box, linear-gradient(135deg, #43a047, #81c784) border-box !important;
       border: 2px solid transparent !important;
       color: #81c784 !important;
@@ -1021,7 +1021,7 @@
       transform: scale(1.05);
     }
 
-    body.premium-theme .grade-pill.grade-1.active {
+    body.premium-theme:not(.premium-light) .grade-pill.grade-1.active {
       background: linear-gradient(#0A0A0B, #0A0A0B) padding-box, linear-gradient(135deg, #f9a825, #ffd54f) border-box !important;
       border: 2px solid transparent !important;
       color: #ffd54f !important;
@@ -1029,7 +1029,7 @@
       transform: scale(1.05);
     }
 
-    body.premium-theme .grade-pill.grade-2.active {
+    body.premium-theme:not(.premium-light) .grade-pill.grade-2.active {
       background: linear-gradient(#0A0A0B, #0A0A0B) padding-box, linear-gradient(135deg, #e53935, #ef9a9a) border-box !important;
       border: 2px solid transparent !important;
       color: #ef9a9a !important;
@@ -1037,7 +1037,7 @@
       transform: scale(1.05);
     }
 
-    body.premium-theme .grade-pill.grade-3.active {
+    body.premium-theme:not(.premium-light) .grade-pill.grade-3.active {
       background: linear-gradient(#0A0A0B, #0A0A0B) padding-box, linear-gradient(135deg, #7c4dff, #b388ff) border-box !important;
       border: 2px solid transparent !important;
       color: #b388ff !important;
@@ -1065,7 +1065,7 @@
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    body.premium-theme .ch-card-wrapper {
+    body.premium-theme:not(.premium-light) .ch-card-wrapper {
       border-radius: 32px;
     }
 
@@ -1082,15 +1082,15 @@
       transition: opacity 0.5s ease;
     }
 
-    body.premium-theme .ch-card-glow {
+    body.premium-theme:not(.premium-light) .ch-card-glow {
       display: block;
     }
 
-    body.premium-theme .ch-card-wrapper:hover .ch-card-glow {
+    body.premium-theme:not(.premium-light) .ch-card-wrapper:hover .ch-card-glow {
       opacity: 0.75;
     }
 
-    body.premium-theme .ch-card {
+    body.premium-theme:not(.premium-light) .ch-card {
       position: relative;
       z-index: 10;
       background-image: linear-gradient(#000000, #000000), var(--glow-gradient) !important;
@@ -1102,64 +1102,64 @@
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s !important;
     }
 
-    body.premium-theme .ch-card-wrapper:hover {
+    body.premium-theme:not(.premium-light) .ch-card-wrapper:hover {
       transform: translateY(-4px) scale(1.02);
     }
 
-    body.premium-theme .ch-card:hover {
+    body.premium-theme:not(.premium-light) .ch-card:hover {
       transform: none !important;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
     }
 
-    body.premium-theme .ch-num {
+    body.premium-theme:not(.premium-light) .ch-num {
       color: var(--glow-color) !important;
       opacity: 0.9;
     }
 
-    body.premium-theme .ch-title {
+    body.premium-theme:not(.premium-light) .ch-title {
       color: #ffffff !important;
     }
 
-    body.premium-theme .ch-arrow svg {
+    body.premium-theme:not(.premium-light) .ch-arrow svg {
       stroke: var(--glow-color) !important;
     }
 
-    body.premium-theme .lesson-list {
+    body.premium-theme:not(.premium-light) .lesson-list {
       background: rgba(10, 10, 12, 0.5) !important;
     }
 
-    body.premium-theme .lesson-row {
+    body.premium-theme:not(.premium-light) .lesson-row {
       background: rgba(26, 26, 32, 0.9) !important;
       border: 1px solid rgba(255, 255, 255, 0.04) !important;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
       transition: all 0.3s !important;
     }
 
-    body.premium-theme .lesson-row:hover {
+    body.premium-theme:not(.premium-light) .lesson-row:hover {
       border-color: var(--glow-color) !important;
       box-shadow: 0 4px 15px var(--glow-shadow) !important;
     }
 
-    body.premium-theme .lesson-title {
+    body.premium-theme:not(.premium-light) .lesson-title {
       color: #f5f5f7 !important;
     }
 
-    body.premium-theme .lesson-num {
+    body.premium-theme:not(.premium-light) .lesson-num {
       color: var(--glow-color) !important;
       opacity: 0.9;
     }
 
-    body.premium-theme .user-popup {
+    body.premium-theme:not(.premium-light) .user-popup {
       background: rgba(22, 22, 26, 0.96) !important;
       border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
     }
 
-    body.premium-theme .user-popup-name {
+    body.premium-theme:not(.premium-light) .user-popup-name {
       color: #ffffff !important;
     }
 
-    body.premium-theme .user-popup-email {
+    body.premium-theme:not(.premium-light) .user-popup-email {
       color: #a1a1aa !important;
     }
 
@@ -1368,7 +1368,7 @@
       transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       color: var(--text);
     }
-    body.premium-theme .dashboard-container {
+    body.premium-theme:not(.premium-light) .dashboard-container {
       background: rgba(22, 22, 26, 0.96);
       border-color: rgba(255, 255, 255, 0.1);
       color: #f5f5f7;
@@ -1462,7 +1462,7 @@
       outline: none;
       padding: 4px;
     }
-    body.premium-theme .time-input {
+    body.premium-theme:not(.premium-light) .time-input {
       color: #fff;
       color-scheme: dark;
     }
@@ -1485,16 +1485,200 @@
       margin-bottom: 6px;
       padding: 8px;
       text-align: center;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.05);
       border-radius: 12px;
-      color: #fff;
+      color: var(--text);
       font-weight: 700;
       text-decoration: none;
       font-size: 13px;
       transition: background 0.2s;
     }
     .btn-dashboard-open:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    body.premium-theme:not(.premium-light) .btn-dashboard-open {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+    body.premium-theme:not(.premium-light) .btn-dashboard-open:hover {
       background: rgba(255, 255, 255, 0.2);
+    }
+    /* ── THEME TOGGLE (Premium Only) ── */
+    .theme-toggle-wrap {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9998;
+    }
+    .theme-toggle {
+      width: 72px;
+      height: 36px;
+      border-radius: 18px;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      padding: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .theme-toggle svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .theme-toggle-knob {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 28px;
+      height: 28px;
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    body.premium-theme.premium-light .theme-toggle-knob {
+      transform: translateX(36px);
+    }
+    
+    /* ── LỊCH SỬ LÀM BÀI (DASHBOARD) ── */
+    .dashboard-section-title {
+      font-size: 14px;
+      font-weight: 800;
+      margin-top: 16px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .history-list {
+      max-height: 250px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding-right: 4px;
+    }
+    .history-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    .history-list::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 4px;
+    }
+    .history-list::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 12px;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+    body.premium-theme:not(.premium-light) .history-item {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    .history-item:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    body.premium-theme:not(.premium-light) .history-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .history-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex-grow: 1;
+      min-width: 0;
+    }
+    .history-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .history-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .history-badge {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .history-badge.exam {
+      background: rgba(140, 44, 158, 0.15);
+      color: #c05cff;
+      border: 0.5px solid rgba(140, 44, 158, 0.3);
+    }
+    .history-badge.quiz {
+      background: rgba(46, 196, 182, 0.15);
+      color: #2ec4b6;
+      border: 0.5px solid rgba(46, 196, 182, 0.3);
+    }
+    .history-score-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      justify-content: center;
+      min-width: 60px;
+    }
+    .history-score {
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .history-score.high { color: var(--correct, #4caf50); }
+    .history-score.medium { color: #f9a825; }
+    .history-score.low { color: var(--wrong, #f44336); }
+    .history-action {
+      font-size: 10px;
+      font-weight: 800;
+      background: var(--teal);
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .history-action:hover {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+    .history-loading, .history-empty {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      padding: 20px 0;
     }
   </style>
 </head>
@@ -1574,6 +1758,60 @@
       </div>
     </div>
 
+    <!-- ── THEME TOGGLE (Premium Only) ── -->
+    <div class="theme-toggle-wrap" id="themeToggleWrap">
+      <button class="theme-toggle" id="themeToggle" onclick="togglePremiumThemeMode()" aria-label="Đổi giao diện sáng/tối">
+        <!-- SVG for Light Mode (Clouds) -->
+        <svg viewBox="0 0 72 36" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="lightBg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFD1D1" />
+              <stop offset="50%" stop-color="#D1D4FF" />
+              <stop offset="100%" stop-color="#9AD7F8" />
+            </linearGradient>
+            <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="white" stop-opacity="0.9" />
+              <stop offset="100%" stop-color="white" stop-opacity="0.4" />
+            </linearGradient>
+          </defs>
+          <!-- Background -->
+          <rect width="72" height="36" fill="url(#lightBg)" />
+          <!-- Small Cloud -->
+          <path d="M 45,18 a 4,4 0 0,1 4,-4 a 5,5 0 0,1 8,2 a 4,4 0 0,1 2,6 h -14 a 4,4 0 0,1 0,-4 z" fill="url(#cloudGrad)" />
+          <!-- Big Cloud -->
+          <path d="M 52,28 a 6,6 0 0,1 6,-6 a 8,8 0 0,1 12,4 a 6,6 0 0,1 4,8 h -22 a 6,6 0 0,1 0,-6 z" fill="url(#cloudGrad)" />
+        </svg>
+
+        <!-- SVG for Dark Mode (Stars/Space) - Default opacity 0, fades in on dark mode -->
+        <svg id="darkToggleBg" viewBox="0 0 72 36" preserveAspectRatio="none" style="opacity: 0; transition: opacity 0.5s;">
+          <defs>
+            <linearGradient id="darkBg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#2D1B68" />
+              <stop offset="50%" stop-color="#8C2C9E" />
+              <stop offset="100%" stop-color="#F35A9C" />
+            </linearGradient>
+            <linearGradient id="nebulaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="white" stop-opacity="0.4" />
+              <stop offset="100%" stop-color="white" stop-opacity="0.1" />
+            </linearGradient>
+          </defs>
+          <!-- Background -->
+          <rect width="72" height="36" fill="url(#darkBg)" />
+          <!-- Nebula shapes -->
+          <path d="M 15,25 a 8,8 0 0,1 8,-8 a 10,10 0 0,1 12,4 a 8,8 0 0,1 6,12 h -26 a 8,8 0 0,1 0,-8 z" fill="url(#nebulaGrad)" />
+          <path d="M 22,32 a 6,6 0 0,1 6,-6 a 8,8 0 0,1 10,3 a 6,6 0 0,1 4,8 h -20 a 6,6 0 0,1 0,-5 z" fill="url(#nebulaGrad)" />
+          <!-- Stars -->
+          <path d="M 38,12 Q 38,15 41,15 Q 38,15 38,18 Q 38,15 35,15 Q 38,15 38,12 Z" fill="#FFD700" opacity="0.8" />
+          <path d="M 20,18 Q 20,20 22,20 Q 20,20 20,22 Q 20,20 18,20 Q 20,20 20,18 Z" fill="white" opacity="0.6" />
+          <circle cx="28" cy="11" r="1.5" fill="white" opacity="0.7" />
+          <circle cx="45" cy="22" r="1" fill="white" opacity="0.5" />
+          <circle cx="15" cy="15" r="1" fill="white" opacity="0.4" />
+        </svg>
+
+        <div class="theme-toggle-knob"></div>
+      </button>
+    </div>
+
   </div>
 
   <div id="dashboardModal" class="dashboard-modal">
@@ -1590,6 +1828,13 @@
           <div class="stat-val" id="statCompleted">0</div>
           <div class="stat-label">Bài hoàn thành 📚</div>
         </div>
+      </div>
+
+      <div class="dashboard-section-title">
+        Lịch Sử Làm Bài ⏳
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="history-loading">Đang tải lịch sử...</div>
       </div>
 
       <div id="reminderSettings" class="reminder-settings">
@@ -1634,6 +1879,118 @@
     // ── Danh sách Đề ôn thi thử tốt nghiệp THPT Quốc gia (Premium Only) ──
     let mockExams = [];
     let studentProgressMap = {};
+    let globalLessonsData = [];
+
+    // ── LỊCH SỬ LÀM BÀI LOGIC ──
+    function getLessonTitleByCode(code) {
+      if (!code) return 'Không rõ đề';
+      
+      const matchedExam = mockExams.find(ex => ex.id === code);
+      if (matchedExam) return matchedExam.title;
+      
+      const parts = code.split('_');
+      if (parts.length >= 4) {
+        const gradeNum = parts[1];
+        const chapterNum = parseInt(parts[2].replace('c', ''), 10);
+        const lessonNum = parseInt(parts[3].replace('b', ''), 10);
+        
+        const gradeObj = globalLessonsData.find(g => {
+          const match = g.grade.match(/\d+/);
+          return match && match[0] === gradeNum;
+        });
+        
+        if (gradeObj) {
+          let chapterObj = gradeObj.chapters.find(ch => {
+            const chMatch = ch.num.match(/[IVXLCDM]+/i);
+            return false;
+          });
+          if (!chapterObj && gradeObj.chapters[chapterNum - 1]) {
+            chapterObj = gradeObj.chapters[chapterNum - 1];
+          }
+          if (chapterObj) {
+            const lessonObj = chapterObj.lessons.find(l => parseInt(l.num, 10) === lessonNum);
+            if (lessonObj) return lessonObj.title;
+          }
+        }
+        
+        // Fallback to parseQuizCode
+        const typeMap = { 'cauhoi': 'Trắc nghiệm', 'đs': 'Đúng/Sai', 'tln': 'Trả lời ngắn', 'baitap': 'Bài tập', 'ontap': 'Ôn tập' };
+        const typeStr = typeMap[parts[0]] || parts[0];
+        return `Vật lí ${parts[1]} - Chương ${parts[2].toUpperCase().replace('C', '')} - Bài ${parseInt(parts[3].toUpperCase().replace('B', ''), 10)} (${typeStr})`;
+      }
+      return code;
+    }
+
+    async function loadHistoryList() {
+      const historyListEl = document.getElementById('historyList');
+      const session = getSession();
+      if (!session || !session.premium || session.gmail.startsWith('demo_')) {
+        historyListEl.innerHTML = '<div class="history-empty">Tính năng Lịch sử chỉ dành cho học sinh Premium đã đăng nhập.</div>';
+        return;
+      }
+      
+      historyListEl.innerHTML = '<div class="history-loading">Đang tải lịch sử...</div>';
+      
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/student_progress?email=eq.${encodeURIComponent(session.gmail)}&select=*&order=completed_at.desc`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+        if (!res.ok) throw new Error('Failed to load');
+        const data = await res.json();
+        
+        if (!data || data.length === 0) {
+          historyListEl.innerHTML = '<div class="history-empty">Chưa có lịch sử làm bài.</div>';
+          return;
+        }
+        
+        historyListEl.innerHTML = '';
+        data.forEach(item => {
+          const isExam = item.type.startsWith('exam');
+          const title = getLessonTitleByCode(item.lesson_id);
+          const score = item.score !== null ? parseFloat(item.score).toFixed(2) : '-';
+          
+          let scoreClass = 'low';
+          if (item.score >= 8.0) scoreClass = 'high';
+          else if (item.score >= 5.0) scoreClass = 'medium';
+          
+          const dateStr = new Date(item.completed_at).toLocaleString('vi-VN', {
+            hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric'
+          });
+          
+          const typeBadge = isExam ? '<span class="history-badge exam">Thi thử VIP</span>' : '<span class="history-badge quiz">Luyện tập</span>';
+          
+          const html = `
+            <div class="history-item">
+              <div class="history-info">
+                <div class="history-title" title="${title}">${title}</div>
+                <div class="history-meta">
+                  ${typeBadge}
+                  <span class="history-date">${dateStr}</span>
+                </div>
+              </div>
+              <div class="history-score-wrap">
+                <div class="history-score ${scoreClass}">${score}</div>
+                <button class="history-action" onclick="retryAttempt('${item.lesson_id}', '${isExam ? 'exam' : 'quiz'}')">Làm lại</button>
+              </div>
+            </div>
+          `;
+          historyListEl.insertAdjacentHTML('beforeend', html);
+        });
+      } catch (err) {
+        historyListEl.innerHTML = '<div class="history-empty">Lỗi khi tải lịch sử. Vui lòng thử lại sau.</div>';
+      }
+    }
+
+    function retryAttempt(lessonId, type) {
+      if (type === 'exam') {
+        window.location.href = `l.html#${lessonId}`;
+      } else {
+        window.location.href = `q.html?quiz=${lessonId}`;
+      }
+    }
 
     // ── DASHBOARD & NHẮC NHỞ LOGIC ──
     function openDashboard() {
@@ -1670,6 +2027,9 @@
       // Compute Completed
       const completedCount = Object.keys(studentProgressMap).length;
       document.getElementById('statCompleted').textContent = completedCount;
+
+      // Tải lịch sử làm bài
+      loadHistoryList();
 
       // Init reminder UI if Capacitor
       if (window.Capacitor) {
@@ -1924,9 +2284,7 @@
 
           const glow = document.createElement('div');
           glow.className = 'ch-card-glow';
-          if (document.body.classList.contains('premium-theme')) {
-            glow.style.background = glowGradient;
-          }
+          // Glow background styling is handled via CSS var(--glow-gradient)
           wrapper.appendChild(glow);
 
           const card = document.createElement('div');
@@ -1937,11 +2295,7 @@
           card.style.setProperty('--glow-shadow', glowShadow);
           card.style.setProperty('--glow-gradient', glowGradient);
 
-          if (document.body.classList.contains('premium-theme')) {
-            card.style.backgroundImage = `linear-gradient(#000000, #000000), ${glowGradient}`;
-            card.style.backgroundOrigin = 'border-box';
-            card.style.backgroundClip = 'padding-box, border-box';
-          }
+          // Card background styling is handled via CSS var(--glow-gradient)
 
           const pillsHTML = `
             <div class="pill pill-a" style="background:linear-gradient(135deg,#7c4dff,#b388ff)"></div>
@@ -2108,9 +2462,7 @@
           // Glow element
           const glow = document.createElement('div');
           glow.className = 'ch-card-glow';
-          if (document.body.classList.contains('premium-theme')) {
-            glow.style.background = glowGradient;
-          }
+          // Glow background styling is handled via CSS var(--glow-gradient)
           wrapper.appendChild(glow);
 
           // Card element
@@ -2122,11 +2474,7 @@
           card.style.setProperty('--glow-shadow', glowShadow);
           card.style.setProperty('--glow-gradient', glowGradient);
 
-          if (document.body.classList.contains('premium-theme')) {
-            card.style.backgroundImage = `linear-gradient(#000000, #000000), ${glowGradient}`;
-            card.style.backgroundOrigin = 'border-box';
-            card.style.backgroundClip = 'padding-box, border-box';
-          }
+          // Card background styling is handled via CSS var(--glow-gradient)
 
           card.innerHTML = `
             <div class="ch-header">
@@ -2245,6 +2593,17 @@
 
       if (isPremium) {
         document.body.classList.add('premium-theme');
+        
+        // --- Restore Premium Light Mode ---
+        const savedMode = localStorage.getItem('zphysics_premium_mode');
+        if (savedMode === 'light') {
+          document.body.classList.add('premium-light');
+          document.getElementById('darkToggleBg').style.opacity = '0';
+        } else {
+          document.body.classList.remove('premium-light');
+          document.getElementById('darkToggleBg').style.opacity = '1';
+        }
+        document.getElementById('themeToggleWrap').style.display = 'block';
         document.getElementById('greetingText').innerHTML = `Xin chào, ${ten} <span style="background: linear-gradient(135deg, #ffe27a, #d4af37); color: #000; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; margin-left: 6px; box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3); display: inline-block; vertical-align: middle;">PREMIUM</span>`;
         document.getElementById('popupName').innerHTML = `${ten} <span style="background: linear-gradient(135deg, #ffe27a, #d4af37); color: #000; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 20px; display: inline-block; vertical-align: middle; margin-left: 4px;">PREMIUM</span>`;
 
@@ -2278,20 +2637,11 @@
           pBtn.style.boxShadow = 'none';
         }
 
-        // Áp dụng kiểu viền phát sáng inline cho các thẻ chương
-        document.querySelectorAll('.ch-card-wrapper').forEach(wrapper => {
-          const glow = wrapper.querySelector('.ch-card-glow');
-          const card = wrapper.querySelector('.ch-card');
-          const glowGradient = wrapper.style.getPropertyValue('--glow-gradient');
-          if (glow && card && glowGradient) {
-            glow.style.background = glowGradient;
-            card.style.backgroundImage = `linear-gradient(#000000, #000000), ${glowGradient}`;
-            card.style.backgroundOrigin = 'border-box';
-            card.style.backgroundClip = 'padding-box, border-box';
-          }
-        });
+        // Đã xóa phần Áp dụng kiểu viền phát sáng inline vì CSS đã lo phần việc này và để không gây lỗi khi chuyển sang Light Mode.
       } else {
         document.body.classList.remove('premium-theme');
+        document.body.classList.remove('premium-light');
+        document.getElementById('themeToggleWrap').style.display = 'none';
         document.getElementById('greetingText').textContent = `Xin chào, ${ten} 👋`;
         document.getElementById('popupName').textContent = ten;
 
@@ -2557,6 +2907,17 @@
     }
     // Nếu chưa login → overlay tự hiện (mặc định display: flex)
 
+    // ── THEME TOGGLE LOGIC ──
+    function togglePremiumThemeMode() {
+      const isLight = document.body.classList.toggle('premium-light');
+      localStorage.setItem('zphysics_premium_mode', isLight ? 'light' : 'dark');
+      
+      const darkToggleBg = document.getElementById('darkToggleBg');
+      if (darkToggleBg) {
+        darkToggleBg.style.opacity = isLight ? '0' : '1';
+      }
+    }
+
     // ── Fetch JSON + Google Sheets links và khởi động ──
     async function initApp() {
       try {
@@ -2673,6 +3034,7 @@
           });
         }
 
+        globalLessonsData = baihocData;
         renderAll(baihocData);
       } catch (err) {
         console.error(err);
