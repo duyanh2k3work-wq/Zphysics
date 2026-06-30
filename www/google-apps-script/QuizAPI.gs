@@ -1442,6 +1442,7 @@ function checkAndSendReminders() {
                   "Hiện tại hệ thống ghi nhận em vẫn chưa hoàn thành bài này. Em hãy tranh thủ làm sớm nhé!\n\n" +
                   "🔗 <b>Link làm bài:</b> <a href=\"" + link + "\">Nhấn vào đây để làm bài</a>";
         
+        msg = cleanLatexForTelegram(msg);
         var payload = {
           'chat_id': student.telegramId,
           'text': msg,
@@ -1504,6 +1505,7 @@ function checkAndSendReminders() {
 
 // --- Hàm tiện ích gửi tin nhắn Telegram ---
 function sendTelegramMessage(chatId, text) {
+  text = cleanLatexForTelegram(text);
   var payload = {
     'chat_id': chatId,
     'text': text,
