@@ -1913,7 +1913,8 @@ function handleCauHoi(chatId) {
   // Kiểm tra giới hạn 3 câu/ngày
   var dailyCount = 0;
   if (playerRow > 0) {
-    var lastQDate = trimCell(gameValues[playerRow - 1][6]).toString();
+    var rawDate = gameValues[playerRow - 1][6];
+    var lastQDate = (rawDate instanceof Date) ? Utilities.formatDate(rawDate, "GMT+7", "yyyy-MM-dd") : trimCell(rawDate).toString();
     if (lastQDate === today) {
       dailyCount = parseInt(gameValues[playerRow - 1][5]) || 0;
     }
@@ -1998,12 +1999,8 @@ function handleCauHoi(chatId) {
     
     // Cập nhật số câu hỏi trong ngày
     if (playerRow > 0) {
-      if (trimCell(gameValues[playerRow - 1][6]).toString() === today) {
-        gameSheet.getRange(playerRow, 6).setValue(dailyCount + 1);
-      } else {
-        gameSheet.getRange(playerRow, 6).setValue(1);
-        gameSheet.getRange(playerRow, 7).setValue(today);
-      }
+      gameSheet.getRange(playerRow, 6).setValue(dailyCount + 1);
+      gameSheet.getRange(playerRow, 7).setValue(today);
     } else {
       // Thêm dòng mới cho học sinh
       gameSheet.appendRow([student.email, 0, 0, 0, '', 1, today]);
