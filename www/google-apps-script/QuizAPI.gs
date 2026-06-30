@@ -1311,7 +1311,7 @@ function checkAndSendReminders() {
   for (var r = 1; r < hsValues.length; r++) {
     var gmail = trimCell(hsValues[r][0]).toLowerCase();
     var name = trimCell(hsValues[r][1]);
-    var telegramId = hsValues[r][4] ? trimCell(hsValues[r][4]) : '';
+    var telegramId = hsValues[r][5] ? trimCell(hsValues[r][5]) : '';
     if (gmail) {
       studentMap[gmail] = { name: name, telegramId: telegramId };
     }
@@ -1541,7 +1541,7 @@ function findStudentByChatId(chatId) {
   
   var values = sheet.getDataRange().getValues();
   for (var r = 1; r < values.length; r++) {
-    var teleId = values[r][4] ? trimCell(values[r][4]).toString() : '';
+    var teleId = values[r][5] ? trimCell(values[r][5]).toString() : '';
     if (teleId === chatId.toString()) {
       return {
         email: trimCell(values[r][0]).toLowerCase(),
@@ -2213,7 +2213,7 @@ function checkBadgeMilestone(email, streak) {
   var values = hsSheet.getDataRange().getValues();
   for (var r = 1; r < values.length; r++) {
     if (trimCell(values[r][0]).toLowerCase() === email) {
-      var chatId = trimCell(values[r][4]);
+      var chatId = trimCell(values[r][5]);
       var name = trimCell(values[r][1]);
       if (chatId) {
         var msg = "🎉 <b>CHÚC MỪNG " + name.toUpperCase() + "!</b>\n\n" +
