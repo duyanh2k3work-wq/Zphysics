@@ -2240,3 +2240,37 @@ function setTelegramWebhook() {
   Logger.log("Kết quả đăng ký Webhook: " + res.getContentText());
 }
 
+// ═══════════════════════════════════════════════════════════════
+// GỬI CÂU HỎI HÀNG NGÀY TỰ ĐỘNG
+// Cài đặt Trigger (Trình kích hoạt) để chạy hàm này mỗi ngày vào 9h sáng
+// ═══════════════════════════════════════════════════════════════
+function sendDailyQuestions() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hocsinhSheet = ss.getSheetByName('hocsinh') || ss.getSheets().find(s => s.getName().toLowerCase() === 'hocsinh');
+  
+  if (!hocsinhSheet) {
+    Logger.log("Không tìm thấy trang tính 'hocsinh'");
+    return;
+  }
+  
+  var hsValues = hocsinhSheet.getDataRange().getValues();
+  var count = 0;
+  
+  for (var r = 1; r < hsValues.length; r++) {
+    var telegramId = hsValues[r][5] ? trimCell(hsValues[r][5]).toString() : '';
+    
+    // Nếu học sinh có đăng ký Telegram ID
+    if (telegramId && telegramId !== '') {
+      try {
+        handleCauHoi(telegramId);
+        count++;
+        // Nghỉ 100ms để tránh vi phạm giới hạn tốc độ gửi tin nhắn của Telegram (30 tin/giây)
+        Utilities.sleep(100);
+      } catch (e) {
+        Logger.log("Lỗi gửi câu hỏi hàng ngày cho " + telegramId + ": " + e.message);
+      }
+    }
+  }
+  
+  Logger.log("Đã gửi câu hỏi hàng ngày cho " + count + " học sinh.");
+}
