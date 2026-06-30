@@ -1611,14 +1611,14 @@ function handleMenu(chatId) {
 function handleDiem(chatId) {
   var student = findStudentByChatId(chatId);
   if (!student) {
-    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.\nTelegram Chat ID của bạn là: <code>" + chatId + "</code>\n\nVui lòng sao chép ID này và điền vào <b>Cột E (Telegram ID)</b> của sheet <b>hocsinh</b> nhé!");
+    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.\nTelegram Chat ID của bạn là: <code>" + chatId + "</code>\n\nVui lòng sao chép ID này và điền vào <b>Cột F (Telegram ID)</b> của sheet <b>hocsinh</b> nhé!");
     return;
   }
   
   try {
     var progress = supabaseRequest(
       'student_progress?email=eq.' + encodeURIComponent(student.email) +
-      '&select=lesson_id,score,type,completed_at&order=completed_at.desc&limit=15', 'GET'
+      '&score=not.is.null&select=score', 'GET'
     );
     
     if (!progress || progress.length === 0) {
@@ -1628,34 +1628,20 @@ function handleDiem(chatId) {
       return;
     }
     
-    var msg = "📊 <b>BẢNG ĐIỂM CỦA " + student.name.toUpperCase() + "</b>\n\n";
     var totalScore = 0;
-    var count = 0;
+    var count = progress.length;
     
     for (var i = 0; i < progress.length; i++) {
-      var p = progress[i];
-      var score = p.score !== null ? parseFloat(p.score) : null;
-      var emoji = score === null ? "⚪" : (score >= 8 ? "🟢" : (score >= 5 ? "🟡" : "🔴"));
-      var title = getLessonTitle(p.lesson_id);
-      var dateStr = "";
-      if (p.completed_at) {
-        var d = new Date(p.completed_at);
-        dateStr = Utilities.formatDate(d, "GMT+7", "dd/MM HH:mm");
-      }
-      
-      msg += (i + 1) + ". " + emoji + " " + title;
-      if (score !== null) {
-        msg += " — <b>" + score + "/10</b>";
-        totalScore += score;
-        count++;
-      }
-      msg += "\n   ⏰ " + dateStr + "\n\n";
+      totalScore += parseFloat(progress[i].score) || 0;
     }
     
-    if (count > 0) {
-      var avg = (totalScore / count).toFixed(1);
-      msg += "📈 <b>Điểm TB: " + avg + "</b> | Đã làm: " + count + " bài";
-    }
+    var avg = (totalScore / count).toFixed(1);
+    var emoji = parseFloat(avg) >= 8 ? "🟢" : (parseFloat(avg) >= 5 ? "🟡" : "🔴");
+    
+    var msg = "📊 <b>THỐNG KÊ HỌC TẬP</b>\n";
+    msg += "👤 <b>" + student.name + "</b>\n\n";
+    msg += "📝 Số bài đã làm: <b>" + count + " bài</b>\n";
+    msg += emoji + " Điểm trung bình: <b>" + avg + "/10</b>\n";
     
     sendTelegramMessage(chatId, msg);
   } catch (e) {
@@ -1670,7 +1656,7 @@ function handleDiem(chatId) {
 function handleTienDo(chatId) {
   var student = findStudentByChatId(chatId);
   if (!student) {
-    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.\nTelegram Chat ID của bạn là: <code>" + chatId + "</code>\n\nVui lòng sao chép ID này và điền vào <b>Cột E (Telegram ID)</b> của sheet <b>hocsinh</b> nhé!");
+    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.\nTelegram Chat ID của bạn là: <code>" + chatId + "</code>\n\nVui lòng sao chép ID này và điền vào <b>Cột F (Telegram ID)</b> của sheet <b>hocsinh</b> nhé!");
     return;
   }
   
@@ -1681,26 +1667,30 @@ function handleTienDo(chatId) {
   }
   
   try {
-    // Lấy tất cả bài đã làm từ Supabase
+    // Lấy tất cả lesson_id đã làm từ Supabase
     var progress = supabaseRequest(
       'student_progress?email=eq.' + encodeURIComponent(student.email) +
       '&score=not.is.null&select=lesson_id', 'GET'
     );
-    var completedSet = {};
+    // Chuẩn hóa lesson_id thành dạng bài: VD baitap_12_c1_b03 → 12_c1_b03
+    var completedBaiSet = {};
     if (progress) {
       for (var i = 0; i < progress.length; i++) {
-        completedSet[progress[i].lesson_id] = true;
+        var lid = progress[i].lesson_id;
+        var baiKey = extractBaiKey(lid);
+        if (baiKey) completedBaiSet[baiKey] = true;
       }
     }
     
-    // Quét các tab sheet để tìm tất cả mã đề thuộc lớp của học sinh
+    // Quét các tab sheet để tìm tất cả bài thuộc lớp
+    // Nhóm theo bài (b0X) chứ không theo từng mã đề riêng lẻ
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheets = ss.getSheets();
-    var chapterMap = {}; // { "c1": { lessonIds: {}, completed: 0, total: 0 } }
+    var chapterMap = {}; // { "c1": { baiIds: {} } }
     
     for (var s = 0; s < sheets.length; s++) {
       var sheetName = sheets[s].getName().toLowerCase();
-      if (sheetName === 'hocsinh' || sheetName === 'deadlines' || sheetName === 'gamification' || sheetName === 'luyende') continue;
+      if (sheetName === 'hocsinh' || sheetName === 'deadlines' || sheetName === 'gamification' || sheetName === 'luyende' || sheetName === 'linkbaihoc') continue;
       
       var values = sheets[s].getDataRange().getValues();
       if (values.length <= HEADER_ROW) continue;
@@ -1709,32 +1699,17 @@ function handleTienDo(chatId) {
         var made = trimCell(values[r][COL.MADE]);
         if (!made) continue;
         
-        var parts = made.split('_');
-        if (parts.length >= 4 && parts[1] === grade) {
-          var chapter = parts[2]; // "c1", "c2"...
+        var baiKey = extractBaiKey(made);
+        if (!baiKey) continue;
+        
+        var parts = baiKey.split('_');
+        if (parts.length >= 3 && parts[0] === grade) {
+          var chapter = parts[1]; // "c1", "c2"...
           if (!chapterMap[chapter]) {
-            chapterMap[chapter] = { lessonIds: {} };
+            chapterMap[chapter] = { baiIds: {} };
           }
-          // Mỗi mã đề là 1 bài duy nhất (VD: baitap_12_c1_b03)
-          chapterMap[chapter].lessonIds[made] = true;
-        }
-      }
-    }
-    
-    // Cũng quét sheet luyende
-    var luyendeSheet = ss.getSheetByName('luyende');
-    if (luyendeSheet) {
-      var ldValues = luyendeSheet.getDataRange().getValues();
-      for (var r = 1; r < ldValues.length; r++) {
-        var lessonId = trimCell(ldValues[r][0]);
-        if (!lessonId) continue;
-        var parts = lessonId.split('_');
-        if (parts.length >= 4 && parts[1] === grade) {
-          var chapter = parts[2];
-          if (!chapterMap[chapter]) {
-            chapterMap[chapter] = { lessonIds: {} };
-          }
-          chapterMap[chapter].lessonIds[lessonId] = true;
+          // Nhóm theo bài: VD 12_c1_b03 (bất kể cauhoi/đs/tln)
+          chapterMap[chapter].baiIds[baiKey] = true;
         }
       }
     }
@@ -1754,15 +1729,15 @@ function handleTienDo(chatId) {
     
     for (var c = 0; c < chapters.length; c++) {
       var ch = chapters[c];
-      var ids = Object.keys(chapterMap[ch].lessonIds);
+      var baiIds = Object.keys(chapterMap[ch].baiIds);
       var done = 0;
-      for (var j = 0; j < ids.length; j++) {
-        if (completedSet[ids[j]]) done++;
+      for (var j = 0; j < baiIds.length; j++) {
+        if (completedBaiSet[baiIds[j]]) done++;
       }
-      totalAll += ids.length;
+      totalAll += baiIds.length;
       completedAll += done;
       
-      var pct = ids.length > 0 ? Math.round(done / ids.length * 100) : 0;
+      var pct = baiIds.length > 0 ? Math.round(done / baiIds.length * 100) : 0;
       var filled = Math.round(pct / 10);
       var bar = "";
       for (var b = 0; b < 10; b++) {
@@ -1771,7 +1746,7 @@ function handleTienDo(chatId) {
       
       var chNum = ch.toUpperCase().replace('C', '');
       msg += "<b>Chương " + chNum + ":</b>\n";
-      msg += bar + " " + pct + "% (" + done + "/" + ids.length + " bài)\n\n";
+      msg += bar + " " + pct + "% (" + done + "/" + baiIds.length + " bài)\n\n";
     }
     
     var totalPct = totalAll > 0 ? Math.round(completedAll / totalAll * 100) : 0;
@@ -1782,6 +1757,21 @@ function handleTienDo(chatId) {
     sendTelegramMessage(chatId, "⚠️ Có lỗi xảy ra. Vui lòng thử lại sau.");
     Logger.log("Lỗi handleTienDo: " + e.message);
   }
+}
+
+// Trích xuất khóa bài từ lesson_id hoặc made:
+// VD: baitap_12_c1_b03 → 12_c1_b03
+//     cauhoi_12_c1_b03 → 12_c1_b03
+//     đs_12_c1_b03     → 12_c1_b03
+//     ontap_12_c1_b03  → 12_c1_b03
+function extractBaiKey(id) {
+  if (!id) return null;
+  var parts = id.split('_');
+  if (parts.length >= 4) {
+    // Bỏ phần prefix (cauhoi, đs, tln, baitap, ontap), giữ lại grade_chapter_bai
+    return parts.slice(1).join('_'); // VD: 12_c1_b03
+  }
+  return null;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1967,8 +1957,8 @@ function handleCauHoi(chatId) {
         var d = trimCell(values[r][COL.D]);
         var correct = trimCell(values[r][COL.CORRECT]).toUpperCase();
         
-        // Chỉ lấy câu hỏi đầy đủ 4 đáp án
-        if (q && a && b && c && d && correct) {
+        // Chỉ lấy câu hỏi trắc nghiệm 4 đáp án (A, B, C, D)
+        if (q && a && b && c && d && (correct === 'A' || correct === 'B' || correct === 'C' || correct === 'D')) {
           allQuestions.push({
             made: made,
             qid: values[r][COL.ID],
