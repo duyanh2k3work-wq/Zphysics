@@ -101,7 +101,7 @@ function doPost(e) {
       } catch (teleErr) {
         Logger.log("Lỗi xử lý Telegram message: " + teleErr.message);
       }
-      return ContentService.createTextOutput("OK");
+      return HtmlService.createHtmlOutput("OK");
     }
     // Nếu là callback query (học sinh bấm nút A/B/C/D trong /cauhoi)
     if (postData.callback_query) {
@@ -110,7 +110,7 @@ function doPost(e) {
       } catch (cbErr) {
         Logger.log("Lỗi xử lý Telegram callback: " + cbErr.message);
       }
-      return ContentService.createTextOutput("OK");
+      return HtmlService.createHtmlOutput("OK");
     }
     
     // ═══ ADMIN ACTIONS (từ admin.html) ═══
@@ -129,7 +129,8 @@ function doPost(e) {
     
     return jsonResponse({ success: true, data: result });
   } catch (err) {
-    return jsonResponse({ success: false, error: String(err.message || err) });
+    Logger.log("Lỗi doPost: " + err.message);
+    return HtmlService.createHtmlOutput("ERROR: " + err.message);
   }
 }
 
