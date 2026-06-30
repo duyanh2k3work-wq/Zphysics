@@ -2235,7 +2235,7 @@ function setTelegramWebhook() {
   // ⚠️ THAY URL DƯỚI ĐÂY BẰNG WEB APP URL CỦA BẠN (lấy từ Deploy > Manage Deployments)
   var webAppUrl = "ĐIỀN_WEB_APP_URL_CỦA_BẠN_VÀO_ĐÂY";
   
-  var url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/setWebhook?url=" + encodeURIComponent(webAppUrl);
+  var url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/setWebhook?url=" + encodeURIComponent(webAppUrl) + "&drop_pending_updates=true";
   var res = UrlFetchApp.fetch(url);
   Logger.log("Kết quả đăng ký Webhook: " + res.getContentText());
 }
