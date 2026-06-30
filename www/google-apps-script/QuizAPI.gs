@@ -1611,7 +1611,7 @@ function handleMenu(chatId) {
 function handleDiem(chatId) {
   var student = findStudentByChatId(chatId);
   if (!student) {
-    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.\nVui lòng liên hệ giáo viên để được thêm Telegram ID vào hệ thống.");
+    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.\nTelegram Chat ID của bạn là: <code>" + chatId + "</code>\n\nVui lòng sao chép ID này và điền vào <b>Cột E (Telegram ID)</b> của sheet <b>hocsinh</b> nhé!");
     return;
   }
   
@@ -1670,7 +1670,7 @@ function handleDiem(chatId) {
 function handleTienDo(chatId) {
   var student = findStudentByChatId(chatId);
   if (!student) {
-    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.");
+    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.\nTelegram Chat ID của bạn là: <code>" + chatId + "</code>\n\nVui lòng sao chép ID này và điền vào <b>Cột E (Telegram ID)</b> của sheet <b>hocsinh</b> nhé!");
     return;
   }
   
@@ -1790,7 +1790,7 @@ function handleTienDo(chatId) {
 function handleDeadline(chatId) {
   var student = findStudentByChatId(chatId);
   if (!student) {
-    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.");
+    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.\nTelegram Chat ID của bạn là: <code>" + chatId + "</code>\n\nVui lòng sao chép ID này và điền vào <b>Cột E (Telegram ID)</b> của sheet <b>hocsinh</b> nhé!");
     return;
   }
   
@@ -1893,7 +1893,7 @@ function handleDeadline(chatId) {
 function handleCauHoi(chatId) {
   var student = findStudentByChatId(chatId);
   if (!student) {
-    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.");
+    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.\nTelegram Chat ID của bạn là: <code>" + chatId + "</code>\n\nVui lòng sao chép ID này và điền vào <b>Cột E (Telegram ID)</b> của sheet <b>hocsinh</b> nhé!");
     return;
   }
   
