@@ -2032,6 +2032,12 @@ function handleCallbackQuery(callbackQuery) {
     'muteHttpExceptions': true
   });
   
+  // Xử lý nút "Câu tiếp theo"
+  if (data === 'next_q') {
+    handleCauHoi(chatId);
+    return;
+  }
+  
   // Parse: q|Chosen|Correct|Made|QuestionID
   var parts = data.split('|');
   if (parts[0] !== 'q' || parts.length < 5) return;
@@ -2107,7 +2113,11 @@ function handleCallbackQuery(callbackQuery) {
     resultMsg += "📖 <b>Giải thích:</b>\n" + explanation;
   }
   
-  sendTelegramMessage(chatId, resultMsg);
+  var nextKeyboard = [[
+    { text: "Câu tiếp theo ➡️", callback_data: "next_q" }
+  ]];
+  
+  sendTelegramMessageWithKeyboard(chatId, resultMsg, nextKeyboard);
 }
 
 // ═══════════════════════════════════════════════════════════════
