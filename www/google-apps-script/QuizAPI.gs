@@ -1521,6 +1521,7 @@ function sendTelegramMessage(chatId, text) {
 
 // --- Gửi tin nhắn kèm Inline Keyboard (các nút bấm) ---
 function sendTelegramMessageWithKeyboard(chatId, text, keyboard) {
+  text = cleanLatexForTelegram(text);
   var payload = {
     'chat_id': chatId,
     'text': text,
@@ -1536,6 +1537,54 @@ function sendTelegramMessageWithKeyboard(chatId, text, keyboard) {
 }
 
 // --- Tìm thông tin học sinh bằng Telegram Chat ID ---
+function cleanLatexForTelegram(text) {
+  if (!text) return text;
+  text = String(text);
+  
+  // Bo dau $ bao quanh cong thuc
+  text = text.replace(/\$/g, '');
+  
+  // Thay the \text{...}
+  text = text.replace(/\\text\{([^}]+)\}/g, '$1');
+  
+  // Ky tu Hy Lap
+  text = text.replace(/\\pi/g, '\u03C0');
+  text = text.replace(/\\omega/g, '\u03C9');
+  text = text.replace(/\\varphi/g, '\u03C6');
+  text = text.replace(/\\phi/g, '\u03C6');
+  text = text.replace(/\\alpha/g, '\u03B1');
+  text = text.replace(/\\beta/g, '\u03B2');
+  text = text.replace(/\\gamma/g, '\u03B3');
+  text = text.replace(/\\Delta/g, '\u0394');
+  text = text.replace(/\\lambda/g, '\u03BB');
+  text = text.replace(/\\mu/g, '\u03BC');
+  text = text.replace(/\\rho/g, '\u03C1');
+  
+  // Luong giac
+  text = text.replace(/\\cos/g, 'cos');
+  text = text.replace(/\\sin/g, 'sin');
+  text = text.replace(/\\tan/g, 'tan');
+  text = text.replace(/\\cot/g, 'cot');
+  
+  // Ky hieu dac biet
+  text = text.replace(/\\circ/g, '\u00B0');
+  text = text.replace(/\^circ/g, '\u00B0');
+  text = text.replace(/\^2/g, '\u00B2');
+  text = text.replace(/\^3/g, '\u00B3');
+  text = text.replace(/\\pm/g, '\u00B1');
+  text = text.replace(/\\approx/g, '\u2248');
+  text = text.replace(/\\neq/g, '\u2260');
+  text = text.replace(/\\le/g, '\u2264');
+  text = text.replace(/\\ge/g, '\u2265');
+  text = text.replace(/\\cdot/g, '\u00B7');
+  text = text.replace(/\\times/g, '\u00D7');
+  
+  // Phan so don gian \frac{a}{b} -> a/b
+  text = text.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)');
+  
+  return text;
+}
+
 function findStudentByChatId(chatId) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('hocsinh');
