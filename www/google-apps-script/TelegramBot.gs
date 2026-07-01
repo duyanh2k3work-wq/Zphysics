@@ -695,6 +695,31 @@ function handleCauHoi(chatId) {
   }
   
   try {
+    // Lấy tiến trình học tập của học sinh từ Supabase để giới hạn bài bốc câu hỏi
+    var progress = supabaseRequest(
+      'student_progress?email=eq.' + encodeURIComponent(student.email) +
+      '&score=not.is.null&select=lesson_id', 'GET'
+    );
+    
+    var maxLessonMap = {};
+    if (progress) {
+      for (var i = 0; i < progress.length; i++) {
+        var key = extractBaiKey(progress[i].lesson_id);
+        if (key) {
+          var keyParts = key.split('_');
+          if (keyParts.length >= 3) {
+            var ch = keyParts[1]; // "c1"
+            var bNum = parseInt(keyParts[2].replace(/[bB]/g, ''), 10);
+            if (!isNaN(bNum)) {
+              if (!maxLessonMap[ch] || bNum > maxLessonMap[ch]) {
+                maxLessonMap[ch] = bNum;
+              }
+            }
+          }
+        }
+      }
+    }
+    
     var grade = student.grade || "12";
     var allQuestions = [];
     var sheets = ss.getSheets();
@@ -710,7 +735,19 @@ function handleCauHoi(chatId) {
         var made = trimCell(values[r][COL.MADE]);
         if (!made) continue;
         var parts = made.split('_');
-        if (parts.length < 2 || parts[1] !== grade) continue;
+        if (parts.length < 4 || parts[1] !== grade) continue;
+        
+        var ch = parts[2]; // "c1"
+        var bNum = parseInt(parts[3].replace(/[bB]/g, ''), 10);
+        if (isNaN(bNum)) continue;
+        
+        var maxAllowed = maxLessonMap[ch] || 0;
+        // Nếu học sinh chưa hoàn thành bất kỳ bài nào, mặc định cho phép làm bài 1 Chương 1
+        if (Object.keys(maxLessonMap).length === 0 && ch === 'c1') {
+          maxAllowed = 1;
+        }
+        
+        if (bNum > maxAllowed) continue;
         
         var q = trimCell(values[r][COL.QUESTION]);
         var a = trimCell(values[r][COL.A]);
