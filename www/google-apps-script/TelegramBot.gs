@@ -722,50 +722,44 @@ function handleCauHoi(chatId) {
     
     var grade = student.grade || "12";
     var allQuestions = [];
-    var sheets = ss.getSheets();
     
-    for (var s = 0; s < sheets.length; s++) {
-      var sheetName = sheets[s].getName().toLowerCase();
-      if (sheetName === 'hocsinh' || sheetName === 'deadlines' || sheetName === 'gamification' || sheetName === 'luyende') continue;
-      
-      var values = sheets[s].getDataRange().getValues();
-      if (values.length <= HEADER_ROW) continue;
-      
-      for (var r = HEADER_ROW; r < values.length; r++) {
-        var made = trimCell(values[r][COL.MADE]);
-        if (!made) continue;
-        var parts = made.split('_');
-        if (parts.length < 4 || parts[1] !== grade) continue;
-        
-        var ch = parts[2]; // "c1"
-        var bNum = parseInt(parts[3].replace(/[bB]/g, ''), 10);
-        if (isNaN(bNum)) continue;
-        
-        var maxAllowed = maxLessonMap[ch] || 0;
-        // Nếu học sinh chưa hoàn thành bất kỳ bài nào, mặc định cho phép làm bài 1 Chương 1
-        if (Object.keys(maxLessonMap).length === 0 && ch === 'c1') {
-          maxAllowed = 1;
-        }
-        
-        if (bNum > maxAllowed) continue;
-        
-        var q = trimCell(values[r][COL.QUESTION]);
-        var a = trimCell(values[r][COL.A]);
-        var b = trimCell(values[r][COL.B]);
-        var c = trimCell(values[r][COL.C]);
-        var d = trimCell(values[r][COL.D]);
-        var correct = trimCell(values[r][COL.CORRECT]).toUpperCase();
-        
-        // Chỉ lấy câu hỏi trắc nghiệm 4 đáp án (A, B, C, D)
-        if (q && a && b && c && d && (correct === 'A' || correct === 'B' || correct === 'C' || correct === 'D')) {
-          allQuestions.push({
-            made: made,
-            qid: values[r][COL.ID],
-            question: q, a: a, b: b, c: c, d: d,
-            correct: correct
-          });
+    try {
+      // Truy vấn trực tiếp từ Supabase để tối ưu tốc độ phản hồi (tránh đọc Google Sheets quá chậm)
+      var supabaseQuestions = supabaseRequest('questions?made=like.cauhoi_' + grade + '_*&select=*', 'GET');
+      if (supabaseQuestions) {
+        for (var i = 0; i < supabaseQuestions.length; i++) {
+          var q = supabaseQuestions[i];
+          var parts = q.made.split('_');
+          if (parts.length < 4) continue;
+          
+          var ch = parts[2]; // "c1"
+          var bNum = parseInt(parts[3].replace(/[bB]/g, ''), 10);
+          if (isNaN(bNum)) continue;
+          
+          var maxAllowed = maxLessonMap[ch] || 0;
+          if (Object.keys(maxLessonMap).length === 0 && ch === 'c1') {
+            maxAllowed = 1;
+          }
+          
+          if (bNum <= maxAllowed) {
+            var correct = String(q.correct).toUpperCase();
+            if (q.question && q.a && q.b && q.c && q.d && (correct === 'A' || correct === 'B' || correct === 'C' || correct === 'D')) {
+              allQuestions.push({
+                made: q.made,
+                qid: q.question_id,
+                question: q.question,
+                a: q.a,
+                b: q.b,
+                c: q.c,
+                d: q.d,
+                correct: correct
+              });
+            }
+          }
         }
       }
+    } catch (err) {
+      Logger.log("Lỗi tải câu hỏi từ Supabase: " + err.message);
     }
     
     if (allQuestions.length === 0) {
@@ -842,24 +836,15 @@ function handleCallbackQuery(callbackQuery) {
   var questionId = parts[4];
   var isCorrect = (chosen === correct);
   
-  // Tìm lời giải thích từ Google Sheet
+  // Tìm lời giải thích từ Supabase để tối ưu tốc độ phản hồi (tránh đọc Google Sheets quá chậm)
   var explanation = "";
   try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheets = ss.getSheets();
-    for (var s = 0; s < sheets.length; s++) {
-      var values = sheets[s].getDataRange().getValues();
-      if (values.length <= HEADER_ROW) continue;
-      for (var r = HEADER_ROW; r < values.length; r++) {
-        if (trimCell(values[r][COL.MADE]) === made && String(values[r][COL.ID]) === String(questionId)) {
-          explanation = trimCell(values[r][COL.EXPLANATION]);
-          break;
-        }
-      }
-      if (explanation) break;
+    var qData = supabaseRequest('questions?made=eq.' + encodeURIComponent(made) + '&question_id=eq.' + questionId + '&select=explanation', 'GET');
+    if (qData && qData.length > 0) {
+      explanation = trimCell(qData[0].explanation);
     }
   } catch (e) {
-    Logger.log("Lỗi tra explanation: " + e.message);
+    Logger.log("Lỗi tra explanation từ Supabase: " + e.message);
   }
   
   // Cập nhật điểm gamification
