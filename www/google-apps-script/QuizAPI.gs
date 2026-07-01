@@ -1541,13 +1541,13 @@ function cleanLatexForTelegram(text) {
   if (!text) return text;
   text = String(text);
   
-  // Bo dau $ bao quanh cong thuc
+  // Bỏ dấu $ bao quanh công thức
   text = text.replace(/\$/g, '');
   
-  // Thay the \text{...}
+  // Thay thế \text{...}
   text = text.replace(/\\text\{([^}]+)\}/g, '$1');
   
-  // Ky tu Hy Lap
+  // Ký tự Hy Lạp
   text = text.replace(/\\pi/g, '\u03C0');
   text = text.replace(/\\omega/g, '\u03C9');
   text = text.replace(/\\varphi/g, '\u03C6');
@@ -1560,13 +1560,13 @@ function cleanLatexForTelegram(text) {
   text = text.replace(/\\mu/g, '\u03BC');
   text = text.replace(/\\rho/g, '\u03C1');
   
-  // Luong giac
+  // Lượng giác
   text = text.replace(/\\cos/g, 'cos');
   text = text.replace(/\\sin/g, 'sin');
   text = text.replace(/\\tan/g, 'tan');
   text = text.replace(/\\cot/g, 'cot');
   
-  // Ky hieu dac biet
+  // Ký hiệu đặc biệt
   text = text.replace(/\\circ/g, '\u00B0');
   text = text.replace(/\^circ/g, '\u00B0');
   text = text.replace(/\^2/g, '\u00B2');
@@ -1579,8 +1579,31 @@ function cleanLatexForTelegram(text) {
   text = text.replace(/\\cdot/g, '\u00B7');
   text = text.replace(/\\times/g, '\u00D7');
   
-  // Phan so don gian \frac{a}{b} -> a/b
+  // Thêm: Căn bậc hai \sqrt{...}
+  text = text.replace(/\\sqrt\{([^}]+)\}/g, '\u221A($1)');
+  
+  // Thêm: Các dấu mũi tên
+  text = text.replace(/\\Rightarrow/g, '\u21D2');
+  text = text.replace(/\\Leftarrow/g, '\u21D0');
+  text = text.replace(/\\rightarrow/g, '\u2192');
+  text = text.replace(/\\lefttarrow/g, '\u2190');
+  text = text.replace(/\\leftrightarrow/g, '\u2194');
+  
+  // Thêm: Toán tử giới hạn
+  text = text.replace(/\\max/g, 'max');
+  text = text.replace(/\\min/g, 'min');
+  text = text.replace(/\\ln/g, 'ln');
+  text = text.replace(/\\log/g, 'log');
+  
+  // Phân số đơn giản \frac{a}{b} -> a/b
   text = text.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)');
+  
+  // Thêm: Rút gọn subscript / superscript dạng móc nhọn
+  text = text.replace(/_\{([^}]+)\}/g, '_$1');
+  text = text.replace(/\^\{([^}]+)\}/g, '^$1');
+  
+  // Xóa các ký tự lướt backslash thừa để tránh hiển thị xấu
+  text = text.replace(/\\/g, '');
   
   return text;
 }
@@ -1634,6 +1657,12 @@ function handleTelegramMessage(update) {
     case '/cauhoi':
       handleCauHoi(chatId);
       break;
+    case '/tatnhan':
+      handleToggleNotification(chatId, false);
+      break;
+    case '/batnhan':
+      handleToggleNotification(chatId, true);
+      break;
     default:
       sendTelegramMessage(chatId, 
         "❓ Mình không hiểu lệnh <b>\"" + text + "\"</b>.\n\n" +
@@ -1651,6 +1680,8 @@ function handleMenu(chatId) {
     "📚 /tiendo — Xem tiến độ học tập theo chương\n" +
     "📅 /deadline — Xem hạn nộp bài sắp tới\n" +
     "🧪 /cauhoi — Thử thách nhanh (3 câu/ngày)\n" +
+    "🔕 /tatnhan — Hủy đăng ký thử thách mỗi sáng\n" +
+    "🔔 /batnhan — Bật nhận thử thách mỗi sáng\n" +
     "📋 /menu — Hiển thị menu này\n\n" +
     "Chọn một lệnh để bắt đầu nhé! 🚀";
   sendTelegramMessage(chatId, msg);
@@ -2301,14 +2332,28 @@ function sendDailyQuestions() {
     return;
   }
   
+  var gameSheet = ss.getSheetByName('gamification');
+  var unsubscribedEmails = {};
+  if (gameSheet) {
+    var gameValues = gameSheet.getDataRange().getValues();
+    for (var r = 1; r < gameValues.length; r++) {
+      var email = trimCell(gameValues[r][0]).toLowerCase();
+      var subVal = gameValues[r][7] ? trimCell(gameValues[r][7]).toString().toUpperCase() : '';
+      if (subVal === 'FALSE') {
+        unsubscribedEmails[email] = true;
+      }
+    }
+  }
+  
   var hsValues = hocsinhSheet.getDataRange().getValues();
   var count = 0;
   
   for (var r = 1; r < hsValues.length; r++) {
+    var email = trimCell(hsValues[r][0]).toLowerCase();
     var telegramId = hsValues[r][5] ? trimCell(hsValues[r][5]).toString() : '';
     
-    // Nếu học sinh có đăng ký Telegram ID
-    if (telegramId && telegramId !== '') {
+    // Nếu học sinh có đăng ký Telegram ID và không nằm trong danh sách hủy nhận tin
+    if (telegramId && telegramId !== '' && !unsubscribedEmails[email]) {
       try {
         handleCauHoi(telegramId);
         count++;
@@ -2321,4 +2366,54 @@ function sendDailyQuestions() {
   }
   
   Logger.log("Đã gửi câu hỏi hàng ngày cho " + count + " học sinh.");
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HỦY / ĐĂNG KÝ NHẬN TIN NHẮN HÀNG NGÀY
+// ═══════════════════════════════════════════════════════════════
+function handleToggleNotification(chatId, isSubscribe) {
+  var student = findStudentByChatId(chatId);
+  if (!student) {
+    sendTelegramMessage(chatId, "❌ Không tìm thấy thông tin của bạn.\nVui lòng cập nhật Telegram ID trong sheet hocsinh trước.");
+    return;
+  }
+  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var gameSheet = ss.getSheetByName('gamification');
+  if (!gameSheet) {
+    gameSheet = ss.insertSheet('gamification');
+    gameSheet.getRange(1, 1, 1, 8).setValues([
+      ['Email', 'Current Streak', 'Max Streak', 'Total Points', 'Last Active Date', 'Daily Questions', 'Last Question Date', 'Daily Subscribed']
+    ]);
+    gameSheet.setFrozenRows(1);
+  }
+  
+  // Đảm bảo có cột thứ 8 header
+  var headers = gameSheet.getRange(1, 1, 1, 8).getValues()[0];
+  if (!headers[7] || headers[7] !== 'Daily Subscribed') {
+    gameSheet.getRange(1, 8).setValue('Daily Subscribed');
+  }
+  
+  var gameValues = gameSheet.getDataRange().getValues();
+  var playerRow = -1;
+  for (var r = 1; r < gameValues.length; r++) {
+    if (trimCell(gameValues[r][0]).toLowerCase() === student.email) {
+      playerRow = r + 1;
+      break;
+    }
+  }
+  
+  var valToWrite = isSubscribe ? "TRUE" : "FALSE";
+  if (playerRow > 0) {
+    gameSheet.getRange(playerRow, 8).setValue(valToWrite);
+  } else {
+    // Thêm dòng mới cho học sinh nếu chưa tồn tại trong bảng gamification
+    gameSheet.appendRow([student.email, 0, 0, 0, '', 0, '', valToWrite]);
+  }
+  
+  if (isSubscribe) {
+    sendTelegramMessage(chatId, "🔔 <b>ĐÃ BẬT NHẬN TIN NHẮN</b>\n\nBạn sẽ nhận được thử thách Vật Lí hàng ngày vào lúc 9h sáng. Chúc bạn học tốt! 💪");
+  } else {
+    sendTelegramMessage(chatId, "🔕 <b>ĐÃ TẮT NHẬN TIN NHẮN</b>\n\nBạn đã hủy đăng ký nhận thử thách hàng ngày. Bạn vẫn có thể chủ động làm bài bằng lệnh /cauhoi bất cứ lúc nào!");
+  }
 }
