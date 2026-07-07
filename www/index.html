@@ -2258,12 +2258,8 @@
         // Exact match by ID
         if (exam.id && exam.id.includes(matchCriteria1)) return true;
         
-        // Match by title
-        if (exam.title) {
-          const normExamTitle = normalizeText(exam.title);
-          if (normExamTitle.length > 3 && normLessonTitle.includes(normExamTitle)) return true;
-          if (normLessonTitle.length > 3 && normExamTitle.includes(normLessonTitle)) return true;
-        }
+        // Đã bỏ tính năng tự động khớp bằng tiêu đề để tránh bị trùng lặp,
+        // hiện tại bắt buộc phải khớp bằng ID (ví dụ 12_c1_b04)
         return false;
       });
     }
