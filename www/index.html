@@ -2423,18 +2423,8 @@
             const autoLinks = {};
             if (l.links && l.links.video) autoLinks.video = l.links.video;
             if (l.links && l.links.baiTap) autoLinks.baiTap = l.links.baiTap;
-            
-            let ltLink = (l.links && (l.links.luyenTap || l.links.tracNghiem)) || '#';
-            if (!ltLink || ltLink === '#') ltLink = `q.html#baitap_${gradeNum}_c${cNum}_b${lNum}`;
-            autoLinks.luyenTap = ltLink;
 
-            let otLink = (l.links && l.links.onTap) || '#';
-            if (!otLink || otLink === '#') otLink = `q.html#ontap_${gradeNum}_c${cNum}_b${lNum}`;
-            autoLinks.onTap = otLink;
-
-            if (l.links && l.links.phieuDapAn) autoLinks.phieuDapAn = l.links.phieuDapAn;
-
-            // Tìm đề thi luyện đề (VIP) phù hợp
+            // Tìm đề thi luyện đề (VIP) phù hợp - ("Bài tập")
             if (typeof mockExams !== 'undefined' && mockExams.length > 0) {
               const matchedExams = findMatchingExamsForLesson(gradeNum, cNum, lNum, l.title, mockExams);
               if (matchedExams && matchedExams.length > 0) {
@@ -2446,6 +2436,16 @@
                 });
               }
             }
+            
+            let ltLink = (l.links && (l.links.luyenTap || l.links.tracNghiem)) || '#';
+            if (!ltLink || ltLink === '#') ltLink = `q.html#baitap_${gradeNum}_c${cNum}_b${lNum}`;
+            autoLinks.luyenTap = ltLink;
+
+            let let_otLink = (l.links && l.links.onTap) || '#';
+            if (!let_otLink || let_otLink === '#') let_otLink = `q.html#ontap_${gradeNum}_c${cNum}_b${lNum}`;
+            autoLinks.onTap = let_otLink;
+
+            if (l.links && l.links.phieuDapAn) autoLinks.phieuDapAn = l.links.phieuDapAn;
 
             // Build link buttons
             const linksHTML = Object.entries(autoLinks)
