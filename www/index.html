@@ -2314,10 +2314,9 @@
           }
           if (examLop !== gradeNum) return false;
           
-          // Loại bỏ các bài tập (BTVN/BTNC) dựa trên mô tả hoặc mã đề có dạng lớp_cChương_bBài
+          // Loại bỏ các bài tập dựa trên mã đề có dạng lớp_cChương_bBài
           const hasLessonPattern = exam.id && /\d+_c\d+_b\d+/i.test(exam.id);
-          const isExercise = exam.desc === 'BTVN' || exam.desc === 'BTNC' || hasLessonPattern;
-          return !isExercise;
+          return !hasLessonPattern;
         });
 
         if (matchingExams.length > 0) {
