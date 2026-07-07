@@ -1338,6 +1338,10 @@
       text-shadow: 0 0 8px rgba(46, 196, 182, 0.4);
       animation: popIn 0.3s ease;
     }
+    .lesson-checkmark.red {
+      color: #ff5252;
+      text-shadow: 0 0 8px rgba(255, 82, 82, 0.4);
+    }
     .dashboard-modal {
       position: fixed;
       inset: 0;
@@ -2364,7 +2368,7 @@
               <div class="lesson-row ${isCompleted > 0 ? 'completed' : ''}">
                 <div class="lesson-meta">
                   <span class="lesson-dot" style="background:#7c4dff"></span>
-                  <span class="lesson-title">${exam.title} ${isCompleted > 0 ? `<span class="lesson-checkmark">✓${isCompleted > 1 ? `x${isCompleted}` : ''}</span>` : ''}</span>
+                  <span class="lesson-title">${exam.title} ${isCompleted > 0 ? `<span class="lesson-checkmark red">✓${isCompleted > 1 ? `x${isCompleted}` : ''}</span>` : ''}</span>
                   <span class="lesson-num" style="color:#b388ff">VIP</span>
                 </div>
                 <div class="lesson-links">${làmBàiBtnHTML} ${videoBtnHTML}</div>
@@ -2491,23 +2495,33 @@
               ? `<span class="lesson-num">${l.num}</span>`
               : `<span class="lesson-num" style="color:#b388ff; font-weight:800;">VIP</span>`;
 
-            let isCompleted = (studentProgressMap[`baitap_${gradeNum}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`cauhoi_${gradeNum}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`đs_${gradeNum}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`tln_${gradeNum}_c${cNum}_b${lNum}`] || 0);
+            let homeworkCompleted = (studentProgressMap[`baitap_${gradeNum}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`cauhoi_${gradeNum}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`đs_${gradeNum}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`tln_${gradeNum}_c${cNum}_b${lNum}`] || 0);
             
             // Check progress for dynamically matched exams
+            let examCompleted = 0;
             if (typeof mockExams !== 'undefined' && mockExams.length > 0) {
               const matchedExams = findMatchingExamsForLesson(gradeNum, cNum, lNum, l.title, mockExams);
               matchedExams.forEach(exam => {
-                isCompleted += (studentProgressMap[exam.id] || 0) + (studentProgressMap[`đs_${exam.id}`] || 0) + (studentProgressMap[`tln_${exam.id}`] || 0);
+                examCompleted += (studentProgressMap[exam.id] || 0) + (studentProgressMap[`đs_${exam.id}`] || 0) + (studentProgressMap[`tln_${exam.id}`] || 0);
               });
             }
 
-            if (isCompleted > 0) completedCount++;
+            const totalCompleted = homeworkCompleted + examCompleted;
+            if (totalCompleted > 0) completedCount++;
+
+            let checkmarksHtml = '';
+            if (homeworkCompleted > 0) {
+              checkmarksHtml += `<span class="lesson-checkmark">✓${homeworkCompleted > 1 ? `x${homeworkCompleted}` : ''}</span>`;
+            }
+            if (examCompleted > 0) {
+              checkmarksHtml += `<span class="lesson-checkmark red">✓${examCompleted > 1 ? `x${examCompleted}` : ''}</span>`;
+            }
 
             return `
-              <div class="lesson-row ${isCompleted > 0 ? 'completed' : ''}">
+              <div class="lesson-row ${totalCompleted > 0 ? 'completed' : ''}">
                 <div class="lesson-meta">
                   <span class="lesson-dot" style="background:${ch.dotColor}"></span>
-                  <span class="lesson-title">${l.num}. ${l.title} ${isCompleted > 0 ? `<span class="lesson-checkmark">✓${isCompleted > 1 ? `x${isCompleted}` : ''}</span>` : ''}</span>
+                  <span class="lesson-title">${l.num}. ${l.title} ${checkmarksHtml}</span>
                   ${numDisplay}
                 </div>
                 <div class="lesson-links">${linksHTML}</div>
