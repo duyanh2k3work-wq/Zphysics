@@ -2316,7 +2316,11 @@
               examLop = '12';
             }
           }
-          return examLop === gradeNum;
+          if (examLop !== gradeNum) return false;
+          
+          // Chỉ giữ lại Đề thi, loại bỏ bài tập BTVN / BTNC
+          const isExercise = exam.desc === 'BTVN' || exam.desc === 'BTNC';
+          return !isExercise;
         });
 
         if (matchingExams.length > 0) {
@@ -2379,10 +2383,10 @@
             <div class="ch-header">
               <div class="ch-icon-wrap">${pillsHTML}</div>
               <div class="ch-info">
-                <div class="ch-num" style="color:#b388ff !important">ĐỀ THI / BÀI TẬP</div>
-                <div class="ch-title">👑 Đề thi / Bài tập</div>
+                <div class="ch-num" style="color:#b388ff !important">ĐỀ THI THỬ</div>
+                <div class="ch-title">👑 Đề ôn thi thử</div>
                 <div class="tags">
-                  <span class="tag" style="color:#b388ff;border-color:#b388ff30;background:#b388ff0d">Đề thi khảo sát & bài tập tổng hợp</span>
+                  <span class="tag" style="color:#b388ff;border-color:#b388ff30;background:#b388ff0d">Đề ôn thi thử tốt nghiệp THPT Quốc gia</span>
                 </div>
                 ${matchingExams.length > 0 ? `
                 <div class="chapter-progress-wrap">
