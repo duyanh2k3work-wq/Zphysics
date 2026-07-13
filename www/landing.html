@@ -440,7 +440,6 @@
           <p>Hàng nghìn học sinh đã bắt đầu hành trình cải thiện điểm số với Zphysics. Đến lượt bạn!</p>
           <div class="perks">
             <div class="perk"><div class="perk-icon">✅</div>Miễn phí hoàn toàn để bắt đầu</div>
-            <div class="perk"><div class="perk-icon">⚡</div>Đăng nhập chỉ bằng Gmail — không cần mật khẩu</div>
             <div class="perk"><div class="perk-icon">📱</div>Học mọi lúc, mọi nơi trên điện thoại</div>
             <div class="perk"><div class="perk-icon">🎯</div>Nội dung chuẩn chương trình THPT Việt Nam</div>
           </div>
@@ -494,13 +493,13 @@
       else { nav.style.background='rgba(255,255,255,0.65)'; nav.style.boxShadow='0 8px 32px rgba(100,120,200,0.12)'; }
     });
 
-    /* SUPABASE */
+    /* ── CONFIG ── */
     const SUPABASE_URL = 'https://vphfgtvyhsqrjznrrnvd.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwaGZndHZ5aHNxcmp6bnJybnZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg4NTYyMDQsImV4cCI6MjA2NDQzMjIwNH0.m7zXBU-OBMlv5IkY_OPKzXh23FDc-aBvjsEAME5s56g';
-
+    const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
     const SESSION_KEY = 'zphysics_session';
 
-    function saveSession(gmail, ten, premium, premiumUntil=null) {
+    function saveSession(gmail, ten, premium, premiumUntil = null) {
       localStorage.setItem(SESSION_KEY, JSON.stringify({ 
         gmail, 
         ten, 
@@ -522,52 +521,121 @@
       } catch { return null; }
     }
 
-    let loginStep = 'email';
-    function showError(msg) { const el=document.getElementById('loginError'); el.textContent=msg; el.classList.add('visible'); document.getElementById('loginEmail').classList.add('error'); }
-    function clearError() { document.getElementById('loginError').classList.remove('visible'); document.getElementById('loginEmail').classList.remove('error'); }
+    let isRegistering = false;
+
+    function showError(msg) {
+      const el = document.getElementById('loginError');
+      el.textContent = msg;
+      el.classList.add('visible');
+      document.getElementById('loginEmail').classList.add('error');
+    }
+    function clearError() {
+      document.getElementById('loginError').classList.remove('visible');
+      document.getElementById('loginEmail').classList.remove('error');
+      document.getElementById('loginName').classList.remove('error');
+    }
     function cancelRegistration() {
-      loginStep='email';
-      document.getElementById('loginNameWrap').style.display='none';
-      document.getElementById('loginSubtitle').textContent='Đăng nhập bằng Gmail để tiếp tục';
-      document.getElementById('loginEmail').value='';
-      document.getElementById('loginName').value='';
-      document.getElementById('loginBtn').innerHTML='🚀 Đăng nhập';
+      isRegistering = false;
+      document.getElementById('loginNameWrap').style.display = 'none';
+      document.getElementById('loginSubtitle').textContent = 'Đăng nhập bằng Gmail để tiếp tục';
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginName').value = '';
+      document.getElementById('loginBtn').innerHTML = '🚀 Đăng nhập';
+      document.getElementById('loginEmail').disabled = false;
       clearError();
     }
 
     async function doLogin() {
+      const emailInput = document.getElementById('loginEmail');
+      const nameInput = document.getElementById('loginName');
+      const nameWrap = document.getElementById('loginNameWrap');
+      const subtitleEl = document.getElementById('loginSubtitle');
+      const errorEl = document.getElementById('loginError');
       const btn = document.getElementById('loginBtn');
-      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const gmail = emailInput.value.trim().toLowerCase();
+
       clearError();
-      if (loginStep==='email' && (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) { showError('Vui lòng nhập Gmail hợp lệ!'); return; }
-      btn.disabled=true;
-      btn.innerHTML='<span class="login-spinner"></span> Đang xử lý...';
-      try {
-        if (loginStep==='email') {
-          const res = await fetch(`${SUPABASE_URL}/rest/v1/students?email=eq.${encodeURIComponent(email)}&select=*`, { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } });
-          const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            const s = data[0];
-            const pu = s.premium_until ? new Date(s.premium_until) : null;
-            saveSession(s.email, s.ten||s.email, !!(pu&&pu>new Date()), s.premium_until||null);
-            window.location.href='index.html';
-          } else {
-            loginStep='register';
-            document.getElementById('loginNameWrap').style.display='block';
-            document.getElementById('loginSubtitle').textContent='Chào mừng! Hãy nhập tên để hoàn tất đăng ký.';
-            document.getElementById('loginName').focus();
-            btn.disabled=false; btn.innerHTML='✅ Hoàn tất đăng ký';
-          }
-        } else {
-          const name = document.getElementById('loginName').value.trim();
-          if (!name) { showError('Vui lòng nhập họ và tên!'); btn.disabled=false; btn.innerHTML='✅ Hoàn tất đăng ký'; return; }
-          const res = await fetch(`${SUPABASE_URL}/rest/v1/students`, { method:'POST', headers: { 'apikey':SUPABASE_ANON_KEY, 'Authorization':`Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type':'application/json', 'Prefer':'return=representation' }, body: JSON.stringify({ email, ten:name, premium:false }) });
-          if (res.ok) { saveSession(email, name, false, null); window.location.href='index.html'; }
-          else { showError('Đăng ký thất bại. Vui lòng thử lại!'); }
+
+      if (!gmail) {
+        showError('⚠️ Vui lòng nhập Gmail');
+        return;
+      }
+
+      if (isRegistering) {
+        const fullName = nameInput.value.trim();
+        if (!fullName) {
+          showError('⚠️ Vui lòng nhập Họ và Tên để kích hoạt');
+          nameInput.classList.add('error');
+          nameInput.focus();
+          return;
         }
-      } catch { showError('Lỗi kết nối. Vui lòng kiểm tra mạng!'); }
-      btn.disabled=false;
-      btn.innerHTML=loginStep==='register' ? '✅ Hoàn tất đăng ký' : '🚀 Đăng nhập';
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="login-spinner"></span> Đang kích hoạt...';
+
+        try {
+          const regUrl = `${SHEETS_API_URL}?action=registerStudent&gmail=${encodeURIComponent(gmail)}&name=${encodeURIComponent(fullName)}`;
+          const response = await fetch(regUrl);
+          if (!response.ok) throw new Error('Không thể kết nối Web App để kích hoạt');
+          const result = await response.json();
+
+          if (result && result.success) {
+            saveSession(gmail, result.ten || fullName, false);
+            window.location.href = 'index.html';
+          } else {
+            throw new Error(result.error || result.message || 'Lỗi xử lý kích hoạt.');
+          }
+        } catch (err) {
+          console.error(err);
+          errorEl.textContent = '❌ Lỗi kích hoạt: ' + (err.message || 'Lỗi mạng, hãy thử lại.');
+          errorEl.classList.add('visible');
+        } finally {
+          btn.disabled = false;
+          if (isRegistering) {
+            btn.innerHTML = '✨ Kích hoạt tài khoản Free';
+          }
+        }
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="login-spinner"></span> Đang kiểm tra...';
+
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/students?email=eq.${encodeURIComponent(gmail)}&select=*`;
+        const res = await fetch(url, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const students = await res.json();
+
+        if (students && students.length > 0) {
+          const student = students[0];
+          const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
+          saveSession(gmail, student.full_name || gmail, isPremium, student.premium_until);
+          window.location.href = 'index.html';
+        } else {
+          isRegistering = true;
+          emailInput.disabled = true;
+          nameWrap.style.display = 'block';
+          subtitleEl.innerHTML = '<span style="color:var(--teal); font-weight:800;">TÀI KHOẢN MỚI</span><br>Nhập Họ & Tên của em để kích hoạt tài khoản Free';
+          btn.innerHTML = '✨ Kích hoạt tài khoản Free';
+          btn.disabled = false;
+          nameInput.focus();
+        }
+      } catch (err) {
+        console.error(err);
+        errorEl.textContent = '⚠️ Lỗi kết nối. Vui lòng thử lại.';
+        errorEl.classList.add('visible');
+      } finally {
+        if (!isRegistering) {
+          btn.disabled = false;
+          btn.innerHTML = '🚀 Đăng nhập';
+        }
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
