@@ -299,6 +299,45 @@
       .cta-section { padding: 48px 0 80px; }
       .login-card { padding: 26px 16px 22px; }
     }
+
+    /* ── GRADE SELECTION STYLE ── */
+    .grade-selection-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text, #1d1d1f);
+      margin-bottom: 8px;
+      text-align: left;
+      padding-left: 4px;
+    }
+    .grade-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .grade-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1.5px solid #e8eaf6;
+      background: rgba(240, 244, 255, 0.5);
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text, #1d1d1f);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .grade-btn:hover {
+      background: rgba(46, 196, 182, 0.05);
+      border-color: var(--teal);
+    }
+    .grade-btn.active {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(46, 196, 182, 0.3);
+    }
   </style>
 </head>
 <body>
@@ -468,9 +507,15 @@
             <input type="email" class="login-input" id="loginEmail" placeholder="Nhập Gmail của em..." autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()">
           </div>
           <div id="loginNameWrap" style="display: none; margin-top: 12px;">
-            <div class="login-input-wrap" style="margin-bottom:0">
+            <div class="login-input-wrap" style="margin-bottom:12px">
               <span class="input-icon">👤</span>
               <input type="text" class="login-input" id="loginName" placeholder="Nhập Họ và Tên của em..." autocomplete="name" onkeydown="if(event.key==='Enter')doLogin()">
+            </div>
+            <div class="grade-selection-label">Em đang là học sinh lớp:</div>
+            <div class="grade-buttons" id="loginGradeButtons">
+              <button type="button" class="grade-btn active" data-grade="10" onclick="selectGrade(10)">10</button>
+              <button type="button" class="grade-btn" data-grade="11" onclick="selectGrade(11)">11</button>
+              <button type="button" class="grade-btn" data-grade="12" onclick="selectGrade(12)">12</button>
             </div>
             <div style="text-align:right;margin-top:6px;margin-bottom:10px">
               <a href="javascript:void(0)" onclick="cancelRegistration()" style="font-size:11px;color:var(--muted);text-decoration:none;font-weight:700;">⬅️ Đổi Gmail khác</a>
@@ -538,6 +583,19 @@
     }
 
     let isRegistering = false;
+    let selectedGrade = '10'; // Lớp được chọn mặc định
+
+    function selectGrade(grade) {
+      selectedGrade = String(grade);
+      const buttons = document.querySelectorAll('#loginGradeButtons .grade-btn');
+      buttons.forEach(btn => {
+        if (btn.getAttribute('data-grade') === selectedGrade) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
 
     function showError(msg) {
       const el = document.getElementById('loginError');
@@ -558,6 +616,10 @@
       document.getElementById('loginName').value = '';
       document.getElementById('loginBtn').innerHTML = '🚀 Đăng nhập';
       document.getElementById('loginEmail').disabled = false;
+      
+      // Reset về lớp 10 mặc định
+      selectGrade(10);
+      
       clearError();
     }
 
@@ -590,13 +652,13 @@
         btn.innerHTML = '<span class="login-spinner"></span> Đang kích hoạt...';
 
         try {
-          const regUrl = `${SHEETS_API_URL}?action=registerStudent&gmail=${encodeURIComponent(gmail)}&name=${encodeURIComponent(fullName)}`;
+          const regUrl = `${SHEETS_API_URL}?action=registerStudent&gmail=${encodeURIComponent(gmail)}&name=${encodeURIComponent(fullName)}&lop=${encodeURIComponent(selectedGrade)}`;
           const response = await fetch(regUrl);
           if (!response.ok) throw new Error('Không thể kết nối Web App để kích hoạt');
           const result = await response.json();
 
           if (result && result.success) {
-            saveSession(gmail, result.ten || fullName, false, null, result.lop);
+            saveSession(gmail, result.ten || fullName, false, null, result.lop || selectedGrade);
             window.location.href = 'index.html';
           } else {
             throw new Error(result.error || result.message || 'Lỗi xử lý kích hoạt.');

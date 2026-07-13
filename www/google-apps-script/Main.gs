@@ -23,7 +23,8 @@ function doGet(e) {
     if (action === 'registerStudent') {
       var gmail = (e && e.parameter && e.parameter.gmail) ? String(e.parameter.gmail).trim().toLowerCase() : '';
       var name = (e && e.parameter && e.parameter.name) ? String(e.parameter.name).trim() : '';
-      return jsonResponse(registerStudent(gmail, name));
+      var lop = (e && e.parameter && e.parameter.lop) ? String(e.parameter.lop).trim() : '';
+      return jsonResponse(registerStudent(gmail, name, lop));
     }
     
     // Lấy link bài học động từ Google Sheet

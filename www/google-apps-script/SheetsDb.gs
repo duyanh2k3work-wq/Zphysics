@@ -396,7 +396,7 @@ function checkStudent(gmail) {
 }
 
 // Đăng ký học sinh mới
-function registerStudent(gmail, name) {
+function registerStudent(gmail, name, lop) {
   if (!gmail) return { success: false, message: 'Gmail không được để trống' };
   if (!name) name = gmail.split('@')[0];
   
@@ -420,7 +420,7 @@ function registerStudent(gmail, name) {
     var rowGmail = String(values[r][0]).trim().toLowerCase();
     if (rowGmail === gmail) {
       var ten = String(values[r][1]).trim();
-      var lop = values[r][2] ? String(values[r][2]).trim() : '';
+      var lopDb = values[r][2] ? String(values[r][2]).trim() : '';
       var loai = values[r][3] ? String(values[r][3]).trim().toLowerCase() : 'free';
       var premiumUntilVal = values[r][4];
       var premiumUntilISO = parseDateToISO(premiumUntilVal);
@@ -439,20 +439,20 @@ function registerStudent(gmail, name) {
         ten: ten, 
         premium: isPremium, 
         premium_until: premiumUntilISO,
-        lop: lop
+        lop: lopDb
       };
     }
   }
   
-  // Thêm vào dòng cuối cùng của sheet (cột C trống, cột D 'free')
-  sheet.appendRow([gmail, name, '', 'free', '', '']);
+  // Thêm vào dòng cuối cùng của sheet (cột C chứa lop, cột D 'free')
+  sheet.appendRow([gmail, name, lop || '', 'free', '', '']);
   
   // Đồng bộ tức thời sang Supabase
   try {
     supabaseRequest('students', 'POST', [{
       email: gmail,
       full_name: name,
-      lop: '',
+      lop: lop || '',
       role: 'free',
       premium_until: null
     }]);
@@ -460,7 +460,7 @@ function registerStudent(gmail, name) {
     console.warn("Lỗi đồng bộ đăng ký Supabase: " + err.message);
   }
   
-  return { success: true, isNew: true, ten: name, premium: false, premium_until: null, lop: '' };
+  return { success: true, isNew: true, ten: name, premium: false, premium_until: null, lop: lop || '' };
 }
 
 // Thiết lập header mặc định cho sheet hiện tại
