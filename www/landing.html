@@ -279,10 +279,25 @@
     }
     @media (max-width:600px) {
       .nav-links li:not(:last-child) { display:none; }
-      .features-grid { grid-template-columns:1fr; }
+      .features-grid { grid-template-columns: 1fr; }
       .hero-visual { display:none; }
-      .login-card { padding:30px 20px 26px; }
-      .stats-grid { grid-template-columns:repeat(2,1fr); }
+      .login-card { padding: 30px 20px 26px; }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width:480px) {
+      .nav-inner { padding: 10px 16px; margin-top: 8px; }
+      .nav-logo { font-size: 20px; }
+      .nav-cta { padding: 8px 16px; font-size: 13px !important; }
+      .hero { padding-top: 100px; padding-bottom: 48px; }
+      .hero-title { font-size: 32px; }
+      .hero-subtitle { font-size: 15px; margin-bottom: 28px; }
+      .stats-grid { grid-template-columns: 1fr; gap: 16px; }
+      .stat-card { padding: 20px 16px; }
+      .features { padding: 48px 0; }
+      .how { padding: 48px 0; }
+      .testimonials { padding: 48px 0; }
+      .cta-section { padding: 48px 0 80px; }
+      .login-card { padding: 26px 16px 22px; }
     }
   </style>
 </head>
