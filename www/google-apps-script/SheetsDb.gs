@@ -463,6 +463,56 @@ function registerStudent(gmail, name, lop) {
   return { success: true, isNew: true, ten: name, premium: false, premium_until: null, lop: lop || '' };
 }
 
+// Nâng cấp tài khoản Premium cho học sinh
+function upgradePremium(gmail) {
+  if (!gmail) return { success: false, message: 'Gmail không được để trống' };
+  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = null;
+  var sheets = ss.getSheets();
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].getName().toLowerCase() === 'hocsinh') {
+      sheet = sheets[i];
+      break;
+    }
+  }
+  
+  if (!sheet) {
+    return { success: false, message: 'Chưa tạo tab "HocSinh" trong Google Sheet' };
+  }
+  
+  var values = sheet.getDataRange().getValues();
+  var foundRow = -1;
+  for (var r = 1; r < values.length; r++) {
+    var rowGmail = String(values[r][0]).trim().toLowerCase();
+    if (rowGmail === gmail) {
+      foundRow = r + 1; // 1-indexed row number in sheet
+      break;
+    }
+  }
+  
+  if (foundRow === -1) {
+    return { success: false, message: 'Không tìm thấy tài khoản học sinh' };
+  }
+  
+  // Cập nhật cột D (Loại tài khoản) thành 'premium'
+  // Cột E (Hạn dùng) thành trống (trọn đời)
+  sheet.getRange(foundRow, 4).setValue('premium');
+  sheet.getRange(foundRow, 5).setValue('');
+  
+  // Đồng bộ sang Supabase
+  try {
+    supabaseRequest('students?email=eq.' + encodeURIComponent(gmail), 'PATCH', {
+      role: 'premium',
+      premium_until: null
+    });
+  } catch (err) {
+    console.warn("Lỗi đồng bộ Supabase khi nâng cấp Premium: " + err.message);
+  }
+  
+  return { success: true, message: 'Nâng cấp Premium thành công', premium: true, premium_until: null };
+}
+
 // Thiết lập header mặc định cho sheet hiện tại
 function setupCurrentSheetHeaders() {
   var sheet = SpreadsheetApp.getActiveSheet();

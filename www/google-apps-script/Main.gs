@@ -27,6 +27,12 @@ function doGet(e) {
       return jsonResponse(registerStudent(gmail, name, lop));
     }
     
+    // Nâng cấp Premium trực tiếp
+    if (action === 'upgradePremium') {
+      var gmail = (e && e.parameter && e.parameter.gmail) ? String(e.parameter.gmail).trim().toLowerCase() : '';
+      return jsonResponse(upgradePremium(gmail));
+    }
+    
     // Lấy link bài học động từ Google Sheet
     if (action === 'getLinks') {
       return jsonResponse(getLinks());
