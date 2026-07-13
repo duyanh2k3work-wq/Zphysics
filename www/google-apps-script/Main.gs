@@ -76,7 +76,7 @@ function doPost(e) {
       return HtmlService.createHtmlOutput("OK");
     }
     
-    // ═══ ADMIN ACTIONS (từ admin.html) ═══
+    // ═══ ADMIN & UTILITY ACTIONS (từ admin.html & client) ═══
     var action = postData.action;
     var result;
     
@@ -86,6 +86,9 @@ function doPost(e) {
       result = editQuestion(postData.id, postData.maDe, postData.questionData);
     } else if (action === 'deleteQuestion') {
       result = deleteQuestion(postData.id, postData.maDe);
+    } else if (action === 'sendReport') {
+      var success = sendReportToTelegram(postData.message);
+      return jsonResponse({ success: success });
     } else {
       throw new Error("Hành động không hợp lệ: " + action);
     }

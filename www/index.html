@@ -1829,8 +1829,8 @@
       
       <div class="dashboard-stats">
         <div class="stat-box">
-          <div class="stat-val" id="statStreak">0</div>
-          <div class="stat-label">Ngày học liên tiếp 🔥</div>
+          <div class="stat-val" id="statAverageScore">-</div>
+          <div class="stat-label">Điểm trung bình ⭐</div>
         </div>
         <div class="stat-box">
           <div class="stat-val" id="statCompleted">0</div>
@@ -1934,6 +1934,7 @@
       const session = getSession();
       if (!session || !session.premium || session.gmail.startsWith('demo_')) {
         historyListEl.innerHTML = '<div class="history-empty">Tính năng Lịch sử chỉ dành cho học sinh Premium đã đăng nhập.</div>';
+        document.getElementById('statAverageScore').textContent = '-';
         return;
       }
       
@@ -1951,8 +1952,33 @@
         
         if (!data || data.length === 0) {
           historyListEl.innerHTML = '<div class="history-empty">Chưa có lịch sử làm bài.</div>';
+          document.getElementById('statAverageScore').textContent = '-';
           return;
         }
+
+        // Calculate average score of best attempt for each lesson
+        const bestScores = {};
+        data.forEach(item => {
+          if (item.score !== null && item.score !== undefined) {
+            const val = parseFloat(item.score);
+            if (!isNaN(val)) {
+              const lid = item.lesson_id;
+              if (bestScores[lid] === undefined || val > bestScores[lid]) {
+                bestScores[lid] = val;
+              }
+            }
+          }
+        });
+        
+        let totalScore = 0;
+        let scoreCount = 0;
+        for (const lid in bestScores) {
+          totalScore += bestScores[lid];
+          scoreCount++;
+        }
+        
+        const avgScore = scoreCount > 0 ? (totalScore / scoreCount).toFixed(2) : '-';
+        document.getElementById('statAverageScore').textContent = avgScore;
         
         historyListEl.innerHTML = '';
         data.forEach(item => {
@@ -2004,33 +2030,8 @@
     function openDashboard() {
       document.getElementById('dashboardModal').classList.add('visible');
       
-      // Compute Streak
-      let dates = [];
-      try { dates = JSON.parse(localStorage.getItem('zphysics_activity_dates') || '[]'); } catch(e){}
-      let streak = 0;
-      if (dates.length > 0) {
-        dates.sort((a, b) => new Date(b) - new Date(a));
-        const todayStr = new Date().toLocaleDateString('en-CA');
-        const yesterdayDate = new Date();
-        yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-        const yesterdayStr = yesterdayDate.toLocaleDateString('en-CA');
-        
-        let currentDate = new Date(dates[0]);
-        if (dates[0] === todayStr || dates[0] === yesterdayStr) {
-          streak = 1;
-          for (let i = 1; i < dates.length; i++) {
-            const prevDate = new Date(dates[i]);
-            const diffDays = (currentDate - prevDate) / (1000 * 3600 * 24);
-            if (diffDays === 1) {
-              streak++;
-              currentDate = prevDate;
-            } else if (diffDays > 1) {
-              break;
-            }
-          }
-        }
-      }
-      document.getElementById('statStreak').textContent = streak;
+      // Initialize Average Score to '-'
+      document.getElementById('statAverageScore').textContent = '-';
 
       // Compute Completed
       const completedCount = Object.keys(studentProgressMap).length;

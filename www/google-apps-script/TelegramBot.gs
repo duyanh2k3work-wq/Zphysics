@@ -385,7 +385,7 @@ function handleDiem(chatId) {
   try {
     var progress = supabaseRequest(
       'student_progress?email=eq.' + encodeURIComponent(student.email) +
-      '&score=not.is.null&select=score', 'GET'
+      '&score=not.is.null&select=lesson_id,score', 'GET'
     );
     
     if (!progress || progress.length === 0) {
@@ -395,19 +395,34 @@ function handleDiem(chatId) {
       return;
     }
     
-    var totalScore = 0;
-    var count = progress.length;
+    var totalAttempts = progress.length;
     
+    // Nhóm theo bài (lesson_id) và chỉ lấy điểm cao nhất
+    var bestScores = {};
     for (var i = 0; i < progress.length; i++) {
-      totalScore += parseFloat(progress[i].score) || 0;
+      var item = progress[i];
+      var lid = item.lesson_id;
+      var scoreVal = parseFloat(item.score);
+      if (isNaN(scoreVal)) continue;
+      
+      if (bestScores[lid] === undefined || scoreVal > bestScores[lid]) {
+        bestScores[lid] = scoreVal;
+      }
     }
     
-    var avg = (totalScore / count).toFixed(1);
+    var totalScore = 0;
+    var count = 0;
+    for (var lid in bestScores) {
+      totalScore += bestScores[lid];
+      count++;
+    }
+    
+    var avg = count > 0 ? (totalScore / count).toFixed(1) : "0.0";
     var emoji = parseFloat(avg) >= 8 ? "🟢" : (parseFloat(avg) >= 5 ? "🟡" : "🔴");
     
     var msg = "📊 <b>THỐNG KÊ HỌC TẬP</b>\n";
     msg += "👤 <b>" + student.name + "</b>\n\n";
-    msg += "📝 Số bài đã làm: <b>" + count + " bài</b>\n";
+    msg += "📝 Số bài đã làm: <b>" + totalAttempts + " bài</b>\n";
     msg += emoji + " Điểm trung bình: <b>" + avg + "/10</b>\n";
     
     sendTelegramMessage(chatId, msg);
@@ -1000,7 +1015,7 @@ function checkBadgeMilestone(email, streak) {
 
 // THIẾT LẬP WEBHOOK — Chạy 1 lần duy nhất để kết nối Bot ↔ Apps Script
 function setTelegramWebhook() {
-  var webAppUrl = "ĐIỀN_WEB_APP_URL_CỦA_BẠN_VÀO_ĐÂY";
+  var webAppUrl = "https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec";
   
   var url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/setWebhook?url=" + encodeURIComponent(webAppUrl) + "&drop_pending_updates=true";
   var res = UrlFetchApp.fetch(url);

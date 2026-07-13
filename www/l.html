@@ -866,9 +866,7 @@
     // === CẤU HÌNH SUPABASE ===
     const SUPABASE_URL = 'https://uztfmglzpfrwvamuggwx.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
-    // ========================
-    const TELEGRAM_WEBHOOK_URL = 'https://api.telegram.org/bot8639832320:AAGQwN-0_kNpiy86WA0wkbY9UEX0_QsloXk/sendMessage';
-    const TELEGRAM_CHAT_ID = '2020283109';
+    const SHEETS_API_URL = localStorage.getItem('ZPHYSICS_API_URL') || 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
 
     function getSession() {
       try {
@@ -1436,7 +1434,7 @@
       }
     }
 
-    // ── GỬI BÁO CÁO TELEGRAM ──
+    // ── GỬI BÁO CÁO TELEGRAM (Qua Backend Google Apps Script để ẩn danh Token) ──
     async function sendToTelegram(studentName, score, wrongList) {
       let message = `🏆 KẾT QUẢ THI VIP (PDF):\n`;
       message += `- Đề thi: ${examData.title}\n`;
@@ -1451,16 +1449,15 @@
       }
 
       try {
-        await fetch(TELEGRAM_WEBHOOK_URL, {
+        await fetch(SHEETS_API_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message
+            action: 'sendReport',
+            message: message
           })
         });
       } catch (err) {
-        console.warn('Lỗi gửi kết quả về Telegram:', err);
+        console.warn('Lỗi gửi báo cáo thi về Telegram:', err);
       }
     }
   </script>

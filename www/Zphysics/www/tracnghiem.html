@@ -802,11 +802,8 @@
   </div>
 
   <script>
-    // ══════════════════════════════════════════════
-    // 🔧 CẤU HÌNH TELEGRAM WEBHOOK
-    // Thay link Webhook của bạn vào đây:
-    const TELEGRAM_WEBHOOK_URL = 'https://api.telegram.org/bot8639832320:AAGQwN-0_kNpiy86WA0wkbY9UEX0_QsloXk/sendMessage';
-    // ══════════════════════════════════════════════
+    // Cấu hình API Endpoint Google Apps Script (Sử dụng để gửi kết quả thi bảo mật)
+    const SHEETS_API_URL = localStorage.getItem('ZPHYSICS_API_URL') || 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
 
     let quizData = [];
     let submitted = false;
@@ -836,7 +833,7 @@
       return null;
     }
 
-    // ── Gửi kết quả về Telegram ──
+    // ── Gửi kết quả về Telegram (Qua Backend Google Apps Script để ẩn danh Token) ──
     function sendResultToTelegram(studentName, score, total) {
       let quizDetails = '';
       if (lessonInfo) {
@@ -852,10 +849,12 @@
 
       const message = `📚 Báo cáo kết quả:${quizDetails}\n- Học sinh: ${studentName}\n- Điểm số: ${score}/${total}`;
 
-      fetch(TELEGRAM_WEBHOOK_URL, {
+      fetch(SHEETS_API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: '2020283109', text: message })
+        body: JSON.stringify({
+          action: 'sendReport',
+          message: message
+        })
       })
         .then(res => {
           if (res.ok) {

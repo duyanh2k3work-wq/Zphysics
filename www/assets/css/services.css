@@ -1,0 +1,324 @@
+/* ============================================================
+   SERVICES — "Giải pháp số theo yêu cầu"
+   Design System: Editorial Glassmorphism / Liquid Glass Minimal
+   ============================================================ */
+
+/* ── Google Font Import ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ── Design Tokens ── */
+:root {
+  /* Page */
+  --page-bg: #F0EBE0;
+  --page-radius: 20px;
+  --page-padding: 36px 32px 40px;
+
+  /* Card */
+  --card-radius: 18px;
+  --card-padding: 22px 20px 18px;
+  --card-gap: 10px;
+  --card-min-height: 210px;
+
+  /* Typography */
+  --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-accent: Georgia, 'Times New Roman', serif;
+
+  /* CTA */
+  --cta-size: 36px;
+  --cta-bg: #0D0D0D;
+  --cta-icon: #ffffff;
+
+  /* Illustration */
+  --illust-width: 140px;
+  --desc-max-width: 145px;
+}
+
+/* ── Page Reset ── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body.services-body {
+  background: var(--page-bg);
+  font-family: var(--font-primary);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Main Container ── */
+.services-page {
+  background: var(--page-bg);
+  border-radius: var(--page-radius);
+  padding: var(--page-padding);
+  max-width: 960px;
+  width: 100%;
+}
+
+/* ── Header — 2 Column Grid ── */
+.services-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 32px;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.header-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #111;
+  text-transform: uppercase;
+}
+
+.header-heading {
+  font-size: 42px;
+  font-weight: 800;
+  color: #0D0D0D;
+  line-height: 1.05;
+  letter-spacing: -1px;
+}
+
+.header-heading em {
+  font-style: italic;
+  font-weight: 400;
+  font-family: var(--font-accent);
+}
+
+.header-right {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.header-subtitle {
+  font-size: 13.5px;
+  color: #888888;
+  line-height: 1.65;
+  max-width: 260px;
+  text-align: right;
+}
+
+/* ── Card Grid — 3×2 ── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--card-gap);
+}
+
+/* ── Base Card ── */
+.card {
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  position: relative;
+  overflow: hidden;
+  min-height: var(--card-min-height);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* No border, no shadow — core rule */
+  border: none;
+  box-shadow: none;
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: default;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+/* ── Card Number ── */
+.card-number {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* ── Card Title ── */
+.card-title {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+/* ── Card Description ── */
+.card-desc {
+  font-size: 11.5px;
+  line-height: 1.6;
+  max-width: var(--desc-max-width);
+  margin-bottom: auto;
+}
+
+/* ── Card Content Wrapper ── */
+.card-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* ── CTA Button ── */
+.card-cta {
+  width: var(--cta-size);
+  height: var(--cta-size);
+  border-radius: 50%;
+  background: var(--cta-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  position: relative;
+  z-index: 2;
+  margin-top: 14px;
+  flex-shrink: 0;
+}
+
+.card-cta:hover {
+  transform: scale(1.1);
+  opacity: 0.85;
+}
+
+.card-cta svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--cta-icon);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+/* ── Illustration (SVG positioned absolute) ── */
+.card-illustration {
+  position: absolute;
+  right: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 1;
+  width: var(--illust-width);
+  height: 100%;
+}
+
+/* ================================================================
+   CARD VARIANTS — Each card has unique gradient bg + text colors
+   ================================================================ */
+
+/* ── Card 01: Ivory (trắng ngà) ── */
+.card-ivory {
+  background: #F5F0E8;
+}
+.card-ivory .card-number { color: rgba(0,0,0,0.35); }
+.card-ivory .card-title  { color: #0D0D0D; }
+.card-ivory .card-desc   { color: rgba(0,0,0,0.45); }
+
+/* ── Card 02: Vibrant (tím–hồng–cam) ── */
+.card-vibrant {
+  background: linear-gradient(135deg, #C8B8F0 0%, #E8B8D8 50%, #F0C8A8 100%);
+}
+.card-vibrant .card-number { color: rgba(255,255,255,0.6); }
+.card-vibrant .card-title  { color: #FFFFFF; }
+.card-vibrant .card-desc   { color: rgba(255,255,255,0.65); }
+
+/* ── Card 03: Soft Purple (tím nhạt) ── */
+.card-purple {
+  background: linear-gradient(140deg, #D0C8F0 0%, #E8C8F0 50%, #F0D8E8 100%);
+}
+.card-purple .card-number { color: rgba(80,60,120,0.4); }
+.card-purple .card-title  { color: #2D2050; }
+.card-purple .card-desc   { color: rgba(80,60,120,0.55); }
+
+/* ── Card 04: Sky (xanh nhạt) ── */
+.card-sky {
+  background: linear-gradient(135deg, #C8DDF0 0%, #D8E8F5 100%);
+}
+.card-sky .card-number { color: rgba(30,80,140,0.35); }
+.card-sky .card-title  { color: #102040; }
+.card-sky .card-desc   { color: rgba(30,80,140,0.5); }
+
+/* ── Card 05: Warm Rose (hồng–cam) ── */
+.card-rose {
+  background: linear-gradient(135deg, #F5D0E0 0%, #F0C8D8 40%, #F8E0C8 100%);
+}
+.card-rose .card-number { color: rgba(140,60,80,0.35); }
+.card-rose .card-title  { color: #280D18; }
+.card-rose .card-desc   { color: rgba(140,60,80,0.5); }
+
+/* ── Card 06: Mint (xanh lá) ── */
+.card-mint {
+  background: linear-gradient(135deg, #D0ECD8 0%, #C8E8D0 50%, #E8F5D0 100%);
+}
+.card-mint .card-number { color: rgba(30,100,50,0.4); }
+.card-mint .card-title  { color: #0A2010; }
+.card-mint .card-desc   { color: rgba(30,100,50,0.5); }
+
+/* ================================================================
+   RESPONSIVE — Graceful degradation
+   ================================================================ */
+@media (max-width: 768px) {
+  .services-header {
+    grid-template-columns: 1fr;
+  }
+
+  .header-right {
+    justify-content: flex-start;
+  }
+
+  .header-subtitle {
+    text-align: left;
+    max-width: 100%;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .header-heading {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 500px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.services-body {
+    padding: 12px;
+  }
+
+  .services-page {
+    padding: 24px 18px 28px;
+  }
+
+  .header-heading {
+    font-size: 28px;
+  }
+
+  .card-illustration {
+    width: 110px;
+    opacity: 0.7;
+  }
+}
