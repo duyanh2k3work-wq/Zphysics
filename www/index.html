@@ -1688,6 +1688,20 @@
       font-weight: 600;
       padding: 20px 0;
     }
+    
+    /* ── LOCKED CARD STYLE ── */
+    .ch-card.locked {
+      opacity: 0.65;
+      cursor: not-allowed !important;
+      filter: grayscale(40%);
+    }
+    .ch-card.locked:hover {
+      transform: none !important;
+      box-shadow: 0 4px 24px var(--shadow) !important;
+    }
+    .ch-card.locked * {
+      pointer-events: none;
+    }
   </style>
 </head>
 
@@ -2265,6 +2279,25 @@
       });
     }
 
+    // --- Helper function to check grade access ---
+    function hasGradeAccess(studentLop, targetGrade) {
+      if (!studentLop) return true; // Trống nghĩa là có quyền tất cả
+      const studentDigits = studentLop.match(/\d+/);
+      const targetDigits = targetGrade.match(/\d+/);
+      if (studentDigits && targetDigits) {
+        return studentDigits[0] === targetDigits[0];
+      }
+      return studentLop.toLowerCase().includes(targetGrade.toLowerCase()) || 
+             targetGrade.toLowerCase().includes(studentLop.toLowerCase());
+    }
+
+    // --- Helper function to show locked grade modal ---
+    function showLockedGradeModal(gradeName) {
+      const session = getSession();
+      const studentLop = session ? session.lop : '';
+      alert(`Bài học này thuộc ${gradeName}.\nTài khoản của em được phân quyền học lớp ${studentLop || '(Chưa xếp lớp)'}.\nHãy liên hệ thầy cô để được cập nhật lớp học đúng nhé!`);
+    }
+
     // ── Render toàn bộ giao diện từ JSON ──
     function renderAll(data) {
       const tabsEl = document.getElementById('gradeTabs');
@@ -2273,10 +2306,19 @@
       contentEl.innerHTML = '';
 
       data.forEach((gradeObj, gIdx) => {
+        const session = getSession();
+        const studentLop = session ? session.lop : null;
+        const gradeNum = gradeObj.grade.match(/\d+/) ? gradeObj.grade.match(/\d+/)[0] : '';
+        const isLockedGrade = !hasGradeAccess(studentLop, gradeNum);
+
         // --- Tab button ---
         const btn = document.createElement('button');
         btn.className = 'grade-pill grade-' + gIdx + (gIdx === 0 ? ' active' : '');
-        btn.textContent = gradeObj.grade;
+        if (isLockedGrade) {
+          btn.innerHTML = gradeObj.grade + ' 🔒';
+        } else {
+          btn.textContent = gradeObj.grade;
+        }
         btn.onclick = () => switchGrade(gIdx);
         tabsEl.appendChild(btn);
 
@@ -2288,7 +2330,7 @@
         // Section label
         const labelDiv = document.createElement('div');
         labelDiv.className = 'section-label';
-        labelDiv.innerHTML = `<h3>Danh sách chương — ${gradeObj.grade}</h3>`;
+        labelDiv.innerHTML = `<h3>Danh sách bài học — ${gradeObj.grade}</h3>`;
         section.appendChild(labelDiv);
 
         // Cards list
@@ -2338,8 +2380,12 @@
           wrapper.appendChild(glow);
 
           const card = document.createElement('div');
-          card.className = 'ch-card';
-          card.setAttribute('onclick', 'toggleCard(this)');
+          card.className = 'ch-card' + (isLockedGrade ? ' locked' : '');
+          if (isLockedGrade) {
+            card.setAttribute('onclick', `showLockedGradeModal('${gradeObj.grade}')`);
+          } else {
+            card.setAttribute('onclick', 'toggleCard(this)');
+          }
 
           card.style.setProperty('--glow-color', dotColor);
           card.style.setProperty('--glow-shadow', glowShadow);
@@ -2381,20 +2427,22 @@
               <div class="ch-icon-wrap">${pillsHTML}</div>
               <div class="ch-info">
                 <div class="ch-num" style="color:#b388ff !important">ĐỀ THI THỬ</div>
-                <div class="ch-title">👑 Đề ôn thi thử</div>
+                <div class="ch-title">👑 Đề ôn thi thử ${isLockedGrade ? '🔒' : ''}</div>
                 <div class="tags">
                   <span class="tag" style="color:#b388ff;border-color:#b388ff30;background:#b388ff0d">Đề ôn thi thử tốt nghiệp THPT Quốc gia</span>
                 </div>
-                ${matchingExams.length > 0 ? `
+                ${isLockedGrade ? `
+                <div class="chapter-progress-text" style="color:#ff4d4d; font-weight:bold;">🔒 Dành riêng cho lớp ${studentLop || ''}</div>
+                ` : (matchingExams.length > 0 ? `
                 <div class="chapter-progress-wrap">
                   <div class="chapter-progress-bar" style="width: ${Math.round((completedMockCount / matchingExams.length) * 100)}%; background: linear-gradient(135deg, #7c4dff, #b388ff)"></div>
                 </div>
                 <div class="chapter-progress-text" style="color: #b388ff">${completedMockCount}/${matchingExams.length} đề hoàn thành</div>
-                ` : ''}
+                ` : '')}
               </div>
-              <div class="ch-arrow"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="ch-arrow">${isLockedGrade ? '🔒' : '<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>'}</div>
             </div>
-            <div class="lesson-list"><div class="lesson-inner">${lessonsHTML}</div></div>`;
+            ${isLockedGrade ? '' : `<div class="lesson-list"><div class="lesson-inner">${lessonsHTML}</div></div>`}`;
 
           wrapper.appendChild(card);
           cardsList.appendChild(wrapper);
@@ -2549,8 +2597,12 @@
 
           // Card element
           const card = document.createElement('div');
-          card.className = 'ch-card';
-          card.setAttribute('onclick', 'toggleCard(this)');
+          card.className = 'ch-card' + (isLockedGrade ? ' locked' : '');
+          if (isLockedGrade) {
+            card.setAttribute('onclick', `showLockedGradeModal('${gradeObj.grade}')`);
+          } else {
+            card.setAttribute('onclick', 'toggleCard(this)');
+          }
 
           card.style.setProperty('--glow-color', dotColor);
           card.style.setProperty('--glow-shadow', glowShadow);
@@ -2563,18 +2615,20 @@
               <div class="ch-icon-wrap">${pillsHTML}</div>
               <div class="ch-info">
                 <div class="ch-num">${ch.num}</div>
-                <div class="ch-title">${ch.title}</div>
+                <div class="ch-title">${ch.title} ${isLockedGrade ? '🔒' : ''}</div>
                 <div class="tags">${tagsHTML}</div>
-                ${totalLessons > 0 ? `
+                ${isLockedGrade ? `
+                <div class="chapter-progress-text" style="color:#ff4d4d; font-weight:bold;">🔒 Dành riêng cho lớp ${studentLop || ''}</div>
+                ` : (totalLessons > 0 ? `
                 <div class="chapter-progress-wrap">
                   <div class="chapter-progress-bar" style="width: ${Math.round((completedCount / totalLessons) * 100)}%"></div>
                 </div>
                 <div class="chapter-progress-text">${completedCount}/${totalLessons} bài hoàn thành</div>
-                ` : ''}
+                ` : '')}
               </div>
-              <div class="ch-arrow"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="ch-arrow">${isLockedGrade ? '🔒' : '<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>'}</div>
             </div>
-            <div class="lesson-list"><div class="lesson-inner">${lessonsHTML}</div></div>`;
+            ${isLockedGrade ? '' : `<div class="lesson-list"><div class="lesson-inner">${lessonsHTML}</div></div>`}`;
 
           wrapper.appendChild(card);
           cardsList.appendChild(wrapper);
@@ -2651,12 +2705,13 @@
       } catch { return null; }
     }
 
-    function saveSession(gmail, ten, premium, premiumUntil = null) {
+    function saveSession(gmail, ten, premium, premiumUntil = null, lop = null) {
       localStorage.setItem(SESSION_KEY, JSON.stringify({ 
         gmail, 
         ten, 
         premium: !!premium, 
-        premium_until: premiumUntil 
+        premium_until: premiumUntil,
+        lop: lop
       }));
     }
 
@@ -2691,15 +2746,16 @@
 
         // Hiển thị thời hạn sử dụng Premium
         const session = getSession();
+        const lopStr = session && session.lop ? ` (Lớp: ${session.lop})` : '';
         if (statusEl) {
           if (session && session.premium_until) {
             const date = new Date(session.premium_until);
             const dateStr = date.toLocaleDateString('vi-VN');
             const timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-            statusEl.textContent = `Hạn dùng: ${dateStr} ${timeStr}`;
+            statusEl.textContent = `Hạn dùng: ${dateStr} ${timeStr}${lopStr}`;
             statusEl.style.color = '#7dd3fc';
           } else {
-            statusEl.textContent = 'Hạn dùng: Trọn đời ♾️';
+            statusEl.textContent = `Hạn dùng: Trọn đời ♾️${lopStr}`;
             statusEl.style.color = '#ffe27a';
           }
         }
@@ -2727,8 +2783,10 @@
         document.getElementById('greetingText').textContent = `Xin chào, ${ten} 👋`;
         document.getElementById('popupName').textContent = ten;
 
+        const session = getSession();
+        const lopStr = session && session.lop ? ` (Lớp: ${session.lop})` : '';
         if (statusEl) {
-          statusEl.textContent = 'Gói: Miễn phí';
+          statusEl.textContent = `Gói: Miễn phí${lopStr}`;
           statusEl.style.color = '#a1a1aa';
         }
 
@@ -2839,7 +2897,7 @@
           const result = await response.json();
 
           if (result && result.success) {
-            saveSession(gmail, result.ten || fullName, false); // Mới đăng ký mặc định là Free (premium = false)
+            saveSession(gmail, result.ten || fullName, false, null, result.lop); // Mới đăng ký mặc định là Free (premium = false)
             window.location.reload();
           } else {
             throw new Error(result.error || result.message || 'Lỗi xử lý kích hoạt.');
@@ -2875,7 +2933,7 @@
         if (students && students.length > 0) {
           const student = students[0];
           const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
-          saveSession(gmail, student.full_name || gmail, isPremium, student.premium_until);
+          saveSession(gmail, student.full_name || gmail, isPremium, student.premium_until, student.lop);
           window.location.reload();
         } else {
           // Gmail chưa tồn tại trong hệ thống -> Mở form đăng ký tự động
@@ -2968,7 +3026,7 @@
                 const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
                 
                 const wasPremium = !!existingSession.premium;
-                saveSession(existingSession.gmail, student.full_name || existingSession.gmail, isPremium, student.premium_until);
+                saveSession(existingSession.gmail, student.full_name || existingSession.gmail, isPremium, student.premium_until, student.lop);
                 showApp(student.full_name || existingSession.gmail, isPremium);
                 
                 // Nếu trạng thái thay đổi lên Premium, chạy lại initApp để tải tiến trình học tập

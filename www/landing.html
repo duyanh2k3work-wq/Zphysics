@@ -514,12 +514,13 @@
     const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
     const SESSION_KEY = 'zphysics_session';
 
-    function saveSession(gmail, ten, premium, premiumUntil = null) {
+    function saveSession(gmail, ten, premium, premiumUntil = null, lop = null) {
       localStorage.setItem(SESSION_KEY, JSON.stringify({ 
         gmail, 
         ten, 
         premium, 
-        premium_until: premiumUntil 
+        premium_until: premiumUntil,
+        lop: lop
       }));
     }
     function loadSession() {
@@ -595,7 +596,7 @@
           const result = await response.json();
 
           if (result && result.success) {
-            saveSession(gmail, result.ten || fullName, false);
+            saveSession(gmail, result.ten || fullName, false, null, result.lop);
             window.location.href = 'index.html';
           } else {
             throw new Error(result.error || result.message || 'Lỗi xử lý kích hoạt.');
@@ -630,7 +631,7 @@
         if (students && students.length > 0) {
           const student = students[0];
           const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
-          saveSession(gmail, student.full_name || gmail, isPremium, student.premium_until);
+          saveSession(gmail, student.full_name || gmail, isPremium, student.premium_until, student.lop);
           window.location.href = 'index.html';
         } else {
           isRegistering = true;

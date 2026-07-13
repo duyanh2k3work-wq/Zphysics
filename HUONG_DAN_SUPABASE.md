@@ -47,6 +47,7 @@ create index idx_questions_made_qid on questions(made, question_id);
 create table students (
   email text primary key,            -- Gmail học sinh
   full_name text,                    -- Tên học sinh
+  lop text,                          -- Lớp học sinh (10, 11, 12,...)
   role text default 'free',          -- 'free' hoặc 'premium'
   premium_until timestamp with time zone, -- Hạn Premium (null = trọn đời / vô hạn)
   created_at timestamp with time zone default timezone('utc'::text, now()) not null

@@ -64,6 +64,7 @@ function onEditInstalled(e) {
       var vals = sheet.getRange(row, 1, 1, 5).getValues()[0];
       var gmail = trimCell(vals[0]).toLowerCase();
       var ten = trimCell(vals[1]);
+      var lop = trimCell(vals[2]);
       var loai = vals[3] ? trimCell(vals[3]).toLowerCase() : 'free';
       var premiumUntilISO = parseDateToISO(vals[4]);
       
@@ -71,6 +72,7 @@ function onEditInstalled(e) {
         var payload = {
           email: gmail,
           full_name: ten,
+          lop: lop,
           role: loai,
           premium_until: premiumUntilISO
         };
@@ -235,6 +237,7 @@ function syncStudentsToSupabase() {
   for (var r = 1; r < values.length; r++) {
     var gmail = trimCell(values[r][0]).toLowerCase();
     var ten = trimCell(values[r][1]);
+    var lop = trimCell(values[r][2]);
     var loai = values[r][3] ? trimCell(values[r][3]).toLowerCase() : 'free';
     var premiumUntilVal = values[r][4];
     var premiumUntilISO = parseDateToISO(premiumUntilVal);
@@ -243,6 +246,7 @@ function syncStudentsToSupabase() {
       students.push({
         email: gmail,
         full_name: ten,
+        lop: lop,
         role: loai,
         premium_until: premiumUntilISO
       });
