@@ -1114,16 +1114,34 @@ function handleToggleNotification(chatId, isSubscribe) {
 
 // ── GỬI BÁO CÁO KẾT QUẢ THI / LUYỆN TẬP VỀ TELEGRAM CHO GIÁO VIÊN ──
 function sendReportToTelegram(message) {
+  var adminBotToken = PropertiesService.getScriptProperties().getProperty('TELEGRAM_ADMIN_BOT_TOKEN');
   var adminChatId = PropertiesService.getScriptProperties().getProperty('TELEGRAM_ADMIN_CHAT_ID');
+  
+  if (!adminBotToken) {
+    Logger.log("Lỗi: Chưa cấu hình TELEGRAM_ADMIN_BOT_TOKEN trong Script Properties.");
+    return false;
+  }
   if (!adminChatId) {
     Logger.log("Lỗi: Chưa cấu hình TELEGRAM_ADMIN_CHAT_ID trong Script Properties.");
     return false;
   }
+  
   try {
-    sendTelegramMessage(adminChatId, message);
+    var text = cleanLatexForTelegram(message);
+    var payload = {
+      'chat_id': adminChatId,
+      'text': text,
+      'parse_mode': 'HTML'
+    };
+    UrlFetchApp.fetch('https://api.telegram.org/bot' + adminBotToken + '/sendMessage', {
+      'method': 'post',
+      'contentType': 'application/json',
+      'payload': JSON.stringify(payload),
+      'muteHttpExceptions': true
+    });
     return true;
   } catch (e) {
-    Logger.log("Lỗi khi gửi báo cáo kết quả thi qua Telegram: " + e.message);
+    Logger.log("Lỗi khi gửi báo cáo kết quả thi qua Telegram Admin Bot: " + e.message);
     return false;
   }
 }
