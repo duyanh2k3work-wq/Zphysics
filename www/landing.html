@@ -498,15 +498,26 @@
     const SUPABASE_URL = 'https://vphfgtvyhsqrjznrrnvd.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwaGZndHZ5aHNxcmp6bnJybnZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg4NTYyMDQsImV4cCI6MjA2NDQzMjIwNH0.m7zXBU-OBMlv5IkY_OPKzXh23FDc-aBvjsEAME5s56g';
 
+    const SESSION_KEY = 'zphysics_session';
+
     function saveSession(gmail, ten, premium, premiumUntil=null) {
-      localStorage.setItem('zp_session', JSON.stringify({ gmail, ten, premium, premiumUntil, savedAt: Date.now() }));
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ 
+        gmail, 
+        ten, 
+        premium, 
+        premium_until: premiumUntil 
+      }));
     }
     function loadSession() {
       try {
-        const raw = localStorage.getItem('zp_session');
+        const raw = localStorage.getItem(SESSION_KEY);
         if (!raw) return null;
         const s = JSON.parse(raw);
-        if (s.premiumUntil && new Date(s.premiumUntil) < new Date()) { s.premium=false; s.premiumUntil=null; localStorage.setItem('zp_session',JSON.stringify(s)); }
+        if (s.premium_until && new Date(s.premium_until) < new Date()) { 
+          s.premium = false; 
+          s.premium_until = null; 
+          localStorage.setItem(SESSION_KEY, JSON.stringify(s)); 
+        }
         return s;
       } catch { return null; }
     }

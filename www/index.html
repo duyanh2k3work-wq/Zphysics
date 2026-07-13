@@ -2992,6 +2992,9 @@
               showApp(existingSession.ten, existingSession.premium);
             });
         }
+      } else {
+        // Chưa đăng nhập -> Chuyển hướng sang Landing Page
+        window.location.href = 'landing.html';
       }
     }
     // Nếu chưa login → overlay tự hiện (mặc định display: flex)
