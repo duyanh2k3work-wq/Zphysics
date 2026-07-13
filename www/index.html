@@ -2338,7 +2338,6 @@
         cardsList.className = 'cards-list';
 
         // Prepend "đề thi/bài tập" card before chapter cards
-        const gradeNum = gradeObj.grade.match(/\d+/) ? gradeObj.grade.match(/\d+/)[0] : '';
         const examsToRender = mockExams && mockExams.length > 0 ? mockExams : DEFAULT_MOCK_EXAMS;
         const matchingExams = examsToRender.filter(exam => {
           let examLop = '';
