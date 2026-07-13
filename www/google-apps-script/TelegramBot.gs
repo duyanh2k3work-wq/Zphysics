@@ -1114,11 +1114,11 @@ function handleToggleNotification(chatId, isSubscribe) {
 
 // ── GỬI BÁO CÁO KẾT QUẢ THI / LUYỆN TẬP VỀ TELEGRAM CHO GIÁO VIÊN ──
 function sendReportToTelegram(message) {
-  var adminBotToken = PropertiesService.getScriptProperties().getProperty('TELEGRAM_ADMIN_BOT_TOKEN');
+  var adminBotToken = PropertiesService.getScriptProperties().getProperty('TELEGRAM_BOT_TOKEN_2');
   var adminChatId = PropertiesService.getScriptProperties().getProperty('TELEGRAM_ADMIN_CHAT_ID');
   
   if (!adminBotToken) {
-    Logger.log("Lỗi: Chưa cấu hình TELEGRAM_ADMIN_BOT_TOKEN trong Script Properties.");
+    Logger.log("Lỗi: Chưa cấu hình TELEGRAM_BOT_TOKEN_2 trong Script Properties.");
     return false;
   }
   if (!adminChatId) {
