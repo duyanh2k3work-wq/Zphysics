@@ -1111,3 +1111,19 @@ function handleToggleNotification(chatId, isSubscribe) {
     sendTelegramMessage(chatId, "🔕 <b>ĐÃ TẮT NHẬN TIN NHẮN</b>\n\nBạn đã hủy đăng ký nhận thử thách hàng ngày. Bạn vẫn có thể chủ động làm bài bằng lệnh /cauhoi bất cứ lúc nào!");
   }
 }
+
+// ── GỬI BÁO CÁO KẾT QUẢ THI / LUYỆN TẬP VỀ TELEGRAM CHO GIÁO VIÊN ──
+function sendReportToTelegram(message) {
+  var adminChatId = PropertiesService.getScriptProperties().getProperty('TELEGRAM_ADMIN_CHAT_ID');
+  if (!adminChatId) {
+    Logger.log("Lỗi: Chưa cấu hình TELEGRAM_ADMIN_CHAT_ID trong Script Properties.");
+    return false;
+  }
+  try {
+    sendTelegramMessage(adminChatId, message);
+    return true;
+  } catch (e) {
+    Logger.log("Lỗi khi gửi báo cáo kết quả thi qua Telegram: " + e.message);
+    return false;
+  }
+}

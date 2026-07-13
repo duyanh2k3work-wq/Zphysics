@@ -2247,9 +2247,7 @@
       });
       
       // Gửi kết quả về Telegram
-      if (TELEGRAM_WEBHOOK_URL && TELEGRAM_WEBHOOK_URL !== 'ĐIỀN_LINK_WEBHOOK_CỦA_BẠN_VÀO_ĐÂY') {
-        sendResultToTelegram(studentName + ' (Ôn tập)', finalScore, maxScore, wrongAnswersList);
-      }
+      sendResultToTelegram(studentName + ' (Ôn tập)', finalScore, maxScore, wrongAnswersList);
       
       // Lưu tiến trình học tập vào Supabase
       if (currentSession && currentSession.gmail) {
@@ -2475,9 +2473,7 @@
       banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
       // Gửi kết quả về Telegram
-      if (TELEGRAM_WEBHOOK_URL && TELEGRAM_WEBHOOK_URL !== 'ĐIỀN_LINK_WEBHOOK_CỦA_BẠN_VÀO_ĐÂY') {
-        sendResultToTelegram(studentName, finalScore, maxScore, wrongAnswersList);
-      }
+      sendResultToTelegram(studentName, finalScore, maxScore, wrongAnswersList);
 
       // Lưu tiến trình học tập
       if (currentSession && currentSession.gmail) {
