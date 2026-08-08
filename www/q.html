@@ -2129,6 +2129,12 @@
 
     // ── Bắt đầu đếm ngược thời gian ──
     function startTimer() {
+      if (quizFile && quizFile.startsWith('baitap_')) {
+        const timerEl = document.getElementById('quizTimer');
+        if (timerEl) timerEl.style.display = 'none';
+        return;
+      }
+
       if (timerInterval) clearInterval(timerInterval);
       timeRemaining = 30 * 60; // 30 phút
       const timerEl = document.getElementById('quizTimer');
