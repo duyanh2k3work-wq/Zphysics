@@ -2533,7 +2533,9 @@
             const lNum = l.num; // '04'
 
             const autoLinks = {};
-            if (l.links && l.links.video) autoLinks.video = l.links.video;
+            if (l.links && l.links.video && typeof l.links.video === 'string' && l.links.video.trim() !== '' && l.links.video.trim() !== '#') {
+              autoLinks.video = l.links.video.trim();
+            }
             if (l.links && l.links.baiTap) autoLinks.baiTap = l.links.baiTap;
 
             // Tìm đề thi luyện đề (VIP) phù hợp - ("Bài tập")
@@ -3250,6 +3252,8 @@
                   if (!l.links) l.links = {};
                   if (matched.video && matched.video.trim() !== '' && matched.video.trim() !== '#') {
                     l.links.video = matched.video.trim();
+                  } else {
+                    delete l.links.video;
                   }
                   if (matched.baiTap && matched.baiTap.trim() !== '' && matched.baiTap.trim() !== '#') {
                     l.links.baiTap = matched.baiTap.trim();

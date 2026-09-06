@@ -419,7 +419,7 @@
           const lessonsHTML = ch.lessons.map(l => {
             // Build link buttons
             const linksHTML = Object.entries(l.links || {})
-              .filter(([key, url]) => key !== 'baiTap')
+              .filter(([key, url]) => key !== 'baiTap' && !(key === 'video' && (!url || url === '#' || !url.trim())))
               .map(([key, url]) => {
               const cfg = LINK_CONFIG[key];
               if (!cfg || url === '#') {

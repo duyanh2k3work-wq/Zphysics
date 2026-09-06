@@ -36,7 +36,6 @@
             "num": "01",
             "title": "Làm quen với Vật lí",
             "links": {
-              "video": "#",
               "tracNghiem": "tracnghiem.html?quiz=cauhoi",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -46,7 +45,6 @@
             "num": "02",
             "title": "Các quy tắc an toàn trong phòng thực hành Vật lí",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -56,7 +54,6 @@
             "num": "03",
             "title": "Thực hành tính sai số trong phép đo. Ghi kết quả đo",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -97,7 +94,6 @@
             "num": "04",
             "title": "Độ dịch chuyển và quãng đường đi được",
             "links": {
-              "video": "#",
               "tracNghiem": "tracnghiem.html?quiz=cauhoi_10_c2_b04",
               "dungSai": "tracnghiem.html?quiz=đs_10_c2_b04",
               "traLoiNgan": "tracnghiem.html?quiz=tln_10_c2_b04"
@@ -107,7 +103,6 @@
             "num": "05",
             "title": "Tốc độ và vận tốc",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -117,7 +112,6 @@
             "num": "06",
             "title": "Thực hành: Đo tốc độ của vật chuyển động",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -127,7 +121,6 @@
             "num": "07",
             "title": "Đồ thị độ dịch chuyển - thời gian",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -137,7 +130,6 @@
             "num": "08",
             "title": "Chuyển động biến đổi. Gia tốc",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -147,7 +139,6 @@
             "num": "09",
             "title": "Chuyển động thẳng biến đổi đều",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -157,7 +148,6 @@
             "num": "10",
             "title": "Sự rơi tự do",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -167,7 +157,6 @@
             "num": "11",
             "title": "Thực hành: Đo gia tốc rơi tự do",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -177,7 +166,6 @@
             "num": "12",
             "title": "Chuyển động ném",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -218,7 +206,6 @@
             "num": "13",
             "title": "Tổng hợp và phân tích lực. Cân bằng lực",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -228,7 +215,6 @@
             "num": "14",
             "title": "Định luật 1 Newton",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -238,7 +224,6 @@
             "num": "15",
             "title": "Định luật 2 Newton",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -248,7 +233,6 @@
             "num": "16",
             "title": "Định luật 3 Newton",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -258,7 +242,6 @@
             "num": "17",
             "title": "Trọng lực và lực căng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -268,7 +251,6 @@
             "num": "18",
             "title": "Lực ma sát",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -278,7 +260,6 @@
             "num": "19",
             "title": "Lực cản và lực nâng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -288,7 +269,6 @@
             "num": "20",
             "title": "Một số ví dụ về cách giải bài toán động lực học",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -298,7 +278,6 @@
             "num": "21",
             "title": "Moment lực. Cân bằng của vật rắn",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -308,7 +287,6 @@
             "num": "22",
             "title": "Thực hành: Tổng hợp lực",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -349,7 +327,6 @@
             "num": "23",
             "title": "Năng lượng. Công cơ học",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -359,7 +336,6 @@
             "num": "24",
             "title": "Công suất",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -369,7 +345,6 @@
             "num": "25",
             "title": "Động năng, thế năng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -379,7 +354,6 @@
             "num": "26",
             "title": "Cơ năng và định luật bảo toàn cơ năng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -389,7 +363,6 @@
             "num": "27",
             "title": "Hiệu suất",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -430,7 +403,6 @@
             "num": "28",
             "title": "Động lượng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -440,7 +412,6 @@
             "num": "29",
             "title": "Định luật bảo toàn động lượng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -450,7 +421,6 @@
             "num": "30",
             "title": "Thực hành: Xác định động lượng của vật trước và sau va chạm",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -491,7 +461,6 @@
             "num": "31",
             "title": "Động học của chuyển động tròn đều",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -501,7 +470,6 @@
             "num": "32",
             "title": "Lực hướng tâm và gia tốc hướng tâm",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -542,7 +510,6 @@
             "num": "33",
             "title": "Biến dạng của vật rắn",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -552,7 +519,6 @@
             "num": "34",
             "title": "Khối lượng riêng. Áp suất chất lỏng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -599,7 +565,6 @@
             "num": "01",
             "title": "Dao động điều hòa",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -609,7 +574,6 @@
             "num": "02",
             "title": "Mô tả dao động điều hòa",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -619,7 +583,6 @@
             "num": "03",
             "title": "Vận tốc, gia tốc trong dao động điều hòa",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -629,7 +592,6 @@
             "num": "04",
             "title": "Bài tập về dao động điều hòa",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -639,7 +601,6 @@
             "num": "05",
             "title": "Động năng. Thế năng. Sự chuyển hoá năng lượng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -649,7 +610,6 @@
             "num": "06",
             "title": "Dao động tắt dần. Dao động cưỡng bức. Cộng hưởng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -659,7 +619,6 @@
             "num": "07",
             "title": "Bài tập về sự chuyển năng lượng trong DĐĐH",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -700,7 +659,6 @@
             "num": "08",
             "title": "Mô tả sóng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -710,7 +668,6 @@
             "num": "09",
             "title": "Sóng ngang, sóng dọc, sự truyền năng lượng của sóng cơ",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -720,7 +677,6 @@
             "num": "10",
             "title": "Thực hành: Đo tần số của sóng âm",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -730,7 +686,6 @@
             "num": "11",
             "title": "Sóng điện từ",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -740,7 +695,6 @@
             "num": "12",
             "title": "Giao thoa sóng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -750,7 +704,6 @@
             "num": "13",
             "title": "Sóng dừng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -760,7 +713,6 @@
             "num": "14",
             "title": "Bài tập về sóng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -770,7 +722,6 @@
             "num": "15",
             "title": "Thực hành: Đo tốc độ truyền âm",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -811,7 +762,6 @@
             "num": "16",
             "title": "Lực tương tác giữa hai điện tích",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -821,7 +771,6 @@
             "num": "17",
             "title": "Khái niệm điện trường",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -831,7 +780,6 @@
             "num": "18",
             "title": "Điện trường đều",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -841,7 +789,6 @@
             "num": "19",
             "title": "Thế năng điện",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -851,7 +798,6 @@
             "num": "20",
             "title": "Điện thế",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -861,7 +807,6 @@
             "num": "21",
             "title": "Tụ điện",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -902,7 +847,6 @@
             "num": "22",
             "title": "Cường độ dòng điện",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -912,7 +856,6 @@
             "num": "23",
             "title": "Điện trở. Định luật Ohm",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -922,7 +865,6 @@
             "num": "24",
             "title": "Nguồn điện",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -932,7 +874,6 @@
             "num": "25",
             "title": "Năng lượng điện và công suất điện",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -942,7 +883,6 @@
             "num": "26",
             "title": "Thực hành: Đo suất điện động và điện trở trong",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -989,7 +929,6 @@
             "num": "01",
             "title": "Cấu trúc của chất. Sự chuyển thể",
             "links": {
-              "video": "#",
               "tracNghiem": "tracnghiem.html?quiz=cauhoi_12_c1_b01",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -999,7 +938,6 @@
             "num": "02",
             "title": "Nội năng. Định luật I của nhiệt động lực học",
             "links": {
-              "video": "#",
               "tracNghiem": "tracnghiem.html?quiz=cauhoi_12_c1_b02",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1009,7 +947,6 @@
             "num": "03",
             "title": "Nhiệt độ. Thang nhiệt độ - nhiệt kế",
             "links": {
-              "video": "#",
               "tracNghiem": "tracnghiem.html?quiz=cauhoi_12_c1_b03",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1019,7 +956,6 @@
             "num": "04",
             "title": "Nhiệt dung riêng",
             "links": {
-              "video": "#",
               "tracNghiem": "tracnghiem.html?quiz=cauhoi_12_c1_b04",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1029,7 +965,6 @@
             "num": "05",
             "title": "Nhiệt nóng chảy riêng",
             "links": {
-              "video": "#",
               "tracNghiem": "tracnghiem.html?quiz=cauhoi_12_c1_b05",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1039,7 +974,6 @@
             "num": "06",
             "title": "Nhiệt hoá hơi riêng",
             "links": {
-              "video": "#",
               "tracNghiem": "tracnghiem.html?quiz=cauhoi_12_c1_b06",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1049,7 +983,6 @@
             "num": "07",
             "title": "Bài tập về vật lí nhiệt",
             "links": {
-              "video": "#",
               "tracNghiem": "tracnghiem.html?quiz=cauhoi_12_c1_b07",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1090,7 +1023,6 @@
             "num": "08",
             "title": "Mô hình động học phân tử chất khí",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1100,7 +1032,6 @@
             "num": "09",
             "title": "Định luật Boyle",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1110,7 +1041,6 @@
             "num": "10",
             "title": "Định luật Charles",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1120,7 +1050,6 @@
             "num": "11",
             "title": "Phương trình trạng thái của khí lí tưởng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1130,7 +1059,6 @@
             "num": "12",
             "title": "Áp suất khí theo mô hình động học phân tử. Quan hệ giữa động năng phân tử và nhiệt độ",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1140,7 +1068,6 @@
             "num": "13",
             "title": "Bài tập về khí lí tưởng",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1181,7 +1108,6 @@
             "num": "14",
             "title": "Từ trường",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1191,7 +1117,6 @@
             "num": "15",
             "title": "Lực từ tác dụng lên dây dẫn mang dòng điện. Cảm ứng từ",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1201,7 +1126,6 @@
             "num": "16",
             "title": "Từ thông. Hiện tượng cảm ứng điện từ",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1211,7 +1135,6 @@
             "num": "17",
             "title": "Máy phát điện xoay chiều",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1221,7 +1144,6 @@
             "num": "18",
             "title": "Ứng dụng hiện tượng cảm ứng điện từ",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1231,7 +1153,6 @@
             "num": "19",
             "title": "Điện từ trường. Mô hình sóng điện từ",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1241,7 +1162,6 @@
             "num": "20",
             "title": "Bài tập về từ trường",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1282,7 +1202,6 @@
             "num": "21",
             "title": "Cấu trúc hạt nhân",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1292,7 +1211,6 @@
             "num": "22",
             "title": "Phản ứng hạt nhân và năng lượng liên kết",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1302,7 +1220,6 @@
             "num": "23",
             "title": "Hiện tượng phóng xạ",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1312,7 +1229,6 @@
             "num": "24",
             "title": "Công nghiệp hạt nhân",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
@@ -1322,7 +1238,6 @@
             "num": "25",
             "title": "Bài tập về vật lí hạt nhân",
             "links": {
-              "video": "#",
               "tracNghiem": "#",
               "dungSai": "#",
               "traLoiNgan": "#"
