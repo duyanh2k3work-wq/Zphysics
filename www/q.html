@@ -1982,6 +1982,38 @@
         const total = quizData.length;
         document.getElementById('submitBtn').disabled = getAnsweredCount() < total;
       }
+    // So sánh đáp án trả lời ngắn (chấp nhận cả dấu chấm và dấu phẩy, ví dụ: 1.5 và 1,5)
+    function isShortAnswerMatch(studentAns, correctAns) {
+      if (studentAns === undefined || studentAns === null) return false;
+      if (correctAns === undefined || correctAns === null) return false;
+
+      const s = String(studentAns).trim().toLowerCase();
+      const c = String(correctAns).trim().toLowerCase();
+
+      if (!s || !c) return false;
+      if (s === c) return true;
+
+      // Hỗ trợ trường hợp đáp án có nhiều phương án đúng phân tách bởi dấu gạch đứng (|)
+      const options = c.includes('|') ? c.split('|').map(opt => opt.trim()).filter(Boolean) : [c];
+
+      for (const opt of options) {
+        if (s === opt) return true;
+
+        // Chuẩn hóa dấu phẩy (,) thành dấu chấm (.) và loại bỏ khoảng trắng thừa
+        const sNorm = s.replace(/,/g, '.').replace(/\s+/g, '');
+        const optNorm = opt.replace(/,/g, '.').replace(/\s+/g, '');
+
+        if (sNorm === optNorm) return true;
+
+        // So sánh theo giá trị số nếu cả hai đều là số hợp lệ
+        const sNum = Number(sNorm);
+        const optNum = Number(optNorm);
+        if (!isNaN(sNum) && !isNaN(optNum) && sNorm !== '' && optNorm !== '') {
+          if (Math.abs(sNum - optNum) < 1e-6) return true;
+        }
+      }
+
+      return false;
     }
 
     // ── Chấm điểm từng câu riêng biệt trong chế độ ôn tập ──
@@ -2048,7 +2080,7 @@
         const inp = document.getElementById(`short-answer-${q.id}`);
         const studentAns = inp ? inp.value.trim().toLowerCase() : '';
         const correctAns = q.correct ? q.correct.toString().trim().toLowerCase() : '';
-        isCorrect = (studentAns === correctAns);
+        isCorrect = isShortAnswerMatch(studentAns, correctAns);
 
         if (inp) {
           inp.disabled = true;
@@ -2405,7 +2437,7 @@
           const inp = document.getElementById(`short-answer-${q.id}`);
           const studentAns = inp ? inp.value.trim().toLowerCase() : '';
           const correctAns = q.correct ? q.correct.toString().trim().toLowerCase() : '';
-          isCorrect = (studentAns === correctAns);
+          isCorrect = isShortAnswerMatch(studentAns, correctAns);
           studentAnsText = inp ? inp.value.trim() : '';
           if (!studentAnsText) studentAnsText = 'Bỏ trống';
 
@@ -2423,7 +2455,7 @@
           if (isCorrect) {
             score += quizFile.startsWith('baitap_') ? 0.25 : 1;
           } else {
-            wrongAnswersList.push(`Câu ${index + 1}: Chọn "${studentAnsText}" (Đáp án đúng: ${q.correct})`);
+            wrongAnswersList.push(`Câu ${index + 1}: Điền "${studentAnsText}" (Đáp án đúng: ${q.correct})`);
           }
         }
 

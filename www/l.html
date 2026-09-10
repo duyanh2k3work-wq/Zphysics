@@ -1248,6 +1248,40 @@
       }).catch(err => console.error('Lỗi lưu tiến trình:', err));
     }
 
+    // So sánh đáp án trả lời ngắn (chấp nhận cả dấu chấm và dấu phẩy, ví dụ: 1.5 và 1,5)
+    function isShortAnswerMatch(studentAns, correctAns) {
+      if (studentAns === undefined || studentAns === null) return false;
+      if (correctAns === undefined || correctAns === null) return false;
+
+      const s = String(studentAns).trim().toLowerCase();
+      const c = String(correctAns).trim().toLowerCase();
+
+      if (!s || !c) return false;
+      if (s === c) return true;
+
+      // Hỗ trợ trường hợp đáp án có nhiều phương án đúng phân tách bởi dấu gạch đứng (|)
+      const options = c.includes('|') ? c.split('|').map(opt => opt.trim()).filter(Boolean) : [c];
+
+      for (const opt of options) {
+        if (s === opt) return true;
+
+        // Chuẩn hóa dấu phẩy (,) thành dấu chấm (.) và loại bỏ khoảng trắng thừa
+        const sNorm = s.replace(/,/g, '.').replace(/\s+/g, '');
+        const optNorm = opt.replace(/,/g, '.').replace(/\s+/g, '');
+
+        if (sNorm === optNorm) return true;
+
+        // So sánh theo giá trị số nếu cả hai đều là số hợp lệ
+        const sNum = Number(sNorm);
+        const optNum = Number(optNorm);
+        if (!isNaN(sNum) && !isNaN(optNum) && sNorm !== '' && optNorm !== '') {
+          if (Math.abs(sNum - optNum) < 1e-6) return true;
+        }
+      }
+
+      return false;
+    }
+
     // ── NỘP BÀI VÀ CHẤM ĐIỂM ──
     function submitExam(isTimeout = false) {
       if (submitted) return;
@@ -1376,7 +1410,7 @@
         const studentVal = input ? input.value.trim().toLowerCase() : '';
 
         if (input) {
-          if (studentVal === correctVal) {
+          if (isShortAnswerMatch(studentVal, correctVal)) {
             input.classList.add('is-correct');
             scorePart3 += 0.25;
           } else {
