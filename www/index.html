@@ -3149,16 +3149,29 @@
     // ── Fetch JSON + Google Sheets links và khởi động ──
     async function initApp() {
       try {
-        // Tải baihoc.json trước
+        // 1. Tải trước từ cache đề thi để hiển thị đề VIP tức thì (<10ms)
+        try {
+          const cachedExams = localStorage.getItem('zphysics_exams_cache');
+          if (cachedExams) {
+            const parsed = JSON.parse(cachedExams);
+            if (Array.isArray(parsed) && parsed.length > 0) mockExams = parsed;
+          }
+        } catch(e) {}
+
+        // 2. Tải baihoc.json trước và render ngay lập tức (<50ms), không để người dùng phải chờ Supabase
         const baihocPromise = fetch('baihoc.json').then(res => {
           if (!res.ok) throw new Error('Không thể tải baihoc.json');
           return res.json();
         });
 
-        const abortCtrl = new AbortController();
-        const timeoutId = setTimeout(() => abortCtrl.abort(), 3500);
+        const baihocData = await baihocPromise;
+        globalLessonsData = baihocData;
+        renderAll(baihocData);
 
-        // Tải danh sách đề thi luyện đề VIP từ Supabase (có timeout 3.5s)
+        const abortCtrl = new AbortController();
+        const timeoutId = setTimeout(() => abortCtrl.abort(), 4000);
+
+        // 3. Tải danh sách đề thi luyện đề VIP từ Supabase trong nền
         const luyendePromise = fetch(`${SUPABASE_URL}/rest/v1/exams?select=*`, {
           signal: abortCtrl.signal,
           headers: {
@@ -3182,7 +3195,6 @@
           })
           .catch(err => {
             console.warn('Lỗi tải đề từ Supabase, chuyển sang dùng luyende.json offline:', err);
-            // Thử lấy từ cache localStorage trước
             try {
               const cached = localStorage.getItem('zphysics_exams_cache');
               if (cached) {
@@ -3190,13 +3202,12 @@
                 if (Array.isArray(parsed) && parsed.length > 0) return parsed;
               }
             } catch(e) {}
-            // Fallback sang luyende.json cục bộ
             return fetch('luyende.json?v=' + Date.now())
               .then(res => res.json())
               .catch(() => []);
           });
 
-        // Tải các link động từ Supabase (có timeout 3.5s)
+        // Tải các link động từ Supabase
         const linksPromise = fetch(`${SUPABASE_URL}/rest/v1/lessons?select=*`, {
           signal: abortCtrl.signal,
           headers: {
@@ -3231,59 +3242,65 @@
           }).then(res => res.ok ? res.json() : []).catch(() => []);
         }
 
-        const [baihocData, sheetLinks, luyendeData, progressData] = await Promise.all([baihocPromise, linksPromise, luyendePromise, progressPromise]);
-        clearTimeout(timeoutId);
+        // 4. Đồng bộ dữ liệu Supabase ngầm và làm mới giao diện mượt mà khi dữ liệu về
+        Promise.all([linksPromise, luyendePromise, progressPromise]).then(([sheetLinks, luyendeData, progressData]) => {
+          clearTimeout(timeoutId);
+          let needUpdate = false;
 
-        if (luyendeData && luyendeData.length > 0) {
-          mockExams = luyendeData;
-          try {
-            localStorage.setItem('zphysics_exams_cache', JSON.stringify(luyendeData));
-          } catch(e) {}
-        }
+          if (luyendeData && luyendeData.length > 0) {
+            mockExams = luyendeData;
+            try {
+              localStorage.setItem('zphysics_exams_cache', JSON.stringify(luyendeData));
+            } catch(e) {}
+            needUpdate = true;
+          }
 
-        if (progressData && progressData.length > 0) {
-          progressData.forEach(p => {
-            if (p.score == null || p.score >= 8.0) {
-              studentProgressMap[p.lesson_id] = (studentProgressMap[p.lesson_id] || 0) + 1;
-            }
-          });
-        }
+          if (progressData && progressData.length > 0) {
+            progressData.forEach(p => {
+              if (p.score == null || p.score >= 8.0) {
+                studentProgressMap[p.lesson_id] = (studentProgressMap[p.lesson_id] || 0) + 1;
+              }
+            });
+            needUpdate = true;
+          }
 
-        // Trộn các link từ Sheet vào cấu trúc baihoc.json
-        if (sheetLinks && sheetLinks.length > 0) {
-          baihocData.forEach(gradeObj => {
-            const gNum = gradeObj.grade.match(/\d+/) ? gradeObj.grade.match(/\d+/)[0] : '';
+          if (sheetLinks && sheetLinks.length > 0) {
+            baihocData.forEach(gradeObj => {
+              const gNum = gradeObj.grade.match(/\d+/) ? gradeObj.grade.match(/\d+/)[0] : '';
 
-            gradeObj.chapters.forEach(ch => {
-              ch.lessons.forEach(l => {
-                const matched = sheetLinks.find(sl => {
-                  if (!sl.lop || !sl.bai) return false;
-                  const slLopNum = String(sl.lop).match(/\d+/) ? String(sl.lop).match(/\d+/)[0] : '';
-                  if (slLopNum !== gNum) return false;
+              gradeObj.chapters.forEach(ch => {
+                ch.lessons.forEach(l => {
+                  const matched = sheetLinks.find(sl => {
+                    if (!sl.lop || !sl.bai) return false;
+                    const slLopNum = String(sl.lop).match(/\d+/) ? String(sl.lop).match(/\d+/)[0] : '';
+                    if (slLopNum !== gNum) return false;
 
-                  const slBaiNum = String(sl.bai).match(/\d+/) ? String(sl.bai).match(/\d+/)[0] : '';
-                  const lNumClean = String(l.num).match(/\d+/) ? String(l.num).match(/\d+/)[0] : '';
-                  return slBaiNum && lNumClean && parseInt(slBaiNum, 10) === parseInt(lNumClean, 10);
+                    const slBaiNum = String(sl.bai).match(/\d+/) ? String(sl.bai).match(/\d+/)[0] : '';
+                    const lNumClean = String(l.num).match(/\d+/) ? String(l.num).match(/\d+/)[0] : '';
+                    return slBaiNum && lNumClean && parseInt(slBaiNum, 10) === parseInt(lNumClean, 10);
+                  });
+
+                  if (matched) {
+                    if (!l.links) l.links = {};
+                    if (matched.video && matched.video.trim() !== '' && matched.video.trim() !== '#') {
+                      l.links.video = matched.video.trim();
+                    } else {
+                      delete l.links.video;
+                    }
+                    if (matched.baiTap && matched.baiTap.trim() !== '' && matched.baiTap.trim() !== '#') {
+                      l.links.baiTap = matched.baiTap.trim();
+                    }
+                  }
                 });
-
-                if (matched) {
-                  if (!l.links) l.links = {};
-                  if (matched.video && matched.video.trim() !== '' && matched.video.trim() !== '#') {
-                    l.links.video = matched.video.trim();
-                  } else {
-                    delete l.links.video;
-                  }
-                  if (matched.baiTap && matched.baiTap.trim() !== '' && matched.baiTap.trim() !== '#') {
-                    l.links.baiTap = matched.baiTap.trim();
-                  }
-                }
               });
             });
-          });
-        }
+            needUpdate = true;
+          }
 
-        globalLessonsData = baihocData;
-        renderAll(baihocData);
+          if (needUpdate) {
+            renderAll(baihocData);
+          }
+        });
       } catch (err) {
         console.error(err);
         document.getElementById('gradeContent').innerHTML =

@@ -931,7 +931,7 @@
     let currentMobileView = 'pdf'; // 'pdf' hoặc 'answers'
 
     // ── KHỞI TẠO TRANG ──
-    window.addEventListener('DOMContentLoaded', async () => {
+    async function initExamPage() {
       // Điền sẵn tên học sinh nếu có trong session
       const nameInput = document.getElementById('studentName');
       if (currentSession && currentSession.ten) {
@@ -1047,7 +1047,13 @@
       };
 
       fetchExamData();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initExamPage);
+    } else {
+      initExamPage();
+    }
 
     function showError(msg) {
       document.getElementById('loadingOverlay').innerHTML = 
@@ -1524,7 +1530,7 @@
   </script>
 
   <!-- BACKGROUND MUSIC CONTROLLER -->
-  <audio id="bgMusic" loop src="assets/alla-turca.mp3"></audio>
+  <audio id="bgMusic" loop preload="none"></audio>
 
   <script>
     // ── GENTLE BACKGROUND MUSIC SYSTEM ──
@@ -1532,37 +1538,31 @@
       const audio = document.getElementById('bgMusic');
       if (!audio) return;
       
-      // Set volume soft by default
       audio.volume = 0.35;
       
-      // Play immediately (might be blocked by browser)
-      audio.play().catch(() => {
-        console.warn("Autoplay blocked by browser. Music will play upon user interaction.");
-      });
-      
-      // Play on first user interaction (click, scroll, keydown, touchstart)
+      // Chỉ tải và phát nhạc nhẹ khi người dùng đã chủ động tương tác, tuyệt đối không tải chặn mạng khi load đề
       const playOnFirstInteraction = () => {
-        if (!audio.paused) {
-          // Already playing, remove listeners
-          events.forEach(event => document.removeEventListener(event, playOnFirstInteraction));
-          return;
+        if (!audio.src || !audio.src.includes('alla-turca.mp3')) {
+          audio.src = 'assets/alla-turca.mp3';
         }
-        audio.play().then(() => {
-          // Play succeeded! Safe to remove listeners.
+        if (audio.paused) {
+          audio.play().then(() => {
+            events.forEach(event => document.removeEventListener(event, playOnFirstInteraction));
+          }).catch(() => {});
+        } else {
           events.forEach(event => document.removeEventListener(event, playOnFirstInteraction));
-        }).catch(err => {
-          console.warn("Play failed on interaction, will retry on next interaction:", err);
-        });
+        }
       };
       
-      const events = ['click', 'touchstart', 'keydown', 'scroll'];
-      events.forEach(event => document.addEventListener(event, playOnFirstInteraction));
+      const events = ['click', 'touchstart', 'keydown'];
+      events.forEach(event => document.addEventListener(event, playOnFirstInteraction, { passive: true }));
     }
     
-    // Initialize when page loads
-    window.addEventListener('DOMContentLoaded', () => {
-      initMusicPlayer();
-    });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => setTimeout(initMusicPlayer, 500));
+    } else {
+      setTimeout(initMusicPlayer, 500);
+    }
   </script>
 </body>
 
