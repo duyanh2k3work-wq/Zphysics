@@ -981,20 +981,15 @@
         }
       } catch (e) {}
 
-      // 2. Fetch Supabase (có timeout 3.5s) để nạp hoặc cập nhật dữ liệu mới nhất
+      // 2. Fetch Supabase (không timeout, để trình duyệt tự quản lý như bản gốc)
       const fetchExamData = async () => {
         try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 3500);
-
           const response = await fetch(`${SUPABASE_URL}/rest/v1/exams?select=*`, {
-            signal: controller.signal,
             headers: {
               'apikey': SUPABASE_ANON_KEY,
               'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
             }
           });
-          clearTimeout(timeoutId);
           if (!response.ok) throw new Error('HTTP ' + response.status);
           const data = await response.json();
           const freshList = data.map(item => ({

@@ -1601,7 +1601,7 @@
         }
       } catch (e) {}
 
-      // 2. Fetch Supabase (timeout 4s) để đồng bộ câu hỏi mới nhất
+      // 2. Fetch Supabase (không timeout, để trình duyệt tự quản lý như bản gốc)
       let url = `${SUPABASE_URL}/rest/v1/questions?made=eq.${encodeURIComponent(quizFile)}&select=*`;
       
       if (quizFile.startsWith('baitap_') || quizFile.startsWith('ontap_')) {
@@ -1611,18 +1611,13 @@
         url = `${SUPABASE_URL}/rest/v1/questions?made=in.(${encodeURIComponent(inVals)})&select=*`;
       }
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-
       fetch(url, {
-        signal: controller.signal,
         headers: {
           'apikey': SUPABASE_ANON_KEY,
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
         }
       })
         .then(res => {
-          clearTimeout(timeoutId);
           if (!res.ok) throw new Error('HTTP ' + res.status);
           return res.json();
         })
@@ -1641,26 +1636,12 @@
           }
         })
         .catch(err => {
-          clearTimeout(timeoutId);
-          console.warn('Supabase chậm hoặc không khả dụng:', err);
+          console.error(err);
           if (!hasRendered) {
-            // Thử fallback sang file json cục bộ nếu có
-            const fallbackFile = quizFile.startsWith('ontap_') ? 'baitap_' + quizFile.substring('ontap_'.length) : quizFile;
-            fetch(fallbackFile + '.json')
-              .then(r => r.ok ? r.json() : Promise.reject('No fallback file'))
-              .then(offlineData => {
-                if (offlineData && Array.isArray(offlineData) && offlineData.length > 0) {
-                  processQuizData(offlineData);
-                } else {
-                  throw err;
-                }
-              })
-              .catch(() => {
-                document.getElementById('quizContainer').innerHTML =
-                  '<div class="loading"><p style="color:#e53935;font-weight:700;font-size:14px">⚠️ Không tải được đề từ Database Supabase.<br><small style="font-weight:600;opacity:.7">'
-                  + (err.message || 'Hãy kiểm tra lại kết nối mạng và mã đề thi.')
-                  + '</small></p></div>';
-              });
+            document.getElementById('quizContainer').innerHTML =
+              '<div class="loading"><p style="color:#e53935;font-weight:700;font-size:14px">⚠️ Không tải được đề từ Database Supabase.<br><small style="font-weight:600;opacity:.7">'
+              + (err.message || 'Hãy kiểm tra lại kết nối mạng và mã đề thi.')
+              + '</small></p></div>';
           }
         });
     }
@@ -2038,6 +2019,8 @@
         const total = quizData.length;
         document.getElementById('submitBtn').disabled = getAnsweredCount() < total;
       }
+    }
+
     // So sánh đáp án trả lời ngắn (chấp nhận cả dấu chấm và dấu phẩy, ví dụ: 1.5 và 1,5)
     function isShortAnswerMatch(studentAns, correctAns) {
       if (studentAns === undefined || studentAns === null) return false;
