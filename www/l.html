@@ -964,62 +964,89 @@
       });
 
 
-      // Tải đề từ Supabase đầu tiên, nếu lỗi thì dùng luyende.json offline
+      // ── TỐI ƯU TẢI ĐỀ (CACHE-FIRST + ĐỒNG BỘ NGẦM) ──
       let list = [];
+
+      // 1. Đọc từ cache localStorage để hiển thị đề tức thì (< 50ms)
       try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/exams?select=*`, {
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        const cached = localStorage.getItem('zphysics_exams_cache');
+        if (cached) {
+          list = JSON.parse(cached);
+          if (Array.isArray(list) && list.length > 0) {
+            examData = list.find(e => e.id === examId) || list[0];
+            if (examData) {
+              initExam(examData);
+            }
           }
-        });
-        if (!response.ok) throw new Error('Không thể tải từ Supabase');
-        const data = await response.json();
-        list = data.map(item => ({
-          ...item,
-          desc: item.description, // Khớp cấu trúc frontend
-          lop: item.grade,         // Khớp trường lop để đồng bộ lớp
-          pdfUrl: item.pdf_url,     // Khớp trường pdfUrl
-          videoUrl: item.video_url, // Khớp trường videoUrl
-          mcAnswers: item.mc_answers,
-          tfAnswers: item.tf_answers,
-          saAnswers: item.sa_answers
-        }));
-      } catch (err) {
-        console.warn('Lỗi tải Supabase, dùng file luyende.json offline:', err);
+        }
+      } catch (e) {}
+
+      // 2. Fetch Supabase (có timeout 3.5s) để nạp hoặc cập nhật dữ liệu mới nhất
+      const fetchExamData = async () => {
         try {
-          const response = await fetch('luyende.json?v=' + Date.now());
-          if (response.ok) {
-            list = await response.json();
-          } else {
-            throw new Error('CORS or offline');
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+          const response = await fetch(`${SUPABASE_URL}/rest/v1/exams?select=*`, {
+            signal: controller.signal,
+            headers: {
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            }
+          });
+          clearTimeout(timeoutId);
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          const data = await response.json();
+          const freshList = data.map(item => ({
+            ...item,
+            desc: item.description,
+            lop: item.grade,
+            pdfUrl: item.pdf_url,
+            videoUrl: item.video_url,
+            mcAnswers: item.mc_answers,
+            tfAnswers: item.tf_answers,
+            saAnswers: item.sa_answers
+          }));
+
+          if (freshList && freshList.length > 0) {
+            try {
+              localStorage.setItem('zphysics_exams_cache', JSON.stringify(freshList));
+            } catch(e) {}
+            // Nếu ban đầu chưa có đề nào được nạp từ cache
+            if (!examData) {
+              examData = freshList.find(e => e.id === examId) || freshList[0];
+              if (examData) initExam(examData);
+            }
           }
-        } catch (e) {
-          console.error('Không thể tải luyende.json:', e);
+        } catch (err) {
+          console.warn('Supabase chậm hoặc lỗi, dùng dữ liệu offline:', err);
+          // Nếu chưa có đề hiển thị, nạp từ file luyende.json cục bộ
+          if (!examData) {
+            try {
+              const res = await fetch('luyende.json?v=' + Date.now());
+              if (res.ok) {
+                const offlineList = await res.json();
+                try {
+                  localStorage.setItem('zphysics_exams_cache', JSON.stringify(offlineList));
+                } catch(e) {}
+                examData = offlineList.find(e => e.id === examId) || offlineList[0];
+                if (examData) {
+                  initExam(examData);
+                } else {
+                  showError('Không tìm thấy thông tin đề thi.');
+                }
+              } else {
+                showError('Không thể tải dữ liệu đề thi.');
+              }
+            } catch (e) {
+              console.error('Không thể tải luyende.json:', e);
+              showError('Không thể tải dữ liệu đề thi.');
+            }
+          }
         }
-      }
+      };
 
-      try {
-        if (!list || list.length === 0) {
-          throw new Error('Danh sách đề thi trống.');
-        }
-        
-        // Tìm đề thi tương ứng
-        examData = list.find(e => e.id === examId);
-        if (!examData) {
-          // fallback sang đề đầu tiên nếu không khớp mã đề
-          examData = list[0];
-        }
-
-        if (examData) {
-          initExam(examData);
-        } else {
-          showError('Không tìm thấy thông tin đề thi.');
-        }
-      } catch (err) {
-        console.error(err);
-        showError('Không thể tải dữ liệu đề thi.');
-      }
+      fetchExamData();
     });
 
     function showError(msg) {

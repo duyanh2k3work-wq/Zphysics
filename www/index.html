@@ -3155,8 +3155,12 @@
           return res.json();
         });
 
-        // Tải danh sách đề thi luyện đề VIP từ Supabase
+        const abortCtrl = new AbortController();
+        const timeoutId = setTimeout(() => abortCtrl.abort(), 3500);
+
+        // Tải danh sách đề thi luyện đề VIP từ Supabase (có timeout 3.5s)
         const luyendePromise = fetch(`${SUPABASE_URL}/rest/v1/exams?select=*`, {
+          signal: abortCtrl.signal,
           headers: {
             'apikey': SUPABASE_ANON_KEY,
             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
@@ -3178,14 +3182,23 @@
           })
           .catch(err => {
             console.warn('Lỗi tải đề từ Supabase, chuyển sang dùng luyende.json offline:', err);
+            // Thử lấy từ cache localStorage trước
+            try {
+              const cached = localStorage.getItem('zphysics_exams_cache');
+              if (cached) {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+              }
+            } catch(e) {}
             // Fallback sang luyende.json cục bộ
             return fetch('luyende.json?v=' + Date.now())
               .then(res => res.json())
               .catch(() => []);
           });
 
-        // Tải các link động từ Supabase
+        // Tải các link động từ Supabase (có timeout 3.5s)
         const linksPromise = fetch(`${SUPABASE_URL}/rest/v1/lessons?select=*`, {
+          signal: abortCtrl.signal,
           headers: {
             'apikey': SUPABASE_ANON_KEY,
             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
@@ -3210,6 +3223,7 @@
         let progressPromise = Promise.resolve([]);
         if (session && session.premium && session.gmail && !session.gmail.startsWith('demo_')) {
           progressPromise = fetch(`${SUPABASE_URL}/rest/v1/student_progress?email=eq.${encodeURIComponent(session.gmail)}&select=*`, {
+            signal: abortCtrl.signal,
             headers: {
               'apikey': SUPABASE_ANON_KEY,
               'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
@@ -3218,9 +3232,13 @@
         }
 
         const [baihocData, sheetLinks, luyendeData, progressData] = await Promise.all([baihocPromise, linksPromise, luyendePromise, progressPromise]);
+        clearTimeout(timeoutId);
 
         if (luyendeData && luyendeData.length > 0) {
           mockExams = luyendeData;
+          try {
+            localStorage.setItem('zphysics_exams_cache', JSON.stringify(luyendeData));
+          } catch(e) {}
         }
 
         if (progressData && progressData.length > 0) {

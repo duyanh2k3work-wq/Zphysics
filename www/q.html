@@ -1510,7 +1510,96 @@
     }
     loadLessonInfo();
 
+    function processQuizData(data) {
+      if (!data || !Array.isArray(data) || data.length === 0) return false;
+
+      let part1 = [];
+      let part2 = [];
+      let part3 = [];
+
+      data.forEach(item => {
+        let type = 'cauhoi';
+        if (item.type) {
+          type = item.type;
+        } else if (item.made) {
+          if (item.made.startsWith('đs')) type = 'đs';
+          else if (item.made.startsWith('tln')) type = 'tln';
+        }
+
+        const q = {
+          id: item.id,
+          type: type,
+          question: item.question,
+          answers: item.answers || [
+            { key: 'A', text: item.a },
+            { key: 'B', text: item.b },
+            { key: 'C', text: item.c },
+            { key: 'D', text: item.d }
+          ],
+          correct: item.correct,
+          explanation: item.explanation
+        };
+
+        if (type === 'cauhoi') part1.push(q);
+        else if (type === 'đs') part2.push(q);
+        else part3.push(q);
+      });
+
+      const shuffle = (arr) => {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      };
+
+      part1 = shuffle(part1);
+      part2 = shuffle(part2);
+      part3 = shuffle(part3);
+
+      if (quizFile.startsWith('baitap_')) {
+        part1 = part1.slice(0, 9);
+        part2 = part2.slice(0, 2);
+        part3 = part3.slice(0, 3);
+      } else if (quizFile.startsWith('ontap_')) {
+        // Chế độ ôn tập: không slice, lấy toàn bộ câu hỏi
+      } else if (quizFile.startsWith('cauhoi')) {
+        part1 = part1.slice(0, 18); part2 = []; part3 = [];
+      } else if (quizFile.startsWith('đs')) {
+        part2 = part2.slice(0, 4); part1 = []; part3 = [];
+      } else if (quizFile.startsWith('tln')) {
+        part3 = part3.slice(0, 6); part1 = []; part2 = [];
+      }
+
+      let mappedData = [...part1, ...part2, ...part3];
+      
+      // Trộn ngẫu nhiên tất cả các phần nếu là chế độ ôn tập
+      if (quizFile.startsWith('ontap_')) {
+        mappedData = shuffle(mappedData);
+      }
+      
+      quizData = mappedData;
+      renderQuiz(mappedData);
+      startTimer();
+      return true;
+    }
+
     function loadQuizFromSupabase() {
+      const cacheKey = 'zphysics_quiz_cache_' + quizFile;
+      let hasRendered = false;
+
+      // 1. Kiểm tra cache local để nạp đề tức thì (< 50ms)
+      try {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          const cachedData = JSON.parse(cached);
+          if (Array.isArray(cachedData) && cachedData.length > 0) {
+            hasRendered = processQuizData(cachedData);
+          }
+        }
+      } catch (e) {}
+
+      // 2. Fetch Supabase (timeout 4s) để đồng bộ câu hỏi mới nhất
       let url = `${SUPABASE_URL}/rest/v1/questions?made=eq.${encodeURIComponent(quizFile)}&select=*`;
       
       if (quizFile.startsWith('baitap_') || quizFile.startsWith('ontap_')) {
@@ -1520,92 +1609,57 @@
         url = `${SUPABASE_URL}/rest/v1/questions?made=in.(${encodeURIComponent(inVals)})&select=*`;
       }
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+
       fetch(url, {
+        signal: controller.signal,
         headers: {
           'apikey': SUPABASE_ANON_KEY,
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
         }
       })
         .then(res => {
+          clearTimeout(timeoutId);
           if (!res.ok) throw new Error('HTTP ' + res.status);
           return res.json();
         })
         .then(data => {
           if (!data || !Array.isArray(data) || data.length === 0) {
-            throw new Error('Đề thi trống hoặc mã đề không chính xác');
+            if (!hasRendered) throw new Error('Đề thi trống hoặc mã đề không chính xác');
+            return;
           }
 
-          let part1 = [];
-          let part2 = [];
-          let part3 = [];
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+          } catch(e) {}
 
-          data.forEach(item => {
-            let type = 'cauhoi';
-            if (item.made.startsWith('đs')) type = 'đs';
-            else if (item.made.startsWith('tln')) type = 'tln';
-
-            const q = {
-              id: item.id,
-              type: type,
-              question: item.question,
-              answers: [
-                { key: 'A', text: item.a },
-                { key: 'B', text: item.b },
-                { key: 'C', text: item.c },
-                { key: 'D', text: item.d }
-              ],
-              correct: item.correct,
-              explanation: item.explanation
-            };
-
-            if (type === 'cauhoi') part1.push(q);
-            else if (type === 'đs') part2.push(q);
-            else part3.push(q);
-          });
-
-          const shuffle = (arr) => {
-            for (let i = arr.length - 1; i > 0; i--) {
-              const j = Math.floor(Math.random() * (i + 1));
-              [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-          };
-
-          part1 = shuffle(part1);
-          part2 = shuffle(part2);
-          part3 = shuffle(part3);
-
-          if (quizFile.startsWith('baitap_')) {
-            part1 = part1.slice(0, 9);
-            part2 = part2.slice(0, 2);
-            part3 = part3.slice(0, 3);
-          } else if (quizFile.startsWith('ontap_')) {
-            // Chế độ ôn tập: không slice, lấy toàn bộ câu hỏi
-          } else if (quizFile.startsWith('cauhoi')) {
-            part1 = part1.slice(0, 18); part2 = []; part3 = [];
-          } else if (quizFile.startsWith('đs')) {
-            part2 = part2.slice(0, 4); part1 = []; part3 = [];
-          } else if (quizFile.startsWith('tln')) {
-            part3 = part3.slice(0, 6); part1 = []; part2 = [];
+          if (!hasRendered) {
+            processQuizData(data);
           }
-
-          let mappedData = [...part1, ...part2, ...part3];
-          
-          // Trộn ngẫu nhiên tất cả các phần nếu là chế độ ôn tập
-          if (quizFile.startsWith('ontap_')) {
-            mappedData = shuffle(mappedData);
-          }
-          
-          quizData = mappedData;
-          renderQuiz(mappedData);
-          startTimer();
         })
         .catch(err => {
-          console.error(err);
-          document.getElementById('quizContainer').innerHTML =
-            '<div class="loading"><p style="color:#e53935;font-weight:700;font-size:14px">⚠️ Không tải được đề từ Database Supabase.<br><small style="font-weight:600;opacity:.7">'
-            + (err.message || 'Hãy kiểm tra lại kết nối mạng và mã đề thi.')
-            + '</small></p></div>';
+          clearTimeout(timeoutId);
+          console.warn('Supabase chậm hoặc không khả dụng:', err);
+          if (!hasRendered) {
+            // Thử fallback sang file json cục bộ nếu có
+            const fallbackFile = quizFile.startsWith('ontap_') ? 'baitap_' + quizFile.substring('ontap_'.length) : quizFile;
+            fetch(fallbackFile + '.json')
+              .then(r => r.ok ? r.json() : Promise.reject('No fallback file'))
+              .then(offlineData => {
+                if (offlineData && Array.isArray(offlineData) && offlineData.length > 0) {
+                  processQuizData(offlineData);
+                } else {
+                  throw err;
+                }
+              })
+              .catch(() => {
+                document.getElementById('quizContainer').innerHTML =
+                  '<div class="loading"><p style="color:#e53935;font-weight:700;font-size:14px">⚠️ Không tải được đề từ Database Supabase.<br><small style="font-weight:600;opacity:.7">'
+                  + (err.message || 'Hãy kiểm tra lại kết nối mạng và mã đề thi.')
+                  + '</small></p></div>';
+              });
+          }
         });
     }
 
