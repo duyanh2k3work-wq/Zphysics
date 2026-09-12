@@ -95,14 +95,19 @@ function onEditInstalled(e) {
       syncLessonsToSupabase();
     } else if (sheetName === 'luyende') {
       // Đồng bộ danh sách đề thi VIP
-      var vals = sheet.getRange(row, 1, 1, 10).getValues()[0];
+      var vals = sheet.getRange(row, 1, 1, 11).getValues()[0];
       var id = trimCell(vals[0]);
       var title = trimCell(vals[1]);
+      var desc = trimCell(vals[2]) || "Đề luyện thi VIP";
+      var openAt = formatScheduleTime(vals[10]);
+      if (openAt && desc.indexOf('[OPEN:') === -1) {
+        desc = desc + ' [OPEN: ' + openAt + ']';
+      }
       if (id) {
         var payload = {
           id: id,
           title: title,
-          description: trimCell(vals[2]) || "Đề luyện thi VIP",
+          description: desc,
           pdf_url: trimCell(vals[3]),
           mc_answers: trimCell(vals[4]),
           tf_answers: trimCell(vals[5]),
@@ -360,6 +365,10 @@ function syncExamsToSupabase() {
     var duration = trimCell(row[7]);
     var lop = trimCell(row[8]);
     var videoUrl = trimCell(row[9]);
+    var openAt = formatScheduleTime(row[10]);
+    if (openAt && desc.indexOf('[OPEN:') === -1) {
+      desc = desc + ' [OPEN: ' + openAt + ']';
+    }
     
     if (id || title) {
       exams.push({

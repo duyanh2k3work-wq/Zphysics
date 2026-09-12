@@ -1741,6 +1741,23 @@
       color: #fff;
       box-shadow: 0 4px 12px rgba(46, 196, 182, 0.3);
     }
+
+    /* ── SCHEDULED EXAM BADGE ── */
+    .exam-scheduled-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(249, 168, 37, 0.15);
+      border: 1px solid rgba(249, 168, 37, 0.4);
+      color: #ffca28;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-left: 6px;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
   </style>
 </head>
 
@@ -2343,6 +2360,44 @@
       alert(`Bài học này thuộc ${gradeName}.\nTài khoản của em được phân quyền học lớp ${studentLop || '(Chưa xếp lớp)'}.\nHãy liên hệ thầy cô để được cập nhật lớp học đúng nhé!`);
     }
 
+    // --- Helper function to parse exam scheduled open time ---
+    function parseExamOpenTime(exam) {
+      if (!exam) return null;
+      let rawStr = '';
+      if (exam.openAt) rawStr = String(exam.openAt).trim();
+      else if (exam.open_at) rawStr = String(exam.open_at).trim();
+      
+      const descText = exam.desc || exam.description || '';
+      const match = descText.match(/\[OPEN:\s*([^\]]+)\]/i);
+      if (match && match[1]) rawStr = match[1].trim();
+
+      if (!rawStr) return null;
+
+      const timeDateMatch = rawStr.match(/^(\d{1,2})[:h](\d{2})\s+(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/i);
+      if (timeDateMatch) {
+        const hours = parseInt(timeDateMatch[1], 10);
+        const mins = parseInt(timeDateMatch[2], 10);
+        const day = parseInt(timeDateMatch[3], 10);
+        const month = parseInt(timeDateMatch[4], 10) - 1;
+        const year = parseInt(timeDateMatch[5], 10);
+        const d = new Date(year, month, day, hours, mins, 0);
+        if (!isNaN(d.getTime())) return d;
+      }
+      const dateTimeMatch = rawStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})\s+(\d{1,2})[:h](\d{2})$/i);
+      if (dateTimeMatch) {
+        const day = parseInt(dateTimeMatch[1], 10);
+        const month = parseInt(dateTimeMatch[2], 10) - 1;
+        const year = parseInt(dateTimeMatch[3], 10);
+        const hours = parseInt(dateTimeMatch[4], 10);
+        const mins = parseInt(dateTimeMatch[5], 10);
+        const d = new Date(year, month, day, hours, mins, 0);
+        if (!isNaN(d.getTime())) return d;
+      }
+      const parsed = new Date(rawStr);
+      if (!isNaN(parsed.getTime())) return parsed;
+      return null;
+    }
+
     // ── Render toàn bộ giao diện từ JSON ──
     function renderAll(data) {
       const tabsEl = document.getElementById('gradeTabs');
@@ -2465,6 +2520,14 @@
               ? `<a href="javascript:void(0)" class="lnk lnk-video" onclick="event.stopPropagation(); openVideoModal('${exam.videoUrl}')">▶️ Video chữa</a>`
               : `<span class="lnk lnk-video" style="opacity:0.4;cursor:default;pointer-events:none">▶️ Video chữa</span>`;
 
+            let lockBadge = '';
+            const openDate = parseExamOpenTime(exam);
+            if (openDate && openDate.getTime() > Date.now()) {
+              const pad = n => String(n).padStart(2, '0');
+              const timeStr = `${pad(openDate.getHours())}:${pad(openDate.getMinutes())} ${pad(openDate.getDate())}/${pad(openDate.getMonth() + 1)}`;
+              lockBadge = `<span class="exam-scheduled-badge" title="Đề thi sẽ mở vào lúc ${timeStr}">🔒 Mở ${timeStr}</span>`;
+            }
+
             const làmBàiBtnHTML = `<a href="javascript:void(0)" class="lnk lnk-tracNghiem" onclick="${clickAction}">📝 Làm bài (${exam.duration || 50} phút)</a>`;
 
             const isCompleted = studentProgressMap[exam.id] || 0;
@@ -2474,7 +2537,7 @@
               <div class="lesson-row ${isCompleted > 0 ? 'completed' : ''}">
                 <div class="lesson-meta">
                   <span class="lesson-dot" style="background:#7c4dff"></span>
-                  <span class="lesson-title">${exam.title} ${isCompleted > 0 ? `<span class="lesson-checkmark red">✓${isCompleted > 1 ? `x${isCompleted}` : ''}</span>` : ''}</span>
+                  <span class="lesson-title">${exam.title} ${isCompleted > 0 ? `<span class="lesson-checkmark red">✓${isCompleted > 1 ? `x${isCompleted}` : ''}</span>` : ''} ${lockBadge}</span>
                   <span class="lesson-num" style="color:#b388ff">VIP</span>
                 </div>
                 <div class="lesson-links">${làmBàiBtnHTML} ${videoBtnHTML}</div>
@@ -3190,7 +3253,8 @@
               videoUrl: item.video_url, // Khớp trường videoUrl
               mcAnswers: item.mc_answers,
               tfAnswers: item.tf_answers,
-              saAnswers: item.sa_answers
+              saAnswers: item.sa_answers,
+              openAt: item.open_at || ''
             }));
           })
           .catch(err => {

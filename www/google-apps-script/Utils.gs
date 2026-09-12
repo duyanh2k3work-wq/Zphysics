@@ -62,3 +62,14 @@ function parseQuestionId(rawId, zeroBasedIndex) {
   if (!isNaN(n)) return n;
   return zeroBasedIndex + 1;
 }
+
+// Định dạng thời gian mở đề từ chuỗi hoặc Date object
+function formatScheduleTime(val) {
+  if (!val) return '';
+  if (val instanceof Date) {
+    var pad = function(n) { return (n < 10 ? '0' : '') + n; };
+    return pad(val.getHours()) + ':' + pad(val.getMinutes()) + ' ' + pad(val.getDate()) + '/' + pad(val.getMonth() + 1) + '/' + val.getFullYear();
+  }
+  return trimCell(val);
+}
+

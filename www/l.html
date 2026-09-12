@@ -767,6 +767,137 @@
       to { opacity: 1; transform: scale(1); }
     }
 
+    /* ── EXAM LOCK & COUNTDOWN SCREEN ── */
+    .exam-lock-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 81px);
+      padding: 30px 20px 60px 20px;
+      text-align: center;
+      z-index: 50;
+      position: relative;
+    }
+
+    .exam-lock-screen.visible {
+      display: flex;
+    }
+
+    .lock-card {
+      max-width: 580px;
+      width: 100%;
+      background: rgba(22, 22, 28, 0.85);
+      border: 1.5px solid rgba(124, 77, 255, 0.35);
+      border-radius: 28px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(124, 77, 255, 0.15);
+      backdrop-filter: blur(20px);
+      padding: 36px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      animation: popIn 0.5s ease both;
+    }
+
+    .lock-icon-badge {
+      width: 68px;
+      height: 68px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(124, 77, 255, 0.2), rgba(249, 168, 37, 0.15));
+      border: 1.5px solid rgba(249, 168, 37, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .lock-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.35;
+    }
+
+    .lock-schedule-info {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--teal);
+    }
+
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 440px;
+      margin-top: 6px;
+    }
+
+    .countdown-box {
+      background: rgba(10, 10, 14, 0.7);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 14px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .countdown-num {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--gold);
+      font-family: monospace;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .countdown-lbl {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .lock-subtext {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .btn-lock-back {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 10px 22px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-lock-back:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
     /* ── RESPONSIVE RESPONSIVENESS ── */
     @media (max-width: 767px) {
       .pdf-pane {
@@ -878,6 +1009,46 @@
       </button>
       <div class="header-timer-wrap">
         ⏱️ <span class="timer-text" id="headerTimer">50:00</span>
+      </div>
+    </div>
+
+    <!-- LOCK SCREEN (HẸN GIỜ MỞ ĐỀ) -->
+    <div class="exam-lock-screen" id="examLockScreen">
+      <div class="lock-card">
+        <div class="lock-icon-badge">🔒</div>
+        <div class="lock-title" id="lockExamTitle">Đề thi chưa đến giờ mở</div>
+        <div class="lock-schedule-info">
+          <span>⏰ Thời gian mở đề:</span>
+          <strong id="lockTargetTimeStr">--:-- --/--/----</strong>
+        </div>
+        
+        <div class="countdown-grid">
+          <div class="countdown-box">
+            <div class="countdown-num" id="cdDays">00</div>
+            <div class="countdown-lbl">Ngày</div>
+          </div>
+          <div class="countdown-box">
+            <div class="countdown-num" id="cdHours">00</div>
+            <div class="countdown-lbl">Giờ</div>
+          </div>
+          <div class="countdown-box">
+            <div class="countdown-num" id="cdMinutes">00</div>
+            <div class="countdown-lbl">Phút</div>
+          </div>
+          <div class="countdown-box">
+            <div class="countdown-num" id="cdSeconds">00</div>
+            <div class="countdown-lbl">Giây</div>
+          </div>
+        </div>
+
+        <p class="lock-subtext">
+          Đề thi đang được khóa và sẽ tự động mở ra ngay khi đồng hồ đếm ngược kết thúc.<br>
+          Các em vui lòng chuẩn bị nháp, máy tính và giữ nguyên màn hình.
+        </p>
+
+        <a href="./" class="btn-lock-back">
+          <span>‹</span> Quay lại danh sách đề
+        </a>
       </div>
     </div>
 
@@ -1045,6 +1216,163 @@
     let timerInterval = null;
     let submitted = false;
     let currentMobileView = 'pdf'; // 'pdf' hoặc 'answers'
+    let countdownTimerId = null;
+    let isExamUnlocked = false;
+
+    // ── HẸN GIỜ MỞ ĐỀ & ĐẾM NGƯỢC ──
+    function parseExamOpenTime(data) {
+      if (!data) return null;
+      let rawStr = '';
+
+      if (data.openAt) rawStr = String(data.openAt).trim();
+      else if (data.open_at) rawStr = String(data.open_at).trim();
+
+      const descText = data.desc || data.description || '';
+      const match = descText.match(/\[OPEN:\s*([^\]]+)\]/i);
+      if (match && match[1]) {
+        rawStr = match[1].trim();
+      }
+
+      if (!rawStr) return null;
+
+      // Format: 10:00 19/09/2026 hoặc 10h00 19-09-2026
+      const timeDateMatch = rawStr.match(/^(\d{1,2})[:h](\d{2})\s+(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/i);
+      if (timeDateMatch) {
+        const hours = parseInt(timeDateMatch[1], 10);
+        const mins = parseInt(timeDateMatch[2], 10);
+        const day = parseInt(timeDateMatch[3], 10);
+        const month = parseInt(timeDateMatch[4], 10) - 1;
+        const year = parseInt(timeDateMatch[5], 10);
+        const d = new Date(year, month, day, hours, mins, 0);
+        if (!isNaN(d.getTime())) return d;
+      }
+
+      // Format: 19/09/2026 10:00
+      const dateTimeMatch = rawStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})\s+(\d{1,2})[:h](\d{2})$/i);
+      if (dateTimeMatch) {
+        const day = parseInt(dateTimeMatch[1], 10);
+        const month = parseInt(dateTimeMatch[2], 10) - 1;
+        const year = parseInt(dateTimeMatch[3], 10);
+        const hours = parseInt(dateTimeMatch[4], 10);
+        const mins = parseInt(dateTimeMatch[5], 10);
+        const d = new Date(year, month, day, hours, mins, 0);
+        if (!isNaN(d.getTime())) return d;
+      }
+
+      const parsed = new Date(rawStr);
+      if (!isNaN(parsed.getTime())) return parsed;
+
+      return null;
+    }
+
+    function formatTimeDisplay(date) {
+      const pad = (n) => String(n).padStart(2, '0');
+      const d = pad(date.getDate());
+      const m = pad(date.getMonth() + 1);
+      const y = date.getFullYear();
+      const h = pad(date.getHours());
+      const min = pad(date.getMinutes());
+      return `${h}:${min} ngày ${d}/${m}/${y}`;
+    }
+
+    function checkAndLoadExam(data) {
+      if (!data) return;
+      examData = data;
+      const openDate = parseExamOpenTime(data);
+
+      if (openDate && openDate.getTime() > Date.now()) {
+        if (!isExamUnlocked) {
+          showExamLockScreen(data, openDate);
+          return;
+        }
+      }
+
+      // Đã đến giờ hoặc không hẹn giờ
+      const lockScreen = document.getElementById('examLockScreen');
+      if (lockScreen && lockScreen.classList.contains('visible')) {
+        unlockAndStartExam(data);
+      } else if (!isExamUnlocked) {
+        initExam(data);
+      }
+    }
+
+    function showExamLockScreen(data, openDate) {
+      document.getElementById('loadingOverlay').style.display = 'none';
+      document.getElementById('examTitle').textContent = data.title || 'Đề thi VIP';
+      const headerTimer = document.getElementById('headerTimer');
+      if (headerTimer) headerTimer.textContent = 'Chưa mở';
+      
+      const lockScreen = document.getElementById('examLockScreen');
+      const mainContainer = document.querySelector('.screen-container');
+      const mobileFooter = document.querySelector('.mobile-footer');
+      
+      lockScreen.classList.add('visible');
+      if (mainContainer) mainContainer.style.display = 'none';
+      if (mobileFooter) mobileFooter.style.display = 'none';
+      
+      document.getElementById('lockExamTitle').textContent = data.title || 'Đề thi VIP';
+      document.getElementById('lockTargetTimeStr').textContent = formatTimeDisplay(openDate);
+      
+      function updateCountdown() {
+        const diff = openDate.getTime() - Date.now();
+        if (diff <= 0) {
+          if (countdownTimerId) clearInterval(countdownTimerId);
+          countdownTimerId = null;
+          unlockAndStartExam(data);
+          return;
+        }
+        
+        const secTotal = Math.floor(diff / 1000);
+        const days = Math.floor(secTotal / 86400);
+        const hours = Math.floor((secTotal % 86400) / 3600);
+        const minutes = Math.floor((secTotal % 3600) / 60);
+        const seconds = secTotal % 60;
+        
+        const pad = (n) => String(n).padStart(2, '0');
+        document.getElementById('cdDays').textContent = pad(days);
+        document.getElementById('cdHours').textContent = pad(hours);
+        document.getElementById('cdMinutes').textContent = pad(minutes);
+        document.getElementById('cdSeconds').textContent = pad(seconds);
+      }
+      
+      updateCountdown();
+      if (countdownTimerId) clearInterval(countdownTimerId);
+      countdownTimerId = setInterval(updateCountdown, 1000);
+    }
+
+    function unlockAndStartExam(data) {
+      isExamUnlocked = true;
+      if (countdownTimerId) {
+        clearInterval(countdownTimerId);
+        countdownTimerId = null;
+      }
+      const lockScreen = document.getElementById('examLockScreen');
+      const mainContainer = document.querySelector('.screen-container');
+      const mobileFooter = document.querySelector('.mobile-footer');
+      
+      if (lockScreen) lockScreen.classList.remove('visible');
+      if (mainContainer) mainContainer.style.display = '';
+      if (mobileFooter) mobileFooter.style.display = '';
+      
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          const audioCtx = new AudioContext();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.8);
+        }
+      } catch(e) {}
+      
+      initExam(data);
+    }
 
     // ── KHỞI TẠO TRANG ──
     async function initExamPage() {
@@ -1079,7 +1407,6 @@
         }
       });
 
-
       // ── TỐI ƯU TẢI ĐỀ (CACHE-FIRST + ĐỒNG BỘ NGẦM) ──
       let list = [];
 
@@ -1089,9 +1416,9 @@
         if (cached) {
           list = JSON.parse(cached);
           if (Array.isArray(list) && list.length > 0) {
-            examData = list.find(e => e.id === examId) || list[0];
-            if (examData) {
-              initExam(examData);
+            const found = list.find(e => e.id === examId) || list[0];
+            if (found) {
+              checkAndLoadExam(found);
             }
           }
         }
@@ -1116,23 +1443,24 @@
             videoUrl: item.video_url,
             mcAnswers: item.mc_answers,
             tfAnswers: item.tf_answers,
-            saAnswers: item.sa_answers
+            saAnswers: item.sa_answers,
+            openAt: item.open_at || ''
           }));
 
           if (freshList && freshList.length > 0) {
             try {
               localStorage.setItem('zphysics_exams_cache', JSON.stringify(freshList));
             } catch(e) {}
-            // Nếu ban đầu chưa có đề nào được nạp từ cache
-            if (!examData) {
-              examData = freshList.find(e => e.id === examId) || freshList[0];
-              if (examData) initExam(examData);
+            // Nếu chưa mở đề hoặc đề đang ở lock screen, cập nhật dữ liệu mới nhất
+            if (!isExamUnlocked) {
+              const freshExam = freshList.find(e => e.id === examId) || freshList[0];
+              if (freshExam) checkAndLoadExam(freshExam);
             }
           }
         } catch (err) {
           console.warn('Supabase chậm hoặc lỗi, dùng dữ liệu offline:', err);
           // Nếu chưa có đề hiển thị, nạp từ file luyende.json cục bộ
-          if (!examData) {
+          if (!isExamUnlocked && !examData) {
             try {
               const res = await fetch('luyende.json?v=' + Date.now());
               if (res.ok) {
@@ -1140,9 +1468,9 @@
                 try {
                   localStorage.setItem('zphysics_exams_cache', JSON.stringify(offlineList));
                 } catch(e) {}
-                examData = offlineList.find(e => e.id === examId) || offlineList[0];
-                if (examData) {
-                  initExam(examData);
+                const offExam = offlineList.find(e => e.id === examId) || offlineList[0];
+                if (offExam) {
+                  checkAndLoadExam(offExam);
                 } else {
                   showError('Không tìm thấy thông tin đề thi.');
                 }
@@ -1184,6 +1512,7 @@
     }
 
     function initExam(data) {
+      isExamUnlocked = true;
       document.getElementById('examTitle').textContent = data.title;
       
       const fileId = extractDriveFileId(data.pdfUrl);

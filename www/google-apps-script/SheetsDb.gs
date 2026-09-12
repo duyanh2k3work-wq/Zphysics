@@ -595,6 +595,10 @@ function getExams() {
     var duration = trimCell(row[7]);
     var lop = trimCell(row[8]); // Cột I (Lớp)
     var videoUrl = trimCell(row[9]); // Cột J (Link Video Chữa)
+    var openAt = formatScheduleTime(row[10]); // Cột K (Thời gian mở đề hẹn giờ)
+    if (openAt && desc.indexOf('[OPEN:') === -1) {
+      desc = desc + ' [OPEN: ' + openAt + ']';
+    }
     
     if (id || title) {
       exams.push({
@@ -607,7 +611,8 @@ function getExams() {
         saAnswers: saAnswers,
         duration: duration ? parseInt(duration, 10) : 50,
         lop: lop || "12",
-        videoUrl: videoUrl || "#"
+        videoUrl: videoUrl || "#",
+        openAt: openAt || ""
       });
     }
   }
