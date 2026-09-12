@@ -9,6 +9,15 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
+  <!-- Mozilla PDF.js Engine -->
+  <script src="vendor/pdfjs/pdf.min.js"></script>
+  <script>
+    if (typeof pdfjsLib === 'undefined') {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      document.head.appendChild(s);
+    }
+  </script>
   <style>
     :root {
       --bg: #0A0A0B;
@@ -171,26 +180,86 @@
       display: flex;
       flex-direction: column;
       border-right: 1.5px solid var(--border);
-      background: #111;
+      background: #0e0e12;
       height: calc(100vh - 81px);
       position: sticky;
       top: 81px;
     }
 
     .pdf-fallback-bar {
-      padding: 10px 16px;
-      background: rgba(26, 26, 32, 0.9);
+      padding: 8px 14px;
+      background: rgba(20, 20, 26, 0.95);
       border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      z-index: 10;
+    }
+
+    .pdf-toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pdf-status-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--teal);
+      background: rgba(46, 196, 182, 0.1);
+      border: 1px solid rgba(46, 196, 182, 0.25);
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .btn-pdf-tool {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 5px 9px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .btn-pdf-tool:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--teal);
+      color: var(--teal);
+    }
+
+    .pdf-zoom-text {
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      min-width: 42px;
+      text-align: center;
+      user-select: none;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    .pdf-zoom-text:hover {
+      color: var(--teal);
+      background: rgba(255, 255, 255, 0.05);
     }
 
     .btn-pdf-fallback {
       background: linear-gradient(135deg, #1b004a, #121216);
       color: var(--gold);
       border: 1px solid rgba(124, 77, 255, 0.3);
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 8px;
       font-size: 12px;
       font-weight: 800;
@@ -198,14 +267,81 @@
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       transition: all 0.2s;
+      white-space: nowrap;
     }
 
     .btn-pdf-fallback:hover {
       background: var(--gold-gradient);
       color: #000;
       border-color: transparent;
+    }
+
+    .pdf-pages-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: auto;
+      background: #111116;
+      padding: 14px 10px 40px 10px;
+      text-align: center;
+      position: relative;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .pdf-page-card {
+      margin: 0 auto 16px auto;
+      background: #ffffff;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    .pdf-page-num-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(10, 10, 14, 0.8);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 12px;
+      backdrop-filter: blur(4px);
+      pointer-events: none;
+      z-index: 2;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .pdf-page-canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .pdf-loading-state,
+    .pdf-error-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+      gap: 12px;
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .pdf-error-state {
+      background: rgba(229, 57, 53, 0.05);
+      border: 1px dashed rgba(229, 57, 53, 0.3);
+      border-radius: 16px;
+      margin: 20px auto;
+      max-width: 460px;
     }
 
     .pdf-viewer-iframe {
@@ -781,10 +917,29 @@
       <!-- LEFT COLUMN: PDF VIEW -->
       <div class="pdf-pane" id="pdfPane">
         <div class="pdf-fallback-bar">
-          <span style="font-size:12px; font-weight:700; color:var(--muted)">Đề thi (PDF)</span>
-          <a class="btn-pdf-fallback" id="btnPdfOpen" href="#" target="_blank">📂 Mở trong cửa sổ mới</a>
+          <div class="pdf-toolbar-group">
+            <span class="pdf-status-badge" id="pdfPageBadge">📄 Đang tải...</span>
+            <button class="btn-pdf-tool" id="btnToggleViewerMode" onclick="toggleViewerMode()" title="Chuyển đổi chế độ xem đề" style="display:none;">🔄 Chế độ xem</button>
+          </div>
+          <div class="pdf-toolbar-group" id="pdfZoomControls">
+            <button class="btn-pdf-tool" onclick="changeZoom(-0.15)" title="Thu nhỏ">➖</button>
+            <span class="pdf-zoom-text" id="pdfZoomText" onclick="resetZoom()" title="Tỷ lệ zoom. Bấm để về 100%">100%</span>
+            <button class="btn-pdf-tool" onclick="changeZoom(0.15)" title="Phóng to">➕</button>
+            <button class="btn-pdf-tool" onclick="fitWidth()" title="Vừa chiều rộng màn hình">↔️ Vừa</button>
+          </div>
+          <div class="pdf-toolbar-group">
+            <a class="btn-pdf-fallback" id="btnPdfOpen" href="#" target="_blank" title="Mở file gốc trên Google Drive">📂 Mở ngoài</a>
+          </div>
         </div>
-        <iframe class="pdf-viewer-iframe" id="pdfViewer" src=""></iframe>
+        <!-- Container hiển thị toàn bộ trang đề thi qua Mozilla PDF.js -->
+        <div class="pdf-pages-container" id="pdfPagesContainer">
+          <div class="pdf-loading-state">
+            <div class="spinner"></div>
+            <div style="font-weight:700; color:var(--muted); font-size:13px; margin-top:8px;">Đang chuẩn bị đề thi...</div>
+          </div>
+        </div>
+        <!-- Iframe dự phòng khi xảy ra sự cố mạng -->
+        <iframe class="pdf-viewer-iframe" id="pdfViewer" src="" style="display:none;"></iframe>
       </div>
 
       <!-- RIGHT COLUMN: ANSWER SHEET -->
@@ -1058,38 +1213,311 @@
          </div>`;
     }
 
-    function cleanPdfUrl(url) {
-      if (!url) return '';
-      // Tự động nhận diện và chuyển đổi link Google Drive thông thường sang dạng direct link để Google Docs Viewer load được
-      if (url.includes('drive.google.com/file/d/')) {
-        const match = url.match(/\/file\/d\/([^\/]+)/);
-        if (match && match[1]) {
-          const fileId = match[1];
-          return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    // ══════════════════════════════════════════════
+    // HỆ THỐNG KẾT XUẤT ĐỀ THI NATIVE BẰNG MOZILLA PDF.JS
+    // ══════════════════════════════════════════════
+    let currentPdfDoc = null;
+    let currentPdfScale = 1.0;
+    let pdfBaseScale = 1.0;
+    let isRenderingPdf = false;
+    let currentPdfFileId = null;
+    let currentPdfRawUrl = null;
+    let viewerMode = 'pdfjs'; // 'pdfjs' hoặc 'iframe'
+
+    function ensurePdfJsWorker() {
+      if (window.pdfjsLib && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
+        try {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdfjs/pdf.worker.min.js';
+        } catch(e) {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
       }
-      return url;
     }
+
+    async function waitForPdfJs(maxWaitMs = 4000) {
+      const start = Date.now();
+      while (typeof pdfjsLib === 'undefined' && (Date.now() - start < maxWaitMs)) {
+        await new Promise(r => setTimeout(r, 50));
+      }
+      return typeof pdfjsLib !== 'undefined';
+    }
+
+    function extractDriveFileId(url) {
+      if (!url) return null;
+      const m1 = url.match(/\/file\/d\/([^\/\?]+)/);
+      if (m1 && m1[1]) return m1[1];
+      const m2 = url.match(/[?&]id=([^&]+)/);
+      if (m2 && m2[1]) return m2[1];
+      return null;
+    }
+
+    function updateZoomText() {
+      const zoomText = document.getElementById('pdfZoomText');
+      if (zoomText && pdfBaseScale > 0) {
+        const percent = Math.round((currentPdfScale / pdfBaseScale) * 100);
+        zoomText.textContent = `${percent}%`;
+      }
+    }
+
+    async function changeZoom(delta) {
+      if (!currentPdfDoc || isRenderingPdf) return;
+      const newScale = currentPdfScale + (delta * pdfBaseScale);
+      const minScale = 0.4 * pdfBaseScale;
+      const maxScale = 2.8 * pdfBaseScale;
+      if (newScale >= minScale && newScale <= maxScale) {
+        currentPdfScale = newScale;
+        updateZoomText();
+        await renderAllPages();
+      }
+    }
+
+    async function resetZoom() {
+      if (!currentPdfDoc || isRenderingPdf) return;
+      currentPdfScale = pdfBaseScale;
+      updateZoomText();
+      await renderAllPages();
+    }
+
+    async function fitWidth() {
+      if (!currentPdfDoc || isRenderingPdf) return;
+      await calculateBaseScale();
+      currentPdfScale = pdfBaseScale;
+      updateZoomText();
+      await renderAllPages();
+    }
+
+    async function calculateBaseScale() {
+      if (!currentPdfDoc) return;
+      try {
+        const container = document.getElementById('pdfPagesContainer');
+        const firstPage = await currentPdfDoc.getPage(1);
+        const unscaled = firstPage.getViewport({ scale: 1.0 });
+        const availWidth = Math.max(container.clientWidth - 28, 280);
+        pdfBaseScale = availWidth / unscaled.width;
+      } catch (e) {
+        pdfBaseScale = 1.0;
+      }
+    }
+
+    async function renderAllPages() {
+      if (!currentPdfDoc || isRenderingPdf) return;
+      isRenderingPdf = true;
+      const container = document.getElementById('pdfPagesContainer');
+      container.innerHTML = '';
+
+      const numPages = currentPdfDoc.numPages;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      try {
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+          const page = await currentPdfDoc.getPage(pageNum);
+          const viewport = page.getViewport({ scale: currentPdfScale });
+
+          const card = document.createElement('div');
+          card.className = 'pdf-page-card';
+          card.style.width = Math.floor(viewport.width) + 'px';
+
+          const tag = document.createElement('div');
+          tag.className = 'pdf-page-num-tag';
+          tag.textContent = `Trang ${pageNum} / ${numPages}`;
+          card.appendChild(tag);
+
+          const canvas = document.createElement('canvas');
+          canvas.className = 'pdf-page-canvas';
+          canvas.width = Math.floor(viewport.width * dpr);
+          canvas.height = Math.floor(viewport.height * dpr);
+          canvas.style.width = Math.floor(viewport.width) + 'px';
+          canvas.style.height = Math.floor(viewport.height) + 'px';
+
+          const ctx = canvas.getContext('2d');
+          ctx.scale(dpr, dpr);
+
+          card.appendChild(canvas);
+          container.appendChild(card);
+
+          await page.render({
+            canvasContext: ctx,
+            viewport: viewport
+          }).promise;
+        }
+      } catch (renderErr) {
+        console.error('Lỗi khi render trang PDF:', renderErr);
+      } finally {
+        isRenderingPdf = false;
+      }
+    }
+
+    function toggleViewerMode() {
+      if (viewerMode === 'pdfjs') {
+        switchToIframeMode();
+      } else {
+        switchToPdfJsMode();
+      }
+    }
+
+    function switchToIframeMode() {
+      viewerMode = 'iframe';
+      const container = document.getElementById('pdfPagesContainer');
+      const iframe = document.getElementById('pdfViewer');
+      const zoomControls = document.getElementById('pdfZoomControls');
+      const badge = document.getElementById('pdfPageBadge');
+      const toggleBtn = document.getElementById('btnToggleViewerMode');
+
+      container.style.display = 'none';
+      iframe.style.display = 'block';
+      zoomControls.style.display = 'none';
+      badge.textContent = 'Drive Preview';
+      toggleBtn.style.display = 'inline-flex';
+      toggleBtn.textContent = '⚡ Xem nét cao (PDF.js)';
+
+      if (currentPdfFileId) {
+        iframe.src = `https://drive.google.com/file/d/${currentPdfFileId}/preview`;
+      } else {
+        iframe.src = currentPdfRawUrl;
+      }
+    }
+
+    function switchToPdfJsMode() {
+      viewerMode = 'pdfjs';
+      const container = document.getElementById('pdfPagesContainer');
+      const iframe = document.getElementById('pdfViewer');
+      const zoomControls = document.getElementById('pdfZoomControls');
+      const toggleBtn = document.getElementById('btnToggleViewerMode');
+
+      iframe.style.display = 'none';
+      container.style.display = 'block';
+      zoomControls.style.display = 'flex';
+      toggleBtn.textContent = '🔄 Chế độ Drive';
+
+      if (currentPdfDoc) {
+        document.getElementById('pdfPageBadge').textContent = `📄 ${currentPdfDoc.numPages} trang`;
+        renderAllPages();
+      } else if (currentPdfRawUrl) {
+        loadAndRenderPdf(currentPdfRawUrl);
+      }
+    }
+
+    async function loadAndRenderPdf(rawUrl) {
+      currentPdfRawUrl = rawUrl;
+      const container = document.getElementById('pdfPagesContainer');
+      const iframe = document.getElementById('pdfViewer');
+      const badge = document.getElementById('pdfPageBadge');
+      const toggleBtn = document.getElementById('btnToggleViewerMode');
+      const zoomControls = document.getElementById('pdfZoomControls');
+
+      viewerMode = 'pdfjs';
+      container.style.display = 'block';
+      iframe.style.display = 'none';
+      zoomControls.style.display = 'flex';
+      toggleBtn.style.display = 'inline-flex';
+      toggleBtn.textContent = '🔄 Chế độ Drive';
+
+      container.innerHTML = `
+        <div class="pdf-loading-state">
+          <div class="spinner"></div>
+          <div style="font-weight:700; color:var(--muted); font-size:13px; margin-top:8px;">
+            Đang tải và giải mã đề thi...
+          </div>
+        </div>
+      `;
+      badge.textContent = 'Đang tải...';
+
+      const fileId = extractDriveFileId(rawUrl);
+      currentPdfFileId = fileId;
+
+      // Đợi thư viện PDF.js sẵn sàng nếu đang tải qua CDN
+      const hasPdfJs = await waitForPdfJs();
+      if (!hasPdfJs) {
+        console.warn('PDF.js chưa sẵn sàng, dùng iframe fallback.');
+        switchToIframeMode();
+        return;
+      }
+
+      // Danh sách candidate download endpoints có CORS
+      let candidateUrls = [];
+      if (fileId) {
+        candidateUrls.push(`https://drive.usercontent.google.com/download?id=${fileId}&export=download`);
+        candidateUrls.push(`https://docs.google.com/uc?export=download&id=${fileId}`);
+      }
+      candidateUrls.push(rawUrl);
+
+      let pdfData = null;
+
+      for (const u of candidateUrls) {
+        try {
+          const res = await fetch(u);
+          if (res.ok) {
+            const buf = await res.arrayBuffer();
+            if (buf && buf.byteLength > 500) {
+              const magic = String.fromCharCode(...new Uint8Array(buf.slice(0, 5)));
+              if (magic.startsWith('%PDF')) {
+                pdfData = buf;
+                break;
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Thử fetch candidate thất bại:', u, e.message);
+        }
+      }
+
+      try {
+        ensurePdfJsWorker();
+
+        let loadingTask;
+        if (pdfData) {
+          loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(pdfData) });
+        } else {
+          loadingTask = pdfjsLib.getDocument({ url: candidateUrls[0] });
+        }
+
+        currentPdfDoc = await loadingTask.promise;
+        badge.textContent = `📄 ${currentPdfDoc.numPages} trang`;
+
+        await calculateBaseScale();
+        currentPdfScale = pdfBaseScale;
+        updateZoomText();
+        await renderAllPages();
+      } catch (err) {
+        console.error('Không thể render bằng PDF.js:', err);
+        container.innerHTML = `
+          <div class="pdf-error-state">
+            <div style="font-size:32px;">⚠️</div>
+            <div style="font-weight:800; color:#fff; font-size:14px;">Không thể tải dữ liệu đề thi trực tiếp</div>
+            <div style="font-size:12px; color:var(--muted); line-height:1.5;">
+              Vui lòng xem đề qua khung nhúng Google Drive hoặc mở ngoài bằng tab mới.
+            </div>
+            <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; justify-content:center;">
+              <button class="btn-pdf-tool" onclick="switchToIframeMode()">🔄 Chuyển sang Google Drive</button>
+              <a class="btn-pdf-fallback" href="${rawUrl}" target="_blank">📂 Mở trong tab mới</a>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Tự động căn chỉnh lại kích thước khi xoay màn hình hoặc thay đổi kích thước cửa sổ
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      if (viewerMode !== 'pdfjs' || !currentPdfDoc) return;
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(async () => {
+        const prevBase = pdfBaseScale;
+        await calculateBaseScale();
+        if (prevBase > 0) {
+          currentPdfScale = (currentPdfScale / prevBase) * pdfBaseScale;
+          updateZoomText();
+          await renderAllPages();
+        }
+      }, 300);
+    });
 
     function initExam(data) {
       document.getElementById('examTitle').textContent = data.title;
       document.getElementById('btnPdfOpen').href = data.pdfUrl;
 
-      // Nếu là link Google Drive, nhúng qua dạng /preview để tải nhanh và ổn định hơn
-      if (data.pdfUrl && data.pdfUrl.includes('drive.google.com')) {
-        const match = data.pdfUrl.match(/\/file\/d\/([^\/]+)/) || data.pdfUrl.match(/id=([^&]+)/);
-        if (match && match[1]) {
-          const fileId = match[1];
-          document.getElementById('pdfViewer').src = `https://drive.google.com/file/d/${fileId}/preview`;
-        } else {
-          document.getElementById('pdfViewer').src = data.pdfUrl;
-        }
-      } else {
-        // Nhúng PDF qua Google Docs Viewer để tránh block CORS / X-Frame-Options trên Webview Capacitor
-        const pdfUrlCleaned = cleanPdfUrl(data.pdfUrl);
-        const encodedPdfUrl = encodeURIComponent(pdfUrlCleaned);
-        document.getElementById('pdfViewer').src = `https://docs.google.com/gview?embedded=true&url=${encodedPdfUrl}`;
-      }
+      // Nạp và hiển thị toàn bộ đề thi trực tiếp bằng PDF.js
+      loadAndRenderPdf(data.pdfUrl);
 
       // Thiết lập thời gian
       const durationMin = data.duration || 50;
@@ -1246,6 +1674,10 @@
         pdf.classList.remove('hidden');
         toggleBtn.textContent = '✍️ Điền đáp án';
         currentMobileView = 'pdf';
+        // Tự động căn chỉnh độ rộng vừa vặn màn hình điện thoại
+        if (viewerMode === 'pdfjs' && currentPdfDoc && !isRenderingPdf) {
+          setTimeout(fitWidth, 120);
+        }
       }
     }
 
