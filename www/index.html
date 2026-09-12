@@ -2516,9 +2516,14 @@
           const lessonsHTML = matchingExams.map(exam => {
             const clickAction = `event.stopPropagation(); const session = getSession(); if (session && session.premium) { window.location.href='l.html#${exam.id}'; } else { window.location.href='premium.html'; }`;
 
-            const videoBtnHTML = (exam.videoUrl && exam.videoUrl !== '#' && exam.videoUrl.trim() !== '')
+            const hasVideo = exam.videoUrl && 
+                             exam.videoUrl !== '#' && 
+                             exam.videoUrl.trim() !== '' && 
+                             exam.videoUrl.trim() !== 'null' && 
+                             exam.videoUrl.trim() !== 'undefined';
+            const videoBtnHTML = hasVideo
               ? `<a href="javascript:void(0)" class="lnk lnk-video" onclick="event.stopPropagation(); openVideoModal('${exam.videoUrl}')">▶️ Video chữa</a>`
-              : `<span class="lnk lnk-video" style="opacity:0.4;cursor:default;pointer-events:none">▶️ Video chữa</span>`;
+              : '';
 
             let lockBadge = '';
             const openDate = parseExamOpenTime(exam);
@@ -2540,7 +2545,7 @@
                   <span class="lesson-title">${exam.title} ${isCompleted > 0 ? `<span class="lesson-checkmark red">✓${isCompleted > 1 ? `x${isCompleted}` : ''}</span>` : ''} ${lockBadge}</span>
                   <span class="lesson-num" style="color:#b388ff">VIP</span>
                 </div>
-                <div class="lesson-links">${làmBàiBtnHTML} ${videoBtnHTML}</div>
+                <div class="lesson-links">${làmBàiBtnHTML}${videoBtnHTML ? ' ' + videoBtnHTML : ''}</div>
               </div>`;
           }).join('');
 
