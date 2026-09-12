@@ -113,6 +113,51 @@
       fill: none;
     }
 
+    .music-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 17px;
+      color: #fff;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .music-btn:hover {
+      transform: scale(1.08);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--teal);
+    }
+
+    .music-btn:active {
+      transform: scale(0.95);
+    }
+
+    .music-btn.playing {
+      background: rgba(46, 196, 182, 0.12);
+      border-color: var(--teal);
+      box-shadow: 0 0 12px rgba(46, 196, 182, 0.25);
+      animation: musicPulse 2s infinite ease-in-out;
+    }
+
+    .music-btn.muted {
+      opacity: 0.55;
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    @keyframes musicPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+
     .header-info {
       flex: 1;
       min-width: 0;
@@ -907,6 +952,9 @@
         <h1 id="examTitle">Đang tải đề thi...</h1>
         <p>Phòng Luyện Đề VIP</p>
       </div>
+      <button class="music-btn" id="musicToggleBtn" onclick="toggleMusic()" title="Bật/Tắt nhạc nền tập trung">
+        <span id="musicIcon">🎵</span>
+      </button>
       <div class="header-timer-wrap">
         ⏱️ <span class="timer-text" id="headerTimer">50:00</span>
       </div>
@@ -1960,28 +2008,88 @@
   <audio id="bgMusic" loop preload="none"></audio>
 
   <script>
-    // ── GENTLE BACKGROUND MUSIC SYSTEM ──
+    // ── GENTLE BACKGROUND MUSIC SYSTEM WITH TOGGLE ──
+    function updateMusicButton(isPlaying) {
+      const btn = document.getElementById('musicToggleBtn');
+      const icon = document.getElementById('musicIcon');
+      if (!btn || !icon) return;
+
+      if (isPlaying) {
+        icon.textContent = '🎵';
+        btn.classList.add('playing');
+        btn.classList.remove('muted');
+        btn.title = 'Tắt nhạc nền (đang phát)';
+      } else {
+        icon.textContent = '🔇';
+        btn.classList.remove('playing');
+        btn.classList.add('muted');
+        btn.title = 'Bật nhạc nền (đang tắt)';
+      }
+    }
+
+    function toggleMusic() {
+      const audio = document.getElementById('bgMusic');
+      if (!audio) return;
+
+      if (!audio.src || !audio.src.includes('alla-turca.mp3')) {
+        audio.src = 'assets/alla-turca.mp3';
+      }
+
+      if (audio.paused) {
+        audio.volume = 0.35;
+        audio.play().then(() => {
+          localStorage.setItem('zphysics_music_muted', 'false');
+          updateMusicButton(true);
+        }).catch(err => {
+          console.warn('Không thể phát nhạc nền:', err);
+        });
+      } else {
+        audio.pause();
+        localStorage.setItem('zphysics_music_muted', 'true');
+        updateMusicButton(false);
+      }
+    }
+
     function initMusicPlayer() {
       const audio = document.getElementById('bgMusic');
       if (!audio) return;
       
       audio.volume = 0.35;
+      const isMuted = localStorage.getItem('zphysics_music_muted') === 'true';
+
+      if (isMuted) {
+        updateMusicButton(false);
+        return;
+      } else {
+        updateMusicButton(false);
+      }
       
-      // Chỉ tải và phát nhạc nhẹ khi người dùng đã chủ động tương tác, tuyệt đối không tải chặn mạng khi load đề
-      const playOnFirstInteraction = () => {
+      // Chỉ tải và phát nhạc nhẹ khi người dùng đã chủ động tương tác
+      const events = ['click', 'touchstart', 'keydown'];
+      const playOnFirstInteraction = (e) => {
+        // Nếu người dùng tương tác trực tiếp vào nút toggleMusic thì để toggleMusic tự xử lý
+        if (e && e.target && e.target.closest && e.target.closest('#musicToggleBtn')) return;
+
+        if (localStorage.getItem('zphysics_music_muted') === 'true') {
+          events.forEach(evt => document.removeEventListener(evt, playOnFirstInteraction));
+          return;
+        }
+
         if (!audio.src || !audio.src.includes('alla-turca.mp3')) {
           audio.src = 'assets/alla-turca.mp3';
         }
+
         if (audio.paused) {
           audio.play().then(() => {
-            events.forEach(event => document.removeEventListener(event, playOnFirstInteraction));
+            updateMusicButton(true);
+            events.forEach(evt => document.removeEventListener(evt, playOnFirstInteraction));
           }).catch(() => {});
         } else {
-          events.forEach(event => document.removeEventListener(event, playOnFirstInteraction));
+          updateMusicButton(true);
+          events.forEach(evt => document.removeEventListener(evt, playOnFirstInteraction));
         }
       };
       
-      const events = ['click', 'touchstart', 'keydown'];
       events.forEach(event => document.addEventListener(event, playOnFirstInteraction, { passive: true }));
     }
     
