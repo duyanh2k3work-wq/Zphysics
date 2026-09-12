@@ -8,16 +8,6 @@
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- Mozilla PDF.js Engine -->
-  <script src="vendor/pdfjs/pdf.min.js"></script>
-  <script>
-    if (typeof pdfjsLib === 'undefined') {
-      const s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-      document.head.appendChild(s);
-    }
-  </script>
   <style>
     :root {
       --bg: #0A0A0B;
@@ -232,13 +222,13 @@
     }
 
     .pdf-fallback-bar {
-      padding: 8px 14px;
+      padding: 10px 16px;
       background: rgba(20, 20, 26, 0.95);
       border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
       z-index: 10;
     }
@@ -246,7 +236,7 @@
     .pdf-toolbar-group {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
     .pdf-status-badge {
@@ -261,55 +251,28 @@
       user-select: none;
     }
 
-    .btn-pdf-tool {
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 5px 9px;
-      border-radius: 8px;
-      font-size: 12px;
+    .pdf-tip-text {
+      font-size: 11px;
       font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s;
+      color: #b388ff;
       user-select: none;
     }
 
-    .btn-pdf-tool:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: var(--teal);
-      color: var(--teal);
+    @media (max-width: 600px) {
+      .pdf-tip-text {
+        display: none;
+      }
     }
 
-    .pdf-zoom-text {
-      font-size: 12px;
-      font-weight: 800;
+    .btn-pdf-popout {
+      background: rgba(255, 255, 255, 0.06);
       color: #fff;
-      min-width: 42px;
-      text-align: center;
-      user-select: none;
-      cursor: pointer;
-      padding: 2px 4px;
-      border-radius: 4px;
-    }
-
-    .pdf-zoom-text:hover {
-      color: var(--teal);
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .btn-pdf-fallback {
-      background: linear-gradient(135deg, #1b004a, #121216);
-      color: var(--gold);
-      border: 1px solid rgba(124, 77, 255, 0.3);
-      padding: 5px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 12px;
       border-radius: 8px;
       font-size: 12px;
       font-weight: 800;
       cursor: pointer;
-      text-decoration: none;
       display: inline-flex;
       align-items: center;
       gap: 5px;
@@ -317,76 +280,34 @@
       white-space: nowrap;
     }
 
-    .btn-pdf-fallback:hover {
+    .btn-pdf-popout:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--teal);
+      color: var(--teal);
+      transform: translateY(-1px);
+    }
+
+    .btn-pdf-fallback {
       background: var(--gold-gradient);
       color: #000;
-      border-color: transparent;
-    }
-
-    .pdf-pages-container {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: auto;
-      background: #111116;
-      padding: 14px 10px 40px 10px;
-      text-align: center;
-      position: relative;
-      scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .pdf-page-card {
-      margin: 0 auto 16px auto;
-      background: #ffffff;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
-      border-radius: 6px;
-      position: relative;
-      overflow: hidden;
-      display: inline-block;
-      max-width: 100%;
-    }
-
-    .pdf-page-num-tag {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(10, 10, 14, 0.8);
-      color: #fff;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 12px;
-      backdrop-filter: blur(4px);
-      pointer-events: none;
-      z-index: 2;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-    }
-
-    .pdf-page-canvas {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .pdf-loading-state,
-    .pdf-error-state {
-      display: flex;
-      flex-direction: column;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      min-height: 280px;
-      gap: 12px;
-      padding: 24px;
-      color: var(--muted);
-      text-align: center;
+      gap: 5px;
+      transition: all 0.2s;
+      white-space: nowrap;
+      box-shadow: 0 2px 10px rgba(124, 77, 255, 0.3);
     }
 
-    .pdf-error-state {
-      background: rgba(229, 57, 53, 0.05);
-      border: 1px dashed rgba(229, 57, 53, 0.3);
-      border-radius: 16px;
-      margin: 20px auto;
-      max-width: 460px;
+    .btn-pdf-fallback:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 18px rgba(124, 77, 255, 0.5);
     }
 
     .pdf-viewer-iframe {
@@ -966,28 +887,20 @@
       <div class="pdf-pane" id="pdfPane">
         <div class="pdf-fallback-bar">
           <div class="pdf-toolbar-group">
-            <span class="pdf-status-badge" id="pdfPageBadge">📄 Đang tải...</span>
-            <button class="btn-pdf-tool" id="btnToggleViewerMode" onclick="toggleViewerMode()" title="Chuyển đổi chế độ xem đề" style="display:none;">🔄 Chế độ xem</button>
-          </div>
-          <div class="pdf-toolbar-group" id="pdfZoomControls">
-            <button class="btn-pdf-tool" onclick="changeZoom(-0.15)" title="Thu nhỏ">➖</button>
-            <span class="pdf-zoom-text" id="pdfZoomText" onclick="resetZoom()" title="Tỷ lệ zoom. Bấm để về 100%">100%</span>
-            <button class="btn-pdf-tool" onclick="changeZoom(0.15)" title="Phóng to">➕</button>
-            <button class="btn-pdf-tool" onclick="fitWidth()" title="Vừa chiều rộng màn hình">↔️ Vừa</button>
+            <span class="pdf-status-badge" id="pdfPageBadge">📄 Đề thi (PDF)</span>
+            <span class="pdf-tip-text">💡 Không cuộn hết trang?</span>
           </div>
           <div class="pdf-toolbar-group">
-            <a class="btn-pdf-fallback" id="btnPdfOpen" href="#" target="_blank" title="Mở file gốc trên Google Drive">📂 Mở ngoài</a>
+            <button type="button" class="btn-pdf-popout" id="btnPdfPopout" title="Mở cửa sổ đề riêng bên cạnh để vừa đọc đề vừa điền đáp án">
+              🪟 Cửa sổ riêng
+            </button>
+            <a class="btn-pdf-fallback" id="btnPdfOpen" href="#" target="_blank" title="Mở đầy đủ toàn bộ đề thi trong tab mới của trình duyệt">
+              📂 Mở tab mới ↗
+            </a>
           </div>
         </div>
-        <!-- Container hiển thị toàn bộ trang đề thi qua Mozilla PDF.js -->
-        <div class="pdf-pages-container" id="pdfPagesContainer">
-          <div class="pdf-loading-state">
-            <div class="spinner"></div>
-            <div style="font-weight:700; color:var(--muted); font-size:13px; margin-top:8px;">Đang chuẩn bị đề thi...</div>
-          </div>
-        </div>
-        <!-- Iframe dự phòng khi xảy ra sự cố mạng -->
-        <iframe class="pdf-viewer-iframe" id="pdfViewer" src="" style="display:none;"></iframe>
+        <!-- Khung nhúng đề thi chính thức -->
+        <iframe class="pdf-viewer-iframe" id="pdfViewer" src="" allow="fullscreen; autoplay; clipboard-read; clipboard-write; storage-access *" allowfullscreen loading="lazy"></iframe>
       </div>
 
       <!-- RIGHT COLUMN: ANSWER SHEET -->
@@ -1261,35 +1174,6 @@
          </div>`;
     }
 
-    // ══════════════════════════════════════════════
-    // HỆ THỐNG KẾT XUẤT ĐỀ THI NATIVE BẰNG MOZILLA PDF.JS
-    // ══════════════════════════════════════════════
-    let currentPdfDoc = null;
-    let currentPdfScale = 1.0;
-    let pdfBaseScale = 1.0;
-    let isRenderingPdf = false;
-    let currentPdfFileId = null;
-    let currentPdfRawUrl = null;
-    let viewerMode = 'pdfjs'; // 'pdfjs' hoặc 'iframe'
-
-    function ensurePdfJsWorker() {
-      if (window.pdfjsLib && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-        try {
-          pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdfjs/pdf.worker.min.js';
-        } catch(e) {
-          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        }
-      }
-    }
-
-    async function waitForPdfJs(maxWaitMs = 4000) {
-      const start = Date.now();
-      while (typeof pdfjsLib === 'undefined' && (Date.now() - start < maxWaitMs)) {
-        await new Promise(r => setTimeout(r, 50));
-      }
-      return typeof pdfjsLib !== 'undefined';
-    }
-
     function extractDriveFileId(url) {
       if (!url) return null;
       const m1 = url.match(/\/file\/d\/([^\/\?]+)/);
@@ -1299,273 +1183,33 @@
       return null;
     }
 
-    function updateZoomText() {
-      const zoomText = document.getElementById('pdfZoomText');
-      if (zoomText && pdfBaseScale > 0) {
-        const percent = Math.round((currentPdfScale / pdfBaseScale) * 100);
-        zoomText.textContent = `${percent}%`;
-      }
-    }
-
-    async function changeZoom(delta) {
-      if (!currentPdfDoc || isRenderingPdf) return;
-      const newScale = currentPdfScale + (delta * pdfBaseScale);
-      const minScale = 0.4 * pdfBaseScale;
-      const maxScale = 2.8 * pdfBaseScale;
-      if (newScale >= minScale && newScale <= maxScale) {
-        currentPdfScale = newScale;
-        updateZoomText();
-        await renderAllPages();
-      }
-    }
-
-    async function resetZoom() {
-      if (!currentPdfDoc || isRenderingPdf) return;
-      currentPdfScale = pdfBaseScale;
-      updateZoomText();
-      await renderAllPages();
-    }
-
-    async function fitWidth() {
-      if (!currentPdfDoc || isRenderingPdf) return;
-      await calculateBaseScale();
-      currentPdfScale = pdfBaseScale;
-      updateZoomText();
-      await renderAllPages();
-    }
-
-    async function calculateBaseScale() {
-      if (!currentPdfDoc) return;
-      try {
-        const container = document.getElementById('pdfPagesContainer');
-        const firstPage = await currentPdfDoc.getPage(1);
-        const unscaled = firstPage.getViewport({ scale: 1.0 });
-        const availWidth = Math.max(container.clientWidth - 28, 280);
-        pdfBaseScale = availWidth / unscaled.width;
-      } catch (e) {
-        pdfBaseScale = 1.0;
-      }
-    }
-
-    async function renderAllPages() {
-      if (!currentPdfDoc || isRenderingPdf) return;
-      isRenderingPdf = true;
-      const container = document.getElementById('pdfPagesContainer');
-      container.innerHTML = '';
-
-      const numPages = currentPdfDoc.numPages;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-      try {
-        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-          const page = await currentPdfDoc.getPage(pageNum);
-          const viewport = page.getViewport({ scale: currentPdfScale });
-
-          const card = document.createElement('div');
-          card.className = 'pdf-page-card';
-          card.style.width = Math.floor(viewport.width) + 'px';
-
-          const tag = document.createElement('div');
-          tag.className = 'pdf-page-num-tag';
-          tag.textContent = `Trang ${pageNum} / ${numPages}`;
-          card.appendChild(tag);
-
-          const canvas = document.createElement('canvas');
-          canvas.className = 'pdf-page-canvas';
-          canvas.width = Math.floor(viewport.width * dpr);
-          canvas.height = Math.floor(viewport.height * dpr);
-          canvas.style.width = Math.floor(viewport.width) + 'px';
-          canvas.style.height = Math.floor(viewport.height) + 'px';
-
-          const ctx = canvas.getContext('2d');
-          ctx.scale(dpr, dpr);
-
-          card.appendChild(canvas);
-          container.appendChild(card);
-
-          await page.render({
-            canvasContext: ctx,
-            viewport: viewport
-          }).promise;
-        }
-      } catch (renderErr) {
-        console.error('Lỗi khi render trang PDF:', renderErr);
-      } finally {
-        isRenderingPdf = false;
-      }
-    }
-
-    function toggleViewerMode() {
-      if (viewerMode === 'pdfjs') {
-        switchToIframeMode();
-      } else {
-        switchToPdfJsMode();
-      }
-    }
-
-    function switchToIframeMode() {
-      viewerMode = 'iframe';
-      const container = document.getElementById('pdfPagesContainer');
-      const iframe = document.getElementById('pdfViewer');
-      const zoomControls = document.getElementById('pdfZoomControls');
-      const badge = document.getElementById('pdfPageBadge');
-      const toggleBtn = document.getElementById('btnToggleViewerMode');
-
-      container.style.display = 'none';
-      iframe.style.display = 'block';
-      zoomControls.style.display = 'none';
-      badge.textContent = 'Drive Preview';
-      toggleBtn.style.display = 'inline-flex';
-      toggleBtn.textContent = '⚡ Xem nét cao (PDF.js)';
-
-      if (currentPdfFileId) {
-        iframe.src = `https://drive.google.com/file/d/${currentPdfFileId}/preview`;
-      } else {
-        iframe.src = currentPdfRawUrl;
-      }
-    }
-
-    function switchToPdfJsMode() {
-      viewerMode = 'pdfjs';
-      const container = document.getElementById('pdfPagesContainer');
-      const iframe = document.getElementById('pdfViewer');
-      const zoomControls = document.getElementById('pdfZoomControls');
-      const toggleBtn = document.getElementById('btnToggleViewerMode');
-
-      iframe.style.display = 'none';
-      container.style.display = 'block';
-      zoomControls.style.display = 'flex';
-      toggleBtn.textContent = '🔄 Chế độ Drive';
-
-      if (currentPdfDoc) {
-        document.getElementById('pdfPageBadge').textContent = `📄 ${currentPdfDoc.numPages} trang`;
-        renderAllPages();
-      } else if (currentPdfRawUrl) {
-        loadAndRenderPdf(currentPdfRawUrl);
-      }
-    }
-
-    async function loadAndRenderPdf(rawUrl) {
-      currentPdfRawUrl = rawUrl;
-      const container = document.getElementById('pdfPagesContainer');
-      const iframe = document.getElementById('pdfViewer');
-      const badge = document.getElementById('pdfPageBadge');
-      const toggleBtn = document.getElementById('btnToggleViewerMode');
-      const zoomControls = document.getElementById('pdfZoomControls');
-
-      viewerMode = 'pdfjs';
-      container.style.display = 'block';
-      iframe.style.display = 'none';
-      zoomControls.style.display = 'flex';
-      toggleBtn.style.display = 'inline-flex';
-      toggleBtn.textContent = '🔄 Chế độ Drive';
-
-      container.innerHTML = `
-        <div class="pdf-loading-state">
-          <div class="spinner"></div>
-          <div style="font-weight:700; color:var(--muted); font-size:13px; margin-top:8px;">
-            Đang tải và giải mã đề thi...
-          </div>
-        </div>
-      `;
-      badge.textContent = 'Đang tải...';
-
-      const fileId = extractDriveFileId(rawUrl);
-      currentPdfFileId = fileId;
-
-      // Đợi thư viện PDF.js sẵn sàng nếu đang tải qua CDN
-      const hasPdfJs = await waitForPdfJs();
-      if (!hasPdfJs) {
-        console.warn('PDF.js chưa sẵn sàng, dùng iframe fallback.');
-        switchToIframeMode();
-        return;
-      }
-
-      // Danh sách candidate download endpoints có CORS
-      let candidateUrls = [];
-      if (fileId) {
-        candidateUrls.push(`https://drive.usercontent.google.com/download?id=${fileId}&export=download`);
-        candidateUrls.push(`https://docs.google.com/uc?export=download&id=${fileId}`);
-      }
-      candidateUrls.push(rawUrl);
-
-      let pdfData = null;
-
-      for (const u of candidateUrls) {
-        try {
-          const res = await fetch(u);
-          if (res.ok) {
-            const buf = await res.arrayBuffer();
-            if (buf && buf.byteLength > 500) {
-              const magic = String.fromCharCode(...new Uint8Array(buf.slice(0, 5)));
-              if (magic.startsWith('%PDF')) {
-                pdfData = buf;
-                break;
-              }
-            }
-          }
-        } catch (e) {
-          console.warn('Thử fetch candidate thất bại:', u, e.message);
-        }
-      }
-
-      try {
-        ensurePdfJsWorker();
-
-        let loadingTask;
-        if (pdfData) {
-          loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(pdfData) });
-        } else {
-          loadingTask = pdfjsLib.getDocument({ url: candidateUrls[0] });
-        }
-
-        currentPdfDoc = await loadingTask.promise;
-        badge.textContent = `📄 ${currentPdfDoc.numPages} trang`;
-
-        await calculateBaseScale();
-        currentPdfScale = pdfBaseScale;
-        updateZoomText();
-        await renderAllPages();
-      } catch (err) {
-        console.error('Không thể render bằng PDF.js:', err);
-        container.innerHTML = `
-          <div class="pdf-error-state">
-            <div style="font-size:32px;">⚠️</div>
-            <div style="font-weight:800; color:#fff; font-size:14px;">Không thể tải dữ liệu đề thi trực tiếp</div>
-            <div style="font-size:12px; color:var(--muted); line-height:1.5;">
-              Vui lòng xem đề qua khung nhúng Google Drive hoặc mở ngoài bằng tab mới.
-            </div>
-            <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; justify-content:center;">
-              <button class="btn-pdf-tool" onclick="switchToIframeMode()">🔄 Chuyển sang Google Drive</button>
-              <a class="btn-pdf-fallback" href="${rawUrl}" target="_blank">📂 Mở trong tab mới</a>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    // Tự động căn chỉnh lại kích thước khi xoay màn hình hoặc thay đổi kích thước cửa sổ
-    let resizeTimer = null;
-    window.addEventListener('resize', () => {
-      if (viewerMode !== 'pdfjs' || !currentPdfDoc) return;
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(async () => {
-        const prevBase = pdfBaseScale;
-        await calculateBaseScale();
-        if (prevBase > 0) {
-          currentPdfScale = (currentPdfScale / prevBase) * pdfBaseScale;
-          updateZoomText();
-          await renderAllPages();
-        }
-      }, 300);
-    });
-
     function initExam(data) {
       document.getElementById('examTitle').textContent = data.title;
-      document.getElementById('btnPdfOpen').href = data.pdfUrl;
+      
+      const fileId = extractDriveFileId(data.pdfUrl);
+      const pdfOpenBtn = document.getElementById('btnPdfOpen');
+      const popoutBtn = document.getElementById('btnPdfPopout');
+      const iframe = document.getElementById('pdfViewer');
 
-      // Nạp và hiển thị toàn bộ đề thi trực tiếp bằng PDF.js
-      loadAndRenderPdf(data.pdfUrl);
+      if (pdfOpenBtn) {
+        pdfOpenBtn.href = data.pdfUrl;
+      }
+
+      if (popoutBtn) {
+        popoutBtn.onclick = (e) => {
+          e.preventDefault();
+          const w = Math.min(Math.floor(window.screen.availWidth * 0.55), 960);
+          const h = Math.floor(window.screen.availHeight * 0.92);
+          window.open(data.pdfUrl, 'zphysics_pdf_window', `width=${w},height=${h},top=40,left=30,resizable=yes,scrollbars=yes`);
+        };
+      }
+
+      // Nhúng đề thi trực tiếp qua Google Drive Preview
+      if (fileId) {
+        iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
+      } else {
+        iframe.src = data.pdfUrl;
+      }
 
       // Thiết lập thời gian
       const durationMin = data.duration || 50;
