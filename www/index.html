@@ -2642,8 +2642,12 @@
                 if (typeof url === 'string') {
                   if (url.includes('tracnghiem.html')) {
                     const match = url.match(/quiz=([^&]+)/);
-                    let quizCode = match ? match[1] : 'cauhoi';
-                    if (quizCode.startsWith('cauhoi_')) quizCode = quizCode.replace('cauhoi_', 'baitap_');
+                    let quizCode = match ? match[1] : '';
+                    if (!quizCode || quizCode === 'cauhoi') {
+                      quizCode = `baitap_${gradeNum}_c${cNum}_b${lNum}`;
+                    } else if (quizCode.startsWith('cauhoi_')) {
+                      quizCode = quizCode.replace('cauhoi_', 'baitap_');
+                    }
                     normalizedUrl = `q.html#${quizCode}`;
                   } else if (url.includes('luyende.html')) {
                     const match = url.match(/exam=([^&]+)/);

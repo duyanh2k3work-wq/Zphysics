@@ -36,9 +36,9 @@
             "num": "01",
             "title": "Làm quen với Vật lí",
             "links": {
-              "tracNghiem": "tracnghiem.html?quiz=cauhoi",
-              "dungSai": "#",
-              "traLoiNgan": "#"
+              "tracNghiem": "tracnghiem.html?quiz=cauhoi_10_c1_b01",
+              "dungSai": "tracnghiem.html?quiz=đs_10_c1_b01",
+              "traLoiNgan": "tracnghiem.html?quiz=tln_10_c1_b01"
             }
           },
           {

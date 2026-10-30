@@ -5,7 +5,9 @@
   <title>Zphysics - Đang chuyển hướng...</title>
   <script>
     const params = new URLSearchParams(window.location.search);
-    const quizCode = params.get('quiz') || 'cauhoi';
+    let quizCode = params.get('quiz') || 'baitap_10_c1_b01';
+    if (!quizCode || quizCode === 'cauhoi') quizCode = 'baitap_10_c1_b01';
+    if (quizCode.startsWith('cauhoi_')) quizCode = quizCode.replace('cauhoi_', 'baitap_');
     window.location.replace('q.html#' + quizCode);
   </script>
 </head>

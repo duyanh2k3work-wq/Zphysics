@@ -1452,8 +1452,9 @@
         quizFile = hashVal;
       }
     }
-    if (!quizFile) quizFile = 'cauhoi';
+    if (!quizFile || quizFile === 'cauhoi') quizFile = 'baitap_10_c1_b01';
     try { quizFile = decodeURIComponent(quizFile); } catch(e) {}
+    if (quizFile === 'cauhoi') quizFile = 'baitap_10_c1_b01';
     
     const isReviewMode = quizFile.startsWith('ontap_');
 
@@ -1475,13 +1476,28 @@
           if (quizFile.startsWith('ontap_')) {
             searchCode = 'baitap_' + quizFile.substring('ontap_'.length);
           }
-          const quizUrlParam = `quiz=${searchCode}`;
+          const baseCode = searchCode.replace(/^(baitap|ontap|cauhoi|đs|tln)_/, '');
+          const codeParts = baseCode.split('_');
+          const targetGrade = codeParts[0] || '';
+          const targetChapter = codeParts[1] ? codeParts[1].replace('c', '') : '';
+          const targetLesson = codeParts[2] ? codeParts[2].replace('b', '') : '';
+          const romanMap = { 'I': '1', 'II': '2', 'III': '3', 'IV': '4', 'V': '5', 'VI': '6', 'VII': '7', 'VIII': '8', 'IX': '9', 'X': '10' };
+
           for (const gradeItem of data) {
+            const gMatch = targetGrade && gradeItem.grade && gradeItem.grade.includes(targetGrade);
             for (const chapterItem of gradeItem.chapters) {
+              let cRaw = chapterItem.num.replace(/chương/i, '').trim().toUpperCase();
+              const cNum = romanMap[cRaw] || cRaw;
+
               for (const lessonItem of chapterItem.lessons) {
                 const links = lessonItem.links || {};
-                const isMatch = Object.values(links).some(link => typeof link === 'string' && link.includes(quizUrlParam));
-                if (isMatch) {
+                const lNum = lessonItem.num ? lessonItem.num.replace(/^0+/, '') : '';
+                const tLessonClean = targetLesson.replace(/^0+/, '');
+
+                const isMatchByLinks = Object.values(links).some(link => typeof link === 'string' && (link.includes(searchCode) || (baseCode && link.includes(baseCode))));
+                const isMatchByStructure = gMatch && (cNum === targetChapter) && (lNum === tLessonClean);
+
+                if (isMatchByLinks || isMatchByStructure) {
                   lessonInfo = {
                     grade: gradeItem.grade,
                     chapter: chapterItem.num + (chapterItem.title ? `: ${chapterItem.title}` : ''),
