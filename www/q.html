@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"
-    onload="if(typeof renderMathInElement==='function'){renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}]});}"></script>
+    onload="if(typeof triggerKaTeX==='function'){triggerKaTeX(document.body);}else if(typeof renderMathInElement==='function'){renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],throwOnError:false});}"></script>
 
   <style>
     .part-header {
@@ -1664,8 +1664,100 @@
 
     loadQuizFromSupabase();
 
+    // ══════════════════════════════════════════════
+    // 🧮 XỬ LÝ & CHUẨN HÓA CÔNG THỨC TOÁN / VẬT LÍ (KaTeX)
+    // ══════════════════════════════════════════════
+    function preprocessMath(text) {
+      if (!text) return '';
+
+      // 1. Chuẩn hóa các ký hiệu động năng trung bình và đại lượng vật lí viết tắt bằng LaTeX
+      let res = text
+        .replace(/\\bar\{Ed1\}/g, '\\overline{E_{d1}}')
+        .replace(/\\bar\{Ed2\}/g, '\\overline{E_{d2}}')
+        .replace(/\\bar\{Ed\}/g, '\\overline{E_d}')
+        .replace(/\\bar\{E_d\}/g, '\\overline{E_d}')
+        .replace(/\\bar\{E_đ\}/g, '\\overline{E_đ}')
+        .replace(/\\bar\{v[²2]\}/g, '\\overline{v^2}')
+        .replace(/\\bar\{s\}/g, '\\overline{s}')
+        .replace(/\\bar\{t\}/g, '\\overline{t}')
+        .replace(/\\bar\{v\}/g, '\\overline{v}')
+        .replace(/\\bar\{\\Delta\s*t\}/g, '\\overline{\\Delta t}')
+        .replace(/\\bar\{Δt\}/g, '\\overline{\\Delta t}');
+
+      // 2. Tách các khối đã có delimiter ($...$, $$...$$, \(...\), \[...\]) để không bọc đè
+      const mathRegex = /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\$[^\$\n]+?\$|\\\([\s\S]*?\\\))/g;
+      const parts = res.split(mathRegex);
+      const tokens = [];
+
+      for (let i = 0; i < parts.length; i++) {
+        // Khối đã có delimiter sẵn -> giữ nguyên
+        if (i % 2 === 1) {
+          tokens.push(parts[i]);
+          continue;
+        }
+
+        let p = parts[i];
+        if (!p) continue;
+
+        // Nếu phần văn bản chứa lệnh LaTeX chưa có delimiter $
+        if (p.includes('\\')) {
+          const hasVietnamese = /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(p);
+          
+          if (!hasVietnamese && (/[=><≈±\/\^]/.test(p) || p.trim().startsWith('\\'))) {
+            let clean = p.trim();
+            let endPunct = '';
+            if (/[.,;:]$/.test(clean)) {
+              endPunct = clean.slice(-1);
+              clean = clean.slice(0, -1).trim();
+            }
+            tokens.push('$' + clean + '$' + endPunct);
+          } else {
+            // Có chứa chữ tiếng Việt: bọc các lệnh / công thức LaTeX riêng lẻ
+            let replaced = p.replace(/(\\(?:overline|bar|hat|vec|dot|ddot|frac|sqrt)\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}|\\(?:Delta|delta|alpha|beta|gamma|lambda|mu|omega|Omega|pi|theta|sigma|rho|tau|phi|varphi|pm|approx|le|ge|times|cdot|ne|neq|Rightarrow|to)(?:\s+[a-zA-Z0-9_]+)?)/g, (m, g1) => '$' + g1.trim() + '$');
+            tokens.push(replaced);
+          }
+        } else {
+          tokens.push(p);
+        }
+      }
+      return tokens.join('');
+    }
+
+    function triggerKaTeX(el) {
+      const target = el || document.getElementById('quizContainer') || document.body;
+      if (typeof renderMathInElement === 'function') {
+        try {
+          renderMathInElement(target, {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '\\[', right: '\\]', display: true },
+              { left: '$', right: '$', display: false },
+              { left: '\\(', right: '\\)', display: false }
+            ],
+            throwOnError: false
+          });
+        } catch (e) {
+          console.warn('KaTeX render error:', e);
+        }
+      } else {
+        let attempts = 0;
+        const interval = setInterval(() => {
+          attempts++;
+          if (typeof renderMathInElement === 'function') {
+            clearInterval(interval);
+            triggerKaTeX(target);
+          } else if (attempts > 20) {
+            clearInterval(interval);
+          }
+        }, 150);
+      }
+    }
+
     function formatText(text) {
       if (!text) return '';
+
+      // Tự động chuẩn hóa và nhận diện công thức LaTeX (bao gồm \bar{Ed} -> \overline{E_d})
+      text = preprocessMath(text);
 
       // 1. Xử lý cú pháp [img]URL[/img] trước
       let html = text.replace(/\[img\](.*?)\[\/img\]/gi, '\n__IMG__$1__ENDIMG__\n');
@@ -1794,16 +1886,7 @@
       });
 
       // Render KaTeX cho nội dung vừa tạo
-      if (typeof renderMathInElement === 'function') {
-        renderMathInElement(container, {
-          delimiters: [
-            { left: '$$', right: '$$', display: true },
-            { left: '\\[', right: '\\]', display: true },
-            { left: '$', right: '$', display: false },
-            { left: '\\(', right: '\\)', display: false }
-          ]
-        });
-      }
+      triggerKaTeX(container);
     }
 
     // ── REVIEW MODE: Hiển thị từng câu một ──
@@ -1878,16 +1961,7 @@
       container.appendChild(card);
       
       // Render KaTeX
-      if (typeof renderMathInElement === 'function') {
-        renderMathInElement(card, {
-          delimiters: [
-            { left: '$$', right: '$$', display: true },
-            { left: '\\[', right: '\\]', display: true },
-            { left: '$', right: '$', display: false },
-            { left: '\\(', right: '\\)', display: false }
-          ]
-        });
-      }
+      triggerKaTeX(card);
       
       // Update progress bar
       const done = rvCorrect + rvWrong + rvSkipped;
@@ -2167,16 +2241,7 @@
         explainEl.classList.add('visible');
         
         // Render KaTeX cho lời giải
-        if (typeof renderMathInElement === 'function') {
-          renderMathInElement(explainEl, {
-            delimiters: [
-              { left: '$$', right: '$$', display: true },
-              { left: '\\[', right: '\\]', display: true },
-              { left: '$', right: '$', display: false },
-              { left: '\\(', right: '\\)', display: false }
-            ]
-          });
-        }
+        triggerKaTeX(explainEl);
       }
       
       updateProgress();
@@ -2528,16 +2593,7 @@
       });
 
       // Render KaTeX cho lời giải
-      if (typeof renderMathInElement === 'function') {
-        renderMathInElement(document.getElementById('quizContainer'), {
-          delimiters: [
-            { left: '$$', right: '$$', display: true },
-            { left: '\\[', right: '\\]', display: true },
-            { left: '$', right: '$', display: false },
-            { left: '\\(', right: '\\)', display: false }
-          ]
-        });
-      }
+      triggerKaTeX(document.getElementById('quizContainer'));
 
       // Hiển thị điểm
       let finalScore = score;
