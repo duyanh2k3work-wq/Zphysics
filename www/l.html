@@ -1091,24 +1091,24 @@
 
         <form id="answerForm" onsubmit="event.preventDefault(); submitExam(false);">
           <!-- Part I: MCQ -->
-          <div class="answer-section">
-            <div class="answer-section-title">PHẦN I: Trắc nghiệm (18 câu - 4.5đ)</div>
+          <div class="answer-section" id="mcqSection">
+            <div class="answer-section-title" id="mcqSectionTitle">PHẦN I: Trắc nghiệm (18 câu - 4.5đ)</div>
             <div class="mcq-grid" id="mcqGrid">
               <!-- RENDERED BY JS -->
             </div>
           </div>
 
           <!-- Part II: True/False -->
-          <div class="answer-section">
-            <div class="answer-section-title">PHẦN II: Đúng / Sai (4 câu - 4.0đ)</div>
+          <div class="answer-section" id="tfSection">
+            <div class="answer-section-title" id="tfSectionTitle">PHẦN II: Đúng / Sai (4 câu - 4.0đ)</div>
             <div class="tf-grid" id="tfGrid">
               <!-- RENDERED BY JS -->
             </div>
           </div>
 
           <!-- Part III: Short Answer -->
-          <div class="answer-section">
-            <div class="answer-section-title">PHẦN III: Trả lời ngắn (6 câu - 1.5đ)</div>
+          <div class="answer-section" id="saSection">
+            <div class="answer-section-title" id="saSectionTitle">PHẦN III: Trả lời ngắn (6 câu - 1.5đ)</div>
             <div class="sa-grid" id="saGrid">
               <!-- RENDERED BY JS -->
             </div>
@@ -1416,7 +1416,7 @@
         if (cached) {
           list = JSON.parse(cached);
           if (Array.isArray(list) && list.length > 0) {
-            const found = list.find(e => e.id === examId) || list[0];
+            const found = examId ? list.find(e => e.id === examId) : list[0];
             if (found) {
               checkAndLoadExam(found);
             }
@@ -1451,10 +1451,20 @@
             try {
               localStorage.setItem('zphysics_exams_cache', JSON.stringify(freshList));
             } catch(e) {}
-            // Nếu chưa mở đề hoặc đề đang ở lock screen, cập nhật dữ liệu mới nhất
-            if (!isExamUnlocked) {
-              const freshExam = freshList.find(e => e.id === examId) || freshList[0];
-              if (freshExam) checkAndLoadExam(freshExam);
+            const freshExam = (examId ? freshList.find(e => e.id === examId) : null) || freshList[0];
+            if (freshExam) {
+              const isDifferent = !examData ||
+                examData.id !== freshExam.id ||
+                examData.title !== freshExam.title ||
+                examData.pdfUrl !== freshExam.pdfUrl ||
+                examData.mcAnswers !== freshExam.mcAnswers ||
+                examData.tfAnswers !== freshExam.tfAnswers ||
+                examData.saAnswers !== freshExam.saAnswers ||
+                examData.openAt !== freshExam.openAt;
+              if (!isExamUnlocked || (isDifferent && !submitted)) {
+                isExamUnlocked = false;
+                checkAndLoadExam(freshExam);
+              }
             }
           }
         } catch (err) {
@@ -1468,7 +1478,7 @@
                 try {
                   localStorage.setItem('zphysics_exams_cache', JSON.stringify(offlineList));
                 } catch(e) {}
-                const offExam = offlineList.find(e => e.id === examId) || offlineList[0];
+                const offExam = (examId ? offlineList.find(e => e.id === examId) : null) || offlineList[0];
                 if (offExam) {
                   checkAndLoadExam(offExam);
                 } else {
@@ -1559,14 +1569,83 @@
       }
 
       // Bắt đầu đếm ngược
+      if (timerInterval) clearInterval(timerInterval);
       startTimer();
     }
 
-    // ── RENDER PHẦN I: TRẮC NGHIỆM MCQ (18 CÂU) ──
+    // ── HELPER PHÂN TÍCH ĐÁP ÁN & CẤU TRÚC ĐỀ ĐỘNG TỪ SHEET ──
+    function parseMCKeys(data) {
+      if (!data || !data.mcAnswers) return [];
+      return String(data.mcAnswers)
+        .split(',')
+        .map(s => s.trim().toUpperCase())
+        .filter(Boolean);
+    }
+
+    function parseTFKeys(data) {
+      if (!data || !data.tfAnswers) return [];
+      return String(data.tfAnswers)
+        .split(';')
+        .map(q => q.trim().replace(/[,;\s]+$/g, '').replace(/D/g, 'Đ').toUpperCase())
+        .filter(Boolean);
+    }
+
+    function parseSAKeys(data) {
+      if (!data || !data.saAnswers) return [];
+      return String(data.saAnswers)
+        .split(';')
+        .map(s => s.trim().toLowerCase())
+        .filter(s => s !== '');
+    }
+
+    function getExamStructure(data) {
+      const mcKeys = parseMCKeys(data);
+      const tfKeys = parseTFKeys(data);
+      const saKeys = parseSAKeys(data);
+      const isEmptyAll = mcKeys.length === 0 && tfKeys.length === 0 && saKeys.length === 0;
+
+      const mcCount = isEmptyAll ? 18 : mcKeys.length;
+      const tfCount = isEmptyAll ? 4 : tfKeys.length;
+      const saCount = isEmptyAll ? 6 : saKeys.length;
+
+      const mcMaxScore = Math.round(mcCount * 0.25 * 100) / 100;
+      const tfMaxScore = Math.round(tfCount * 1.0 * 100) / 100;
+      const remaining = Math.round((10 - mcMaxScore - tfMaxScore) * 100) / 100;
+      const saMaxScore = saCount > 0 ? (remaining > 0 ? remaining : Math.round(saCount * 0.25 * 100) / 100) : 0;
+      const saPointEach = saCount > 0 ? saMaxScore / saCount : 0.25;
+
+      return {
+        mcKeys,
+        tfKeys,
+        saKeys,
+        mcCount,
+        tfCount,
+        saCount,
+        mcMaxScore,
+        tfMaxScore,
+        saMaxScore,
+        saPointEach
+      };
+    }
+
+    function formatScoreBadge(score) {
+      return Number.isInteger(score) ? `${score}.0` : `${score}`;
+    }
+
+    // ── RENDER PHẦN I: TRẮC NGHIỆM MCQ (TỰ ĐỘNG THEO SHEET) ──
     function renderMCQGrid() {
+      const { mcCount, mcMaxScore } = getExamStructure(examData);
+      const section = document.getElementById('mcqSection');
+      const titleEl = document.getElementById('mcqSectionTitle');
       const grid = document.getElementById('mcqGrid');
       grid.innerHTML = '';
-      for (let i = 1; i <= 18; i++) {
+
+      if (section) section.style.display = mcCount > 0 ? '' : 'none';
+      if (titleEl) {
+        titleEl.textContent = `PHẦN I: Trắc nghiệm (${mcCount} câu - ${formatScoreBadge(mcMaxScore)}đ)`;
+      }
+
+      for (let i = 1; i <= mcCount; i++) {
         const row = document.createElement('div');
         row.className = 'mcq-row';
         row.innerHTML = `
@@ -1589,11 +1668,20 @@
       btn.classList.add('selected');
     }
 
-    // ── RENDER PHẦN II: ĐÚNG / SAI TF (4 CÂU) ──
+    // ── RENDER PHẦN II: ĐÚNG / SAI TF (TỰ ĐỘNG THEO SHEET) ──
     function renderTFGrid() {
+      const { tfCount, tfMaxScore } = getExamStructure(examData);
+      const section = document.getElementById('tfSection');
+      const titleEl = document.getElementById('tfSectionTitle');
       const grid = document.getElementById('tfGrid');
       grid.innerHTML = '';
-      for (let i = 1; i <= 4; i++) {
+
+      if (section) section.style.display = tfCount > 0 ? '' : 'none';
+      if (titleEl) {
+        titleEl.textContent = `PHẦN II: Đúng / Sai (${tfCount} câu - ${formatScoreBadge(tfMaxScore)}đ)`;
+      }
+
+      for (let i = 1; i <= tfCount; i++) {
         const box = document.createElement('div');
         box.className = 'tf-question-box';
         
@@ -1627,11 +1715,20 @@
       btn.classList.add('selected');
     }
 
-    // ── RENDER PHẦN III: TRẢ LỜI NGẮN SA (6 CÂU) ──
+    // ── RENDER PHẦN III: TRẢ LỜI NGẮN SA (TỰ ĐỘNG THEO SHEET) ──
     function renderSAGrid() {
+      const { saCount, saMaxScore } = getExamStructure(examData);
+      const section = document.getElementById('saSection');
+      const titleEl = document.getElementById('saSectionTitle');
       const grid = document.getElementById('saGrid');
       grid.innerHTML = '';
-      for (let i = 1; i <= 6; i++) {
+
+      if (section) section.style.display = saCount > 0 ? '' : 'none';
+      if (titleEl) {
+        titleEl.textContent = `PHẦN III: Trả lời ngắn (${saCount} câu - ${formatScoreBadge(saMaxScore)}đ)`;
+      }
+
+      for (let i = 1; i <= saCount; i++) {
         const row = document.createElement('div');
         row.className = 'sa-row';
         row.innerHTML = `
@@ -1808,16 +1905,16 @@
       const mobileSubmitBtn = document.getElementById('btnMobileSubmit');
       if (mobileSubmitBtn) mobileSubmitBtn.disabled = true;
 
-      // ── BẮT ĐẦU CHẤM ĐIỂM ──
-      let scorePart1 = 0; // Trắc nghiệm 18 câu (0.25đ/câu, tối đa 4.5đ)
-      let scorePart2 = 0; // Đúng sai 4 câu (tối đa 4.0đ)
-      let scorePart3 = 0; // Trả lời ngắn 6 câu (0.25đ/câu, tối đa 1.5đ)
+      // ── BẮT ĐẦU CHẤM ĐIỂM (ĐỘNG THEO CẤU TRÚC ĐỀ TRÊN SHEET) ──
+      const { mcKeys, tfKeys: tfQuestionKeys, saKeys, mcCount, tfCount, saCount, saPointEach } = getExamStructure(examData);
+      let scorePart1 = 0;
+      let scorePart2 = 0;
+      let scorePart3 = 0;
       
       let wrongList = [];
 
       // 1. Chấm Phần I (Trắc nghiệm)
-      const mcKeys = examData.mcAnswers.split(',').map(s => s.trim().toUpperCase());
-      for (let i = 1; i <= 18; i++) {
+      for (let i = 1; i <= mcCount; i++) {
         const correctKey = mcKeys[i - 1] || '';
         const selectedBtn = document.querySelector(`.mcq-options[data-q="${i}"] .mcq-btn.selected`);
         const studentAns = selectedBtn ? selectedBtn.dataset.opt : '';
@@ -1841,11 +1938,10 @@
 
       // 2. Chấm Phần II (Đúng / Sai)
       // Định dạng đáp án đúng sai: Đ,S,Đ,S;S,Đ,S,Đ...
-      const tfQuestionKeys = examData.tfAnswers.split(';').map(q => q.trim().replace(/D/g, 'Đ').toUpperCase());
-      for (let i = 1; i <= 4; i++) {
+      for (let i = 1; i <= tfCount; i++) {
         const correctStr = tfQuestionKeys[i - 1] || 'ĐĐĐĐ';
-        const correctAnswers = correctStr.split(',').map(s => s.trim()); // Hỗ trợ dấu phẩy hoặc kí tự liền nhau
-        const cleanCorrectAnswers = correctAnswers.length >= 4 ? correctAnswers : correctStr.replace(/,/g, '').split('');
+        const correctAnswers = correctStr.split(',').map(s => s.trim()).filter(Boolean); // Hỗ trợ dấu phẩy hoặc kí tự liền nhau
+        const cleanCorrectAnswers = correctAnswers.length >= 4 ? correctAnswers : correctStr.replace(/[,;\s]/g, '').split('');
 
         let correctStatementsCount = 0;
         let statementDetails = [];
@@ -1884,8 +1980,7 @@
       }
 
       // 3. Chấm Phần III (Trả lời ngắn)
-      const saKeys = examData.saAnswers.split(';').map(s => s.trim().toLowerCase());
-      for (let i = 1; i <= 6; i++) {
+      for (let i = 1; i <= saCount; i++) {
         const correctVal = saKeys[i - 1] || '';
         const input = document.querySelector(`.sa-input[data-q="${i}"]`);
         const studentVal = input ? input.value.trim().toLowerCase() : '';
@@ -1893,7 +1988,7 @@
         if (input) {
           if (isShortAnswerMatch(studentVal, correctVal)) {
             input.classList.add('is-correct');
-            scorePart3 += 0.25;
+            scorePart3 += saPointEach;
           } else {
             input.classList.add('is-wrong');
             wrongList.push(`- Câu ${i} (Phần III): Điền "${studentVal || 'Bỏ trống'}" (Đáp án đúng: ${correctVal})`);
