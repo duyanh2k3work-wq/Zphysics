@@ -3,6 +3,9 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>Zphysics — Phòng Luyện Đề VIP</title>
   <link rel="icon" type="image/png" href="logo.png">
@@ -1174,25 +1177,42 @@
 
     // Xác thực quyền Premium
     const currentSession = getSession();
-    const urlParams = new URLSearchParams(window.location.search);
-    let demoMode = urlParams.get('demo');
-    let examId = urlParams.get('exam');
+    function parseUrlExamParams() {
+      const searchParams = new URLSearchParams(window.location.search);
+      let dMode = searchParams.get('demo');
+      let eId = searchParams.get('exam');
 
-    // Hỗ trợ Hash Routing cho đề thi thử
-    if (!examId && window.location.hash) {
-      const hashVal = window.location.hash.substring(1);
-      const hashParams = new URLSearchParams(hashVal);
-      if (hashParams.has('exam')) {
-        examId = hashParams.get('exam');
-      } else if (hashVal && !hashVal.includes('=')) {
-        examId = hashVal;
+      if (window.location.hash) {
+        const rawHash = window.location.hash.substring(1);
+        const [hashPart, hashQuery] = rawHash.split('?');
+        if (hashQuery) {
+          const hqParams = new URLSearchParams(hashQuery);
+          if (!dMode && hqParams.has('demo')) dMode = hqParams.get('demo');
+          if (!eId && hqParams.has('exam')) eId = hqParams.get('exam');
+        }
+        const hashParams = new URLSearchParams(hashPart);
+        if (!eId && hashParams.has('exam')) {
+          eId = hashParams.get('exam');
+        } else if (!eId && hashPart && !hashPart.includes('=')) {
+          eId = hashPart;
+        }
+        if (!dMode && hashParams.has('demo')) {
+          dMode = hashParams.get('demo');
+        }
       }
-      if (hashParams.has('demo')) {
-        demoMode = hashParams.get('demo');
-      }
+      if (!eId) eId = '';
+      try { eId = decodeURIComponent(eId).trim(); } catch(e) {}
+      return { examId: eId, demoMode: dMode };
     }
-    if (!examId) examId = '';
-    try { examId = decodeURIComponent(examId); } catch(e) {}
+
+    let { examId, demoMode } = parseUrlExamParams();
+
+    function findExamById(list, targetId) {
+      if (!Array.isArray(list) || list.length === 0) return null;
+      if (!targetId) return list[0];
+      const norm = String(targetId).trim().toLowerCase();
+      return list.find(e => e && e.id && String(e.id).trim().toLowerCase() === norm) || null;
+    }
 
     // Tự động làm đẹp URL bằng cách chuyển đổi từ query sang hash
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
@@ -1416,7 +1436,7 @@
         if (cached) {
           list = JSON.parse(cached);
           if (Array.isArray(list) && list.length > 0) {
-            const found = examId ? list.find(e => e.id === examId) : list[0];
+            const found = findExamById(list, examId);
             if (found) {
               checkAndLoadExam(found);
             }
@@ -1428,6 +1448,7 @@
       const fetchExamData = async () => {
         try {
           const response = await fetch(`${SUPABASE_URL}/rest/v1/exams?select=*`, {
+            cache: 'no-store',
             headers: {
               'apikey': SUPABASE_ANON_KEY,
               'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
@@ -1451,7 +1472,7 @@
             try {
               localStorage.setItem('zphysics_exams_cache', JSON.stringify(freshList));
             } catch(e) {}
-            const freshExam = (examId ? freshList.find(e => e.id === examId) : null) || freshList[0];
+            const freshExam = findExamById(freshList, examId) || (!examId ? freshList[0] : null);
             if (freshExam) {
               const isDifferent = !examData ||
                 examData.id !== freshExam.id ||
@@ -1478,7 +1499,7 @@
                 try {
                   localStorage.setItem('zphysics_exams_cache', JSON.stringify(offlineList));
                 } catch(e) {}
-                const offExam = (examId ? offlineList.find(e => e.id === examId) : null) || offlineList[0];
+                const offExam = findExamById(offlineList, examId) || (!examId ? offlineList[0] : null);
                 if (offExam) {
                   checkAndLoadExam(offExam);
                 } else {
@@ -1496,6 +1517,17 @@
       };
 
       fetchExamData();
+
+      window.addEventListener('hashchange', () => {
+        const parsed = parseUrlExamParams();
+        if (parsed.examId && parsed.examId !== examId) {
+          examId = parsed.examId;
+          submitted = false;
+          isExamUnlocked = false;
+          examData = null;
+          fetchExamData();
+        }
+      });
     }
 
     if (document.readyState === 'loading') {
@@ -1575,24 +1607,27 @@
 
     // ── HELPER PHÂN TÍCH ĐÁP ÁN & CẤU TRÚC ĐỀ ĐỘNG TỪ SHEET ──
     function parseMCKeys(data) {
-      if (!data || !data.mcAnswers) return [];
-      return String(data.mcAnswers)
+      const raw = data && (data.mcAnswers || data.mc_answers);
+      if (!raw) return [];
+      return String(raw)
         .split(',')
         .map(s => s.trim().toUpperCase())
         .filter(Boolean);
     }
 
     function parseTFKeys(data) {
-      if (!data || !data.tfAnswers) return [];
-      return String(data.tfAnswers)
+      const raw = data && (data.tfAnswers || data.tf_answers);
+      if (!raw) return [];
+      return String(raw)
         .split(';')
         .map(q => q.trim().replace(/[,;\s]+$/g, '').replace(/D/g, 'Đ').toUpperCase())
         .filter(Boolean);
     }
 
     function parseSAKeys(data) {
-      if (!data || !data.saAnswers) return [];
-      return String(data.saAnswers)
+      const raw = data && (data.saAnswers || data.sa_answers);
+      if (!raw) return [];
+      return String(raw)
         .split(';')
         .map(s => s.trim().toLowerCase())
         .filter(s => s !== '');
