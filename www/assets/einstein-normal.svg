@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="100%" height="100%">
+  <defs>
+    <radialGradient id="greenBg" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#58CC02" />
+      <stop offset="70%" stop-color="#46A302" />
+      <stop offset="100%" stop-color="#2B6B00" />
+    </radialGradient>
+    <linearGradient id="chalkGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#DDF4FF" />
+    </linearGradient>
+  </defs>
+
+  <!-- Duolingo Green Vibrant Background Ring -->
+  <circle cx="120" cy="120" r="110" fill="url(#greenBg)" />
+
+  <!-- Playful Background Orbit Rings (Atom Bohr model) -->
+  <ellipse cx="120" cy="120" rx="90" ry="32" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.3" transform="rotate(-25 120 120)" />
+  <ellipse cx="120" cy="120" rx="90" ry="32" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.3" transform="rotate(35 120 120)" />
+  <!-- Little electrons on orbits -->
+  <circle cx="45" cy="80" r="4" fill="#FFD600" />
+  <circle cx="195" cy="160" r="4" fill="#FFD600" />
+  <circle cx="65" cy="170" r="3.5" fill="#38BDF8" />
+
+  <!-- Lab Coat with green accent -->
+  <path d="M 72,175 Q 60,225 60,232 L 180,232 Q 180,225 168,175 Z" fill="#E2E8F0" />
+  <path d="M 85,175 L 78,232 L 162,232 L 155,175 Z" fill="#FFFFFF" />
+  <!-- Warm Teal/Teal-Blue vest inside -->
+  <polygon points="120,175 105,215 120,230 135,215" fill="#1CB0F6" />
+  <!-- Pocket with physics pens -->
+  <rect x="84" y="195" width="20" height="22" rx="4" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="1.5" />
+  <line x1="88" y1="188" x2="88" y2="198" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" />
+  <line x1="94" y1="186" x2="94" y2="198" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" />
+
+  <!-- Bouncy Wild Fluffy Einstein Hair -->
+  <g fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2">
+    <circle cx="65" cy="85" r="28" />
+    <circle cx="48" cy="115" r="26" />
+    <circle cx="45" cy="145" r="22" />
+    <circle cx="175" cy="85" r="28" />
+    <circle cx="192" cy="115" r="26" />
+    <circle cx="195" cy="145" r="22" />
+    <circle cx="85" cy="62" r="30" />
+    <circle cx="120" cy="50" r="32" />
+    <circle cx="155" cy="62" r="30" />
+    <!-- Fun playful hair tufts -->
+    <path d="M 38,95 Q 18,88 28,110 Z" />
+    <path d="M 202,95 Q 222,88 212,110 Z" />
+    <path d="M 112,32 Q 120,10 134,30 Z" />
+  </g>
+
+  <!-- Cheerful Head / Face -->
+  <ellipse cx="120" cy="125" rx="52" ry="46" fill="#FED7AA" />
+  <!-- Rosy Cute Cheeks -->
+  <ellipse cx="84" cy="142" rx="11" ry="7" fill="#F87171" opacity="0.6" />
+  <ellipse cx="156" cy="142" rx="11" ry="7" fill="#F87171" opacity="0.6" />
+
+  <!-- EYES: PLAYFUL WINK! -->
+  <g>
+    <!-- Left Eye: Cheerful Wide Open -->
+    <ellipse cx="92" cy="118" rx="12" ry="14" fill="#FFFFFF" stroke="#1E293B" stroke-width="2.5" />
+    <circle cx="94" cy="118" r="7" fill="#1E293B" />
+    <circle cx="91" cy="115" r="3" fill="#FFFFFF" />
+    <circle cx="97" cy="122" r="1.5" fill="#FFFFFF" />
+    <!-- Happy curved eyebrow -->
+    <path d="M 80,102 Q 92,94 104,102" stroke="#64748B" stroke-width="3" stroke-linecap="round" fill="none" />
+
+    <!-- Right Eye: Winking Curvy Arch (^_~) -->
+    <path d="M 136,120 Q 148,108 160,120" stroke="#1E293B" stroke-width="4.5" stroke-linecap="round" fill="none" />
+    <path d="M 134,102 Q 148,94 162,102" stroke="#64748B" stroke-width="3" stroke-linecap="round" fill="none" />
+  </g>
+
+  <!-- Bushy White Mustache parted slightly for tongue -->
+  <path d="M 120,138 C 106,134 88,136 78,148 C 90,158 110,154 116,146 C 120,146 124,146 124,146 C 130,154 150,158 162,148 C 152,136 134,134 120,138 Z" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5" />
+
+  <!-- ICONIC PLAYFUL STICKING-OUT TONGUE 😛 -->
+  <g>
+    <!-- Mouth opening -->
+    <ellipse cx="120" cy="154" rx="10" ry="6" fill="#881337" />
+    <!-- Pink tongue sticking out -->
+    <path d="M 112,152 C 112,166 114,174 120,174 C 126,174 128,166 128,152 Z" fill="#FB7185" stroke="#E11D48" stroke-width="1.5" />
+    <!-- Tongue middle crease -->
+    <line x1="120" y1="156" x2="120" y2="168" stroke="#E11D48" stroke-width="1.5" />
+  </g>
+
+  <!-- Left Hand Holding Piece of White Chalk writing E=mc² -->
+  <g transform="translate(170, 125)">
+    <circle cx="16" cy="16" r="10" fill="#FED7AA" stroke="#FDBA74" stroke-width="1.5" />
+    <!-- Chalk stick -->
+    <polygon points="12,18 28,4 32,8 16,22" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1" />
+    <!-- Little chalk glow -->
+    <circle cx="30" cy="6" r="3" fill="#FFFFFF" />
+  </g>
+
+  <!-- Floating Formula drawn in air -->
+  <g transform="translate(160, 85)">
+    <text x="0" y="0" fill="#FFFFFF" font-family="'Nunito', sans-serif" font-weight="900" font-size="16" stroke="#15803D" stroke-width="1">E=mc²</text>
+    <polygon points="45,-18 47,-13 52,-11 47,-9 45,-4 43,-9 38,-11 43,-13" fill="#FEF08A" />
+  </g>
+
+  <!-- Left hand waving friendly -->
+  <g transform="translate(38, 140)">
+    <circle cx="18" cy="18" r="10" fill="#FED7AA" stroke="#FDBA74" stroke-width="1.5" />
+    <path d="M 18,10 Q 14,0 20,-2 Q 24,0 22,10" fill="#FED7AA" stroke="#FDBA74" stroke-width="1" />
+    <path d="M 22,10 Q 22,-4 28,-3 Q 30,0 26,10" fill="#FED7AA" stroke="#FDBA74" stroke-width="1" />
+  </g>
+
+  <!-- DUOLINGO STYLE BADGE AT BOTTOM -->
+  <g transform="translate(35, 195)">
+    <rect x="0" y="0" width="170" height="36" rx="18" fill="#FFFFFF" stroke="#46A302" stroke-width="3" />
+    <text x="18" y="24" fill="#15803D" font-family="'Nunito', sans-serif" font-weight="900" font-size="14">⚡ CÓ 3 PHÚT KHÔNG?</text>
+  </g>
+</svg>

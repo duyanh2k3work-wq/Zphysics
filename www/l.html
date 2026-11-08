@@ -437,6 +437,12 @@
       gap: 12px;
     }
 
+    .mcq-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
     .mcq-row {
       background: rgba(255, 255, 255, 0.01);
       border: 1px solid rgba(255, 255, 255, 0.04);
@@ -948,6 +954,9 @@
         gap: 12px;
       }
       .mcq-grid {
+        gap: 8px;
+      }
+      .mcq-col {
         gap: 8px;
       }
       .mcq-row {
@@ -1680,6 +1689,15 @@
         titleEl.textContent = `PHẦN I: Trắc nghiệm (${mcCount} câu - ${formatScoreBadge(mcMaxScore)}đ)`;
       }
 
+      if (mcCount <= 0) return;
+
+      const col1 = document.createElement('div');
+      col1.className = 'mcq-col';
+      const col2 = document.createElement('div');
+      col2.className = 'mcq-col';
+
+      const half = Math.ceil(mcCount / 2);
+
       for (let i = 1; i <= mcCount; i++) {
         const row = document.createElement('div');
         row.className = 'mcq-row';
@@ -1692,7 +1710,16 @@
             <div class="mcq-btn" data-opt="D" onclick="selectMCQ(this, ${i}, 'D')">D</div>
           </div>
         `;
-        grid.appendChild(row);
+        if (i <= half) {
+          col1.appendChild(row);
+        } else {
+          col2.appendChild(row);
+        }
+      }
+
+      grid.appendChild(col1);
+      if (mcCount > 1) {
+        grid.appendChild(col2);
       }
     }
 

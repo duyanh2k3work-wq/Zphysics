@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{EXAM_TITLE}} - Mã đề {{EXAM_CODE}}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm 15mm 18mm 15mm;
+      @bottom-right {
+        content: "Trang " counter(page) "/" counter(pages);
+        font-size: 10pt;
+        font-family: 'Times New Roman', serif;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 12pt;
+      line-height: 1.35;
+      color: #000;
+      background: #fff;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Header chuẩn đề thi */
+    .exam-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid #000;
+    }
+
+    .header-col {
+      text-align: center;
+      flex: 1;
+    }
+
+    .header-col.left {
+      max-width: 45%;
+      text-align: center;
+    }
+
+    .header-col.right {
+      max-width: 52%;
+      text-align: center;
+    }
+
+    .org-title {
+      font-size: 11pt;
+      text-transform: uppercase;
+      font-weight: normal;
+      margin: 0;
+    }
+
+    .school-name {
+      font-size: 11pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin: 2px 0 0 0;
+    }
+
+    .exam-name {
+      font-size: 12pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .exam-sub {
+      font-size: 11pt;
+      font-style: italic;
+      margin: 2px 0 0 0;
+    }
+
+    .exam-code-box {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 2px 8px;
+      border: 1px solid #000;
+      font-weight: bold;
+      font-size: 11pt;
+    }
+
+    .student-info {
+      margin-bottom: 14px;
+      font-size: 11pt;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .info-line {
+      display: inline-block;
+      border-bottom: 1px dotted #444;
+      min-width: 200px;
+    }
+
+    /* Tiêu đề từng phần */
+    .section-title {
+      font-weight: bold;
+      font-size: 12pt;
+      text-transform: uppercase;
+      margin: 12px 0 4px 0;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    .section-guide {
+      font-style: italic;
+      margin: 0 0 10px 0;
+      font-size: 11pt;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    /* Câu hỏi */
+    .question-item {
+      margin-bottom: 10px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      text-align: justify;
+    }
+
+    .q-num {
+      font-weight: bold;
+    }
+
+    /* Các phương án A, B, C, D */
+    .options-grid {
+      display: grid;
+      margin: 4px 0 6px 16px;
+      gap: 4px 12px;
+    }
+
+    .options-grid.cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .options-grid.cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .options-grid.cols-1 {
+      grid-template-columns: 1fr;
+    }
+
+    .opt-key {
+      font-weight: bold;
+    }
+
+    /* Phần Đúng / Sai */
+    .tf-sub-items {
+      margin: 4px 0 6px 20px;
+    }
+
+    .tf-sub-item {
+      margin-bottom: 3px;
+    }
+
+    .tf-key {
+      font-weight: bold;
+    }
+
+    /* Hình vẽ vector SVG */
+    .svg-figure {
+      text-align: center;
+      margin: 8px 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .svg-figure svg {
+      max-width: 70%;
+      height: auto;
+    }
+
+    /* Footer kết thúc */
+    .exam-end {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 18px;
+      padding-top: 8px;
+      border-top: 1px dashed #666;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Đề Thi -->
+  <div class="exam-header">
+    <div class="header-col left">
+      <div class="org-title">HỆ THỐNG GIÁO DỤC ZPHYSICS</div>
+      <div class="school-name">NGÂN HÀNG ĐỀ THI CHUẨN</div>
+      <div class="exam-code-box">MÃ ĐỀ: {{EXAM_CODE}}</div>
+    </div>
+    <div class="header-col right">
+      <div class="exam-name">{{EXAM_TITLE}}</div>
+      <div class="exam-sub">Năm học: {{ACADEMIC_YEAR}} - Môn: VẬT LÍ {{GRADE}}</div>
+      <div class="exam-sub">Thời gian làm bài: {{DURATION}} phút (không kể thời gian phát đề)</div>
+    </div>
+  </div>
+
+  <!-- Thông tin học sinh -->
+  <div class="student-info">
+    <div>Họ và tên thí sinh: <span class="info-line" style="min-width: 260px;"></span></div>
+    <div>Số báo danh: <span class="info-line" style="min-width: 140px;"></span></div>
+  </div>
+
+  <!-- PHẦN I: Trắc nghiệm 4 phương án -->
+  <div class="section-title">PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn</div>
+  <div class="section-guide">Thí sinh trả lời từ câu 1 đến câu 18. Mỗi câu hỏi thí sinh chỉ chọn một phương án.</div>
+  
+  <div class="questions-container" id="part-1">
+    {{PART_1_QUESTIONS}}
+  </div>
+
+  <!-- PHẦN II: Trắc nghiệm Đúng / Sai -->
+  <div class="section-title">PHẦN II. Câu trắc nghiệm đúng sai</div>
+  <div class="section-guide">Thí sinh trả lời từ câu 1 đến câu 4. Trong mỗi ý a), b), c), d) ở mỗi câu, thí sinh chọn đúng hoặc sai.</div>
+  
+  <div class="questions-container" id="part-2">
+    {{PART_2_QUESTIONS}}
+  </div>
+
+  <!-- PHẦN III: Trả lời ngắn -->
+  <div class="section-title">PHẦN III. Câu trắc nghiệm trả lời ngắn</div>
+  <div class="section-guide">Thí sinh trả lời từ câu 1 đến câu 6. Điền kết quả số tương ứng vào phiếu trả lời.</div>
+  
+  <div class="questions-container" id="part-3">
+    {{PART_3_QUESTIONS}}
+  </div>
+
+  <div class="exam-end">
+    ---------- HẾT ----------<br>
+    <span style="font-weight: normal; font-size: 10pt; font-style: italic;">(Cán bộ coi thi không giải thích gì thêm)</span>
+  </div>
+
+</body>
+</html>
