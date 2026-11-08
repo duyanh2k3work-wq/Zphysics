@@ -7,7 +7,6 @@
   <title>Zphysics - Hệ thống Vật lí THPT</title>
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
-  <link rel="stylesheet" href="assets/css/gamification.css">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
   <style>
@@ -1810,34 +1809,14 @@
 
   <div class="app">
 
-    <!-- ── DUOLINGO GAMIFIED TOPBAR ── -->
-    <div class="gamified-topbar">
-      <div class="topbar-brand">
-        <div class="topbar-brand-logo">⚛️</div>
-        <div class="topbar-brand-text">
-          <h1>Z<span>physics</span></h1>
-          <div class="badge-physics" id="greetingText">Xin chào, Nhà Vật Lí 👋</div>
-        </div>
+    <div class="header">
+      <div class="header-left">
+        <h2 id="greetingText">Xin chào, bạn 👋</h2>
+        <h1>Z<span>physics</span></h1>
       </div>
-
-      <div class="topbar-stats">
-        <div class="stat-chip streak" onclick="setEinsteinState('streak')" title="Chuỗi học tập">
-          🔥 <span id="topbarStreakText">14</span>
-        </div>
-        <div class="stat-chip gems" title="Tinh thể tri thức">
-          💎 520
-        </div>
-        <div class="stat-chip hearts" title="Năng lượng làm bài">
-          ❤️ 5/5
-        </div>
-        <div class="stat-chip league" title="Hạng đấu">
-          🏆 Vàng
-        </div>
-      </div>
-
-      <div class="topbar-user" style="position:relative">
-        <button class="topbar-avatar-btn avatar-btn" id="avatarBtn" title="Hồ sơ học tập">
-          <img src="assets/stickers/einstein-streak-833.png" alt="Einstein Avatar">
+      <div style="position:relative">
+        <button class="avatar-btn" id="avatarBtn">
+          <img src="https://i.postimg.cc/44LHDhL1/avatar.png" alt="Z">
         </button>
         <div class="user-popup" id="userPopup">
           <div class="user-popup-name" id="popupName"></div>
@@ -1846,121 +1825,6 @@
           <a href="javascript:void(0)" class="btn-dashboard-open" id="btnDashboard" onclick="openDashboard()" style="display: none;">📊 Tiến độ học tập</a>
           <a href="premium.html" class="premium-btn-popup">👑 Nâng cấp Premium</a>
           <button class="logout-btn" id="logoutBtn">🚪 Đăng xuất</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── EINSTEIN CHIBI MASCOT HERO BENTO CARD ── -->
-    <div class="einstein-hero-card">
-      <div class="mascot-stage" onclick="onMascotClick()" title="Bấm vào bác Einstein để nghe danh ngôn!">
-        <img id="mascotSvg" src="assets/stickers/einstein-streak-833.png" class="mascot-svg-wrap" alt="Albert Einstein Official Sticker">
-      </div>
-      <div class="mascot-content">
-        <div class="mascot-badge-row">
-          <span id="mascotStatusTag" class="mascot-status-tag streak-high">UNSTOPPABLE • 🔥 833 NGÀY</span>
-        </div>
-        <h2 id="mascotHeadline" class="mascot-headline">Thần đồng Vật lí! Bất khả chiến bại!</h2>
-        <div id="mascotQuote" class="mascot-quote-bubble">
-          Albert Einstein: "Trọng lực có thể bẻ cong không thời gian, nhưng không thể bẻ cong điểm 10 Vật lí của em!"
-        </div>
-        <div class="mascot-state-switcher">
-          <button class="state-btn active" data-state="streak" onclick="setEinsteinState('streak')">😎 Bất Khả Chiến Bại (833)</button>
-          <button class="state-btn" data-state="danger" onclick="setEinsteinState('danger')">🔥 Cháy Phòng Lab (300)</button>
-          <button class="state-btn" data-state="lost" onclick="setEinsteinState('lost')">💥 Thí Nghiệm Nổ (0)</button>
-          <button class="state-btn" data-state="practice" onclick="setEinsteinState('practice')">😛 Thè Lưỡi Ôn Bài (45)</button>
-          <button class="state-btn" data-state="ready" onclick="setEinsteinState('ready')">💡 Ý Tưởng Mới (1)</button>
-          <button class="state-btn" data-state="huddle" onclick="setEinsteinState('huddle')">🥺 Ngồi Co Ro</button>
-          <button class="state-btn" data-state="rain" onclick="setEinsteinState('rain')">🌧️ Trời Mưa (833)</button>
-        </div>
-        <div>
-          <button id="mascotCtaBtn" class="duo-btn-cta green" onclick="EINSTEIN_STATES.streak.action()">TIẾP TỤC CHINH PHỤC 🏆</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── DUOLINGO WIDGETS BENTO GALLERY (OFFICIAL EINSTEIN STICKERS) ── -->
-    <div class="widgets-gallery-section">
-      <div class="gallery-section-title">
-        📱 Bộ Widget Sticker Einstein Chính Thức (Duolingo Style)
-      </div>
-      <div class="widgets-bento-grid">
-        <!-- Widget 1: Unstoppable 833 -->
-        <div class="widget-card-sticker" onclick="setEinsteinState('streak')" title="Unstoppable! Streak 833">
-          <img src="assets/stickers/einstein-streak-833.png" alt="Unstoppable 833">
-        </div>
-
-        <!-- Widget 2: Last Chance 300 -->
-        <div class="widget-card-sticker" onclick="setEinsteinState('danger')" title="Last chance! Streak 300">
-          <img src="assets/stickers/einstein-crisis-300.png" alt="Last chance 300">
-        </div>
-
-        <!-- Widget 3: Streak Lost 0 -->
-        <div class="widget-card-sticker" onclick="setEinsteinState('lost')" title="Streak lost! 0">
-          <img src="assets/stickers/einstein-lost-soot.png" alt="Streak lost 0">
-        </div>
-
-        <!-- Widget 4: Time to Practice 45 -->
-        <div class="widget-card-sticker" onclick="setEinsteinState('practice')" title="Time to practice! Streak 45">
-          <img src="assets/stickers/einstein-practice-45.png" alt="Time to practice 45">
-        </div>
-
-        <!-- Widget 5: Ready to Practice 1 -->
-        <div class="widget-card-sticker" onclick="setEinsteinState('ready')" title="Ready to practice? Streak 1">
-          <img src="assets/stickers/einstein-ready-1.png" alt="Ready to practice 1">
-        </div>
-
-        <!-- Widget 6: Streak Lost Huddle -->
-        <div class="widget-card-sticker" onclick="setEinsteinState('huddle')" title="Streak lost! Huddle">
-          <img src="assets/stickers/einstein-lost-huddle.png" alt="Streak lost huddle">
-        </div>
-
-        <!-- Widget 7: Practice Today Rain 833 -->
-        <div class="widget-card-sticker" onclick="setEinsteinState('rain')" title="Practice today? Streak 833">
-          <img src="assets/stickers/einstein-rain-833.png" alt="Practice today rain">
-        </div>
-      </div>
-    </div>
-
-    <!-- ── BENTO QUICK ACCESS MODULES ── -->
-    <div class="bento-quick-grid">
-      <div class="bento-tile highlight-vip" onclick="const session = getSession(); if (session && session.premium) { window.location.href='l.html'; } else { window.location.href='premium.html'; }">
-        <div>
-          <span class="tile-badge" style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px;">👑 PHÒNG LUYỆN ĐỀ VIP</span>
-          <div class="tile-title">Đề Thi Thử Tốt Nghiệp THPT Chuẩn 2026</div>
-          <div class="tile-subtitle">Hệ thống đề bám sát cấu trúc Bộ GD&ĐT, đồng hồ bấm giờ 50 phút, video lời giải chi tiết.</div>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:12px; font-weight:800; color:#E9D5FF;">⚡ Cập nhật đề mới hằng tuần</span>
-          <span class="duo-btn-cta" style="padding: 8px 16px; font-size: 13px;">VÀO THI NGAY →</span>
-        </div>
-      </div>
-
-      <div class="bento-tile" onclick="openDashboard()">
-        <div>
-          <span class="tile-badge" style="color: var(--duo-green-dark); background: var(--duo-green-soft); padding: 4px 10px; border-radius: 12px;">🎯 NHIỆM VỤ NGÀY</span>
-          <div class="tile-title" style="font-size: 17px;">Hoàn thành 1 bài trắc nghiệm</div>
-          <div class="tile-subtitle">Tích lũy kinh nghiệm và giữ ngọn lửa Streak cùng Giáo sư Einstein.</div>
-        </div>
-        <div>
-          <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; margin-bottom: 6px;">
-            <span>Tiến độ</span>
-            <span style="color:var(--duo-green-dark)">1 / 2 bài</span>
-          </div>
-          <div style="height: 10px; background: #E2E8F0; border-radius: 10px; overflow: hidden;">
-            <div style="width: 50%; height: 100%; background: var(--duo-green); border-radius: 10px;"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bento-tile" onclick="openDashboard()">
-        <div>
-          <span class="tile-badge" style="color: var(--duo-blue-dark); background: var(--duo-blue-soft); padding: 4px 10px; border-radius: 12px;">📊 BẢNG VÀNG</span>
-          <div class="tile-title" style="font-size: 17px;">Tiến Độ & Thống Kê</div>
-          <div class="tile-subtitle">Theo dõi điểm trung bình, số đề đã làm và lịch sử bài thi.</div>
-        </div>
-        <div style="display:flex; align-items:center; justify-content:space-between;">
-          <span style="font-size: 22px; font-weight: 900; color: var(--duo-blue);">Top 3 ⭐</span>
-          <span style="font-size: 12px; font-weight: 800; color: var(--duo-text-muted);">Xem chi tiết →</span>
         </div>
       </div>
     </div>
@@ -3519,7 +3383,6 @@
 
     initApp();
   </script>
-  <script src="assets/einstein-gamification.js"></script>
 </body>
 
 </html>
