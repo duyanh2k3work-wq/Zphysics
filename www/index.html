@@ -9,6 +9,8 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/auth.js"></script>
   <style>
     :root {
       --bg: #f0f4ff;
@@ -800,6 +802,62 @@
       cursor: not-allowed;
       transform: none !important;
       box-shadow: none !important;
+    }
+
+    .google-login-btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 50px;
+      border: 1.5px solid #dadce0;
+      background: #ffffff;
+      color: #3c4043;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(60, 64, 67, 0.1);
+      transition: all 0.25s ease;
+      margin-top: 8px;
+    }
+
+    .google-login-btn:hover {
+      background: #f8fafd;
+      border-color: #d2e3fc;
+      box-shadow: 0 4px 16px rgba(66, 133, 244, 0.22);
+      transform: translateY(-2px);
+    }
+
+    .google-login-btn:active {
+      transform: scale(0.98);
+    }
+
+    .google-icon {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .demo-btn {
+      padding: 8px 16px;
+      border-radius: 30px;
+      border: 1.5px solid rgba(142, 151, 197, 0.3);
+      background: rgba(240, 244, 255, 0.65);
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .demo-btn:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+      background: #fff;
     }
 
     .login-spinner {
@@ -1766,31 +1824,29 @@
   <div class="login-overlay" id="loginOverlay">
     <div class="login-card">
       <div class="login-logo">Z<span>physics</span></div>
-      <div class="login-subtitle" id="loginSubtitle">Đăng nhập bằng Gmail để tiếp tục</div>
-      <div class="login-input-wrap">
-        <span class="input-icon">📧</span>
-        <input type="email" class="login-input" id="loginEmail" placeholder="Nhập Gmail của em..." autocomplete="email"
-          onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="login-subtitle" id="loginSubtitle">Đăng nhập nhanh để tiếp tục học</div>
+      
+      <button type="button" class="google-login-btn" onclick="loginWithGoogle()">
+        <svg class="google-icon" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <span>Tiếp tục với Google</span>
+      </button>
+
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0;font-size:12px;font-weight:700;color:var(--muted);">
+        <span style="flex:1;height:1px;background:rgba(142,151,197,0.2);"></span>
+        <span>hoặc</span>
+        <span style="flex:1;height:1px;background:rgba(142,151,197,0.2);"></span>
       </div>
-      <div id="loginNameWrap" style="display: none; margin-top: 12px;">
-        <div class="login-input-wrap" style="margin-bottom: 12px;">
-          <span class="input-icon">👤</span>
-          <input type="text" class="login-input" id="loginName" placeholder="Nhập Họ và Tên của em..."
-            autocomplete="name" onkeydown="if(event.key==='Enter')doLogin()">
-        </div>
-        <div class="grade-selection-label">Em đang là học sinh lớp:</div>
-        <div class="grade-buttons" id="loginGradeButtons">
-          <button type="button" class="grade-btn active" data-grade="10" onclick="selectGrade(10)">10</button>
-          <button type="button" class="grade-btn" data-grade="11" onclick="selectGrade(11)">11</button>
-          <button type="button" class="grade-btn" data-grade="12" onclick="selectGrade(12)">12</button>
-        </div>
-        <div style="text-align: right; margin-top: 6px; margin-bottom: 12px;">
-          <a href="javascript:void(0)" onclick="cancelRegistration()"
-            style="font-size: 11px; color: var(--muted); text-decoration: none; font-weight: 700;">⬅️ Đổi Gmail khác</a>
-        </div>
+
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button type="button" class="demo-btn" onclick="loginDemo(false)">Dùng thử Free</button>
+        <button type="button" class="demo-btn" onclick="loginDemo(true)" style="border-color:#d4af37;color:#b8860b;">👑 Thử bản VIP</button>
       </div>
-      <div class="login-error" id="loginError"></div>
-      <button class="login-btn" id="loginBtn" onclick="doLogin()">🚀 Đăng nhập</button>
+      <div class="login-error" id="loginError" style="margin-top:10px;"></div>
     </div>
   </div>
 
@@ -2020,7 +2076,7 @@
         const res = await fetch(`${SUPABASE_URL}/rest/v1/student_progress?email=eq.${encodeURIComponent(session.gmail)}&select=*&order=completed_at.desc`, {
           headers: {
             'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            'Authorization': (session && session.access_token) ? `Bearer ${session.access_token}` : `Bearer ${SUPABASE_ANON_KEY}`
           }
         });
         if (!res.ok) throw new Error('Failed to load');
@@ -3108,8 +3164,7 @@
     }
 
     function doLogout() {
-      clearSession();
-      window.location.reload();
+      logoutStudent();
     }
 
     // ── Xử lý popup avatar: chỉ dùng 1 listener duy nhất ──
@@ -3131,80 +3186,28 @@
       }
     });
 
-    // ── HỖ TRỢ XEM THỬ DEMO KHÔNG CẦN DEPLOY GOOGLE SHEETS ──
-    const urlParams = new URLSearchParams(window.location.search);
-    const demoMode = urlParams.get('demo');
+    // ── KHỞI ĐỘNG XÁC THỰC GOOGLE OAUTH & SUPABASE AUTH ──
+    (async function initAuthFlow() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const demoMode = urlParams.get('demo');
 
-    if (demoMode === 'premium') {
-      saveSession('demo_premium@zphysics.vn', 'Demo Premium Student', true);
-      showApp('Demo Premium Student', true);
-    } else if (demoMode === 'free') {
-      saveSession('demo_free@zphysics.vn', 'Demo Free Student', false);
-      showApp('Demo Free Student', false);
-    } else {
-      // ── Khởi động thực tế: kiểm tra session và xác thực trực tuyến ──
-      const existingSession = getSession();
-      if (existingSession && existingSession.gmail) {
-        if (existingSession.gmail.startsWith('demo_')) {
-          // Bỏ qua xác thực online với tài khoản demo để dễ dàng kiểm thử
-          showApp(existingSession.ten, existingSession.premium);
-        } else {
-          const emailInput = document.getElementById('loginEmail');
-          const btn = document.getElementById('loginBtn');
-          const errorEl = document.getElementById('loginError');
+      if (demoMode === 'premium') {
+        loginDemo(true);
+        return;
+      } else if (demoMode === 'free') {
+        loginDemo(false);
+        return;
+      }
 
-          // Điền sẵn email và hiển thị trạng thái đang xác thực
-          emailInput.value = existingSession.gmail;
-          emailInput.disabled = true;
-          btn.disabled = true;
-          btn.innerHTML = '<span class="login-spinner"></span> Đang xác thực...';
-
-          const checkUrl = `${SUPABASE_URL}/rest/v1/students?email=eq.${encodeURIComponent(existingSession.gmail)}&select=*`;
-          fetch(checkUrl, {
-            headers: {
-              'apikey': SUPABASE_ANON_KEY,
-              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-            }
-          })
-            .then(res => {
-              if (!res.ok) throw new Error('HTTP ' + res.status);
-              return res.json();
-            })
-            .then(students => {
-              if (students && students.length > 0) {
-                const student = students[0];
-                const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
-                
-                const wasPremium = !!existingSession.premium;
-                saveSession(existingSession.gmail, student.full_name || existingSession.gmail, isPremium, student.premium_until, student.lop);
-                showApp(student.full_name || existingSession.gmail, isPremium);
-                
-                // Nếu trạng thái thay đổi lên Premium, chạy lại initApp để tải tiến trình học tập
-                if (isPremium && !wasPremium) {
-                  initApp();
-                }
-              } else {
-                // Không hợp lệ (đã bị xóa khỏi Database)
-                clearSession();
-                emailInput.value = '';
-                emailInput.disabled = false;
-                btn.disabled = false;
-                btn.innerHTML = '🚀 Đăng nhập';
-                errorEl.textContent = '❌ Tài khoản của em đã bị khóa hoặc xóa khỏi hệ thống.';
-                errorEl.classList.add('visible');
-              }
-            })
-            .catch(err => {
-              console.warn('Lỗi kết nối khi xác thực, cho phép sử dụng phiên offline:', err);
-              // Gặp lỗi mạng -> Cho phép vào app bình thường
-              showApp(existingSession.ten, existingSession.premium);
-            });
-        }
+      // Kiểm tra và đồng bộ phiên đăng nhập từ Supabase
+      const session = await syncAndGetAuthSession();
+      if (session && session.gmail) {
+        showApp(session.ten, session.premium);
       } else {
         // Chưa đăng nhập -> Chuyển hướng sang Landing Page
         window.location.href = 'landing.html';
       }
-    }
+    })();
     // Nếu chưa login → overlay tự hiện (mặc định display: flex)
 
     // ── THEME TOGGLE LOGIC ──
@@ -3310,7 +3313,7 @@
             signal: abortCtrl.signal,
             headers: {
               'apikey': SUPABASE_ANON_KEY,
-              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+              'Authorization': (session && session.access_token) ? `Bearer ${session.access_token}` : `Bearer ${SUPABASE_ANON_KEY}`
             }
           }).then(res => res.ok ? res.json() : []).catch(() => []);
         }
