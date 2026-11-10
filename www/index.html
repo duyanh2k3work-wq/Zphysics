@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/auth.js?v=20261111_02"></script>
+  <script src="assets/js/auth.js?v=20261111_03"></script>
   <style>
     :root {
       --bg: #f0f4ff;
@@ -3209,7 +3209,13 @@
       // Kiểm tra và đồng bộ phiên đăng nhập từ Supabase
       const session = await syncAndGetAuthSession();
       if (session && session.gmail) {
-        showApp(session.ten, session.premium);
+        try {
+          showApp(session.ten, session.premium);
+        } catch (errShow) {
+          console.error('Lỗi showApp:', errShow);
+          const ov = document.getElementById('loginOverlay');
+          if (ov) ov.style.display = 'none';
+        }
       } else {
         // Nếu vừa từ Google về mà gặp lỗi thì giữ lại thông báo, không vội redirect làm mất dấu vết
         if (hasAuthHash) {

@@ -105,34 +105,21 @@ async function resolveSupabaseSession() {
       return null;
     }
 
-    // Nếu có access_token và refresh_token trong hash, thử chủ động setSession
-    const params = new URLSearchParams(hash.substring(1));
-    const token = params.get('access_token');
-    const refresh = params.get('refresh_token');
-    if (token && refresh) {
-      try {
-        const { data: sRes } = await sbClient.auth.setSession({
-          access_token: token,
-          refresh_token: refresh
-        });
-        if (sRes && sRes.session) {
-          try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (e) {}
-          return sRes.session;
-        }
-      } catch (e) {
-        console.warn('Lỗi gọi setSession:', e);
-      }
-    }
-
-    // Lắng nghe onAuthStateChange và kiểm tra song song mỗi 200ms
+    // Lắng nghe onAuthStateChange và kiểm tra song song mỗi 150ms
     return new Promise((resolve) => {
       let settled = false;
       let checkTimer = null;
+      let authSub = null;
 
       const cleanup = () => {
         settled = true;
-        if (checkTimer) clearInterval(checkTimer);
-        try { subscription.unsubscribe(); } catch (e) {}
+        if (checkTimer) {
+          clearInterval(checkTimer);
+          checkTimer = null;
+        }
+        if (authSub && typeof authSub.unsubscribe === 'function') {
+          try { authSub.unsubscribe(); } catch (e) {}
+        }
       };
 
       const finishWithSession = (s) => {
@@ -142,12 +129,21 @@ async function resolveSupabaseSession() {
         resolve(s);
       };
 
-      const { data: { subscription } } = sbClient.auth.onAuthStateChange((event, s) => {
-        if (s && s.user) {
-          finishWithSession(s);
+      // Đăng ký listener trước
+      try {
+        const subRes = sbClient.auth.onAuthStateChange((event, s) => {
+          if (s && s.user) {
+            finishWithSession(s);
+          }
+        });
+        if (subRes && subRes.data && subRes.data.subscription) {
+          authSub = subRes.data.subscription;
         }
-      });
+      } catch (errSub) {
+        console.warn('Lỗi onAuthStateChange:', errSub);
+      }
 
+      // Polling dự phòng mỗi 150ms
       checkTimer = setInterval(async () => {
         try {
           const { data: { session } } = await sbClient.auth.getSession();
@@ -155,15 +151,15 @@ async function resolveSupabaseSession() {
             finishWithSession(session);
           }
         } catch (e) {}
-      }, 200);
+      }, 150);
 
-      // Sau 4 giây nếu không có session
+      // Sau 5 giây nếu không nhận được session
       setTimeout(() => {
         if (!settled) {
           cleanup();
           resolve(null);
         }
-      }, 4000);
+      }, 5000);
     });
   }
 
