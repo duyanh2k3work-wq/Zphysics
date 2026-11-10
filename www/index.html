@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/auth.js?v=20261111_04"></script>
+  <script src="assets/js/auth.js?v=20261111_05"></script>
   <style>
     :root {
       --bg: #f0f4ff;
@@ -1836,17 +1836,7 @@
         <span>Tiếp tục với Google</span>
       </button>
 
-      <div style="display:flex;align-items:center;gap:12px;margin:16px 0;font-size:12px;font-weight:700;color:var(--muted);">
-        <span style="flex:1;height:1px;background:rgba(142,151,197,0.2);"></span>
-        <span>hoặc</span>
-        <span style="flex:1;height:1px;background:rgba(142,151,197,0.2);"></span>
-      </div>
-
-      <div style="display:flex;gap:10px;justify-content:center;">
-        <button type="button" class="demo-btn" onclick="loginDemo(false)">Dùng thử Free</button>
-        <button type="button" class="demo-btn" onclick="loginDemo(true)" style="border-color:#d4af37;color:#b8860b;">👑 Thử bản VIP</button>
-      </div>
-      <div class="login-error" id="loginError" style="margin-top:10px;"></div>
+      <div class="login-error" id="loginError" style="margin-top:12px;"></div>
     </div>
   </div>
 
@@ -3188,17 +3178,6 @@
 
     // ── KHỞI ĐỘNG XÁC THỰC GOOGLE OAUTH & SUPABASE AUTH ──
     (async function initAuthFlow() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const demoMode = urlParams.get('demo');
-
-      if (demoMode === 'premium') {
-        loginDemo(true);
-        return;
-      } else if (demoMode === 'free') {
-        loginDemo(false);
-        return;
-      }
-
       // Đang có hash OAuth (vừa từ Google redirect về)
       const hasAuthHash = window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error'));
       if (hasAuthHash) {

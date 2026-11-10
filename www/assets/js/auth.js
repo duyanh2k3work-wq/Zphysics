@@ -48,22 +48,6 @@ async function loginWithGoogle() {
 }
 
 /**
- * Đăng nhập nhanh chế độ dùng thử (Demo)
- */
-function loginDemo(isPremium) {
-  const sessionObj = {
-    gmail: isPremium ? 'demo_premium@zphysics.vn' : 'demo_free@zphysics.vn',
-    ten: isPremium ? 'Học sinh VIP Demo' : 'Học sinh Dùng thử',
-    lop: '12',
-    premium: !!isPremium,
-    premium_until: null,
-    access_token: null
-  };
-  localStorage.setItem(SESSION_KEY, JSON.stringify(sessionObj));
-  window.location.href = 'index.html';
-}
-
-/**
  * Lấy header Authorization chuẩn (sử dụng Token JWT nếu có)
  */
 function getAuthHeaders(session) {
@@ -170,17 +154,6 @@ async function resolveSupabaseSession() {
  * Lấy phiên đăng nhập hiện tại và đồng bộ với bảng students
  */
 async function syncAndGetAuthSession() {
-  // 1. Kiểm tra session demo offline trước
-  try {
-    const rawLocal = localStorage.getItem(SESSION_KEY);
-    if (rawLocal) {
-      const parsed = JSON.parse(rawLocal);
-      if (parsed && parsed.gmail && parsed.gmail.startsWith('demo_')) {
-        return parsed;
-      }
-    }
-  } catch (e) {}
-
   if (!sbClient) {
     try {
       const raw = localStorage.getItem(SESSION_KEY);
