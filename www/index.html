@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/auth.js?v=20261111_05"></script>
+  <script src="assets/js/auth.js?v=20261111_06"></script>
   <style>
     :root {
       --bg: #f0f4ff;
@@ -2101,6 +2101,7 @@
         
         const avgScore = scoreCount > 0 ? (totalScore / scoreCount).toFixed(2) : '-';
         document.getElementById('statAverageScore').textContent = avgScore;
+        document.getElementById('statCompleted').textContent = scoreCount;
         
         historyListEl.innerHTML = '';
         data.forEach(item => {
@@ -2157,7 +2158,9 @@
 
       // Compute Completed
       const completedCount = Object.keys(studentProgressMap).length;
-      document.getElementById('statCompleted').textContent = completedCount;
+      if (completedCount > 0) {
+        document.getElementById('statCompleted').textContent = completedCount;
+      }
 
       // Tải lịch sử làm bài
       loadHistoryList();
@@ -3195,6 +3198,7 @@
           const ov = document.getElementById('loginOverlay');
           if (ov) ov.style.display = 'none';
         }
+        initApp();
       } else {
         // Nếu vừa từ Google về mà gặp lỗi thì giữ lại thông báo, không vội redirect làm mất dấu vết
         if (hasAuthHash) {
@@ -3331,9 +3335,7 @@
 
           if (progressData && progressData.length > 0) {
             progressData.forEach(p => {
-              if (p.score == null || p.score >= 8.0) {
-                studentProgressMap[p.lesson_id] = (studentProgressMap[p.lesson_id] || 0) + 1;
-              }
+              studentProgressMap[p.lesson_id] = (studentProgressMap[p.lesson_id] || 0) + 1;
             });
             needUpdate = true;
           }
@@ -3381,8 +3383,6 @@
           `<p style="color:#e53935;text-align:center;padding:40px 24px;font-weight:700">⚠️ Không tải được dữ liệu bài học.<br><small style="font-weight:600;opacity:.7">${err.message || 'Lỗi kết nối'}</small></p>`;
       }
     }
-
-    initApp();
   </script>
 </body>
 
