@@ -3199,12 +3199,25 @@
         return;
       }
 
+      // Đang có hash OAuth (vừa từ Google redirect về)
+      const hasAuthHash = window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error'));
+      if (hasAuthHash) {
+        const sub = document.getElementById('loginSubtitle');
+        if (sub) sub.textContent = 'Đang đồng bộ tài khoản Google... Vui lòng đợi';
+      }
+
       // Kiểm tra và đồng bộ phiên đăng nhập từ Supabase
       const session = await syncAndGetAuthSession();
       if (session && session.gmail) {
         showApp(session.ten, session.premium);
       } else {
-        // Chưa đăng nhập -> Chuyển hướng sang Landing Page
+        // Nếu vừa từ Google về mà gặp lỗi thì giữ lại thông báo, không vội redirect làm mất dấu vết
+        if (hasAuthHash) {
+          const sub = document.getElementById('loginSubtitle');
+          if (sub) sub.textContent = 'Đăng nhập không thành công. Vui lòng bấm thử lại!';
+          return;
+        }
+        // Chưa đăng nhập bình thường -> Chuyển hướng sang Landing Page
         window.location.href = 'landing.html';
       }
     })();

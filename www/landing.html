@@ -722,6 +722,11 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
+      const hasAuthHash = window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error'));
+      if (hasAuthHash) {
+        const sub = document.getElementById('loginSubtitle');
+        if (sub) sub.textContent = 'Đang xác thực tài khoản Google...';
+      }
       const s = await syncAndGetAuthSession();
       if (s && s.gmail && !s.gmail.startsWith('demo_')) {
         window.location.href = 'index.html';

@@ -1349,7 +1349,8 @@
                 gmail: currentSession.gmail, 
                 ten: student.full_name || currentSession.gmail, 
                 premium: isPremium, 
-                premium_until: student.premium_until 
+                premium_until: student.premium_until,
+                access_token: currentSession.access_token
               }));
               
               // Nếu quyền thay đổi trực tuyến, kích hoạt giao diện

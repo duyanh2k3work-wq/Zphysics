@@ -22,6 +22,26 @@ if (window.supabase) {
 }
 
 /**
+ * Trích xuất tham số Auth từ URL hash (dành cho OAuth callback)
+ */
+function extractAuthFromHash() {
+  const hash = window.location.hash ? window.location.hash.substring(1) : '';
+  if (!hash) return null;
+
+  const params = new URLSearchParams(hash);
+  const error = params.get('error') || params.get('error_description');
+  const accessToken = params.get('access_token');
+  const refreshToken = params.get('refresh_token');
+
+  return {
+    hasAuth: !!(accessToken || error),
+    error: error ? decodeURIComponent(error.replace(/\+/g, ' ')) : null,
+    accessToken,
+    refreshToken: refreshToken || ''
+  };
+}
+
+/**
  * Đăng nhập bằng Google OAuth (1-chạm)
  */
 async function loginWithGoogle() {
@@ -30,13 +50,8 @@ async function loginWithGoogle() {
     return;
   }
   
-  // Xác định URL chuyển hướng sau khi đăng nhập thành công
-  let redirectUrl = window.location.origin + '/index.html';
-  if (window.location.pathname.endsWith('landing.html')) {
-    redirectUrl = window.location.origin + '/index.html';
-  } else {
-    redirectUrl = window.location.origin + window.location.pathname;
-  }
+  // URL chuyển hướng sau khi đăng nhập thành công: luôn về index.html
+  const redirectUrl = window.location.origin + '/index.html';
 
   try {
     const { data, error } = await sbClient.auth.signInWithOAuth({
@@ -103,18 +118,66 @@ async function syncAndGetAuthSession() {
   }
 
   try {
-    // 2. Lấy session từ Supabase Auth
-    const { data: { session }, error: sessionError } = await sbClient.auth.getSession();
-    if (sessionError || !session || !session.user) {
-      // Nếu có session trong URL hash, đợi Supabase client parse
-      if (window.location.hash && window.location.hash.includes('access_token')) {
-        const { data: newSession } = await sbClient.auth.onAuthStateChange(async (event, currentSession) => {
-          if (currentSession && currentSession.user) {
-            window.location.hash = '';
-            window.location.reload();
+    // 2. Kiểm tra xem có token từ Google OAuth chuyển hướng về trong URL hash không
+    const authHash = extractAuthFromHash();
+
+    if (authHash && authHash.error) {
+      console.error('OAuth Hash Error:', authHash.error);
+      alert('Đăng nhập Google thất bại: ' + authHash.error);
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+      return null;
+    }
+
+    let session = null;
+
+    if (authHash && authHash.accessToken) {
+      // Chủ động nạp trực tiếp Token vào Supabase Client
+      try {
+        const { data: setRes, error: setErr } = await sbClient.auth.setSession({
+          access_token: authHash.accessToken,
+          refresh_token: authHash.refreshToken
+        });
+        if (setRes && setRes.session) {
+          session = setRes.session;
+        }
+      } catch (setErr) {
+        console.warn('sbClient.setSession warning:', setErr);
+      }
+      
+      // Dọn sạch hash trên URL để an toàn và chuyên nghiệp
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+
+    // 3. Nếu chưa có session, lấy từ bộ nhớ lưu trữ của Supabase
+    if (!session) {
+      const { data: getRes, error: getErr } = await sbClient.auth.getSession();
+      if (!getErr && getRes && getRes.session) {
+        session = getRes.session;
+      }
+    }
+
+    // 4. Nếu vẫn chưa có session mà trước đó có hash accessToken, chờ thêm 1.5s phòng khi Supabase client đang parse ngầm
+    if (!session && authHash && authHash.accessToken) {
+      session = await new Promise((resolve) => {
+        let finished = false;
+        const { data: { subscription } } = sbClient.auth.onAuthStateChange((event, s) => {
+          if (!finished && s && s.user) {
+            finished = true;
+            subscription.unsubscribe();
+            resolve(s);
           }
         });
-      }
+        setTimeout(() => {
+          if (!finished) {
+            finished = true;
+            subscription.unsubscribe();
+            resolve(null);
+          }
+        }, 1500);
+      });
+    }
+
+    if (!session || !session.user) {
       return null;
     }
 
@@ -122,12 +185,33 @@ async function syncAndGetAuthSession() {
     const email = (user.email || '').toLowerCase();
     const token = session.access_token;
 
-    // 3. Truy vấn bảng students bằng chính Token của học sinh (RLS Authenticated)
-    const { data: student, error: studentError } = await sbClient
-      .from('students')
-      .select('email, full_name, lop, role, premium_until')
-      .eq('email', email)
-      .maybeSingle();
+    // 5. Truy vấn thông tin học sinh từ bảng students bằng JWT Token của chính học sinh (RLS Authenticated)
+    let student = null;
+    try {
+      const { data, error } = await sbClient
+        .from('students')
+        .select('email, full_name, lop, role, premium_until')
+        .eq('email', email)
+        .maybeSingle();
+      if (!error && data) {
+        student = data;
+      }
+    } catch (e) {
+      console.warn('Lỗi đọc bảng students lần 1:', e);
+    }
+
+    // Nếu vừa tạo tài khoản mới tinh, trigger có thể mất vài trăm ms để ghi vào bảng -> Thử lại 1 lần
+    if (!student) {
+      await new Promise(r => setTimeout(r, 400));
+      try {
+        const { data } = await sbClient
+          .from('students')
+          .select('email, full_name, lop, role, premium_until')
+          .eq('email', email)
+          .maybeSingle();
+        if (data) student = data;
+      } catch (e) {}
+    }
 
     let isPremium = false;
     let ten = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
@@ -156,12 +240,6 @@ async function syncAndGetAuthSession() {
     };
 
     localStorage.setItem(SESSION_KEY, JSON.stringify(sessionObj));
-
-    // Làm sạch URL hash nếu vừa hoàn tất chuyển hướng OAuth
-    if (window.location.hash && window.location.hash.includes('access_token')) {
-      history.replaceState(null, '', window.location.pathname + window.location.search);
-    }
-
     return sessionObj;
   } catch (err) {
     console.warn('Lỗi đồng bộ Auth session:', err);
