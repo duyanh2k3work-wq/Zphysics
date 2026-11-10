@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/auth.js?v=20261111_03"></script>
+  <script src="assets/js/auth.js?v=20261111_04"></script>
   <style>
     :root {
       --teal: #2ec4b6;
@@ -559,10 +559,10 @@
     });
 
     /* ── CONFIG ── */
-    const SUPABASE_URL = 'https://uztfmglzpfrwvamuggwx.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
-    const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
-    const SESSION_KEY = 'zphysics_session';
+    var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
+    var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
+    var SHEETS_API_URL = window.SHEETS_API_URL || 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
+    var SESSION_KEY = window.SESSION_KEY || 'zphysics_session';
 
     function saveSession(gmail, ten, premium, premiumUntil = null, lop = null) {
       localStorage.setItem(SESSION_KEY, JSON.stringify({ 

@@ -5,12 +5,12 @@
  * ═══════════════════════════════════════════════════════════════
  */
 
-const SUPABASE_URL = 'https://uztfmglzpfrwvamuggwx.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
-const SESSION_KEY = 'zphysics_session';
+var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
+var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
+var SESSION_KEY = window.SESSION_KEY || 'zphysics_session';
 
 // Khởi tạo Supabase Client
-let sbClient = null;
+var sbClient = null;
 if (window.supabase) {
   sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {

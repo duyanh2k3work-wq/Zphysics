@@ -20,3 +20,4 @@ www/Zphysics/
 *.zip
 *.tar.gz
 assets/*_full.mp3
+dev_server.js
