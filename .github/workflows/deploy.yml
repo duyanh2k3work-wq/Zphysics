@@ -29,6 +29,14 @@ jobs:
       - name: Checkout mã nguồn
         uses: actions/checkout@v4
 
+      - name: Kiểm tra tính toàn vẹn thư mục www
+        run: |
+          if find www -mindepth 2 \( -name package.json -o -name node_modules -o -name build.gradle \) | grep -q .; then
+            echo "::error::Thư mục www/ chứa file project lồng (package.json/node_modules/android). Hủy deploy."
+            exit 1
+          fi
+          echo "Thư mục www hợp lệ, sẵn sàng deploy lên GitHub Pages."
+
       - name: Cấu hình GitHub Pages
         uses: actions/configure-pages@v5
 

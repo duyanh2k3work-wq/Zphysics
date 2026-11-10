@@ -8,3 +8,15 @@ Thumbs.db
 .idea/
 *.apk
 *.bak
+
+# Nested project prevention in web directory
+www/**/node_modules/
+www/**/android/
+www/**/package.json
+www/**/package-lock.json
+www/Zphysics/
+
+# Backups and archives
+*.zip
+*.tar.gz
+assets/*_full.mp3
