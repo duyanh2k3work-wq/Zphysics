@@ -21,3 +21,8 @@ www/Zphysics/
 *.tar.gz
 assets/*_full.mp3
 dev_server.js
+
+# Google Apps Script clasp local credentials and project link
+.clasprc.json
+**/.clasprc.json
+**/.clasp.json
