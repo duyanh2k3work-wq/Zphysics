@@ -8,6 +8,8 @@
 var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
 var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
 var SESSION_KEY = window.SESSION_KEY || 'zphysics_session';
+var NATIVE_AUTH_REDIRECT_URL = 'com.zanh.zphysics://auth/callback';
+var HANDLED_AUTH_URL_KEY = 'zphysics_handled_auth_url';
 
 // Khởi tạo Supabase Client
 var sbClient = null;
@@ -21,6 +23,175 @@ if (window.supabase) {
   });
 }
 
+var nativeAuthListenerAttached = false;
+var nativeAuthProcessingPromise = null;
+var activeNativeAuthUrl = null;
+
+function isNativeCapacitorApp() {
+  try {
+    return !!(
+      window.Capacitor &&
+      typeof window.Capacitor.isNativePlatform === 'function' &&
+      window.Capacitor.isNativePlatform()
+    );
+  } catch (e) {
+    return false;
+  }
+}
+
+function getCapacitorPlugins() {
+  return (window.Capacitor && window.Capacitor.Plugins) ? window.Capacitor.Plugins : {};
+}
+
+function isAuthCallbackUrl(rawUrl) {
+  return typeof rawUrl === 'string' && rawUrl.toLowerCase().startsWith(NATIVE_AUTH_REDIRECT_URL);
+}
+
+function extractAuthParamsFromUrl(rawUrl) {
+  try {
+    const parsed = new URL(rawUrl);
+    const queryParams = new URLSearchParams(parsed.search || '');
+    const hashStr = parsed.hash && parsed.hash.startsWith('#') ? parsed.hash.slice(1) : (parsed.hash || '');
+    const hashParams = new URLSearchParams(hashStr);
+    const get = (key) => hashParams.get(key) || queryParams.get(key);
+    return {
+      access_token: get('access_token'),
+      refresh_token: get('refresh_token'),
+      code: get('code'),
+      error: get('error'),
+      error_description: get('error_description')
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+async function closeNativeBrowserSafely() {
+  const { Browser } = getCapacitorPlugins();
+  if (Browser && typeof Browser.close === 'function') {
+    try {
+      await Browser.close();
+    } catch (e) {}
+  }
+}
+
+function markHandledAuthUrl(rawUrl) {
+  try {
+    sessionStorage.setItem(HANDLED_AUTH_URL_KEY, rawUrl);
+  } catch (e) {}
+}
+
+function isAuthUrlAlreadyHandled(rawUrl) {
+  try {
+    return sessionStorage.getItem(HANDLED_AUTH_URL_KEY) === rawUrl;
+  } catch (e) {
+    return false;
+  }
+}
+
+function formatOAuthError(rawErr) {
+  const text = String(rawErr || 'Lỗi không xác định');
+  try {
+    return decodeURIComponent(text.replace(/\+/g, ' '));
+  } catch (e) {
+    return text;
+  }
+}
+
+async function processNativeAuthUrl(rawUrl) {
+  if (!sbClient || !isAuthCallbackUrl(rawUrl)) return null;
+  if (isAuthUrlAlreadyHandled(rawUrl)) return null;
+
+  if (nativeAuthProcessingPromise && activeNativeAuthUrl === rawUrl) {
+    return nativeAuthProcessingPromise;
+  }
+
+  activeNativeAuthUrl = rawUrl;
+  nativeAuthProcessingPromise = (async () => {
+    await closeNativeBrowserSafely();
+
+    const sub = document.getElementById('loginSubtitle');
+    if (sub) sub.textContent = 'Đang xác thực tài khoản Google...';
+
+    const params = extractAuthParamsFromUrl(rawUrl);
+    if (!params) return null;
+
+    if (params.error || params.error_description) {
+      markHandledAuthUrl(rawUrl);
+      const errMsg = params.error_description || params.error;
+      console.error('Lỗi Auth từ deep link:', errMsg);
+      alert('Đăng nhập Google thất bại: ' + formatOAuthError(errMsg));
+      if (sub) sub.textContent = 'Đăng nhập không thành công. Vui lòng bấm thử lại!';
+      return null;
+    }
+
+    if (params.code) {
+      const { data, error } = await sbClient.auth.exchangeCodeForSession(params.code);
+      markHandledAuthUrl(rawUrl);
+      if (error) throw error;
+      return data && data.session ? data.session : null;
+    }
+
+    if (params.access_token) {
+      const { data, error } = await sbClient.auth.setSession({
+        access_token: params.access_token,
+        refresh_token: params.refresh_token || ''
+      });
+      markHandledAuthUrl(rawUrl);
+      if (error) throw error;
+      return data && data.session ? data.session : null;
+    }
+
+    return null;
+  })()
+    .catch((err) => {
+      console.error('Lỗi xử lý callback Google OAuth trên app:', err);
+      alert('Không thể hoàn tất đăng nhập Google trong ứng dụng: ' + (err.message || 'Lỗi xác thực'));
+      return null;
+    })
+    .finally(() => {
+      nativeAuthProcessingPromise = null;
+      activeNativeAuthUrl = null;
+    });
+
+  return nativeAuthProcessingPromise;
+}
+
+function navigateToAppHomeAfterLogin() {
+  if (window.location.pathname && window.location.pathname.toLowerCase().includes('landing')) {
+    window.location.replace('index.html');
+  } else {
+    window.location.reload();
+  }
+}
+
+function initNativeAuthBridge() {
+  if (nativeAuthListenerAttached || !isNativeCapacitorApp()) return;
+  const { App } = getCapacitorPlugins();
+  if (!App || typeof App.addListener !== 'function') return;
+
+  nativeAuthListenerAttached = true;
+  try {
+    App.addListener('appUrlOpen', async (event) => {
+      const url = event && event.url;
+      if (!isAuthCallbackUrl(url) || isAuthUrlAlreadyHandled(url)) return;
+
+      const session = await processNativeAuthUrl(url);
+      if (session && session.user) {
+        const synced = await syncAndGetAuthSession();
+        if (synced && synced.gmail) {
+          navigateToAppHomeAfterLogin();
+        }
+      }
+    });
+  } catch (e) {
+    nativeAuthListenerAttached = false;
+    console.warn('Không thể đăng ký listener appUrlOpen:', e);
+  }
+}
+
+initNativeAuthBridge();
+
 /**
  * Đăng nhập bằng Google OAuth (1-chạm)
  */
@@ -29,12 +200,35 @@ async function loginWithGoogle() {
     alert('Thư viện xác thực đang tải, vui lòng thử lại sau giây lát!');
     return;
   }
-  
-  // Luôn chuyển hướng về /index.html sau khi đăng nhập xong
-  const redirectUrl = window.location.origin + '/index.html';
+
+  const isNative = isNativeCapacitorApp();
+  const { Browser } = getCapacitorPlugins();
 
   try {
-    const { data, error } = await sbClient.auth.signInWithOAuth({
+    // Trên app Android/iOS (Capacitor): mở Chrome Custom Tabs & redirect về deep link của app
+    if (isNative && Browser && typeof Browser.open === 'function') {
+      initNativeAuthBridge();
+      const { data, error } = await sbClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: NATIVE_AUTH_REDIRECT_URL,
+          skipBrowserRedirect: true
+        }
+      });
+      if (error) throw error;
+      if (!data || !data.url) {
+        throw new Error('Không lấy được liên kết đăng nhập Google.');
+      }
+      await Browser.open({
+        url: data.url,
+        toolbarColor: '#1a2255'
+      });
+      return;
+    }
+
+    // Trên trình duyệt web: chuyển hướng về /index.html sau khi đăng nhập xong
+    const redirectUrl = window.location.origin + '/index.html';
+    const { error } = await sbClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: redirectUrl
@@ -60,7 +254,7 @@ function getAuthHeaders(session) {
 }
 
 /**
- * Chờ và lấy session Supabase chuẩn xác từ URL callback hoặc storage
+ * Chờ và lấy session Supabase chuẩn xác từ URL callback, deep link hoặc storage
  */
 async function resolveSupabaseSession() {
   if (!sbClient) return null;
@@ -73,19 +267,37 @@ async function resolveSupabaseSession() {
     }
   } catch (e) {}
 
-  // 2. Nếu trong URL có hash OAuth callback
+  // 2. Nếu là app Capacitor cold-start từ deep link OAuth callback
+  if (isNativeCapacitorApp()) {
+    const { App } = getCapacitorPlugins();
+    if (App && typeof App.getLaunchUrl === 'function') {
+      try {
+        const launch = await App.getLaunchUrl();
+        if (launch && launch.url && isAuthCallbackUrl(launch.url)) {
+          const nativeSession = await processNativeAuthUrl(launch.url);
+          if (nativeSession && nativeSession.user) {
+            return nativeSession;
+          }
+        }
+      } catch (e) {
+        console.warn('Lỗi đọc getLaunchUrl:', e);
+      }
+    }
+  }
+
+  // 3. Nếu trong URL web có hash/query OAuth callback
   const hash = window.location.hash || '';
   const search = window.location.search || '';
-  const isAuthCallback = hash.includes('access_token') || hash.includes('error') || search.includes('code=');
+  const isAuthCallback = hash.includes('access_token') || hash.includes('error') || search.includes('code=') || search.includes('error=');
 
   if (isAuthCallback) {
-    // Kiểm tra lỗi nếu có từ Google / Supabase
-    if (hash.includes('error=')) {
-      const params = new URLSearchParams(hash.substring(1));
-      const err = params.get('error_description') || params.get('error');
-      console.error('Lỗi Auth từ URL hash:', err);
-      alert('Đăng nhập Google thất bại: ' + decodeURIComponent(err.replace(/\+/g, ' ')));
-      try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (e) {}
+    // Kiểm tra lỗi nếu có từ Google / Supabase (ở hash hoặc query)
+    if (hash.includes('error=') || search.includes('error=')) {
+      const urlParams = extractAuthParamsFromUrl(window.location.href);
+      const err = (urlParams && (urlParams.error_description || urlParams.error)) || 'Lỗi xác thực';
+      console.error('Lỗi Auth từ URL callback:', err);
+      alert('Đăng nhập Google thất bại: ' + formatOAuthError(err));
+      try { history.replaceState(null, '', window.location.pathname); } catch (e) {}
       return null;
     }
 
