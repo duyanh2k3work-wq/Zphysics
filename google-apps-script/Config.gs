@@ -27,12 +27,12 @@ var ANSWER_KEYS = ['A', 'B', 'C', 'D'];
 var scriptProperties = PropertiesService.getScriptProperties();
 
 // URL và Anon Key có thể để mặc định vì là thông tin công khai
-var SUPABASE_URL = scriptProperties.getProperty('SUPABASE_URL') || "https://uztfmglzpfrwvamuggwx.supabase.co";
-var SUPABASE_ANON_KEY = scriptProperties.getProperty('SUPABASE_ANON_KEY') || "sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM";
+var SUPABASE_URL = (scriptProperties.getProperty('SUPABASE_URL') || "https://uztfmglzpfrwvamuggwx.supabase.co").trim();
+var SUPABASE_ANON_KEY = (scriptProperties.getProperty('SUPABASE_ANON_KEY') || "sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM").trim();
 
 // CÁC KHÓA BẢO MẬT CAO: Đọc trực tiếp từ môi trường bảo mật của Google, KHÔNG ghi đè thô vào code
-var SUPABASE_KEY = scriptProperties.getProperty('SUPABASE_KEY'); 
-var TELEGRAM_BOT_TOKEN = scriptProperties.getProperty('TELEGRAM_BOT_TOKEN');
+var SUPABASE_KEY = (scriptProperties.getProperty('SUPABASE_KEY') || "").trim(); 
+var TELEGRAM_BOT_TOKEN = (scriptProperties.getProperty('TELEGRAM_BOT_TOKEN') || "").trim();
 
-var WEB_APP_URL = scriptProperties.getProperty('WEB_APP_URL') || "https://zphysics.io.vn";
+var WEB_APP_URL = (scriptProperties.getProperty('WEB_APP_URL') || "https://zphysics.io.vn").trim();
 // =========================================================================

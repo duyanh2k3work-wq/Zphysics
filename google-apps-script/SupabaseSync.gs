@@ -76,18 +76,8 @@ function onEditInstalled(e) {
           role: loai,
           premium_until: premiumUntilISO
         };
-        var url = SUPABASE_URL + '/rest/v1/students?on_conflict=email';
-        var headers = {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Content-Type': 'application/json',
+        supabaseRequest('students?on_conflict=email', 'POST', payload, {
           'Prefer': 'resolution=merge-duplicates'
-        };
-        UrlFetchApp.fetch(url, {
-          method: 'POST',
-          headers: headers,
-          payload: JSON.stringify(payload),
-          muteHttpExceptions: true
         });
       }
     } else if (sheetName === 'linkbaihoc') {
@@ -116,18 +106,8 @@ function onEditInstalled(e) {
           grade: trimCell(vals[8]) || "12",
           video_url: trimCell(vals[9]) || "#"
         };
-        var url = SUPABASE_URL + '/rest/v1/exams?on_conflict=id';
-        var headers = {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Content-Type': 'application/json',
+        supabaseRequest('exams?on_conflict=id', 'POST', payload, {
           'Prefer': 'resolution=merge-duplicates'
-        };
-        UrlFetchApp.fetch(url, {
-          method: 'POST',
-          headers: headers,
-          payload: JSON.stringify(payload),
-          muteHttpExceptions: true
         });
       }
     } else {
@@ -162,7 +142,7 @@ function onEditInstalled(e) {
 
 function syncAllToSupabase() {
   if (!SUPABASE_URL || !SUPABASE_KEY || SUPABASE_URL.indexOf("xxxxxx") !== -1 || SUPABASE_URL === "") {
-    SpreadsheetApp.getUi().alert("Lỗi: Vui lòng cấu hình SUPABASE_URL & SUPABASE_KEY ở đầu file mã nguồn Google Apps Script trước khi chạy đồng bộ.");
+    SpreadsheetApp.getUi().alert("Lỗi: Vui lòng cấu hình SUPABASE_URL & SUPABASE_KEY trong Cài đặt dự án (Script Properties) của Google Apps Script trước khi chạy đồng bộ.");
     return;
   }
   
@@ -191,36 +171,110 @@ function runSyncDirectly() {
   console.log("Đồng bộ hoàn tất!");
 }
 
-function supabaseRequest(path, method, payload) {
-  var url = SUPABASE_URL + '/rest/v1/' + path;
+var USE_SUPABASE_PROXY_CACHE = false;
+
+function buildDirectSupabaseHeaders(path, method, extraHeaders) {
+  var key = trimCell(SUPABASE_KEY);
+  var anonKey = trimCell(SUPABASE_ANON_KEY);
   var headers = {
-    'apikey': SUPABASE_ANON_KEY, // Dùng anon key để qua bộ lọc Browser của Supabase
-    'Authorization': 'Bearer ' + SUPABASE_KEY, // Dùng service_role JWT key để bypass RLS (quyền Admin)
     'Content-Type': 'application/json'
   };
-  
-  if (method === 'POST' && (path.indexOf('questions') !== -1 || path.indexOf('students') !== -1)) {
+
+  if (key.indexOf('sb_secret_') === 0) {
+    // Secret key mới (opaque, không phải JWT 3 phần): chỉ truyền qua header apikey
+    headers['apikey'] = key;
+  } else {
+    // Legacy service_role JWT (eyJ...)
+    headers['apikey'] = anonKey || key;
+    headers['Authorization'] = 'Bearer ' + key;
+  }
+
+  if (method === 'POST' && (
+    path.indexOf('questions') !== -1 ||
+    path.indexOf('students') !== -1 ||
+    path.indexOf('on_conflict=') !== -1
+  )) {
     headers['Prefer'] = 'resolution=merge-duplicates';
   }
-  
-  var options = {
-    'method': method,
-    'headers': headers,
-    'muteHttpExceptions': true
-  };
-  
-  if (payload) {
-    options.payload = JSON.stringify(payload);
+
+  if (extraHeaders) {
+    for (var k in extraHeaders) {
+      if (Object.prototype.hasOwnProperty.call(extraHeaders, k)) {
+        headers[k] = extraHeaders[k];
+      }
+    }
   }
-  
-  var response = UrlFetchApp.fetch(url, options);
+
+  return headers;
+}
+
+function fetchViaSheetsProxy(baseUrl, anonKey, secretKey, path, method, payload, prefer) {
+  var proxyUrl = baseUrl + '/functions/v1/sheets-proxy';
+  var proxyHeaders = {
+    'apikey': anonKey || secretKey,
+    'x-sync-key': secretKey,
+    'Content-Type': 'application/json'
+  };
+  var proxyBody = {
+    path: path,
+    method: method,
+    prefer: prefer || ''
+  };
+  if (payload !== undefined && payload !== null) {
+    proxyBody.payload = payload;
+  }
+  return UrlFetchApp.fetch(proxyUrl, {
+    'method': 'POST',
+    'headers': proxyHeaders,
+    'payload': JSON.stringify(proxyBody),
+    'muteHttpExceptions': true
+  });
+}
+
+function supabaseRequest(path, method, payload, extraHeaders) {
+  var baseUrl = trimCell(SUPABASE_URL).replace(/\/+$/, '');
+  var key = trimCell(SUPABASE_KEY);
+  var anonKey = trimCell(SUPABASE_ANON_KEY);
+  var upperMethod = String(method || 'GET').toUpperCase();
+
+  if (!baseUrl || !key) {
+    throw new Error('Chưa cấu hình SUPABASE_URL hoặc SUPABASE_KEY trong Script Properties.');
+  }
+
+  var headers = buildDirectSupabaseHeaders(path, upperMethod, extraHeaders);
+  var prefer = headers['Prefer'] || '';
+  var isSecretKey = key.indexOf('sb_secret_') === 0;
+  var response;
+
+  if (isSecretKey && USE_SUPABASE_PROXY_CACHE) {
+    response = fetchViaSheetsProxy(baseUrl, anonKey, key, path, upperMethod, payload, prefer);
+  } else {
+    var url = baseUrl + '/rest/v1/' + path;
+    var options = {
+      'method': upperMethod,
+      'headers': headers,
+      'muteHttpExceptions': true
+    };
+    if (payload !== undefined && payload !== null) {
+      options.payload = JSON.stringify(payload);
+    }
+
+    response = UrlFetchApp.fetch(url, options);
+
+    // Nếu Apps Script (User-Agent Mozilla/5.0) bị Supabase chặn khi gửi sb_secret_ trực tiếp -> chuyển qua Edge Function proxy
+    if (isSecretKey && response.getResponseCode() === 401) {
+      USE_SUPABASE_PROXY_CACHE = true;
+      response = fetchViaSheetsProxy(baseUrl, anonKey, key, path, upperMethod, payload, prefer);
+    }
+  }
+
   var code = response.getResponseCode();
   var content = response.getContentText();
-  
+
   if (code < 200 || code >= 300) {
     throw new Error('Supabase API error (' + code + ') on ' + path + ': ' + content);
   }
-  
+
   return content ? JSON.parse(content) : null;
 }
 
@@ -451,7 +505,7 @@ function syncQuestionsToSupabase() {
   supabaseRequest('questions?id=not.is.null', 'DELETE');
   
   // 2. Insert dữ liệu mới theo từng chunk nhỏ để tránh quá tải payload
-  var chunkSize = 500;
+  var chunkSize = 300;
   for (var i = 0; i < questions.length; i += chunkSize) {
     var chunk = questions.slice(i, i + chunkSize);
     supabaseRequest('questions', 'POST', chunk);
@@ -484,38 +538,21 @@ function supabaseUpsertQuestion(maDe, id, qData) {
   };
   
   // Sử dụng POST với header resolution=merge-duplicates để tự động Upsert dựa trên unique constraint
-  var url = SUPABASE_URL + '/rest/v1/questions?on_conflict=made,question_id';
-  var headers = {
-    'apikey': SUPABASE_ANON_KEY, // Dùng anon key để qua bộ lọc Browser của Supabase
-    'Authorization': 'Bearer ' + SUPABASE_KEY, // Dùng service_role JWT key để bypass RLS (quyền Admin)
-    'Content-Type': 'application/json',
-    'Prefer': 'resolution=merge-duplicates'
-  };
-  
-  var options = {
-    'method': 'POST',
-    'headers': headers,
-    'payload': JSON.stringify(payload),
-    'muteHttpExceptions': true
-  };
-  
-  UrlFetchApp.fetch(url, options);
+  try {
+    supabaseRequest('questions?on_conflict=made,question_id', 'POST', payload, {
+      'Prefer': 'resolution=merge-duplicates'
+    });
+  } catch (err) {
+    console.warn("Lỗi upsert câu hỏi lên Supabase: " + err.message);
+  }
 }
 
 function supabaseDeleteQuestion(maDe, id) {
   if (!SUPABASE_URL || !SUPABASE_KEY || SUPABASE_URL.indexOf("xxxxxx") !== -1 || SUPABASE_URL === "") return;
   
-  var url = SUPABASE_URL + '/rest/v1/questions?made=eq.' + encodeURIComponent(maDe) + '&question_id=eq.' + parseInt(id, 10);
-  var headers = {
-    'apikey': SUPABASE_ANON_KEY, // Dùng anon key để qua bộ lọc Browser của Supabase
-    'Authorization': 'Bearer ' + SUPABASE_KEY // Dùng service_role JWT key để bypass RLS (quyền Admin)
-  };
-  
-  var options = {
-    'method': 'DELETE',
-    'headers': headers,
-    'muteHttpExceptions': true
-  };
-  
-  UrlFetchApp.fetch(url, options);
+  try {
+    supabaseRequest('questions?made=eq.' + encodeURIComponent(maDe) + '&question_id=eq.' + parseInt(id, 10), 'DELETE');
+  } catch (err) {
+    console.warn("Lỗi xóa câu hỏi trên Supabase: " + err.message);
+  }
 }
