@@ -194,16 +194,31 @@ html[data-theme="dark"] .tf-seg[data-selected="0"] .tf-btn[data-val="Đ"] {
 }
 
 /* ── Shared Tactile, Bento & Editorial Primitives ── */
+html,
+body,
+button,
+input,
+select,
+textarea,
+code,
+pre,
+kbd,
+.mono,
+.serif-accent,
+.font-display {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
 .serif-accent {
-  font-family: 'Newsreader', Georgia, serif;
-  font-style: italic;
-  font-weight: 500;
+  font-family: Arial, Helvetica, sans-serif;
+  font-style: normal;
+  font-weight: 600;
   letter-spacing: -0.01em;
 }
 
 .font-display {
-  font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', -apple-system, sans-serif;
-  letter-spacing: -0.025em;
+  font-family: Arial, Helvetica, sans-serif;
+  letter-spacing: -0.02em;
 }
 
 /* Tactile Keycap (.kbd-cap) */
@@ -218,10 +233,10 @@ html[data-theme="dark"] .tf-seg[data-selected="0"] .tf-btn[data-val="Đ"] {
   background: var(--raised);
   border: 1px solid var(--border-strong);
   border-bottom-width: 2px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: Arial, Helvetica, sans-serif;
   font-variant-numeric: tabular-nums;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
   color: var(--text-secondary);
   user-select: none;
@@ -402,9 +417,9 @@ html[data-theme="dark"] .bento-surface {
 }
 
 .cmd-group-label {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--muted);
   padding: 6px 10px 4px;
 }
@@ -438,9 +453,9 @@ html[data-theme="dark"] .bento-surface {
 }
 
 .cmd-item-tag {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   padding: 2px 6px;
   border-radius: 4px;
   background: var(--bg-deep);
