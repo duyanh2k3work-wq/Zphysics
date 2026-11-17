@@ -9,7 +9,10 @@
   <link rel="apple-touch-icon" href="logo.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/auth.js?v=20261111_07"></script>
-  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_arial">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_feat1">
   <script src="assets/js/pinui.js?v=20261118_arial"></script>
   <script>PinUI.initTheme('light');</script>
   <style>
@@ -1957,6 +1960,15 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
             Tiến độ &amp; Lịch sử
           </button>
+          <button type="button" class="sidebar-nav-btn" id="sidebarMistakeBtn" onclick="openMistakeModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="M12 7v4"/><path d="M12 15h.01"/></svg>
+            Sổ tay câu sai
+            <span class="sidebar-nav-badge is-zero" id="sidebarMistakeBadge">0</span>
+          </button>
+          <button type="button" class="sidebar-nav-btn" id="sidebarFlashcardBtn" onclick="openFlashcardModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M7 15V9l5 6V9"/><path d="M16 9h2"/></svg>
+            Flashcard Công thức
+          </button>
           <a href="premium.html" class="sidebar-nav-btn" id="sidebarPremiumLink">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             Gói Premium
@@ -2096,7 +2108,111 @@
           <span class="ch-rt-count" id="chReaderProgText">0/0</span>
         </div>
         <span class="ch-rt-sep" aria-hidden="true"></span>
+        <button type="button" class="ch-rt-btn" id="chReaderFlashcardBtn" onclick="openFlashcardForCurrentChapter()" title="Ôn Flashcard công thức và bẫy Đúng/Sai của chương này">Flashcard</button>
+        <span class="ch-rt-sep" aria-hidden="true"></span>
         <button type="button" class="ch-rt-btn" id="chReaderNextBtn" onclick="stepChapterReader(1)">Sau →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MISTAKE NOTEBOOK MODAL (SỔ TAY CÂU SAI) ── -->
+  <div id="mistakeModal" class="zp-modal-backdrop" onclick="if(event.target===this) closeMistakeModal()">
+    <div class="zp-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="mistakeModalTitle">
+      <div class="zp-modal-head">
+        <div>
+          <h3 id="mistakeModalTitle">Sổ tay câu sai</h3>
+          <div class="zp-modal-sub" id="mistakeModalSub">Tự động lưu các câu trả lời sai từ bài tập &amp; ôn tập để luyện lại</div>
+        </div>
+        <button type="button" class="zp-modal-close" onclick="closeMistakeModal()" aria-label="Đóng sổ tay câu sai">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="zp-modal-body">
+        <div class="zp-filter-bar">
+          <div class="zp-chip-group" id="mistakeGradeFilterGroup">
+            <button type="button" class="zp-filter-chip active" data-grade="all" onclick="setMistakeGradeFilter('all')">Tất cả</button>
+            <button type="button" class="zp-filter-chip" data-grade="12" onclick="setMistakeGradeFilter('12')">Lớp 12</button>
+            <button type="button" class="zp-filter-chip" data-grade="11" onclick="setMistakeGradeFilter('11')">Lớp 11</button>
+            <button type="button" class="zp-filter-chip" data-grade="10" onclick="setMistakeGradeFilter('10')">Lớp 10</button>
+          </div>
+          <div class="zp-chip-group">
+            <button type="button" class="zp-secondary-btn" id="mistakeClearAllBtn" onclick="clearAllMistakes()">Xóa tất cả</button>
+            <a href="q.html#mistakes" class="zp-primary-btn" id="mistakeRetryBtn">Luyện lại câu sai →</a>
+          </div>
+        </div>
+        <div id="mistakeModalList" style="display:flex; flex-direction:column; gap:10px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FLASHCARD MODAL (CÔNG THỨC & BẪY ĐÚNG/SAI) ── -->
+  <div id="flashcardModal" class="zp-modal-backdrop" onclick="if(event.target===this) closeFlashcardModal()">
+    <div class="zp-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="fcModalTitle">
+      <div class="zp-modal-head">
+        <div>
+          <h3 id="fcModalTitle">Flashcard Công thức &amp; Bẫy Đúng/Sai</h3>
+          <div class="zp-modal-sub" id="fcModalSub">Ôn nhanh công thức trọng tâm, đơn vị SI và bẫy lý thuyết GDPT 2018</div>
+        </div>
+        <button type="button" class="zp-modal-close" onclick="closeFlashcardModal()" aria-label="Đóng Flashcard">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="zp-modal-body">
+        <div class="fc-controls-top">
+          <select id="fcGradeSelect" class="fc-select" onchange="onFlashcardGradeChange()">
+            <option value="all">Tất cả khối lớp</option>
+            <option value="12">Vật lí 12</option>
+            <option value="11">Vật lí 11</option>
+            <option value="10">Vật lí 10</option>
+          </select>
+          <select id="fcChapterSelect" class="fc-select" onchange="onFlashcardFilterChange()">
+            <option value="all">Tất cả chuyên đề</option>
+          </select>
+          <select id="fcStatusSelect" class="fc-select" onchange="onFlashcardFilterChange()">
+            <option value="all">Tất cả thẻ</option>
+            <option value="unmastered">Chưa thuộc</option>
+            <option value="mastered">Đã thuộc</option>
+          </select>
+        </div>
+
+        <div class="fc-progress-row">
+          <span id="fcCounterText">Thẻ 0 / 0</span>
+          <span id="fcMasteredStats">Đã thuộc: 0 thẻ</span>
+        </div>
+
+        <div class="fc-scene" id="fcScene">
+          <div class="fc-card" id="fcCard" onclick="flipFlashcard()" role="button" tabindex="0" aria-label="Lật thẻ Flashcard">
+            <div class="fc-face fc-front">
+              <div class="fc-face-top">
+                <span class="fc-type-tag" id="fcFrontBadge">Công thức</span>
+                <span class="mono" style="font-size:11px; color:var(--muted);" id="fcFrontMeta">Lớp 12</span>
+              </div>
+              <div class="fc-main-text" id="fcFrontText">Đang tải bộ thẻ...</div>
+              <div class="fc-face-hint">Chạm vào thẻ hoặc bấm phím <span class="kbd-cap">Space</span> để xem đáp án</div>
+            </div>
+            <div class="fc-face fc-back">
+              <div class="fc-face-top">
+                <span class="fc-type-tag" id="fcBackBadge">Đáp án &amp; Ghi nhớ</span>
+                <span class="mono" style="font-size:11px; color:var(--muted);" id="fcBackMeta">Lớp 12</span>
+              </div>
+              <div class="fc-formula-box" id="fcBackFormula"></div>
+              <div class="fc-note-text" id="fcBackNote"></div>
+              <div class="fc-face-hint">Bấm để lật lại mặt trước</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fc-bottom-actions">
+          <div class="zp-chip-group">
+            <button type="button" class="zp-secondary-btn" id="fcPrevBtn" onclick="stepFlashcard(-1)">← Trước</button>
+            <button type="button" class="zp-secondary-btn" onclick="flipFlashcard()">Lật thẻ</button>
+            <button type="button" class="zp-secondary-btn" id="fcNextBtn" onclick="stepFlashcard(1)">Sau →</button>
+          </div>
+          <div class="zp-chip-group">
+            <button type="button" class="zp-secondary-btn" onclick="shuffleFlashcards()">Trộn thẻ</button>
+            <button type="button" class="zp-secondary-btn fc-mastered-btn" id="fcMasteredBtn" onclick="toggleCurrentFlashcardMastered()">Đánh dấu đã thuộc ✓</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -2759,8 +2875,10 @@
         labelDiv.className = 'section-label';
         labelDiv.innerHTML = `
           <h3>Danh mục bài học — ${gradeObj.grade}</h3>
-          <div class="section-label-right">
+          <div class="section-label-right" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <span class="section-summary">${gradeObj.chapters.length} chương · ${totalLessonsInGrade} bài học</span>
+            <button type="button" class="zp-filter-chip" onclick="openMistakeModal()" title="Xem và ôn lại các câu làm sai">Sổ tay câu sai (<span class="mistake-inline-count">0</span>)</button>
+            <button type="button" class="zp-filter-chip" onclick="openFlashcardModal('${gradeNum}')" title="Ôn nhanh Flashcard công thức và bẫy Đúng/Sai">Flashcard</button>
           </div>
         `;
         section.appendChild(labelDiv);
@@ -3126,6 +3244,7 @@
       if (readerBackdrop && readerBackdrop.classList.contains('open') && currentReaderCardKey && chapterReaderRegistry[currentReaderCardKey]) {
         populateChapterReader(chapterReaderRegistry[currentReaderCardKey], null);
       }
+      if (typeof updateMistakeBadges === 'function') updateMistakeBadges();
     }
 
     function openCardInGrade(gIdx, cardKey, lessonKey) {
@@ -3191,6 +3310,25 @@
         });
       });
 
+      items.unshift(
+        {
+          type: 'action',
+          action: 'mistakes',
+          tag: 'Ôn tập',
+          title: 'Sổ tay câu sai (Luyện lại câu trả lời sai)',
+          meta: `${getMistakeItems().length} câu`,
+          searchStr: normalizeText('so tay cau sai on lai mistake notebook')
+        },
+        {
+          type: 'action',
+          action: 'flashcards',
+          tag: 'Ghi nhớ',
+          title: 'Flashcard Công thức & Bẫy Đúng/Sai THPT',
+          meta: 'Lớp 10–12',
+          searchStr: normalizeText('flashcard cong thuc don vi bay dung sai ghi nho nhanh')
+        }
+      );
+
       cmdItemsCache = items;
     }
 
@@ -3204,7 +3342,7 @@
       const q = normalizeText(query || '');
       const matches = q
         ? cmdItemsCache.filter(item => item.searchStr.includes(q)).slice(0, 18)
-        : cmdItemsCache.filter(item => item.type === 'chapter' || item.type === 'exam').slice(0, 14);
+        : cmdItemsCache.filter(item => item.type === 'action' || item.type === 'chapter' || item.type === 'exam').slice(0, 14);
 
       currentFilteredCmdItems = matches;
       cmdActiveIdx = 0;
@@ -3229,6 +3367,11 @@
       const item = currentFilteredCmdItems[idx];
       if (!item) return;
       closeCmdPalette();
+      if (item.type === 'action') {
+        if (item.action === 'mistakes') openMistakeModal();
+        else if (item.action === 'flashcards') openFlashcardModal();
+        return;
+      }
       if (item.type === 'exam') {
         const session = getSession();
         if (session && session.premium) {
@@ -3270,6 +3413,39 @@
         }
         return;
       }
+
+      const mistakeModal = document.getElementById('mistakeModal');
+      if (mistakeModal && mistakeModal.classList.contains('open')) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeMistakeModal();
+        }
+        return;
+      }
+
+      const fcModal = document.getElementById('flashcardModal');
+      if (fcModal && fcModal.classList.contains('open')) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeFlashcardModal();
+          return;
+        }
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (tag !== 'input' && tag !== 'textarea' && tag !== 'select') {
+          if (e.key === ' ' || e.code === 'Space') {
+            e.preventDefault();
+            flipFlashcard();
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            stepFlashcard(-1);
+          } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            stepFlashcard(1);
+          }
+        }
+        return;
+      }
+
       if (e.key === 'Escape') {
         const videoModal = document.getElementById('videoModal');
         if (videoModal && videoModal.classList.contains('visible')) {
@@ -3335,6 +3511,547 @@
         }
       });
     }
+
+    /* ── FEATURE #5: MISTAKE NOTEBOOK (SỔ TAY CÂU SAI) ── */
+    const MISTAKE_STORAGE_KEY = 'zp_mistakes_v1';
+    let activeMistakeGradeFilter = 'all';
+
+    function triggerModalKaTeX(el) {
+      if (!el) return;
+      if (typeof renderMathInElement === 'function') {
+        try {
+          renderMathInElement(el, {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '\\[', right: '\\]', display: true },
+              { left: '$', right: '$', display: false },
+              { left: '\\(', right: '\\)', display: false }
+            ],
+            throwOnError: false
+          });
+        } catch (e) {}
+      }
+    }
+
+    function formatModalSafeText(text) {
+      if (!text) return '';
+      const escaped = String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      return escaped
+        .replace(/\[img\](.*?)\[\/img\]/gi, '<div style="margin:6px 0;"><img src="$1" style="max-width:100%; border-radius:8px; border:1px solid var(--border);" onerror="this.style.display=\'none\'"></div>')
+        .replace(/\n/g, '<br>');
+    }
+
+    function getMistakeItems() {
+      try {
+        const raw = localStorage.getItem(MISTAKE_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveMistakeItems(items) {
+      try {
+        localStorage.setItem(MISTAKE_STORAGE_KEY, JSON.stringify(items));
+      } catch (e) {}
+    }
+
+    function updateMistakeBadges() {
+      const count = getMistakeItems().length;
+      const sideBadge = document.getElementById('sidebarMistakeBadge');
+      if (sideBadge) {
+        sideBadge.textContent = String(count);
+        sideBadge.classList.toggle('is-zero', count === 0);
+      }
+      document.querySelectorAll('.mistake-inline-count').forEach(el => {
+        el.textContent = String(count);
+      });
+    }
+
+    function openMistakeModal() {
+      const modal = document.getElementById('mistakeModal');
+      if (!modal) return;
+      renderMistakeModalList();
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMistakeModal() {
+      const modal = document.getElementById('mistakeModal');
+      if (!modal) return;
+      modal.classList.remove('open');
+      const readerBackdrop = document.getElementById('chapterReaderBackdrop');
+      const fcModal = document.getElementById('flashcardModal');
+      const anyOpen = (readerBackdrop && readerBackdrop.classList.contains('open')) || (fcModal && fcModal.classList.contains('open'));
+      document.body.style.overflow = anyOpen ? 'hidden' : '';
+    }
+
+    function setMistakeGradeFilter(grade) {
+      activeMistakeGradeFilter = grade || 'all';
+      document.querySelectorAll('#mistakeGradeFilterGroup .zp-filter-chip').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-grade') === activeMistakeGradeFilter);
+      });
+      renderMistakeModalList();
+    }
+
+    function formatMistakeCorrectDisplay(item) {
+      if (!item) return '';
+      const validAns = Array.isArray(item.answers) ? item.answers.filter(a => a && a.text && a.text.trim() !== '') : [];
+      if (item.type === 'cauhoi') {
+        const keyNorm = String(item.correct || '').trim().toUpperCase();
+        const found = validAns.find(a => String(a.key).trim().toUpperCase() === keyNorm);
+        return found ? `${found.key}. ${formatModalSafeText(found.text)}` : formatModalSafeText(item.correct);
+      }
+      if (item.type === 'đs') {
+        const letters = String(item.correct || '').toUpperCase().replace(/D/g, 'Đ').split('');
+        return validAns.map((a, idx) => `${a.key}: ${letters[idx] || 'Đ'}`).join(' · ');
+      }
+      return formatModalSafeText(item.correct);
+    }
+
+    function renderMistakeModalList() {
+      const listEl = document.getElementById('mistakeModalList');
+      const retryBtn = document.getElementById('mistakeRetryBtn');
+      const clearBtn = document.getElementById('mistakeClearAllBtn');
+      const subEl = document.getElementById('mistakeModalSub');
+      if (!listEl) return;
+
+      const all = getMistakeItems();
+      const filtered = activeMistakeGradeFilter === 'all'
+        ? all
+        : all.filter(it => String(it.grade) === String(activeMistakeGradeFilter));
+
+      if (subEl) {
+        subEl.textContent = all.length > 0
+          ? `Hiện có ${all.length} câu từng làm sai (đang lọc: ${filtered.length} câu)`
+          : 'Tự động lưu các câu trả lời sai từ bài tập & ôn tập để luyện lại';
+      }
+
+      if (retryBtn) {
+        const hashTarget = activeMistakeGradeFilter === 'all' ? 'mistakes' : `mistakes_${activeMistakeGradeFilter}`;
+        retryBtn.href = `q.html#${hashTarget}`;
+        if (filtered.length === 0) {
+          retryBtn.style.pointerEvents = 'none';
+          retryBtn.style.opacity = '0.45';
+        } else {
+          retryBtn.style.pointerEvents = '';
+          retryBtn.style.opacity = '1';
+        }
+      }
+      if (clearBtn) {
+        clearBtn.style.display = all.length > 0 ? '' : 'none';
+      }
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `
+          <div style="text-align:center; padding:36px 16px; color:var(--muted); font-size:13.5px;">
+            ${all.length === 0
+              ? 'Chưa có câu sai nào được ghi nhận. Khi làm bài ở phần Bài tập hoặc Ôn tập, các câu sai sẽ tự động được gom vào đây.'
+              : 'Không có câu sai nào thuộc khối lớp đang chọn.'}
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map((item) => {
+        const idStr = escapeHtmlAttr(item.id);
+        const typeLabel = item.type === 'đs' ? 'Đúng/Sai' : (item.type === 'tln' ? 'Trả lời ngắn' : 'Trắc nghiệm');
+        const gradeTag = item.grade ? `<span class="tag">Lớp ${escapeHtmlAttr(item.grade)}</span>` : '';
+        const lessonTag = item.lessonTitle ? `<span class="tag">${escapeHtmlAttr(item.lessonTitle)}</span>` : '';
+        const wrongCountTag = `<span class="tag" style="color:var(--wrong); border-color:rgba(220,38,38,0.3);">Sai ${item.wrongCount || 1} lần</span>`;
+        const correctDisp = formatMistakeCorrectDisplay(item);
+        const expText = item.explanation ? formatModalSafeText(item.explanation) : 'Chưa có lời giải chi tiết.';
+
+        return `
+          <div class="mistake-item-card">
+            <div class="mistake-item-head">
+              <div class="mistake-meta-tags">
+                ${gradeTag}
+                ${lessonTag}
+                <span class="tag">${typeLabel}</span>
+                ${wrongCountTag}
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <button type="button" class="toolbar-mini-btn" onclick="toggleMistakeExplain('${idStr}')">Xem giải</button>
+                <button type="button" class="toolbar-mini-btn is-danger" onclick="removeMistakeById('${idStr}')">Đã nhớ · Xóa</button>
+              </div>
+            </div>
+            <div class="mistake-q-text">${formatModalSafeText(item.question)}</div>
+            <div class="mistake-explain-box" id="mistake-exp-${idStr}">
+              <div style="margin-bottom:6px; color:var(--correct); font-weight:600;">Đáp án đúng: ${correctDisp}</div>
+              <div><strong style="color:var(--accent);">Lời giải:</strong> ${expText}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      triggerModalKaTeX(listEl);
+      updateMistakeBadges();
+    }
+
+    function toggleMistakeExplain(id) {
+      const box = document.getElementById('mistake-exp-' + id);
+      if (!box) return;
+      box.classList.toggle('open');
+      if (box.classList.contains('open')) triggerModalKaTeX(box);
+    }
+
+    function removeMistakeById(id) {
+      const next = getMistakeItems().filter(it => String(it.id) !== String(id));
+      saveMistakeItems(next);
+      renderMistakeModalList();
+      updateMistakeBadges();
+    }
+
+    function clearAllMistakes() {
+      if (!confirm('Xóa toàn bộ câu hỏi trong Sổ tay câu sai?')) return;
+      saveMistakeItems([]);
+      renderMistakeModalList();
+      updateMistakeBadges();
+    }
+
+    /* ── FEATURE #6: FLASHCARD ENGINE (CÔNG THỨC & BẪY ĐÚNG/SAI) ── */
+    const FLASHCARD_MASTERED_KEY = 'zp_flashcards_mastered_v1';
+
+    const ZPHYSICS_FLASHCARD_BANK = [
+      // Lớp 12 - Chương I: Vật lí nhiệt
+      { id: '12_c1_1', grade: '12', chapterKey: '12-c1', chapterLabel: 'Chương I · Vật lí nhiệt', kind: 'formula', frontTitle: 'Định luật I Nhiệt động lực học', frontBody: 'Hệ thức liên hệ giữa độ biến thiên nội năng, nhiệt lượng và công?', backFormula: '$\\Delta U = A + Q$', backNote: 'Quy ước dấu: $Q > 0$ (nhận nhiệt), $Q < 0$ (tỏa nhiệt); $A > 0$ (nhận công), $A < 0$ (thực hiện công). Đơn vị: Joule (J).' },
+      { id: '12_c1_2', grade: '12', chapterKey: '12-c1', chapterLabel: 'Chương I · Vật lí nhiệt', kind: 'formula', frontTitle: 'Thang nhiệt độ Kelvin & Celsius', frontBody: 'Chuyển đổi nhiệt độ từ độ C sang Kelvin và độ biến thiên nhiệt độ?', backFormula: '$T\\,(K) = t\\,(^\\circ\\text{C}) + 273$', backNote: 'Độ chia thang Kelvin và Celsius bằng nhau: $\\Delta T\\,(K) = \\Delta t\\,(^\\circ\\text{C})$. Độ không tuyệt đối là $0\\,\\text{K} \\approx -273{,}15^\\circ\\text{C}$.' },
+      { id: '12_c1_3', grade: '12', chapterKey: '12-c1', chapterLabel: 'Chương I · Vật lí nhiệt', kind: 'formula', frontTitle: 'Nhiệt lượng thu vào / tỏa ra & Chuyển thể', frontBody: '3 công thức tính nhiệt lượng khi tăng nhiệt độ, nóng chảy và hóa hơi?', backFormula: '$Q = mc\\Delta T \\quad|\\quad Q = \\lambda m \\quad|\\quad Q = Lm$', backNote: '$c$: nhiệt dung riêng (J/kg.K); $\\lambda$: nhiệt nóng chảy riêng (J/kg); $L$: nhiệt hóa hơi riêng (J/kg).' },
+      { id: '12_c1_4', grade: '12', chapterKey: '12-c1', chapterLabel: 'Chương I · Vật lí nhiệt', kind: 'trap', frontTitle: 'Bẫy Đúng/Sai · Nóng chảy & Sôi', frontBody: 'Nhận định: "Khi đun nước đang sôi ở áp suất chuẩn, càng tăng công suất bếp thì nhiệt độ của nước càng tăng nhanh hơn." Đúng hay Sai?', backFormula: 'SAI (Nhiệt độ không đổi)', backNote: 'Trong suốt quá trình nóng chảy hoặc sôi của chất tinh khiết ở áp suất không đổi, nhiệt độ KHÔNG TĂNG; nhiệt lượng cung cấp chỉ dùng để phá vỡ liên kết chuyển thể.' },
+      // Lớp 12 - Chương II: Khí lí tưởng
+      { id: '12_c2_1', grade: '12', chapterKey: '12-c2', chapterLabel: 'Chương II · Khí lí tưởng', kind: 'formula', frontTitle: 'Định luật Boyle & Charles', frontBody: 'Hệ thức quá trình đẳng nhiệt (Boyle) và đẳng áp (Charles)?', backFormula: '$p_1V_1 = p_2V_2 \\quad|\\quad \\dfrac{V_1}{T_1} = \\dfrac{V_2}{T_2}$', backNote: 'BẮT BUỘC đổi nhiệt độ $T$ sang Kelvin ($T = t + 273$). Phương trình trạng thái: $\\dfrac{p_1V_1}{T_1} = \\dfrac{p_2V_2}{T_2}$.' },
+      { id: '12_c2_2', grade: '12', chapterKey: '12-c2', chapterLabel: 'Chương II · Khí lí tưởng', kind: 'formula', frontTitle: 'Phương trình Clapeyron (Khí lí tưởng)', frontBody: 'Hệ thức liên hệ giữa $p, V, T$ và số mol khí $n$?', backFormula: '$pV = nRT = \\dfrac{m}{M}RT$', backNote: 'Trong hệ SI: $p\\,(\\text{Pa})$, $V\\,(\\text{m}^3)$, $R = 8{,}31\\,\\text{J/(mol}\\cdot\\text{K)}$, $T\\,(\\text{K})$.' },
+      { id: '12_c2_3', grade: '12', chapterKey: '12-c2', chapterLabel: 'Chương II · Khí lí tưởng', kind: 'formula', frontTitle: 'Áp suất khí & Động năng trung bình phân tử', frontBody: 'Công thức động học phân tử cho áp suất và động năng tịnh tiến trung bình $\\overline{E_đ}$?', backFormula: '$p = \\dfrac{1}{3}\\mu m \\overline{v^2} \\quad|\\quad \\overline{E_đ} = \\dfrac{3}{2}kT$', backNote: 'Hằng số Boltzmann $k = 1{,}38\\times 10^{-23}\\,\\text{J/K}$. Động năng trung bình CHỈ phụ thuộc nhiệt độ tuyệt đối $T$.' },
+      { id: '12_c2_4', grade: '12', chapterKey: '12-c2', chapterLabel: 'Chương II · Khí lí tưởng', kind: 'trap', frontTitle: 'Bẫy Đúng/Sai · Đồ thị đẳng tích', frontBody: 'Nhận định: "Nếu giữ nguyên thể tích, khi tăng nhiệt độ từ $20^\\circ\\text{C}$ lên $40^\\circ\\text{C}$ thì áp suất chất khí tăng gấp đôi." Đúng hay Sai?', backFormula: 'SAI (Phải dùng Kelvin)', backNote: 'Áp suất tỉ lệ thuận với nhiệt độ tuyệt đối $T\\,(K)$, không tỉ lệ thuận với $t\\,(^\\circ\\text{C})$: $\\dfrac{p_2}{p_1} = \\dfrac{273+40}{273+20} \\approx 1{,}068$.' },
+      // Lớp 12 - Chương III: Từ trường
+      { id: '12_c3_1', grade: '12', chapterKey: '12-c3', chapterLabel: 'Chương III · Từ trường', kind: 'formula', frontTitle: 'Lực từ tác dụng lên đoạn dây dẫn', frontBody: 'Độ lớn lực từ tác dụng lên dây dẫn mang dòng điện đặt trong từ trường đều?', backFormula: '$F = BI\\ell\\sin\\alpha$', backNote: '$\\alpha$ là góc hợp bởi vectơ chiều dòng điện $\\vec{I}$ và vectơ cảm ứng từ $\\vec{B}$. Đơn vị của $B$ là Tesla ($\\text{T}$).' },
+      { id: '12_c3_2', grade: '12', chapterKey: '12-c3', chapterLabel: 'Chương III · Từ trường', kind: 'formula', frontTitle: 'Từ thông & Suất điện động cảm ứng', frontBody: 'Công thức tính từ thông qua $N$ vòng dây và định luật Faraday?', backFormula: '$\\Phi = NBS\\cos\\alpha \\quad|\\quad e_c = -\\dfrac{\\Delta\\Phi}{\\Delta t}$', backNote: 'Đơn vị từ thông: Weber ($\\text{Wb}$). Dấu trừ biểu thị định luật Lenz: dòng điện cảm ứng chống lại nguyên nhân sinh ra nó.' },
+      { id: '12_c3_3', grade: '12', chapterKey: '12-c3', chapterLabel: 'Chương III · Từ trường', kind: 'formula', frontTitle: 'Máy biến áp & Dòng điện xoay chiều', frontBody: 'Giá trị hiệu dụng $I, U$ và tỉ số biến áp lí tưởng?', backFormula: '$I = \\dfrac{I_0}{\\sqrt{2}},\\; U = \\dfrac{U_0}{\\sqrt{2}} \\quad|\\quad \\dfrac{U_1}{U_2} = \\dfrac{N_1}{N_2}$', backNote: 'Máy biến áp làm thay đổi điện áp và cường độ dòng điện xoay chiều, KHÔNG làm thay đổi tần số $f$.' },
+      { id: '12_c3_4', grade: '12', chapterKey: '12-c3', chapterLabel: 'Chương III · Từ trường', kind: 'trap', frontTitle: 'Bẫy Đúng/Sai · Góc trong công thức từ thông', frontBody: 'Nhận định: "Trong $\\Phi = NBS\\cos\\alpha$, $\\alpha$ là góc hợp bởi đường sức từ $\\vec{B}$ và mặt phẳng khung dây." Đúng hay Sai?', backFormula: 'SAI (Góc với vectơ pháp tuyến)', backNote: '$\\alpha$ là góc hợp bởi $\\vec{B}$ và vectơ PHÁP TUYẾN $\\vec{n}$ của mặt phẳng khung. Nếu đề cho góc giữa $\\vec{B}$ và mặt phẳng khung là $\\beta$ thì $\\alpha = 90^\\circ - \\beta$.' },
+      // Lớp 12 - Chương IV: Vật lí hạt nhân
+      { id: '12_c4_1', grade: '12', chapterKey: '12-c4', chapterLabel: 'Chương IV · Vật lí hạt nhân', kind: 'formula', frontTitle: 'Độ hụt khối & Năng lượng liên kết', frontBody: 'Công thức độ hụt khối và năng lượng liên kết của hạt nhân $^A_Z X$?', backFormula: '$\\Delta m = Zm_p + (A-Z)m_n - m_X \\quad|\\quad W_{\\text{lk}} = \\Delta m c^2$', backNote: 'Quy đổi nhanh: $1\\,\\text{u}\\cdot c^2 \\approx 931{,}5\\,\\text{MeV}$. Hạt nhân càng bền vững khi năng lượng liên kết riêng $W_{\\text{lkr}} = \\dfrac{W_{\\text{lk}}}{A}$ càng lớn.' },
+      { id: '12_c4_2', grade: '12', chapterKey: '12-c4', chapterLabel: 'Chương IV · Vật lí hạt nhân', kind: 'formula', frontTitle: 'Định luật phóng xạ & Độ phóng xạ', frontBody: 'Số hạt còn lại $N(t)$, khối lượng còn lại và độ phóng xạ $H(t)$ sau thời gian $t$?', backFormula: '$N(t) = N_0 \\cdot 2^{-t/T} = N_0 e^{-\\lambda t} \\quad|\\quad H = \\lambda N$', backNote: '$\\lambda = \\dfrac{\\ln 2}{T}$. Đơn vị độ phóng xạ là Becquerel ($1\\,\\text{Bq} = 1\\,\\text{phân rã/s}$). Số hạt đã phân rã: $\\Delta N = N_0(1 - 2^{-t/T})$.' },
+      { id: '12_c4_3', grade: '12', chapterKey: '12-c4', chapterLabel: 'Chương IV · Vật lí hạt nhân', kind: 'trap', frontTitle: 'Bẫy Đúng/Sai · Chu kì bán rã & Môi trường', frontBody: 'Nhận định: "Có thể làm chậm tốc độ phóng xạ của chất phóng xạ bằng cách làm lạnh sâu xuống gần $0\\,\\text{K}$ hoặc tăng áp suất." Đúng hay Sai?', backFormula: 'SAI (Không phụ thuộc môi trường)', backNote: 'Quá trình phóng xạ có tính tự phát và ngẫu nhiên, chu kì bán rã $T$ CHỈ phụ thuộc bản chất hạt nhân, hoàn toàn không phụ thuộc nhiệt độ, áp suất hay phản ứng hóa học.' },
+      // Lớp 11 - Chương 1: Dao động
+      { id: '11_c1_1', grade: '11', chapterKey: '11-c1', chapterLabel: 'Chương 1 · Dao động', kind: 'formula', frontTitle: 'Phương trình DĐĐH & Hệ thức độc lập', frontBody: 'Liên hệ pha và độ lớn giữa li độ $x$, vận tốc $v$, gia tốc $a$?', backFormula: '$a = -\\omega^2 x \\quad|\\quad A^2 = x^2 + \\dfrac{v^2}{\\omega^2}$', backNote: '$v_{\\max} = \\omega A$ (tại VTCB $x=0$); $a_{\\max} = \\omega^2 A$ (tại biên $x = \\pm A$). Tần số góc $\\omega = \\dfrac{2\\pi}{T} = 2\\pi f$.' },
+      { id: '11_c1_2', grade: '11', chapterKey: '11-c1', chapterLabel: 'Chương 1 · Dao động', kind: 'formula', frontTitle: 'Năng lượng trong Dao động điều hòa', frontBody: 'Công thức động năng, thế năng và cơ năng của vật DĐĐH?', backFormula: '$W = W_đ + W_t = \\dfrac{1}{2}m\\omega^2 A^2 = \\text{const}$', backNote: 'Động năng và thế năng biến thiên tuần hoàn với chu kì $T\' = \\dfrac{T}{2}$ và tần số góc $\\omega\' = 2\\omega$.' },
+      { id: '11_c1_3', grade: '11', chapterKey: '11-c1', chapterLabel: 'Chương 1 · Dao động', kind: 'trap', frontTitle: 'Bẫy Đúng/Sai · Pha của $v, a, x$ & Cộng hưởng', frontBody: 'Nhận định: "Khi đi từ vị trí biên về vị trí cân bằng, vật chuyển động nhanh dần nên vận tốc và gia tốc cùng hướng với nhau." Đúng hay Sai?', backFormula: 'ĐÚNG', backNote: 'Khi tiến về VTCB, gia tốc $\\vec{a}$ luôn hướng về VTCB cùng chiều chuyển động ($\\vec{a} \\cdot \\vec{v} > 0$). Lực kéo về có độ lớn giảm dần nhưng tốc độ tăng dần.' },
+      // Lớp 11 - Chương 2: Sóng
+      { id: '11_c2_1', grade: '11', chapterKey: '11-c2', chapterLabel: 'Chương 2 · Sóng', kind: 'formula', frontTitle: 'Bước sóng & Giao thoa hai nguồn cùng pha', frontBody: 'Công thức bước sóng và điều kiện cực đại giao thoa cùng pha?', backFormula: '$\\lambda = vT = \\dfrac{v}{f} \\quad|\\quad d_2 - d_1 = k\\lambda\\;(k \\in \\mathbb{Z})$', backNote: 'Cực tiểu giao thoa (2 nguồn cùng pha): $d_2 - d_1 = (k + 0{,}5)\\lambda$. Giao thoa ánh sáng Young: $i = \\dfrac{\\lambda D}{a}$.' },
+      { id: '11_c2_2', grade: '11', chapterKey: '11-c2', chapterLabel: 'Chương 2 · Sóng', kind: 'formula', frontTitle: 'Điều kiện Sóng dừng trên dây', frontBody: 'Điều kiện chiều dài dây $\\ell$ để có sóng dừng ở 2 trường hợp đầu dây?', backFormula: '2 đầu cố định: $\\ell = k\\dfrac{\\lambda}{2} \\quad|\\quad$ 1 đầu tự do: $\\ell = (2k+1)\\dfrac{\\lambda}{4}$', backNote: 'Khoảng cách giữa hai nút liên tiếp hoặc hai bụng liên tiếp là $\\dfrac{\\lambda}{2}$; giữa nút và bụng kề nhau là $\\dfrac{\\lambda}{4}$.' },
+      { id: '11_c2_3', grade: '11', chapterKey: '11-c2', chapterLabel: 'Chương 2 · Sóng', kind: 'trap', frontTitle: 'Bẫy Đúng/Sai · Sóng ngang & Sóng dọc', frontBody: 'Nhận định: "Sóng cơ học truyền được trong cả chất rắn, chất lỏng, chất khí và chân không." Đúng hay Sai?', backFormula: 'SAI (Chỉ sóng điện từ truyền được chân không)', backNote: 'Sóng cơ cần môi trường vật chất đàn hồi (không truyền được trong chân không). Sóng điện từ truyền được cả trong chân không với $c = 3\\times 10^8\\,\\text{m/s}$.' },
+      // Lớp 11 - Chương 3: Điện trường
+      { id: '11_c3_1', grade: '11', chapterKey: '11-c3', chapterLabel: 'Chương 3 · Điện trường', kind: 'formula', frontTitle: 'Định luật Coulomb & Cường độ điện trường', frontBody: 'Lực tương tác giữa 2 điện tích điểm và cường độ điện trường gây bởi $Q$?', backFormula: '$F = k\\dfrac{|q_1 q_2|}{\\varepsilon r^2} \\quad|\\quad E = \\dfrac{F}{|q|} = k\\dfrac{|Q|}{\\varepsilon r^2}$', backNote: '$k = 9\\times 10^9\\,\\text{N}\\cdot\\text{m}^2/\\text{C}^2$. Điện trường đều giữa 2 bản tụ phẳng: $E = \\dfrac{U}{d}$ (đơn vị V/m).' },
+      { id: '11_c3_2', grade: '11', chapterKey: '11-c3', chapterLabel: 'Chương 3 · Điện trường', kind: 'formula', frontTitle: 'Công của lực điện & Tụ điện', frontBody: 'Công của lực điện trường đều và điện dung, năng lượng tụ điện?', backFormula: '$A = qEd \\quad|\\quad Q = CU \\quad|\\quad W = \\dfrac{1}{2}CU^2 = \\dfrac{Q^2}{2C}$', backNote: '$d = s\\cos\\alpha$ là hình chiếu đường đi lên phương đường sức. Công lực điện KHÔNG phụ thuộc hình dạng đường đi.' },
+      // Lớp 11 - Chương 4: Dòng điện
+      { id: '11_c4_1', grade: '11', chapterKey: '11-c4', chapterLabel: 'Chương 4 · Dòng điện', kind: 'formula', frontTitle: 'Định luật Ohm cho toàn mạch & Công suất', frontBody: 'Cường độ dòng điện mạch kín và hiệu điện thế hai cực nguồn điện?', backFormula: '$I = \\dfrac{\\mathcal{E}}{R_N + r} \\quad|\\quad U = \\mathcal{E} - Ir \\quad|\\quad P = UI$', backNote: 'Suất điện động nguồn $\\mathcal{E} = A_{\\text{ng}}/q$. Khi đoản mạch ($R_N = 0$), dòng điện cực đại $I_{\\max} = \\mathcal{E}/r$.' },
+      // Lớp 10 - Chương I: Mở đầu
+      { id: '10_c1_1', grade: '10', chapterKey: '10-c1', chapterLabel: 'Chương I · Mở đầu', kind: 'formula', frontTitle: 'Sai số tuyệt đối & Sai số tỉ đối', frontBody: 'Cách viết kết quả đo đại lượng $A$ và tính sai số tỉ đối?', backFormula: '$A = \\overline{A} \\pm \\Delta A \\quad|\\quad \\delta A = \\dfrac{\\Delta A}{\\overline{A}}\\cdot 100\\%$', backNote: 'Sai số tuyệt đối $\\Delta A = \\overline{\\Delta A} + \\Delta A_{\\text{dc}}$ (sai số ngẫu nhiên + sai số dụng cụ).' },
+      // Lớp 10 - Chương II: Động học
+      { id: '10_c2_1', grade: '10', chapterKey: '10-c2', chapterLabel: 'Chương II · Động học', kind: 'formula', frontTitle: 'Chuyển động thẳng biến đổi đều', frontBody: '3 phương trình cơ bản của chuyển động thẳng có gia tốc $a$ không đổi?', backFormula: '$v = v_0 + at \\quad|\\quad d = v_0 t + \\dfrac{1}{2}at^2 \\quad|\\quad v^2 - v_0^2 = 2ad$', backNote: 'Nếu chuyển động nhanh dần đều: $a\\cdot v > 0$; chậm dần đều: $a\\cdot v < 0$.' },
+      { id: '10_c2_2', grade: '10', chapterKey: '10-c2', chapterLabel: 'Chương II · Động học', kind: 'formula', frontTitle: 'Rơi tự do & Chuyển động ném ngang', frontBody: 'Thời gian chạm đất và tầm xa khi ném ngang từ độ cao $h$ với vận tốc $v_0$?', backFormula: '$t = \\sqrt{\\dfrac{2h}{g}} \\quad|\\quad L = v_0 t = v_0\\sqrt{\\dfrac{2h}{g}}$', backNote: 'Thời gian rơi chỉ phụ thuộc độ cao $h$ và gia tốc $g$, KHÔNG phụ thuộc vận tốc ném ngang $v_0$ hay khối lượng vật.' },
+      { id: '10_c2_3', grade: '10', chapterKey: '10-c2', chapterLabel: 'Chương II · Động học', kind: 'trap', frontTitle: 'Bẫy Đúng/Sai · Quãng đường & Độ dịch chuyển', frontBody: 'Nhận định: "Độ lớn độ dịch chuyển luôn bằng quãng đường vật đi được." Đúng hay Sai?', backFormula: 'SAI (Chỉ bằng khi đi thẳng 1 chiều)', backNote: 'Khi vật chuyển động thẳng và KHÔNG đổi chiều thì $d = s$. Nếu vật đổi chiều hoặc đi theo đường cong thì độ lớn độ dịch chuyển luôn NHỎ HƠN quãng đường ($|\\vec{d}| < s$).' },
+      // Lớp 10 - Chương III: Động lực học
+      { id: '10_c3_1', grade: '10', chapterKey: '10-c3', chapterLabel: 'Chương III · Động lực học', kind: 'formula', frontTitle: 'Định luật II Newton & Lực ma sát trượt', frontBody: 'Biểu thức định luật II Newton, trọng lực và lực ma sát trượt?', backFormula: '$\\vec{a} = \\dfrac{\\vec{F}_{\\text{hl}}}{m} \\quad|\\quad P = mg \\quad|\\quad F_{\\text{mst}} = \\mu N$', backNote: 'Moment lực: $M = F\\cdot d$ (đơn vị $\\text{N}\\cdot\\text{m}$), trong đó $d$ là cánh tay đòn vuông góc từ trục quay đến giá của lực.' },
+      { id: '10_c3_2', grade: '10', chapterKey: '10-c3', chapterLabel: 'Chương III · Động lực học', kind: 'trap', frontTitle: 'Bẫy Đúng/Sai · Cặp lực Định luật III Newton', frontBody: 'Nhận định: "Lực và phản lực theo định luật III Newton là hai lực cân bằng nên triệt tiêu lẫn nhau." Đúng hay Sai?', backFormula: 'SAI (Đặt vào 2 vật khác nhau)', backNote: 'Cặp lực-phản lực ($\`\\vec{F}_{AB} = -\\vec{F}_{BA}\`$) tuy cùng giá, ngược chiều, cùng độ lớn nhưng tác dụng lên HAI VẬT KHÁC NHAU nên KHÔNG thể cân bằng hay triệt tiêu nhau.' },
+      // Lớp 10 - Chương IV: Công & Năng lượng
+      { id: '10_c4_1', grade: '10', chapterKey: '10-c4', chapterLabel: 'Chương IV · Công & Năng lượng', kind: 'formula', frontTitle: 'Công cơ học, Công suất & Cơ năng', frontBody: 'Công thức công $A$, công suất $P$ và cơ năng trọng trường $W$?', backFormula: '$A = Fs\\cos\\alpha \\quad|\\quad P = \\dfrac{A}{t} = Fv \\quad|\\quad W = \\dfrac{1}{2}mv^2 + mgh$', backNote: 'Hiệu suất $H = \\dfrac{P_{\\text{có ích}}}{P_{\\text{toàn phần}}}\\cdot 100\\%$ luôn $< 100\\%$.' },
+      // Lớp 10 - Chương V: Động lượng
+      { id: '10_c5_1', grade: '10', chapterKey: '10-c5', chapterLabel: 'Chương V · Động lượng', kind: 'formula', frontTitle: 'Động lượng & Định luật bảo toàn động lượng', frontBody: 'Động lượng, xung lượng của lực và va chạm mềm?', backFormula: '$\\vec{p} = m\\vec{v} \\quad|\\quad \\vec{F}\\Delta t = \\Delta\\vec{p} \\quad|\\quad \\sum\\vec{p}_{\\text{trước}} = \\sum\\vec{p}_{\\text{sau}}$', backNote: 'Va chạm mềm hai vật dính vào nhau: $V = \\dfrac{m_1\\vec{v}_1 + m_2\\vec{v}_2}{m_1 + m_2}$ (bảo toàn động lượng, cơ năng giảm).' },
+      // Lớp 10 - Chương VI: Chuyển động tròn
+      { id: '10_c6_1', grade: '10', chapterKey: '10-c6', chapterLabel: 'Chương VI · Chuyển động tròn', kind: 'formula', frontTitle: 'Gia tốc hướng tâm & Lực hướng tâm', frontBody: 'Liên hệ giữa tốc độ dài $v$, tốc độ góc $\\omega$ và lực hướng tâm?', backFormula: '$v = \\omega r \\quad|\\quad a_{\\text{ht}} = \\dfrac{v^2}{r} = \\omega^2 r \\quad|\\quad F_{\\text{ht}} = ma_{\\text{ht}}$', backNote: 'Chu kì $T = \\dfrac{2\\pi}{\\omega}$; tần số $f = \\dfrac{1}{T}$ (Hz). Vật tròn đều có tốc độ không đổi nhưng vận tốc luôn thay đổi hướng.' },
+      // Lớp 10 - Chương VII: Biến dạng & Áp suất
+      { id: '10_c7_1', grade: '10', chapterKey: '10-c7', chapterLabel: 'Chương VII · Biến dạng & Áp suất', kind: 'formula', frontTitle: 'Định luật Hooke & Áp suất chất lỏng', frontBody: 'Công thức lực đàn hồi lò xo và áp suất ở độ sâu $h$ trong chất lỏng?', backFormula: '$F_{\\text{đh}} = k|\\Delta\\ell| \\quad|\\quad p = p_0 + \\rho g h$', backNote: 'Khối lượng riêng $\\rho = m/V$ ($\\text{kg/m}^3$); $1\\,\\text{atm} \\approx 1{,}013\\times 10^5\\,\\text{Pa}$.' }
+    ];
+
+    let allFlashcardsDeck = [];
+    let filteredFlashcards = [];
+    let fcCurrentIndex = 0;
+    let fcIsFlipped = false;
+
+    function getMasteredFlashcards() {
+      try {
+        const raw = localStorage.getItem(FLASHCARD_MASTERED_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveMasteredFlashcards(arr) {
+      try {
+        localStorage.setItem(FLASHCARD_MASTERED_KEY, JSON.stringify(arr));
+      } catch (e) {}
+    }
+
+    function extractTrueFalseCardsFromCache() {
+      const bonusCards = [];
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!k || (!k.startsWith('zphysics_quiz_cache_đs_') && !k.startsWith('zphysics_quiz_cache_baitap_'))) continue;
+          const raw = localStorage.getItem(k);
+          const list = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(list)) continue;
+          list.forEach((item) => {
+            const made = String(item.made || '');
+            if (!made.startsWith('đs_') && item.type !== 'đs') return;
+            const gm = made.match(/(\d{2})_c(\d+)/i);
+            if (!gm) return;
+            const gNum = gm[1];
+            const cNum = gm[2];
+            const ansArr = item.answers || [
+              { key: 'a', text: item.a },
+              { key: 'b', text: item.b },
+              { key: 'c', text: item.c },
+              { key: 'd', text: item.d }
+            ];
+            const keyStr = String(item.correct || '').toUpperCase().replace(/D/g, 'Đ').split('');
+            if (ansArr[0] && ansArr[0].text && bonusCards.length < 24) {
+              const verdict = (keyStr[0] === 'S') ? 'SAI' : 'ĐÚNG';
+              bonusCards.push({
+                id: `cache_ds_${item.id || bonusCards.length}`,
+                grade: gNum,
+                chapterKey: `${gNum}-c${cNum}`,
+                chapterLabel: `Chương ${cNum} · Từ câu hỏi Đúng/Sai`,
+                kind: 'trap',
+                frontTitle: `Bẫy Đúng/Sai · Lớp ${gNum} (Ý a)`,
+                frontBody: `${item.question}\nÝ a) ${ansArr[0].text}`,
+                backFormula: verdict,
+                backNote: item.explanation || 'Kiểm tra kĩ điều kiện vật lí của mệnh đề.'
+              });
+            }
+          });
+        }
+      } catch (e) {}
+      return bonusCards;
+    }
+
+    function buildFlashcardDeck() {
+      const bankClean = ZPHYSICS_FLASHCARD_BANK.map(c => ({
+        ...c,
+        backNote: String(c.backNote || '').replace(/\(\`\\vec/g, '($\\vec').replace(/\$\`\)/g, '$)')
+      }));
+      allFlashcardsDeck = [...bankClean, ...extractTrueFalseCardsFromCache()];
+    }
+
+    function populateFlashcardChapters(selectedChapter) {
+      const gradeSel = document.getElementById('fcGradeSelect');
+      const chSel = document.getElementById('fcChapterSelect');
+      if (!chSel) return;
+      const gradeVal = gradeSel ? gradeSel.value : 'all';
+
+      const map = new Map();
+      allFlashcardsDeck.forEach(c => {
+        if (gradeVal !== 'all' && String(c.grade) !== String(gradeVal)) return;
+        if (!map.has(c.chapterKey)) map.set(c.chapterKey, c.chapterLabel);
+      });
+
+      chSel.innerHTML = `<option value="all">Tất cả chuyên đề</option>` +
+        Array.from(map.entries()).map(([k, lbl]) => `<option value="${escapeHtmlAttr(k)}">${escapeHtmlAttr(lbl)}</option>`).join('');
+
+      if (selectedChapter && map.has(selectedChapter)) {
+        chSel.value = selectedChapter;
+      } else {
+        chSel.value = 'all';
+      }
+    }
+
+    function applyFlashcardFilters() {
+      const gradeVal = document.getElementById('fcGradeSelect')?.value || 'all';
+      const chVal = document.getElementById('fcChapterSelect')?.value || 'all';
+      const stVal = document.getElementById('fcStatusSelect')?.value || 'all';
+      const masteredSet = new Set(getMasteredFlashcards());
+
+      filteredFlashcards = allFlashcardsDeck.filter(c => {
+        if (gradeVal !== 'all' && String(c.grade) !== String(gradeVal)) return false;
+        if (chVal !== 'all' && c.chapterKey !== chVal) return false;
+        const isDone = masteredSet.has(c.id);
+        if (stVal === 'mastered' && !isDone) return false;
+        if (stVal === 'unmastered' && isDone) return false;
+        return true;
+      });
+
+      fcCurrentIndex = 0;
+      fcIsFlipped = false;
+      renderCurrentFlashcard();
+    }
+
+    function onFlashcardGradeChange() {
+      populateFlashcardChapters('all');
+      applyFlashcardFilters();
+    }
+
+    function onFlashcardFilterChange() {
+      applyFlashcardFilters();
+    }
+
+    function renderCurrentFlashcard() {
+      const cardEl = document.getElementById('fcCard');
+      const frontBadge = document.getElementById('fcFrontBadge');
+      const frontMeta = document.getElementById('fcFrontMeta');
+      const frontText = document.getElementById('fcFrontText');
+      const backBadge = document.getElementById('fcBackBadge');
+      const backMeta = document.getElementById('fcBackMeta');
+      const backFormula = document.getElementById('fcBackFormula');
+      const backNote = document.getElementById('fcBackNote');
+      const counterEl = document.getElementById('fcCounterText');
+      const masteredStats = document.getElementById('fcMasteredStats');
+      const prevBtn = document.getElementById('fcPrevBtn');
+      const nextBtn = document.getElementById('fcNextBtn');
+      const masteredBtn = document.getElementById('fcMasteredBtn');
+      if (!cardEl) return;
+
+      const masteredList = getMasteredFlashcards();
+      if (masteredStats) {
+        masteredStats.textContent = `Đã thuộc: ${masteredList.length} / ${allFlashcardsDeck.length} thẻ`;
+      }
+
+      if (!filteredFlashcards.length) {
+        cardEl.classList.remove('is-flipped');
+        if (frontBadge) { frontBadge.textContent = 'Trống'; frontBadge.className = 'fc-type-tag'; }
+        if (frontMeta) frontMeta.textContent = '';
+        if (frontText) frontText.textContent = 'Không có thẻ nào khớp với bộ lọc hiện tại.';
+        if (backFormula) backFormula.textContent = '';
+        if (backNote) backNote.textContent = '';
+        if (counterEl) counterEl.textContent = 'Thẻ 0 / 0';
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+        if (masteredBtn) { masteredBtn.disabled = true; masteredBtn.classList.remove('is-done'); }
+        return;
+      }
+
+      if (fcCurrentIndex < 0) fcCurrentIndex = 0;
+      if (fcCurrentIndex >= filteredFlashcards.length) fcCurrentIndex = filteredFlashcards.length - 1;
+      const card = filteredFlashcards[fcCurrentIndex];
+      const isTrap = card.kind === 'trap';
+      const isDone = masteredList.includes(card.id);
+
+      cardEl.classList.toggle('is-flipped', fcIsFlipped);
+      if (frontBadge) {
+        frontBadge.textContent = isTrap ? 'Bẫy Đúng / Sai' : 'Công thức & Đơn vị';
+        frontBadge.className = 'fc-type-tag' + (isTrap ? ' is-trap' : '');
+      }
+      if (frontMeta) frontMeta.textContent = `Lớp ${card.grade} · ${card.chapterLabel}`;
+      if (frontText) {
+        frontText.innerHTML = `<div style="font-size:13px; color:var(--accent); font-weight:600; margin-bottom:8px;">${formatModalSafeText(card.frontTitle)}</div><div>${formatModalSafeText(card.frontBody)}</div>`;
+      }
+
+      if (backBadge) {
+        backBadge.textContent = isTrap ? 'Kết luận' : 'Công thức cần nhớ';
+        backBadge.className = 'fc-type-tag' + (isTrap ? ' is-trap' : '');
+      }
+      if (backMeta) backMeta.textContent = `Lớp ${card.grade} · ${card.chapterLabel}`;
+      if (backFormula) backFormula.innerHTML = formatModalSafeText(card.backFormula);
+      if (backNote) backNote.innerHTML = formatModalSafeText(card.backNote);
+
+      if (counterEl) counterEl.textContent = `Thẻ ${fcCurrentIndex + 1} / ${filteredFlashcards.length}`;
+      if (prevBtn) prevBtn.disabled = fcCurrentIndex <= 0;
+      if (nextBtn) nextBtn.disabled = fcCurrentIndex >= filteredFlashcards.length - 1;
+      if (masteredBtn) {
+        masteredBtn.disabled = false;
+        masteredBtn.classList.toggle('is-done', isDone);
+        masteredBtn.textContent = isDone ? 'Đã thuộc ✓' : 'Đánh dấu đã thuộc ✓';
+      }
+
+      triggerModalKaTeX(cardEl);
+    }
+
+    function flipFlashcard() {
+      if (!filteredFlashcards.length) return;
+      fcIsFlipped = !fcIsFlipped;
+      const cardEl = document.getElementById('fcCard');
+      if (cardEl) cardEl.classList.toggle('is-flipped', fcIsFlipped);
+    }
+
+    function stepFlashcard(delta) {
+      if (!filteredFlashcards.length) return;
+      const next = fcCurrentIndex + delta;
+      if (next < 0 || next >= filteredFlashcards.length) return;
+      fcCurrentIndex = next;
+      fcIsFlipped = false;
+      renderCurrentFlashcard();
+    }
+
+    function shuffleFlashcards() {
+      for (let i = filteredFlashcards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [filteredFlashcards[i], filteredFlashcards[j]] = [filteredFlashcards[j], filteredFlashcards[i]];
+      }
+      fcCurrentIndex = 0;
+      fcIsFlipped = false;
+      renderCurrentFlashcard();
+    }
+
+    function toggleCurrentFlashcardMastered() {
+      if (!filteredFlashcards.length) return;
+      const card = filteredFlashcards[fcCurrentIndex];
+      const list = getMasteredFlashcards();
+      const idx = list.indexOf(card.id);
+      if (idx === -1) list.push(card.id);
+      else list.splice(idx, 1);
+      saveMasteredFlashcards(list);
+      renderCurrentFlashcard();
+    }
+
+    function openFlashcardModal(gradeOpt, chapterOpt) {
+      buildFlashcardDeck();
+      const gradeSel = document.getElementById('fcGradeSelect');
+      const statusSel = document.getElementById('fcStatusSelect');
+      if (gradeSel) {
+        gradeSel.value = (gradeOpt === '10' || gradeOpt === '11' || gradeOpt === '12') ? String(gradeOpt) : 'all';
+      }
+      if (statusSel) statusSel.value = 'all';
+      populateFlashcardChapters(chapterOpt || 'all');
+      applyFlashcardFilters();
+
+      const modal = document.getElementById('flashcardModal');
+      if (modal) {
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeFlashcardModal() {
+      const modal = document.getElementById('flashcardModal');
+      if (!modal) return;
+      modal.classList.remove('open');
+      const readerBackdrop = document.getElementById('chapterReaderBackdrop');
+      const mistakeModal = document.getElementById('mistakeModal');
+      const anyOpen = (readerBackdrop && readerBackdrop.classList.contains('open')) || (mistakeModal && mistakeModal.classList.contains('open'));
+      document.body.style.overflow = anyOpen ? 'hidden' : '';
+    }
+
+    function openFlashcardForCurrentChapter() {
+      if (!currentReaderCardKey || !chapterReaderRegistry[currentReaderCardKey]) {
+        openFlashcardModal('all', 'all');
+        return;
+      }
+      const entry = chapterReaderRegistry[currentReaderCardKey];
+      const gm = String(entry.gradeLabel || '').match(/\d+/);
+      const gradeNum = gm ? gm[0] : 'all';
+      if (entry.isExam) {
+        openFlashcardModal(gradeNum, 'all');
+        return;
+      }
+      const romanMap = { 'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10 };
+      const cRaw = String(entry.chNum || '').replace(/chương/i, '').trim().toUpperCase();
+      const cNum = romanMap[cRaw] || parseInt(cRaw, 10) || 1;
+      const chKey = (gradeNum !== 'all') ? `${gradeNum}-c${cNum}` : 'all';
+      openFlashcardModal(gradeNum, chKey);
+    }
+
+    document.addEventListener('DOMContentLoaded', updateMistakeBadges);
+    window.addEventListener('pageshow', updateMistakeBadges);
+    window.addEventListener('storage', (e) => {
+      if (!e || e.key === MISTAKE_STORAGE_KEY) updateMistakeBadges();
+    });
 
     var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
     var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';

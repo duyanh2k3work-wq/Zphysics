@@ -10,7 +10,7 @@
   <title>Zphysics — Phòng luyện đề</title>
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
-  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_arial">
+  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_feat1">
   <script src="assets/js/pinui.js?v=20261118_arial"></script>
   <script>PinUI.initTheme('dark');</script>
   <style>
@@ -403,52 +403,60 @@
     /* Part I: MCQ grid */
     .mcq-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    @media (max-width: 1180px) and (min-width: 768px) {
+      .mcq-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .mcq-col {
       display: flex;
       flex-direction: column;
       gap: 6px;
+      min-width: 0;
     }
 
     .mcq-row {
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 6px 8px;
+      padding: 5px 6px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 6px;
+      gap: 4px;
+      min-width: 0;
     }
 
     .mcq-qnum {
       font-family: Arial, Helvetica, sans-serif;
       font-variant-numeric: tabular-nums;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 500;
       color: var(--muted);
-      min-width: 20px;
+      min-width: 17px;
       text-align: right;
     }
 
     .mcq-options {
       display: flex;
-      gap: 4px;
+      gap: 3px;
     }
 
     .mcq-btn {
-      width: 28px;
-      height: 28px;
+      width: 25px;
+      height: 26px;
       border-radius: 6px;
       border: 1px solid var(--border-strong);
       background: var(--card);
       border-bottom-width: 2px;
       color: var(--text-secondary);
       font-family: Arial, Helvetica, sans-serif;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 500;
       display: flex;
       align-items: center;
@@ -456,6 +464,11 @@
       cursor: pointer;
       user-select: none;
       transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease), transform 90ms ease;
+    }
+
+    #mcqGrid .exam-flag-btn {
+      width: 21px;
+      height: 22px;
     }
 
     .mcq-btn:hover {
@@ -1054,7 +1067,34 @@
       <div class="answers-pane hidden" id="answersPane">
         <div class="student-card" id="studentCard">
           <label for="studentName">Họ và tên học sinh <span style="color:var(--wrong)">*</span></label>
-          <input type="text" class="student-input" id="studentName" placeholder="Nhập họ tên của em để nộp bài">
+          <input type="text" class="student-input" id="studentName" placeholder="Nhập họ tên của em để nộp bài" oninput="saveExamDraft()">
+        </div>
+
+        <div class="q-palette-card" id="examPaletteCard" style="margin-bottom:0;">
+          <div class="q-palette-head" style="flex-direction:column; align-items:stretch; gap:8px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+              <div class="q-palette-stats" id="examPaletteStats">
+                <span>Đã làm: <strong>0/28</strong></span>
+                <span>Phân vân: <strong style="color:var(--warning)">0</strong></span>
+              </div>
+              <button type="button" class="toolbar-mini-btn" id="toggleExamPaletteBtn" onclick="toggleExamPalette()">Thu gọn</button>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; flex-wrap:wrap;">
+              <span class="autosave-pill" id="examAutosaveStatus" title="Đáp án và đồng hồ được tự động lưu trên trình duyệt">
+                <span class="autosave-dot"></span>
+                <span id="examAutosaveText">Tự lưu nháp</span>
+              </span>
+              <button type="button" class="toolbar-mini-btn is-danger" onclick="clearExamDraft(true)">Xóa nháp</button>
+            </div>
+          </div>
+          <div class="q-palette-grid" id="examPaletteGrid"></div>
+          <div class="q-palette-legend">
+            <span class="qp-leg-item"><span class="qp-leg-dot"></span>Chưa làm</span>
+            <span class="qp-leg-item"><span class="qp-leg-dot is-answered"></span>Đã làm</span>
+            <span class="qp-leg-item"><span class="qp-leg-dot is-flagged"></span>Phân vân</span>
+            <span class="qp-leg-item"><span class="qp-leg-dot is-correct"></span>Đúng</span>
+            <span class="qp-leg-item"><span class="qp-leg-dot is-wrong"></span>Sai</span>
+          </div>
         </div>
 
         <div class="score-banner" id="scoreBanner">
@@ -1103,6 +1143,7 @@
   </div>
 
   <script>
+    const SVG_FLAG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>';
     const SVG_VOL_ON = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
     const SVG_VOL_OFF = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>';
 
@@ -1200,6 +1241,252 @@
     let currentMobileView = 'pdf';
     let countdownTimerId = null;
     let isExamUnlocked = false;
+    let flaggedExamItems = new Set();
+    let examResultsMap = {};
+    let examAutosaveIntervalId = null;
+
+    function getExamDraftKey() {
+      const targetId = (examData && examData.id) || examId || 'default';
+      return 'zphysics_draft_exam_' + targetId;
+    }
+
+    function loadExamDraft() {
+      try {
+        const raw = localStorage.getItem(getExamDraftKey());
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return (parsed && typeof parsed === 'object') ? parsed : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function updateExamAutosaveStatus(label, isSaved) {
+      const pill = document.getElementById('examAutosaveStatus');
+      const txt = document.getElementById('examAutosaveText');
+      if (txt) txt.textContent = label;
+      if (pill) pill.classList.toggle('is-saved', !!isSaved);
+    }
+
+    function collectExamState() {
+      if (!examData) return null;
+      const { mcCount, tfCount, saCount } = getExamStructure(examData);
+      const mc = {};
+      for (let i = 1; i <= mcCount; i++) {
+        const sel = document.querySelector(`.mcq-options[data-q="${i}"] .mcq-btn.selected`);
+        if (sel && sel.dataset && sel.dataset.opt) mc[String(i)] = sel.dataset.opt;
+      }
+      const tf = {};
+      for (let i = 1; i <= tfCount; i++) {
+        const qTf = {};
+        ['a', 'b', 'c', 'd'].forEach(sub => {
+          const row = document.querySelector(`.tf-statement-row[data-q="${i}"][data-sub="${sub}"]`);
+          const sel = row ? row.querySelector('.tf-btn.selected') : null;
+          if (sel && sel.dataset && sel.dataset.val) qTf[sub] = sel.dataset.val;
+        });
+        if (Object.keys(qTf).length > 0) tf[String(i)] = qTf;
+      }
+      const sa = {};
+      for (let i = 1; i <= saCount; i++) {
+        const inp = document.querySelector(`.sa-input[data-q="${i}"]`);
+        if (inp && inp.value.trim() !== '') sa[String(i)] = inp.value;
+      }
+      const nameInput = document.getElementById('studentName');
+      return {
+        examId: (examData && examData.id) || examId || 'default',
+        studentName: (nameInput && !nameInput.disabled) ? nameInput.value : '',
+        mc: mc,
+        tf: tf,
+        sa: sa,
+        flagged: Array.from(flaggedExamItems),
+        timeRemaining: timeRemaining,
+        updatedAt: Date.now()
+      };
+    }
+
+    function saveExamDraft() {
+      if (submitted || !isExamUnlocked || !examData) return;
+      try {
+        const state = collectExamState();
+        if (!state) return;
+        localStorage.setItem(getExamDraftKey(), JSON.stringify(state));
+        const d = new Date();
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        updateExamAutosaveStatus(`Đã tự lưu ${hh}:${mm}`, true);
+      } catch (e) {}
+    }
+
+    function clearExamDraft(askConfirm) {
+      if (askConfirm && !confirm('Xóa toàn bộ đáp án nháp của đề này?')) return;
+      try { localStorage.removeItem(getExamDraftKey()); } catch (e) {}
+      if (askConfirm && examData) {
+        flaggedExamItems.clear();
+        examResultsMap = {};
+        renderMCQGrid();
+        renderTFGrid();
+        renderSAGrid();
+        updateExamPalette();
+        updateExamAutosaveStatus('Đã xóa nháp', false);
+      }
+    }
+
+    function restoreExamDraft(draft) {
+      if (!draft || typeof draft !== 'object') return false;
+      let restoredAny = false;
+
+      if (draft.studentName) {
+        const nameInput = document.getElementById('studentName');
+        if (nameInput && !nameInput.disabled && !nameInput.value.trim()) {
+          nameInput.value = draft.studentName;
+          restoredAny = true;
+        }
+      }
+
+      if (Array.isArray(draft.flagged)) {
+        draft.flagged.forEach(itemKey => {
+          flaggedExamItems.add(itemKey);
+          const fBtn = document.getElementById('exam-flag-' + itemKey);
+          if (fBtn) fBtn.classList.add('flagged');
+          restoredAny = true;
+        });
+      }
+
+      if (draft.mc && typeof draft.mc === 'object') {
+        Object.entries(draft.mc).forEach(([qNum, opt]) => {
+          const btn = document.querySelector(`.mcq-options[data-q="${qNum}"] .mcq-btn[data-opt="${opt}"]`);
+          if (btn) {
+            btn.parentElement.querySelectorAll('.mcq-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            restoredAny = true;
+          }
+        });
+      }
+
+      if (draft.tf && typeof draft.tf === 'object') {
+        Object.entries(draft.tf).forEach(([qNum, subs]) => {
+          if (!subs || typeof subs !== 'object') return;
+          Object.entries(subs).forEach(([sub, val]) => {
+            const row = document.querySelector(`.tf-statement-row[data-q="${qNum}"][data-sub="${sub}"]`);
+            const btn = row ? row.querySelector(`.tf-btn[data-val="${val}"]`) : null;
+            if (btn) {
+              btn.parentElement.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+              btn.classList.add('selected');
+              const idx = val === 'Đ' ? '0' : '1';
+              btn.parentElement.setAttribute('data-selected', idx);
+              btn.parentElement.style.setProperty('--seg-index', idx);
+              restoredAny = true;
+            }
+          });
+        });
+      }
+
+      if (draft.sa && typeof draft.sa === 'object') {
+        Object.entries(draft.sa).forEach(([qNum, val]) => {
+          const inp = document.querySelector(`.sa-input[data-q="${qNum}"]`);
+          if (inp && typeof val === 'string') {
+            inp.value = val;
+            restoredAny = true;
+          }
+        });
+      }
+
+      return restoredAny;
+    }
+
+    function toggleExamPalette() {
+      const card = document.getElementById('examPaletteCard');
+      const btn = document.getElementById('toggleExamPaletteBtn');
+      if (!card || !btn) return;
+      const collapsed = card.classList.toggle('collapsed');
+      btn.textContent = collapsed ? 'Mở rộng' : 'Thu gọn';
+    }
+
+    function toggleExamFlag(itemKey) {
+      if (submitted) return;
+      const btn = document.getElementById('exam-flag-' + itemKey);
+      if (flaggedExamItems.has(itemKey)) {
+        flaggedExamItems.delete(itemKey);
+        if (btn) btn.classList.remove('flagged');
+      } else {
+        flaggedExamItems.add(itemKey);
+        if (btn) btn.classList.add('flagged');
+      }
+      updateExamPalette();
+      saveExamDraft();
+    }
+
+    function scrollToExamQuestion(itemKey) {
+      const el = document.getElementById('exam-q-' + itemKey);
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('exam-q-highlight');
+      setTimeout(() => el.classList.remove('exam-q-highlight'), 1000);
+    }
+
+    function isExamItemAnswered(itemKey) {
+      const [part, num] = itemKey.split('-');
+      if (part === 'mc') {
+        return !!document.querySelector(`.mcq-options[data-q="${num}"] .mcq-btn.selected`);
+      }
+      if (part === 'tf') {
+        const selected = document.querySelectorAll(`.tf-statement-row[data-q="${num}"] .tf-btn.selected`);
+        return selected.length === 4;
+      }
+      if (part === 'sa') {
+        const inp = document.querySelector(`.sa-input[data-q="${num}"]`);
+        return !!(inp && inp.value.trim() !== '');
+      }
+      return false;
+    }
+
+    function getAllExamItemKeys() {
+      if (!examData) return [];
+      const { mcCount, tfCount, saCount } = getExamStructure(examData);
+      const list = [];
+      for (let i = 1; i <= mcCount; i++) list.push({ key: `mc-${i}`, label: String(i).padStart(2, '0'), group: 'I', title: `Phần I - Câu ${i}` });
+      for (let i = 1; i <= tfCount; i++) list.push({ key: `tf-${i}`, label: `II.${i}`, group: 'II', title: `Phần II - Câu ${i}` });
+      for (let i = 1; i <= saCount; i++) list.push({ key: `sa-${i}`, label: `III.${i}`, group: 'III', title: `Phần III - Câu ${i}` });
+      return list;
+    }
+
+    function updateExamPalette() {
+      const grid = document.getElementById('examPaletteGrid');
+      const statsEl = document.getElementById('examPaletteStats');
+      if (!grid || !examData) return;
+
+      const items = getAllExamItemKeys();
+      let answeredCount = 0;
+      let flaggedCount = 0;
+
+      grid.innerHTML = items.map(it => {
+        const isAns = isExamItemAnswered(it.key);
+        const isFlag = flaggedExamItems.has(it.key);
+        const resState = examResultsMap[it.key];
+        if (isAns) answeredCount++;
+        if (isFlag) flaggedCount++;
+
+        const cls = ['qp-chip'];
+        if (resState === 'correct') cls.push('is-correct');
+        else if (resState === 'wrong') cls.push('is-wrong');
+        else if (isAns) cls.push('is-answered');
+        if (isFlag) cls.push('is-flagged');
+
+        return `<button type="button" class="${cls.join(' ')}" onclick="scrollToExamQuestion('${it.key}')" title="${it.title}${isFlag ? ' (Đang phân vân)' : ''}">${it.label}</button>`;
+      }).join('');
+
+      if (statsEl) {
+        statsEl.innerHTML = `
+          <span>Đã làm: <strong>${answeredCount}/${items.length}</strong></span>
+          <span>Phân vân: <strong style="color:var(--warning)">${flaggedCount}</strong></span>
+        `;
+      }
+    }
+
+    function onExamShortAnswerInput() {
+      updateExamPalette();
+      saveExamDraft();
+    }
 
     function parseExamOpenTime(data) {
       if (!data) return null;
@@ -1507,12 +1794,25 @@
       }
 
       const durationMin = data.duration || 50;
-      timeRemaining = durationMin * 60;
+      const savedDraft = loadExamDraft();
+      timeRemaining = (savedDraft && typeof savedDraft.timeRemaining === 'number' && savedDraft.timeRemaining > 20)
+        ? savedDraft.timeRemaining
+        : (durationMin * 60);
       updateTimerDisplay();
 
+      flaggedExamItems.clear();
+      examResultsMap = {};
       renderMCQGrid();
       renderTFGrid();
       renderSAGrid();
+
+      const didRestore = restoreExamDraft(savedDraft);
+      updateExamPalette();
+      if (didRestore) {
+        updateExamAutosaveStatus('Đã khôi phục bài nháp', true);
+      } else {
+        updateExamAutosaveStatus('Tự lưu nháp', false);
+      }
 
       document.getElementById('loadingOverlay').style.display = 'none';
 
@@ -1524,6 +1824,14 @@
 
       if (timerInterval) clearInterval(timerInterval);
       startTimer();
+
+      if (!examAutosaveIntervalId) {
+        examAutosaveIntervalId = setInterval(() => {
+          if (!submitted && isExamUnlocked && examData) {
+            saveExamDraft();
+          }
+        }, 5000);
+      }
     }
 
     function syncResponsivePanes() {
@@ -1604,8 +1912,12 @@
       for (let i = 1; i <= mcCount; i++) {
         const row = document.createElement('div');
         row.className = 'mcq-row';
+        row.id = `exam-q-mc-${i}`;
         row.innerHTML = `
-          <span class="mcq-qnum">${String(i).padStart(2, '0')}</span>
+          <div style="display:flex; align-items:center; gap:5px;">
+            <button type="button" class="exam-flag-btn" id="exam-flag-mc-${i}" onclick="toggleExamFlag('mc-${i}')" title="Đánh dấu phân vân">${SVG_FLAG}</button>
+            <span class="mcq-qnum">${String(i).padStart(2, '0')}</span>
+          </div>
           <div class="mcq-options" data-q="${i}">
             <div class="mcq-btn" data-opt="A" onclick="selectMCQ(this, ${i}, 'A')">A</div>
             <div class="mcq-btn" data-opt="B" onclick="selectMCQ(this, ${i}, 'B')">B</div>
@@ -1629,6 +1941,8 @@
       if (window.PinUI && typeof window.PinUI.pressButton === 'function') {
         window.PinUI.pressButton(btn, 0.12);
       }
+      updateExamPalette();
+      saveExamDraft();
     }
 
     let hoveredMcqRow = null;
@@ -1666,6 +1980,7 @@
       for (let i = 1; i <= tfCount; i++) {
         const box = document.createElement('div');
         box.className = 'tf-question-box';
+        box.id = `exam-q-tf-${i}`;
 
         let statementsHTML = '';
         ['a', 'b', 'c', 'd'].forEach(sub => {
@@ -1682,7 +1997,10 @@
         });
 
         box.innerHTML = `
-          <div class="tf-qtitle">Câu ${i}</div>
+          <div class="tf-qtitle" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <span>Câu ${i}</span>
+            <button type="button" class="exam-flag-btn" id="exam-flag-tf-${i}" onclick="toggleExamFlag('tf-${i}')" title="Đánh dấu phân vân">${SVG_FLAG}</button>
+          </div>
           <div class="tf-statement-grid">${statementsHTML}</div>
         `;
         grid.appendChild(box);
@@ -1700,6 +2018,8 @@
       if (window.PinUI && typeof window.PinUI.pressButton === 'function') {
         window.PinUI.pressButton(btn, 0.10);
       }
+      updateExamPalette();
+      saveExamDraft();
     }
 
     function renderSAGrid() {
@@ -1717,10 +2037,14 @@
       for (let i = 1; i <= saCount; i++) {
         const row = document.createElement('div');
         row.className = 'sa-row';
+        row.id = `exam-q-sa-${i}`;
         row.innerHTML = `
-          <span class="sa-qlabel">Câu ${i}</span>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button type="button" class="exam-flag-btn" id="exam-flag-sa-${i}" onclick="toggleExamFlag('sa-${i}')" title="Đánh dấu phân vân">${SVG_FLAG}</button>
+            <span class="sa-qlabel">Câu ${i}</span>
+          </div>
           <div style="text-align:right;">
-            <input type="text" class="sa-input" data-q="${i}" placeholder="Nhập đáp số">
+            <input type="text" class="sa-input" data-q="${i}" placeholder="Nhập đáp số" oninput="onExamShortAnswerInput()">
             <div class="sa-feedback" id="sa-feedback-${i}">Đúng: </div>
           </div>
         `;
@@ -1874,13 +2198,35 @@
         nameInput.value = studentName;
       }
 
+      if (!isTimeout) {
+        const allItems = getAllExamItemKeys();
+        const unansweredItems = allItems.filter(it => !isExamItemAnswered(it.key));
+        const flaggedCount = flaggedExamItems.size;
+        if (unansweredItems.length > 0 || flaggedCount > 0) {
+          const warnParts = [];
+          if (unansweredItems.length > 0) warnParts.push(`${unansweredItems.length} câu chưa điền đủ đáp án`);
+          if (flaggedCount > 0) warnParts.push(`${flaggedCount} câu đang đánh dấu phân vân`);
+          if (!confirm(`Em vẫn còn ${warnParts.join(' và ')}.\n\nBấm OK để nộp bài ngay, hoặc Cancel để kiểm tra lại.`)) {
+            const firstProblemKey = unansweredItems[0] ? unansweredItems[0].key : Array.from(flaggedExamItems)[0];
+            if (currentMobileView === 'pdf' && window.innerWidth < 768) {
+              toggleView('answers');
+            }
+            if (firstProblemKey) scrollToExamQuestion(firstProblemKey);
+            return;
+          }
+        }
+      }
+
       submitted = true;
       clearInterval(timerInterval);
+      try { localStorage.removeItem(getExamDraftKey()); } catch (e) {}
+      updateExamAutosaveStatus('Đã nộp bài', true);
 
       nameInput.disabled = true;
       document.querySelectorAll('.mcq-btn').forEach(btn => btn.style.pointerEvents = 'none');
       document.querySelectorAll('.tf-btn').forEach(btn => btn.classList.add('locked'));
       document.querySelectorAll('.sa-input').forEach(inp => inp.disabled = true);
+      document.querySelectorAll('.exam-flag-btn').forEach(btn => btn.disabled = true);
       document.getElementById('submitBtn').disabled = true;
 
       const mobileSubmitBtn = document.getElementById('btnMobileSubmit');
@@ -1904,7 +2250,9 @@
 
         if (studentAns === correctKey) {
           scorePart1 += 0.25;
+          examResultsMap[`mc-${i}`] = 'correct';
         } else {
+          examResultsMap[`mc-${i}`] = 'wrong';
           wrongList.push(`- Câu ${i} (Phần I): Chọn ${studentAns || 'Bỏ trống'} (Đáp án đúng: ${correctKey})`);
         }
       }
@@ -1941,7 +2289,10 @@
         else if (correctStatementsCount === 4) qScore = 1.0;
 
         scorePart2 += qScore;
-        if (correctStatementsCount < 4) {
+        if (correctStatementsCount === 4) {
+          examResultsMap[`tf-${i}`] = 'correct';
+        } else {
+          examResultsMap[`tf-${i}`] = 'wrong';
           wrongList.push(`- Câu ${i} (Phần II): Đúng ${correctStatementsCount}/4 ý. Sai: [${statementDetails.join(', ')}]`);
         }
       }
@@ -1955,8 +2306,10 @@
           if (isShortAnswerMatch(studentVal, correctVal)) {
             input.classList.add('is-correct');
             scorePart3 += saPointEach;
+            examResultsMap[`sa-${i}`] = 'correct';
           } else {
             input.classList.add('is-wrong');
+            examResultsMap[`sa-${i}`] = 'wrong';
             wrongList.push(`- Câu ${i} (Phần III): Điền "${studentVal || 'Bỏ trống'}" (Đáp án đúng: ${correctVal})`);
 
             const feedbackEl = document.getElementById(`sa-feedback-${i}`);
@@ -1967,6 +2320,8 @@
           }
         }
       }
+
+      updateExamPalette();
 
       const totalScore = Math.round((scorePart1 + scorePart2 + scorePart3) * 100) / 100;
 

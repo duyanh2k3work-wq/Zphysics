@@ -15,7 +15,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"
     onload="if(typeof triggerKaTeX==='function'){triggerKaTeX(document.body);}else if(typeof renderMathInElement==='function'){renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],throwOnError:false});}"></script>
-  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_arial">
+  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_feat1">
   <script src="assets/js/pinui.js?v=20261118_arial"></script>
   <script>PinUI.initTheme('light');</script>
 
@@ -983,6 +983,43 @@
       <div class="quiz-timer" id="quizTimer" style="display:none">30:00</div>
     </div>
 
+    <div class="study-toolbar" id="studyToolbar">
+      <div class="seg-control study-mode-seg" id="quizModeSeg" style="--seg-count: 2; --seg-index: 0;" role="tablist" aria-label="Chế độ làm bài">
+        <span class="seg-thumb"></span>
+        <button type="button" class="seg-btn active" data-mode="exam" onclick="setStudyMode('exam')">Kiểm tra</button>
+        <button type="button" class="seg-btn" data-mode="practice" onclick="setStudyMode('practice')">Luyện từng câu</button>
+      </div>
+      <div class="study-toolbar-right">
+        <span class="autosave-pill" id="autosaveStatus" title="Tiến trình làm bài được tự động lưu trên trình duyệt">
+          <span class="autosave-dot"></span>
+          <span id="autosaveText">Tự lưu nháp</span>
+        </span>
+        <button type="button" class="toolbar-mini-btn is-danger" id="clearDraftBtn" onclick="clearQuizDraft(true)" title="Xóa bài đang làm dở để làm lại từ đầu">Xóa nháp</button>
+        <button type="button" class="toolbar-mini-btn" id="togglePaletteBtn" onclick="toggleQuestionPalette()">Ẩn bảng câu hỏi</button>
+      </div>
+    </div>
+
+    <div class="q-palette-card" id="questionPaletteCard">
+      <div class="q-palette-head">
+        <div class="q-palette-title">
+          <span>Bảng điều hướng câu hỏi</span>
+        </div>
+        <div class="q-palette-stats" id="questionPaletteStats">
+          <span>Đã làm: <strong>0</strong></span>
+          <span>Chưa làm: <strong>0</strong></span>
+          <span>Phân vân: <strong style="color:var(--warning)">0</strong></span>
+        </div>
+      </div>
+      <div class="q-palette-grid" id="questionPaletteGrid"></div>
+      <div class="q-palette-legend">
+        <span class="qp-leg-item"><span class="qp-leg-dot"></span>Chưa làm</span>
+        <span class="qp-leg-item"><span class="qp-leg-dot is-answered"></span>Đã làm</span>
+        <span class="qp-leg-item"><span class="qp-leg-dot is-flagged"></span>Phân vân</span>
+        <span class="qp-leg-item"><span class="qp-leg-dot is-correct"></span>Đúng</span>
+        <span class="qp-leg-item"><span class="qp-leg-dot is-wrong"></span>Sai</span>
+      </div>
+    </div>
+
     <div class="score-banner" id="scoreBanner">
       <div class="score-value" id="scoreValue"></div>
       <div class="score-label">Tổng điểm</div>
@@ -1024,6 +1061,7 @@
     const SVG_CHECK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     const SVG_X = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
     const SVG_CLOCK = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+    const SVG_FLAG = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>';
     const SVG_VOL_ON = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
     const SVG_VOL_OFF = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>';
 
@@ -1180,6 +1218,12 @@
     let rvWrong = 0;
     let rvSkipped = 0;
     let rvResults = [];
+
+    let studyMode = 'exam';
+    let flaggedQuestionIds = new Set();
+    let checkedQuestionIds = new Set();
+    let autosaveIntervalId = null;
+    const MISTAKE_STORAGE_KEY = 'zp_mistakes_v1';
 
     function parseQuizCode(code) {
       if (!code) return null;
@@ -1377,30 +1421,522 @@
 
     const params = new URLSearchParams(window.location.search);
     let quizFile = params.get('quiz');
+    let urlModeParam = params.get('mode');
 
     if (!quizFile && window.location.hash) {
-      const hashVal = window.location.hash.substring(1);
-      const hashParams = new URLSearchParams(hashVal);
-      if (hashParams.has('quiz')) {
+      const rawHash = window.location.hash.substring(1);
+      const [hashMain, hashQuery] = rawHash.split('?');
+      if (hashQuery) {
+        const hq = new URLSearchParams(hashQuery);
+        if (!urlModeParam && hq.has('mode')) urlModeParam = hq.get('mode');
+        if (!quizFile && hq.has('quiz')) quizFile = hq.get('quiz');
+      }
+      const hashParams = new URLSearchParams(hashMain);
+      if (!quizFile && hashParams.has('quiz')) {
         quizFile = hashParams.get('quiz');
-      } else if (hashVal && !hashVal.includes('=')) {
-        quizFile = hashVal;
+      } else if (!quizFile && hashMain && !hashMain.includes('=')) {
+        quizFile = hashMain;
+      }
+      if (!urlModeParam && hashParams.has('mode')) {
+        urlModeParam = hashParams.get('mode');
       }
     }
     if (!quizFile || quizFile === 'cauhoi') quizFile = 'baitap_10_c1_b01';
     try { quizFile = decodeURIComponent(quizFile); } catch (e) {}
     if (quizFile === 'cauhoi') quizFile = 'baitap_10_c1_b01';
 
+    const isMistakeQuiz = quizFile.startsWith('mistakes');
     const isReviewMode = quizFile.startsWith('ontap_');
+
+    if (isMistakeQuiz) {
+      studyMode = 'practice';
+    } else if (urlModeParam === 'practice' || urlModeParam === 'exam') {
+      studyMode = urlModeParam;
+    } else {
+      try {
+        studyMode = localStorage.getItem('zphysics_quiz_mode') === 'practice' ? 'practice' : 'exam';
+      } catch (e) {
+        studyMode = 'exam';
+      }
+    }
 
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
       const cleanPath = window.location.pathname.replace(/\.html$/, '');
       if (window.location.search.includes('quiz=')) {
-        history.replaceState(null, '', cleanPath + '#' + quizFile);
+        history.replaceState(null, '', cleanPath + '#' + quizFile + (urlModeParam ? `?mode=${urlModeParam}` : ''));
       }
     }
 
+    function getMistakesList() {
+      try {
+        const raw = localStorage.getItem(MISTAKE_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveMistakesList(list) {
+      try {
+        localStorage.setItem(MISTAKE_STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {}
+    }
+
+    function inferQuestionGrade(q) {
+      const rawMade = String((q && (q._originMade || q.made)) || quizFile || '');
+      const m = rawMade.match(/(?:^|_)(\d{2})(?:_|$)/);
+      if (m) return m[1];
+      if (lessonInfo && lessonInfo.grade) {
+        const lm = String(lessonInfo.grade).match(/\d+/);
+        if (lm) return lm[0];
+      }
+      return '';
+    }
+
+    function recordMistake(q) {
+      if (!q || !q.question) return;
+      const list = getMistakesList();
+      const qKey = String(q.id);
+      const originMade = q._originMade || (isMistakeQuiz ? q.made : quizFile) || quizFile;
+      const grade = q._originGrade || inferQuestionGrade(q);
+      const parsedMeta = parseQuizCode(originMade);
+      const lessonLabel = q._originLesson
+        || (lessonInfo ? lessonInfo.lesson : '')
+        || (parsedMeta ? `${parsedMeta.chapter} · ${parsedMeta.lesson}` : originMade);
+      const existingIdx = list.findIndex(item => String(item.id) === qKey);
+
+      if (existingIdx !== -1) {
+        list[existingIdx].wrongCount = (list[existingIdx].wrongCount || 1) + 1;
+        list[existingIdx].lastWrongAt = Date.now();
+        if (!list[existingIdx].grade && grade) list[existingIdx].grade = grade;
+        if (!list[existingIdx].lessonTitle && lessonLabel) list[existingIdx].lessonTitle = lessonLabel;
+      } else {
+        list.unshift({
+          id: q.id,
+          made: originMade,
+          grade: grade,
+          lessonTitle: lessonLabel,
+          chapterTitle: (lessonInfo && lessonInfo.chapter) || q._originChapter || '',
+          type: q.type,
+          question: q.question,
+          answers: q.answers,
+          correct: q.correct,
+          explanation: q.explanation || '',
+          wrongCount: 1,
+          lastWrongAt: Date.now()
+        });
+      }
+      saveMistakesList(list.slice(0, 200));
+    }
+
+    function resolveMistake(qId) {
+      const list = getMistakesList();
+      const qKey = String(qId);
+      const next = list.filter(item => String(item.id) !== qKey);
+      if (next.length !== list.length) {
+        saveMistakesList(next);
+        return true;
+      }
+      return false;
+    }
+
+    function getDraftKey() {
+      return 'zphysics_draft_quiz_' + quizFile;
+    }
+
+    function loadQuizDraft() {
+      try {
+        const raw = localStorage.getItem(getDraftKey());
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return (parsed && typeof parsed === 'object') ? parsed : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function updateAutosaveStatus(label, isSaved) {
+      const pill = document.getElementById('autosaveStatus');
+      const txt = document.getElementById('autosaveText');
+      if (txt) txt.textContent = label;
+      if (pill) pill.classList.toggle('is-saved', !!isSaved);
+    }
+
+    function collectQuizAnswersState() {
+      const answers = {};
+      quizData.forEach(q => {
+        const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
+        if (q.type === 'đs' && validAnswers.length > 0) {
+          const tfObj = {};
+          validAnswers.forEach(a => {
+            const parent = document.getElementById(`tf-${q.id}-${a.key}`);
+            const sel = parent ? parent.querySelector('.tf-btn.selected') : null;
+            if (sel && sel.dataset && sel.dataset.val) {
+              tfObj[a.key] = sel.dataset.val;
+            }
+          });
+          if (Object.keys(tfObj).length > 0) answers[String(q.id)] = tfObj;
+        } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
+          const sel = document.querySelector(`#answers-${q.id} .answer-option.selected`);
+          if (sel && sel.dataset && sel.dataset.key) {
+            answers[String(q.id)] = sel.dataset.key;
+          }
+        } else {
+          const inp = document.getElementById(`short-answer-${q.id}`);
+          if (inp && inp.value.trim() !== '') {
+            answers[String(q.id)] = inp.value;
+          }
+        }
+      });
+      return answers;
+    }
+
+    function saveQuizDraft() {
+      if (submitted || isReviewMode || !Array.isArray(quizData) || quizData.length === 0) return;
+      try {
+        const draft = {
+          quizFile: quizFile,
+          questionIds: quizData.map(q => q.id),
+          answers: collectQuizAnswersState(),
+          flaggedIds: Array.from(flaggedQuestionIds),
+          checkedIds: Array.from(checkedQuestionIds),
+          studyMode: studyMode,
+          timeRemaining: timeRemaining,
+          updatedAt: Date.now()
+        };
+        localStorage.setItem(getDraftKey(), JSON.stringify(draft));
+        const d = new Date();
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        updateAutosaveStatus(`Đã tự lưu ${hh}:${mm}`, true);
+      } catch (e) {}
+    }
+
+    function clearQuizDraft(resetUI) {
+      if (resetUI && !confirm('Xóa toàn bộ đáp án nháp đang lưu cho bài này?')) {
+        return;
+      }
+      try {
+        localStorage.removeItem(getDraftKey());
+      } catch (e) {}
+      if (resetUI) {
+        flaggedQuestionIds.clear();
+        checkedQuestionIds.clear();
+        submitted = false;
+        const banner = document.getElementById('scoreBanner');
+        if (banner) banner.classList.remove('visible');
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) submitBtn.style.display = '';
+        const retryBtn = document.getElementById('retryBtn');
+        if (retryBtn) retryBtn.classList.remove('visible');
+        renderQuiz(quizData);
+        startTimer();
+        updateAutosaveStatus('Đã xóa nháp', false);
+        showToast('Đã xóa bản nháp làm bài', 'success');
+      }
+    }
+
+    function setStudyMode(mode, skipSave) {
+      if (isReviewMode) return;
+      studyMode = (mode === 'practice') ? 'practice' : 'exam';
+      if (!isMistakeQuiz) {
+        try { localStorage.setItem('zphysics_quiz_mode', studyMode); } catch (e) {}
+      }
+      document.body.classList.toggle('study-mode-practice', studyMode === 'practice');
+      const seg = document.getElementById('quizModeSeg');
+      if (seg) {
+        seg.style.setProperty('--seg-index', studyMode === 'practice' ? '1' : '0');
+        seg.querySelectorAll('.seg-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.mode === studyMode);
+        });
+      }
+      if (!skipSave) saveQuizDraft();
+    }
+
+    function toggleQuestionPalette() {
+      const card = document.getElementById('questionPaletteCard');
+      const btn = document.getElementById('togglePaletteBtn');
+      if (!card || !btn) return;
+      const isCollapsed = card.classList.toggle('collapsed');
+      btn.textContent = isCollapsed ? 'Hiện bảng câu hỏi' : 'Ẩn bảng câu hỏi';
+    }
+
+    function isQuestionAnswered(q) {
+      const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
+      if (q.type === 'đs' && validAnswers.length > 0) {
+        const selectedTf = document.querySelectorAll(`#answers-${q.id} .tf-btn.selected`);
+        return selectedTf.length === validAnswers.length;
+      } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
+        return !!document.querySelector(`#answers-${q.id} .answer-option.selected`);
+      } else {
+        const inp = document.getElementById(`short-answer-${q.id}`);
+        return !!(inp && inp.value.trim() !== '');
+      }
+    }
+
+    function renderQuestionPalette() {
+      const card = document.getElementById('questionPaletteCard');
+      const grid = document.getElementById('questionPaletteGrid');
+      const statsEl = document.getElementById('questionPaletteStats');
+      if (!card || !grid) return;
+
+      if (isReviewMode || !quizData || quizData.length === 0) {
+        card.style.display = 'none';
+        return;
+      }
+      card.style.display = '';
+
+      let answeredCount = 0;
+      let flaggedCount = 0;
+
+      grid.innerHTML = quizData.map((q, idx) => {
+        const qKey = String(q.id);
+        const cardEl = document.querySelector(`.question-card[data-id="${q.id}"]`);
+        const isCorrect = cardEl && cardEl.classList.contains('correct-card');
+        const isWrong = cardEl && cardEl.classList.contains('wrong-card');
+        const isAnswered = isQuestionAnswered(q);
+        const isFlagged = flaggedQuestionIds.has(qKey);
+
+        if (isAnswered) answeredCount++;
+        if (isFlagged) flaggedCount++;
+
+        const classes = ['qp-chip'];
+        if (isCorrect) classes.push('is-correct');
+        else if (isWrong) classes.push('is-wrong');
+        else if (isAnswered) classes.push('is-answered');
+        if (isFlagged) classes.push('is-flagged');
+
+        return `<button type="button" class="${classes.join(' ')}" onclick="scrollToQuestion('${escapeTelegramHtml(qKey)}')" title="Câu ${idx + 1}${isFlagged ? ' (Đang phân vân)' : ''}">${String(idx + 1).padStart(2, '0')}</button>`;
+      }).join('');
+
+      const unansweredCount = Math.max(0, quizData.length - answeredCount);
+      if (statsEl) {
+        statsEl.innerHTML = `
+          <span>Đã làm: <strong>${answeredCount}/${quizData.length}</strong></span>
+          <span>Chưa làm: <strong>${unansweredCount}</strong></span>
+          <span>Phân vân: <strong style="color:var(--warning)">${flaggedCount}</strong></span>
+        `;
+      }
+    }
+
+    function scrollToQuestion(qId) {
+      const card = document.querySelector(`.question-card[data-id="${qId}"]`);
+      if (!card) return;
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.style.boxShadow = '0 0 0 2px var(--accent)';
+      setTimeout(() => { card.style.boxShadow = ''; }, 1000);
+    }
+
+    function toggleQuestionFlag(qId) {
+      const qKey = String(qId);
+      const card = document.querySelector(`.question-card[data-id="${qKey}"]`);
+      const btn = document.getElementById('flag-btn-' + qKey);
+      if (flaggedQuestionIds.has(qKey)) {
+        flaggedQuestionIds.delete(qKey);
+        if (card) card.classList.remove('flagged-card');
+        if (btn) {
+          btn.classList.remove('flagged');
+          btn.innerHTML = `${SVG_FLAG}<span>Xem lại</span>`;
+        }
+      } else {
+        flaggedQuestionIds.add(qKey);
+        if (card) card.classList.add('flagged-card');
+        if (btn) {
+          btn.classList.add('flagged');
+          btn.innerHTML = `${SVG_FLAG}<span>Phân vân</span>`;
+        }
+      }
+      renderQuestionPalette();
+      saveQuizDraft();
+    }
+
+    function checkSingleQuestion(qId, opts = {}) {
+      const idx = quizData.findIndex(item => String(item.id) === String(qId));
+      if (idx === -1) return;
+      const q = quizData[idx];
+
+      if (q.type !== 'cauhoi' && q.type !== 'đs' && !opts.allowEmpty) {
+        const inp = document.getElementById(`short-answer-${q.id}`);
+        if (inp && inp.value.trim() === '' && !opts.skipMistakeUpdate) {
+          showToast('Vui lòng nhập đáp án trước khi kiểm tra', 'error');
+          inp.focus();
+          return;
+        }
+      } else if (!opts.allowEmpty && !opts.skipMistakeUpdate && q.type === 'cauhoi') {
+        const sel = document.querySelector(`#answers-${q.id} .answer-option.selected`);
+        if (!sel) {
+          showToast('Vui lòng chọn một phương án trước khi kiểm tra', 'error');
+          return;
+        }
+      }
+
+      const res = evaluateQuestion(q, idx);
+      checkedQuestionIds.add(String(q.id));
+
+      const checkBtn = document.getElementById(`check-btn-${q.id}`);
+      const resetBtn = document.getElementById(`reset-btn-${q.id}`);
+      const tipEl = document.getElementById(`ptip-${q.id}`);
+      if (checkBtn) checkBtn.style.display = 'none';
+      if (resetBtn) resetBtn.style.display = 'inline-flex';
+      if (tipEl) tipEl.textContent = res.isCorrect ? 'Chính xác! Đọc lời giải để củng cố.' : 'Đã lưu vào Sổ tay câu sai để ôn lại.';
+
+      const explainEl = document.getElementById('explain-' + q.id);
+      if (explainEl) triggerKaTeX(explainEl);
+
+      if (!opts.skipMistakeUpdate) {
+        if (!res.isCorrect) {
+          recordMistake(q);
+        } else if (isMistakeQuiz) {
+          if (resolveMistake(q.id)) {
+            showToast('Tuyệt vời! Đã xóa câu này khỏi Sổ tay câu sai.', 'success');
+          }
+        }
+      }
+
+      updateProgress();
+      checkAllAnswered();
+      renderQuestionPalette();
+      if (!opts.skipDraftSave) saveQuizDraft();
+    }
+
+    function resetSingleQuestion(qId) {
+      if (submitted) return;
+      const idx = quizData.findIndex(item => String(item.id) === String(qId));
+      if (idx === -1) return;
+      const q = quizData[idx];
+      checkedQuestionIds.delete(String(q.id));
+
+      const card = document.querySelector(`.question-card[data-id="${q.id}"]`);
+      if (card) card.classList.remove('correct-card', 'wrong-card');
+
+      const icon = document.getElementById('icon-' + q.id);
+      if (icon) {
+        icon.style.display = 'none';
+        icon.classList.remove('is-correct', 'is-wrong');
+        icon.innerHTML = '';
+      }
+
+      const explainEl = document.getElementById('explain-' + q.id);
+      if (explainEl) explainEl.classList.remove('visible');
+
+      const answersEl = document.getElementById('answers-' + q.id);
+      if (answersEl) {
+        if (q.type === 'đs') {
+          answersEl.querySelectorAll('.tf-statement').forEach(parent => {
+            parent.querySelectorAll('.tf-btn').forEach(btn => {
+              btn.style.pointerEvents = '';
+              btn.style.opacity = '';
+              btn.style.borderColor = '';
+              btn.style.backgroundColor = '';
+              btn.style.color = '';
+              btn.classList.remove('selected');
+            });
+            const seg = parent.querySelector('.tf-toggles');
+            if (seg) {
+              seg.setAttribute('data-selected', 'none');
+              seg.style.removeProperty('--seg-index');
+            }
+          });
+        } else if (q.type === 'cauhoi') {
+          answersEl.querySelectorAll('.answer-option').forEach(opt => {
+            opt.classList.remove('locked', 'selected', 'is-correct', 'is-wrong');
+          });
+        } else {
+          const inp = document.getElementById(`short-answer-${q.id}`);
+          if (inp) {
+            inp.disabled = false;
+            inp.value = '';
+            inp.style.borderColor = '';
+            inp.style.backgroundColor = '';
+          }
+        }
+      }
+
+      const checkBtn = document.getElementById(`check-btn-${q.id}`);
+      const resetBtn = document.getElementById(`reset-btn-${q.id}`);
+      const tipEl = document.getElementById(`ptip-${q.id}`);
+      if (checkBtn) checkBtn.style.display = '';
+      if (resetBtn) resetBtn.style.display = 'none';
+      if (tipEl) tipEl.textContent = 'Chọn đáp án rồi xem lời giải ngay';
+
+      updateProgress();
+      checkAllAnswered();
+      renderQuestionPalette();
+      saveQuizDraft();
+    }
+
+    function restoreQuizDraft(draft) {
+      if (!draft || !draft.answers) return false;
+      let restoredAny = false;
+
+      if (draft.studyMode && !urlModeParam && !isMistakeQuiz) {
+        setStudyMode(draft.studyMode, true);
+      }
+
+      if (Array.isArray(draft.flaggedIds)) {
+        draft.flaggedIds.forEach(fid => {
+          const qKey = String(fid);
+          flaggedQuestionIds.add(qKey);
+          const card = document.querySelector(`.question-card[data-id="${qKey}"]`);
+          const btn = document.getElementById('flag-btn-' + qKey);
+          if (card) card.classList.add('flagged-card');
+          if (btn) {
+            btn.classList.add('flagged');
+            btn.innerHTML = `${SVG_FLAG}<span>Phân vân</span>`;
+          }
+          restoredAny = true;
+        });
+      }
+
+      quizData.forEach(q => {
+        const val = draft.answers[String(q.id)];
+        if (val === undefined || val === null) return;
+        const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
+        if (q.type === 'đs' && validAnswers.length > 0 && typeof val === 'object') {
+          Object.entries(val).forEach(([k, v]) => {
+            const parent = document.getElementById(`tf-${q.id}-${k}`);
+            if (!parent) return;
+            const targetBtn = parent.querySelector(`.tf-btn[data-val="${v}"]`);
+            if (targetBtn) {
+              parent.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+              targetBtn.classList.add('selected');
+              const seg = targetBtn.closest('.tf-toggles');
+              if (seg) {
+                const segIdx = v === 'Đ' ? '0' : '1';
+                seg.setAttribute('data-selected', segIdx);
+                seg.style.setProperty('--seg-index', segIdx);
+              }
+              restoredAny = true;
+            }
+          });
+        } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
+          const opt = document.querySelector(`#answers-${q.id} .answer-option[data-key="${val}"]`);
+          if (opt) {
+            document.querySelectorAll(`#answers-${q.id} .answer-option`).forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            restoredAny = true;
+          }
+        } else {
+          const inp = document.getElementById(`short-answer-${q.id}`);
+          if (inp && typeof val === 'string') {
+            inp.value = val;
+            restoredAny = true;
+          }
+        }
+      });
+
+      if (Array.isArray(draft.checkedIds)) {
+        draft.checkedIds.forEach(cid => {
+          checkSingleQuestion(cid, { skipDraftSave: true, skipMistakeUpdate: true });
+        });
+      }
+
+      return restoredAny;
+    }
+
     function loadLessonInfo() {
+      if (isMistakeQuiz) return;
       fetch('baihoc.json')
         .then(res => res.json())
         .then(data => {
@@ -1462,11 +1998,13 @@
     function processQuizData(data) {
       if (!data || !Array.isArray(data) || data.length === 0) return false;
 
+      const draft = isReviewMode ? null : loadQuizDraft();
       let part1 = [];
       let part2 = [];
       let part3 = [];
+      const itemById = new Map();
 
-      data.forEach(item => {
+      data.forEach((item, rawIdx) => {
         let type = 'cauhoi';
         if (item.type) {
           type = item.type;
@@ -1475,8 +2013,9 @@
           else if (item.made.startsWith('tln')) type = 'tln';
         }
 
+        const qId = (item.id !== undefined && item.id !== null) ? item.id : (900000 + rawIdx);
         const q = {
-          id: item.id,
+          id: qId,
           type: type,
           question: item.question,
           answers: item.answers || [
@@ -1486,9 +2025,14 @@
             { key: 'D', text: item.d }
           ],
           correct: item.correct,
-          explanation: item.explanation
+          explanation: item.explanation,
+          _originMade: item.made || '',
+          _originGrade: item.grade || '',
+          _originLesson: item.lessonTitle || '',
+          _originChapter: item.chapterTitle || ''
         };
 
+        itemById.set(String(qId), q);
         if (type === 'cauhoi') part1.push(q);
         else if (type === 'đs') part2.push(q);
         else part3.push(q);
@@ -1502,37 +2046,113 @@
         return arr;
       };
 
-      part1 = shuffle(part1);
-      part2 = shuffle(part2);
-      part3 = shuffle(part3);
+      let mappedData = null;
 
-      if (quizFile.startsWith('baitap_')) {
-        part1 = part1.slice(0, 9);
-        part2 = part2.slice(0, 2);
-        part3 = part3.slice(0, 3);
-      } else if (quizFile.startsWith('ontap_')) {
-        // Keep all questions
-      } else if (quizFile.startsWith('cauhoi')) {
-        part1 = part1.slice(0, 18); part2 = []; part3 = [];
-      } else if (quizFile.startsWith('đs')) {
-        part2 = part2.slice(0, 4); part1 = []; part3 = [];
-      } else if (quizFile.startsWith('tln')) {
-        part3 = part3.slice(0, 6); part1 = []; part2 = [];
+      if (draft && Array.isArray(draft.questionIds) && draft.questionIds.length > 0) {
+        const restoredList = draft.questionIds.map(id => itemById.get(String(id))).filter(Boolean);
+        if (restoredList.length > 0) {
+          mappedData = restoredList;
+        }
       }
 
-      let mappedData = [...part1, ...part2, ...part3];
+      if (!mappedData) {
+        part1 = shuffle(part1);
+        part2 = shuffle(part2);
+        part3 = shuffle(part3);
 
-      if (quizFile.startsWith('ontap_')) {
-        mappedData = shuffle(mappedData);
+        if (isMistakeQuiz) {
+          mappedData = [...part1, ...part2, ...part3];
+        } else if (quizFile.startsWith('baitap_')) {
+          part1 = part1.slice(0, 9);
+          part2 = part2.slice(0, 2);
+          part3 = part3.slice(0, 3);
+          mappedData = [...part1, ...part2, ...part3];
+        } else if (quizFile.startsWith('ontap_')) {
+          mappedData = shuffle([...part1, ...part2, ...part3]);
+        } else if (quizFile.startsWith('cauhoi')) {
+          mappedData = part1.slice(0, 18);
+        } else if (quizFile.startsWith('đs')) {
+          mappedData = part2.slice(0, 4);
+        } else if (quizFile.startsWith('tln')) {
+          mappedData = part3.slice(0, 6);
+        } else {
+          mappedData = [...part1, ...part2, ...part3];
+        }
       }
 
       quizData = mappedData;
       renderQuiz(mappedData);
-      startTimer();
+
+      let initialTimerSec = null;
+      if (draft && !isReviewMode) {
+        const didRestore = restoreQuizDraft(draft);
+        renderQuestionPalette();
+        updateProgress();
+        checkAllAnswered();
+        if (didRestore) {
+          updateAutosaveStatus('Đã khôi phục bài nháp', true);
+          showToast('Đã khôi phục tiến trình làm bài trước đó', 'success');
+        }
+        if (typeof draft.timeRemaining === 'number' && draft.timeRemaining > 30) {
+          initialTimerSec = draft.timeRemaining;
+        }
+      }
+
+      startTimer(initialTimerSec);
+
+      if (!autosaveIntervalId && !isReviewMode) {
+        autosaveIntervalId = setInterval(() => {
+          if (!submitted && !isReviewMode && Array.isArray(quizData) && quizData.length > 0) {
+            saveQuizDraft();
+          }
+        }, 5000);
+      }
+
       return true;
     }
 
     function loadQuizFromSupabase() {
+      if (isMistakeQuiz) {
+        const gradeMatch = quizFile.match(/^mistakes_(\d{2})$/);
+        const gradeFilter = gradeMatch ? gradeMatch[1] : '';
+        const allMistakes = getMistakesList();
+        const filtered = gradeFilter
+          ? allMistakes.filter(m => String(m.grade) === gradeFilter)
+          : allMistakes;
+
+        const h1El = document.querySelector('.header-info h1');
+        if (h1El) h1El.innerHTML = 'Z<span>physics</span> — Sổ tay câu sai';
+        const subtitleEl = document.getElementById('headerSubtitle');
+        if (subtitleEl) {
+          subtitleEl.textContent = `${filtered.length} câu cần ôn lại${gradeFilter ? ' · Lớp ' + gradeFilter : ''}`;
+        }
+        lessonInfo = {
+          grade: gradeFilter ? `Vật lí ${gradeFilter}` : 'Tổng hợp',
+          chapter: 'Sổ tay câu sai',
+          lesson: 'Luyện lại các câu trả lời sai'
+        };
+
+        if (filtered.length === 0) {
+          document.getElementById('quizContainer').innerHTML = `
+            <div class="review-done-msg">
+              <h2>Sổ tay câu sai hiện đang trống</h2>
+              <p style="margin-bottom:16px;">Em chưa có câu trả lời sai nào${gradeFilter ? ' ở Lớp ' + gradeFilter : ''} hoặc đã khắc phục hết.</p>
+              <a href="./" class="zp-primary-btn" style="text-decoration:none;">Quay lại trang chủ</a>
+            </div>
+          `;
+          const tb = document.getElementById('studyToolbar');
+          const pal = document.getElementById('questionPaletteCard');
+          const sb = document.getElementById('submitBtn');
+          if (tb) tb.style.display = 'none';
+          if (pal) pal.style.display = 'none';
+          if (sb) sb.style.display = 'none';
+          return;
+        }
+
+        processQuizData(filtered);
+        return;
+      }
+
       const cacheKey = 'zphysics_quiz_cache_' + quizFile;
       let hasRendered = false;
 
@@ -1701,7 +2321,12 @@
       container.innerHTML = '';
       document.getElementById('progressText').textContent = `0 / ${data.length}`;
 
+      const toolbarEl = document.getElementById('studyToolbar');
+      const paletteEl = document.getElementById('questionPaletteCard');
+
       if (isReviewMode) {
+        if (toolbarEl) toolbarEl.style.display = 'none';
+        if (paletteEl) paletteEl.style.display = 'none';
         const submitBtn = document.getElementById('submitBtn');
         if (submitBtn) submitBtn.style.display = 'none';
         const reviewBar = document.getElementById('reviewBar');
@@ -1717,31 +2342,33 @@
         return;
       }
 
+      if (toolbarEl) toolbarEl.style.display = '';
+      setStudyMode(studyMode, true);
+
       const submitBtn = document.getElementById('submitBtn');
       if (submitBtn) submitBtn.style.display = '';
       const reviewBar = document.getElementById('reviewBar');
       if (reviewBar) reviewBar.style.display = 'none';
 
-      let p1Count = 0, p2Count = 0, p3Count = 0;
-      data.forEach(q => {
-        if (q.type === 'cauhoi') p1Count++;
-        else if (q.type === 'đs') p2Count++;
-        else p3Count++;
-      });
+      let lastPartRendered = '';
 
       data.forEach((q, idx) => {
-        if (quizFile.startsWith('baitap_')) {
-          if (idx === 0 && p1Count > 0) {
-            container.insertAdjacentHTML('beforeend', `<div class="part-header">Phần I. Câu trắc nghiệm nhiều phương án lựa chọn</div>`);
-          } else if (idx === p1Count && p2Count > 0) {
-            container.insertAdjacentHTML('beforeend', `<div class="part-header">Phần II. Câu trắc nghiệm đúng sai</div>`);
-          } else if (idx === p1Count + p2Count && p3Count > 0) {
-            container.insertAdjacentHTML('beforeend', `<div class="part-header">Phần III. Câu trắc nghiệm trả lời ngắn</div>`);
+        if (quizFile.startsWith('baitap_') || isMistakeQuiz) {
+          const partKey = q.type === 'cauhoi' ? 'I' : (q.type === 'đs' ? 'II' : 'III');
+          if (partKey !== lastPartRendered) {
+            lastPartRendered = partKey;
+            const partTitles = {
+              'I': 'Phần I. Câu trắc nghiệm nhiều phương án lựa chọn',
+              'II': 'Phần II. Câu trắc nghiệm đúng sai',
+              'III': 'Phần III. Câu trắc nghiệm trả lời ngắn'
+            };
+            container.insertAdjacentHTML('beforeend', `<div class="part-header">${partTitles[partKey]}</div>`);
           }
         }
 
         const card = document.createElement('div');
-        card.className = 'question-card';
+        const isFlagged = flaggedQuestionIds.has(String(q.id));
+        card.className = 'question-card' + (isFlagged ? ' flagged-card' : '');
         card.dataset.id = q.id;
 
         const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
@@ -1753,14 +2380,14 @@
               <div class="tf-text"><strong>${a.key}.</strong> ${formatText(a.text)}</div>
               <div class="tf-toggles seg-control tf-seg" data-selected="none">
                 <span class="seg-thumb"></span>
-                <div class="tf-btn seg-btn" data-val="Đ" onclick="selectTF(this, ${q.id}, '${a.key}', 'Đ')">Đúng</div>
-                <div class="tf-btn seg-btn" data-val="S" onclick="selectTF(this, ${q.id}, '${a.key}', 'S')">Sai</div>
+                <div class="tf-btn seg-btn" data-val="Đ" onclick="selectTF(this, '${q.id}', '${a.key}', 'Đ')">Đúng</div>
+                <div class="tf-btn seg-btn" data-val="S" onclick="selectTF(this, '${q.id}', '${a.key}', 'S')">Sai</div>
               </div>
             </div>
           `).join('');
         } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
           answersHTML = validAnswers.map(a => `
-            <label class="answer-option" data-key="${a.key}" onclick="selectAnswer(this, ${q.id})">
+            <label class="answer-option" data-key="${a.key}" onclick="selectAnswer(this, '${q.id}')">
               <span class="opt-keycap kbd-cap">${a.key}</span>
               <span class="answer-text">${formatText(a.text)}</span>
             </label>
@@ -1768,20 +2395,36 @@
         } else {
           answersHTML = `
             <div>
-              <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời" oninput="inputShortAnswer()">
+              <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời" oninput="inputShortAnswer()" onkeydown="if(event.key==='Enter' && studyMode==='practice'){ event.preventDefault(); checkSingleQuestion('${q.id}'); }">
             </div>
           `;
         }
 
+        const sourceBadge = (isMistakeQuiz && q._originLesson)
+          ? ` · ${escapeTelegramHtml(q._originLesson)}`
+          : '';
+
         card.innerHTML = `
           <div class="q-header">
             <div class="q-num">${String(idx + 1).padStart(2, '0')}</div>
-            <span class="q-badge">Câu ${idx + 1}</span>
-            <span class="q-result-icon" id="icon-${q.id}"></span>
+            <span class="q-badge">Câu ${idx + 1}${sourceBadge}</span>
+            <div class="q-header-right">
+              <button type="button" class="q-flag-btn${isFlagged ? ' flagged' : ''}" id="flag-btn-${q.id}" onclick="toggleQuestionFlag('${q.id}')" title="Đánh dấu câu phân vân để xem lại sau">
+                ${SVG_FLAG}<span>${isFlagged ? 'Phân vân' : 'Xem lại'}</span>
+              </button>
+              <span class="q-result-icon" id="icon-${q.id}"></span>
+            </div>
           </div>
           <div class="q-text">${formatText(q.question)}</div>
           <div class="answers-list" id="answers-${q.id}">
             ${answersHTML}
+          </div>
+          <div class="q-practice-actions" id="practiceActions-${q.id}">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <button type="button" class="btn-check-single" id="check-btn-${q.id}" onclick="checkSingleQuestion('${q.id}')">Kiểm tra &amp; Xem giải</button>
+              <button type="button" class="btn-reset-single" id="reset-btn-${q.id}" style="display:none;" onclick="resetSingleQuestion('${q.id}')">Làm lại câu này</button>
+            </div>
+            <span class="q-practice-tip" id="ptip-${q.id}">Chọn đáp án rồi xem lời giải ngay</span>
           </div>
           <div class="explanation" id="explain-${q.id}">
             <strong>Lời giải:</strong> ${formatText(q.explanation)}
@@ -1792,6 +2435,8 @@
       });
 
       triggerKaTeX(container);
+      renderQuestionPalette();
+      checkAllAnswered();
     }
 
     function showReviewCard() {
@@ -1907,7 +2552,7 @@
       function selectAnswer(el, qId) {
       if (submitted) return;
       const answersEl = document.getElementById('answers-' + qId);
-      if (isReviewMode && answersEl.querySelector('.answer-option.locked')) return;
+      if (answersEl && answersEl.querySelector('.answer-option.locked')) return;
 
       answersEl.querySelectorAll('.answer-option').forEach(opt => opt.classList.remove('selected'));
       el.classList.add('selected');
@@ -1921,6 +2566,12 @@
       } else {
         updateProgress();
         checkAllAnswered();
+        renderQuestionPalette();
+        if (studyMode === 'practice') {
+          checkSingleQuestion(qId);
+        } else {
+          saveQuizDraft();
+        }
       }
     }
 
@@ -1955,12 +2606,9 @@
       if (submitted) return;
       const answersEl = document.getElementById('answers-' + qId);
 
-      if (isReviewMode) {
-        const parent = document.getElementById(`tf-${qId}-${key}`);
-        if (parent.querySelector('.tf-btn[style*="pointer-events: none"]')) return;
-      }
-
       const parent = document.getElementById(`tf-${qId}-${key}`);
+      if (!parent || parent.querySelector('.tf-btn[style*="pointer-events: none"]')) return;
+
       parent.querySelectorAll('.tf-btn').forEach(btn => btn.classList.remove('selected'));
       el.classList.add('selected');
       el.dataset.val = val;
@@ -1973,7 +2621,7 @@
       }
 
       if (isReviewMode) {
-        const q = quizData.find(item => item.id === qId);
+        const q = quizData.find(item => String(item.id) === String(qId));
         const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
         const selectedTf = answersEl.querySelectorAll('.tf-btn.selected');
         if (selectedTf.length === validAnswers.length) {
@@ -1985,6 +2633,15 @@
       } else {
         updateProgress();
         checkAllAnswered();
+        renderQuestionPalette();
+        const q = quizData.find(item => String(item.id) === String(qId));
+        const validAnswers = q ? q.answers.filter(a => a.text && a.text.trim() !== '') : [];
+        const selectedTf = answersEl.querySelectorAll('.tf-btn.selected');
+        if (studyMode === 'practice' && validAnswers.length > 0 && selectedTf.length === validAnswers.length) {
+          checkSingleQuestion(qId);
+        } else {
+          saveQuizDraft();
+        }
       }
     }
 
@@ -1992,6 +2649,8 @@
       if (submitted) return;
       updateProgress();
       checkAllAnswered();
+      renderQuestionPalette();
+      saveQuizDraft();
     }
 
     function getAnsweredCount() {
@@ -2037,8 +2696,8 @@
         const rvEndBtn = document.getElementById('rvEndBtn');
         if (rvEndBtn) rvEndBtn.disabled = false;
       } else {
-        const total = quizData.length;
-        document.getElementById('submitBtn').disabled = getAnsweredCount() < total;
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) submitBtn.disabled = !quizData || quizData.length === 0 || submitted;
       }
     }
 
@@ -2136,7 +2795,9 @@
         else if (correctCount === 3) qScore = 0.5;
         else if (correctCount === 4) qScore = 1.0;
 
-        if (!quizFile.startsWith('baitap_')) {
+        if (isMistakeQuiz) {
+          qScore = validAnswers.length > 0 ? (correctCount / validAnswers.length) : 0;
+        } else if (!quizFile.startsWith('baitap_')) {
           qScore = correctCount;
         }
 
@@ -2202,17 +2863,21 @@
     }
 
     function gradeQuestion(qId) {
-      const idx = quizData.findIndex(item => item.id === qId);
+      const idx = quizData.findIndex(item => String(item.id) === String(qId));
       if (idx === -1) return;
       const q = quizData[idx];
 
       const { isCorrect, wrongDetail } = evaluateQuestion(q, idx);
+      if (!isCorrect) {
+        recordMistake(q);
+      }
 
       const explainEl = document.getElementById('explain-' + q.id);
       if (explainEl) triggerKaTeX(explainEl);
 
       updateProgress();
       checkAllAnswered();
+      renderQuestionPalette();
 
       if (isReviewMode) {
         const actionsEl = document.getElementById('reviewActions-' + q.id);
@@ -2243,15 +2908,15 @@
       gradeQuestion(qId);
     }
 
-    function startTimer() {
-      if (quizFile && quizFile.startsWith('baitap_')) {
+    function startTimer(initialSeconds) {
+      if (quizFile && (quizFile.startsWith('baitap_') || isMistakeQuiz)) {
         const timerEl = document.getElementById('quizTimer');
         if (timerEl) timerEl.style.display = 'none';
         return;
       }
 
       if (timerInterval) clearInterval(timerInterval);
-      timeRemaining = 30 * 60;
+      timeRemaining = (typeof initialSeconds === 'number' && initialSeconds > 0) ? initialSeconds : (30 * 60);
       const timerEl = document.getElementById('quizTimer');
       timerEl.style.display = 'flex';
       timerEl.classList.remove('urgent');
@@ -2392,41 +3057,74 @@
       }).catch(err => console.error('Lỗi lưu tiến trình:', err));
     }
 
-    function submitQuiz() {
+    function submitQuiz(isTimeout = false) {
       if (submitted) return;
 
       const nameInput = document.getElementById('studentName');
       const studentCard = document.getElementById('studentCard');
-      const studentName = nameInput.value.trim();
+      let studentName = nameInput ? nameInput.value.trim() : '';
 
-      if (!studentName) {
-        studentCard.classList.add('error');
-        nameInput.focus();
-        setTimeout(() => studentCard.classList.remove('error'), 2000);
+      if (!isTimeout && !studentName) {
+        if (studentCard) studentCard.classList.add('error');
+        if (nameInput) nameInput.focus();
+        setTimeout(() => { if (studentCard) studentCard.classList.remove('error'); }, 2000);
         return;
       }
-      studentCard.classList.remove('error');
+      if (isTimeout && !studentName) {
+        studentName = 'Học sinh ẩn danh (Tự động nộp)';
+        if (nameInput) nameInput.value = studentName;
+      }
+      if (studentCard) studentCard.classList.remove('error');
+
+      if (!isTimeout && !isMistakeQuiz) {
+        const answeredCount = getAnsweredCount();
+        const unansweredCount = Math.max(0, quizData.length - answeredCount);
+        const flaggedCount = flaggedQuestionIds.size;
+        if (unansweredCount > 0 || flaggedCount > 0) {
+          const warnParts = [];
+          if (unansweredCount > 0) warnParts.push(`${unansweredCount} câu chưa làm`);
+          if (flaggedCount > 0) warnParts.push(`${flaggedCount} câu đang đánh dấu phân vân`);
+          if (!confirm(`Em vẫn còn ${warnParts.join(' và ')}.\n\nBấm OK để nộp bài ngay, hoặc Cancel để kiểm tra lại.`)) {
+            const firstProblem = quizData.find(q => !isQuestionAnswered(q) || flaggedQuestionIds.has(String(q.id)));
+            if (firstProblem) scrollToQuestion(firstProblem.id);
+            return;
+          }
+        }
+      }
 
       submitted = true;
-      nameInput.disabled = true;
-      nameInput.style.opacity = '0.6';
+      if (timerInterval) clearInterval(timerInterval);
+      if (nameInput) {
+        nameInput.disabled = true;
+        nameInput.style.opacity = '0.6';
+      }
 
       let score = 0;
       let wrongAnswersList = [];
+      let resolvedCount = 0;
 
       quizData.forEach((q, index) => {
         const res = evaluateQuestion(q, index);
         score += res.score;
-        if (!res.isCorrect && res.wrongDetail) {
-          wrongAnswersList.push(res.wrongDetail);
+        if (!res.isCorrect) {
+          recordMistake(q);
+          if (res.wrongDetail) wrongAnswersList.push(res.wrongDetail);
+        } else if (isMistakeQuiz) {
+          if (resolveMistake(q.id)) resolvedCount++;
         }
       });
 
+      try { localStorage.removeItem(getDraftKey()); } catch (e) {}
+      updateAutosaveStatus('Đã nộp bài', true);
+      renderQuestionPalette();
       triggerKaTeX(document.getElementById('quizContainer'));
 
       let finalScore = score;
       let maxScore = quizData.length;
-      if (quizFile.startsWith('baitap_')) {
+      if (isMistakeQuiz) {
+        finalScore = parseFloat(((score / Math.max(1, quizData.length)) * 10).toFixed(2));
+        maxScore = 10;
+      } else if (quizFile.startsWith('baitap_')) {
         finalScore = score * 2;
         maxScore = 10;
       }
@@ -2440,23 +3138,28 @@
         pct >= 70 ? 'var(--correct)' : pct >= 40 ? 'var(--warning)' : 'var(--wrong)';
 
       let msg = '';
-      if (pct === 100) msg = 'Kết quả xuất sắc, hoàn thành trọn vẹn bài tập.';
-      else if (pct >= 70) msg = 'Kết quả tốt, xem lại các câu sai để nắm chắc hơn.';
-      else if (pct >= 40) msg = 'Mức khá, nên xem kỹ phần lời giải bên dưới.';
-      else msg = 'Cần ôn tập lại lý thuyết trước khi làm lại.';
+      if (isMistakeQuiz && resolvedCount > 0) {
+        msg = `Đã khắc phục ${resolvedCount} câu sai khỏi Sổ tay. `;
+      }
+      if (pct === 100) msg += 'Kết quả xuất sắc, hoàn thành trọn vẹn bài tập.';
+      else if (pct >= 70) msg += 'Kết quả tốt, xem lại các câu sai để nắm chắc hơn.';
+      else if (pct >= 40) msg += 'Mức khá, nên xem kỹ phần lời giải bên dưới.';
+      else msg += 'Cần ôn tập lại lý thuyết trước khi làm lại.';
       document.getElementById('scoreMsg').textContent = msg;
 
       banner.classList.add('visible');
       banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-      sendResultToTelegram(studentName, finalScore, maxScore, wrongAnswersList);
+      if (!isMistakeQuiz) {
+        sendResultToTelegram(studentName, finalScore, maxScore, wrongAnswersList);
 
-      if (currentSession && currentSession.gmail) {
-        let dbScore = finalScore;
-        if (!quizFile.startsWith('baitap_') && maxScore > 0) {
-          dbScore = (score / maxScore) * 10;
+        if (currentSession && currentSession.gmail) {
+          let dbScore = finalScore;
+          if (!quizFile.startsWith('baitap_') && maxScore > 0) {
+            dbScore = (score / maxScore) * 10;
+          }
+          saveProgressToSupabase(currentSession.gmail, quizFile, 'quiz', parseFloat(dbScore.toFixed(2)));
         }
-        saveProgressToSupabase(currentSession.gmail, quizFile, 'quiz', parseFloat(dbScore.toFixed(2)));
       }
 
       document.getElementById('submitBtn').style.display = 'none';
@@ -2465,7 +3168,21 @@
 
     function retryQuiz() {
       submitted = false;
+      flaggedQuestionIds.clear();
+      checkedQuestionIds.clear();
+      try { localStorage.removeItem(getDraftKey()); } catch (e) {}
       document.getElementById('scoreBanner').classList.remove('visible');
+
+      if (isMistakeQuiz) {
+        const gradeMatch = quizFile.match(/^mistakes_(\d{2})$/);
+        const gradeFilter = gradeMatch ? gradeMatch[1] : '';
+        const remaining = getMistakesList().filter(m => !gradeFilter || String(m.grade) === gradeFilter);
+        if (remaining.length === 0) {
+          loadQuizFromSupabase();
+          return;
+        }
+        quizData = remaining;
+      }
 
       if (isReviewMode) {
         const reviewBar = document.getElementById('reviewBar');
@@ -2476,7 +3193,7 @@
         const submitBtn = document.getElementById('submitBtn');
         if (submitBtn) {
           submitBtn.style.display = '';
-          submitBtn.disabled = true;
+          submitBtn.disabled = false;
         }
       }
 
@@ -2488,6 +3205,7 @@
         nameInput.style.opacity = '1';
       }
       renderQuiz(quizData);
+      updateAutosaveStatus('Tự lưu nháp', false);
       startTimer();
     }
   </script>
