@@ -677,12 +677,12 @@
       display: block;
     }
 
-    /* ── CHAPTER CARDS GRID ── */
+    /* ── CHAPTER CARDS GRID (PINUI READER CARD STYLE) ── */
     .cards-list {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
-      align-items: start;
+      align-items: stretch;
     }
 
     @media (min-width: 1360px) {
@@ -693,6 +693,7 @@
 
     .ch-card-wrapper {
       width: 100%;
+      display: flex;
     }
 
     .ch-card-glow {
@@ -700,19 +701,31 @@
     }
 
     .ch-card {
+      width: 100%;
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 18px;
       overflow: hidden;
-      transition: border-color 150ms var(--ease);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 4px 14px rgba(31, 27, 22, 0.03);
+      transition: border-color 180ms var(--ease), transform 180ms var(--ease), box-shadow 180ms var(--ease);
+    }
+
+    html[data-theme="dark"] .ch-card {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 8px 20px rgba(0, 0, 0, 0.28);
     }
 
     .ch-card:hover {
       border-color: var(--border-strong);
+      transform: translateY(-2px);
     }
 
     .ch-card.open {
-      border-color: var(--border-strong);
+      border-color: var(--accent);
     }
 
     .ch-card.locked {
@@ -720,17 +733,370 @@
       cursor: not-allowed;
     }
 
+    .ch-card.locked:hover {
+      transform: none;
+    }
+
     .ch-card.locked * {
       pointer-events: none;
     }
 
     .ch-header {
-      padding: 20px;
+      padding: 20px 20px 14px;
       display: flex;
       align-items: flex-start;
       gap: 14px;
-      cursor: pointer;
       user-select: none;
+    }
+
+    /* Excerpt preview inside collapsed card + floating glass Open pill */
+    .ch-excerpt-preview {
+      position: relative;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 12px 18px 46px;
+      min-height: 112px;
+      overflow: hidden;
+    }
+
+    .ch-preview-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .ch-preview-line {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: var(--text-secondary);
+    }
+
+    .ch-preview-line .pl-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 11px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .ch-preview-line .pl-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ch-open-pill {
+      position: absolute;
+      left: 50%;
+      bottom: 11px;
+      transform: translateX(-50%);
+      height: 30px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(253, 251, 247, 0.86);
+      backdrop-filter: blur(14px) saturate(1.4);
+      -webkit-backdrop-filter: blur(14px) saturate(1.4);
+      border: 1px solid var(--border-strong);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 4px 12px rgba(31, 27, 22, 0.08);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: border-color 150ms var(--ease), color 150ms var(--ease), background-color 150ms var(--ease);
+    }
+
+    html[data-theme="dark"] .ch-open-pill {
+      background: rgba(26, 30, 40, 0.82);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 6px 16px rgba(0, 0, 0, 0.42);
+    }
+
+    .ch-card:hover .ch-open-pill {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .ch-open-pill svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* ── OPENED CHAPTER READER DIALOG ── */
+    .ch-reader-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(15, 14, 12, 0.42);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    html[data-theme="dark"] .ch-reader-backdrop {
+      background: rgba(5, 7, 12, 0.68);
+    }
+
+    .ch-reader-backdrop.open {
+      display: flex;
+    }
+
+    .ch-reader-dialog {
+      position: relative;
+      width: min(740px, calc(100vw - 24px));
+      height: min(84vh, 760px);
+      border-radius: 26px;
+      background: rgba(253, 251, 247, 0.95);
+      backdrop-filter: blur(22px) saturate(1.45);
+      -webkit-backdrop-filter: blur(22px) saturate(1.45);
+      border: 1px solid var(--border-strong);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 24px 60px rgba(31, 27, 22, 0.18);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      will-change: transform, opacity;
+    }
+
+    html[data-theme="dark"] .ch-reader-dialog {
+      background: rgba(17, 20, 28, 0.93);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 28px 72px rgba(0, 0, 0, 0.6);
+    }
+
+    .ch-reader-head {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .ch-reader-head-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .ch-reader-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+
+    .ch-reader-title {
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      line-height: 1.28;
+    }
+
+    .ch-reader-close {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border-strong);
+      background: var(--raised);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: border-color 150ms var(--ease), color 150ms var(--ease), background-color 150ms var(--ease), transform 120ms ease;
+    }
+
+    .ch-reader-close:hover {
+      border-color: var(--accent);
+      color: var(--text);
+      background: var(--card);
+    }
+
+    .ch-reader-close:active {
+      transform: scale(0.94);
+    }
+
+    .ch-reader-body-wrap {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .ch-reader-edge-top,
+    .ch-reader-edge-bot {
+      position: absolute;
+      left: 0;
+      right: 0;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .ch-reader-edge-top {
+      top: 0;
+      height: 18px;
+      background: linear-gradient(to bottom, var(--card), transparent);
+    }
+
+    .ch-reader-edge-bot {
+      bottom: 0;
+      height: 76px;
+      background: linear-gradient(to top, var(--card) 22%, transparent);
+    }
+
+    .ch-reader-body {
+      height: 100%;
+      overflow-y: auto;
+      padding: 16px 22px 86px;
+    }
+
+    .ch-reader-lessons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ch-reader-toolbar {
+      position: absolute;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      z-index: 8;
+      height: 44px;
+      padding: 4px 6px;
+      border-radius: 999px;
+      background: rgba(253, 251, 247, 0.88);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      border: 1px solid var(--border-strong);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 24px rgba(31, 27, 22, 0.14);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      max-width: calc(100% - 24px);
+    }
+
+    html[data-theme="dark"] .ch-reader-toolbar {
+      background: rgba(26, 30, 40, 0.86);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 10px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    .ch-rt-btn {
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      transition: background-color 140ms ease, color 140ms ease, opacity 140ms ease;
+    }
+
+    .ch-rt-btn:hover:not(:disabled) {
+      background: var(--raised);
+      color: var(--accent);
+    }
+
+    .ch-rt-btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .ch-rt-sep {
+      width: 1px;
+      height: 18px;
+      background: var(--border-strong);
+      flex-shrink: 0;
+      margin: 0 4px;
+    }
+
+    .ch-rt-progress {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 8px;
+    }
+
+    .ch-rt-track {
+      width: 64px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--raised);
+      overflow: hidden;
+    }
+
+    .ch-rt-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      border-radius: 999px;
+      transition: width 260ms var(--ease);
+    }
+
+    .ch-rt-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+      .ch-reader-dialog {
+        width: calc(100vw - 16px);
+        height: 86vh;
+        border-radius: 22px;
+      }
+
+      .ch-reader-head {
+        padding: 16px 16px 12px;
+      }
+
+      .ch-reader-title {
+        font-size: 17px;
+      }
+
+      .ch-reader-body {
+        padding: 12px 14px 82px;
+      }
+
+      .ch-rt-track {
+        width: 44px;
+      }
+
+      .ch-rt-btn {
+        padding: 0 9px;
+        font-size: 11.5px;
+      }
     }
 
     .ch-badge {
@@ -841,42 +1207,19 @@
       stroke: currentColor;
       stroke-width: 1.5;
       fill: none;
-      transition: transform 200ms var(--ease);
-    }
-
-    .ch-card.open .ch-arrow svg {
-      transform: rotate(180deg);
     }
 
     /* ── LESSON LIST ── */
-    .lesson-list {
-      max-height: 0;
-      overflow: hidden;
-      opacity: 0;
-      border-top: 0 solid var(--border);
-      background: var(--bg);
-      transition: max-height 360ms var(--ease), opacity 220ms var(--ease);
-    }
-
-    .ch-card.open .lesson-list {
-      max-height: 4000px;
-      opacity: 1;
-      border-top-width: 1px;
-    }
-
-    .lesson-inner {
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
     .lesson-row {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      transition: border-color 150ms var(--ease);
+      border-radius: 10px;
+      padding: 13px 14px;
+      transition: border-color 150ms var(--ease), background-color 150ms var(--ease);
+    }
+
+    .ch-reader-lessons .lesson-row {
+      background: var(--bg);
     }
 
     .lesson-row:hover {
@@ -1708,6 +2051,46 @@
     </div>
   </div>
 
+  <!-- ── CHAPTER READER MODAL (PINUI READER CARD MORPH) ── -->
+  <div id="chapterReaderBackdrop" class="ch-reader-backdrop" onclick="if(event.target===this) closeChapterReader()">
+    <div id="chapterReaderDialog" class="ch-reader-dialog" role="dialog" aria-modal="true" aria-labelledby="chReaderTitle">
+      <div class="ch-reader-head">
+        <div class="ch-reader-head-left">
+          <div class="ch-badge" id="chReaderBadge">I</div>
+          <div style="min-width:0; flex:1;">
+            <div class="ch-reader-kicker" id="chReaderKicker">Lớp 12 · Chương I</div>
+            <h3 class="ch-reader-title" id="chReaderTitle">Tên chương</h3>
+            <div class="tags" id="chReaderTags" style="margin-top:8px;"></div>
+          </div>
+        </div>
+        <button type="button" class="ch-reader-close" id="chReaderCloseBtn" onclick="closeChapterReader()" aria-label="Đóng chương">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="ch-reader-body-wrap">
+        <div class="ch-reader-edge-top" aria-hidden="true"></div>
+        <div class="ch-reader-body" id="chReaderBody">
+          <div class="ch-reader-lessons" id="chReaderLessons"></div>
+        </div>
+        <div class="ch-reader-edge-bot" aria-hidden="true"></div>
+      </div>
+
+      <div class="ch-reader-toolbar" role="toolbar" aria-label="Điều hướng chương">
+        <button type="button" class="ch-rt-btn" id="chReaderPrevBtn" onclick="stepChapterReader(-1)">← Trước</button>
+        <span class="ch-rt-sep" aria-hidden="true"></span>
+        <div class="ch-rt-progress" title="Tiến độ hoàn thành chương">
+          <div class="ch-rt-track">
+            <div class="ch-rt-fill" id="chReaderProgFill"></div>
+          </div>
+          <span class="ch-rt-count" id="chReaderProgText">0/0</span>
+        </div>
+        <span class="ch-rt-sep" aria-hidden="true"></span>
+        <button type="button" class="ch-rt-btn" id="chReaderNextBtn" onclick="stepChapterReader(1)">Sau →</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
       const path = window.location.pathname;
@@ -2054,21 +2437,245 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    let chapterReaderRegistry = {};
+    let gradeCardOrder = {};
+    let currentReaderCardKey = null;
+    let isReaderAnimating = false;
+
     function toggleCard(card) {
-      const list = card.querySelector('.lesson-list');
-      const isOpen = card.classList.contains('open');
-      card.closest('.cards-list').querySelectorAll('.ch-card.open').forEach(c => {
-        if (c !== card) {
-          c.classList.remove('open');
-          c.querySelector('.lesson-list').style.maxHeight = '0';
+      openChapterReader(card);
+    }
+
+    function escapeHtmlAttr(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function populateChapterReader(entry, highlightLessonKey) {
+      const badgeEl = document.getElementById('chReaderBadge');
+      const kickerEl = document.getElementById('chReaderKicker');
+      const titleEl = document.getElementById('chReaderTitle');
+      const tagsEl = document.getElementById('chReaderTags');
+      const lessonsEl = document.getElementById('chReaderLessons');
+      const bodyEl = document.getElementById('chReaderBody');
+      const progFill = document.getElementById('chReaderProgFill');
+      const progText = document.getElementById('chReaderProgText');
+      const prevBtn = document.getElementById('chReaderPrevBtn');
+      const nextBtn = document.getElementById('chReaderNextBtn');
+      if (!badgeEl || !lessonsEl) return;
+
+      badgeEl.textContent = entry.badge;
+      badgeEl.className = 'ch-badge' + (entry.isExam ? ' is-exam' : '');
+      kickerEl.textContent = `${entry.gradeLabel} · ${entry.chNum}`;
+      titleEl.textContent = entry.chTitle;
+      tagsEl.innerHTML = entry.tagsHTML || '';
+      lessonsEl.innerHTML = entry.lessonsHTML || '';
+
+      const total = entry.totalCount || 0;
+      const done = entry.completedCount || 0;
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      if (progFill) progFill.style.width = pct + '%';
+      if (progText) progText.textContent = `${done}/${total}`;
+
+      const orderList = gradeCardOrder[entry.gIdx] || [];
+      const idxInGrade = orderList.indexOf(entry.cardKey);
+      if (prevBtn) prevBtn.disabled = idxInGrade <= 0;
+      if (nextBtn) nextBtn.disabled = idxInGrade < 0 || idxInGrade >= orderList.length - 1;
+
+      if (bodyEl) bodyEl.scrollTop = 0;
+
+      if (highlightLessonKey && bodyEl) {
+        setTimeout(() => {
+          const row = lessonsEl.querySelector(`.lesson-row[data-lesson-key="${highlightLessonKey}"]`);
+          if (row) {
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            row.classList.add('flash-highlight');
+            setTimeout(() => row.classList.remove('flash-highlight'), 1900);
+          }
+        }, 120);
+      }
+    }
+
+    function openChapterReader(cardElOrKey, highlightLessonKey) {
+      if (isReaderAnimating) return;
+      const cardKey = typeof cardElOrKey === 'string'
+        ? cardElOrKey
+        : (cardElOrKey && cardElOrKey.getAttribute ? cardElOrKey.getAttribute('data-card-key') : null);
+      if (!cardKey || !chapterReaderRegistry[cardKey]) return;
+
+      const entry = chapterReaderRegistry[cardKey];
+      const sourceCard = (typeof cardElOrKey === 'object' && cardElOrKey)
+        ? cardElOrKey
+        : document.querySelector(`.ch-card[data-card-key="${cardKey}"]`);
+
+      const openPill = sourceCard ? sourceCard.querySelector('.ch-open-pill') : null;
+      if (openPill && window.PinUI && typeof window.PinUI.pressButton === 'function') {
+        window.PinUI.pressButton(openPill, 0.08);
+      }
+
+      const cardRect = (sourceCard && typeof sourceCard.getBoundingClientRect === 'function')
+        ? sourceCard.getBoundingClientRect()
+        : null;
+
+      currentReaderCardKey = cardKey;
+      populateChapterReader(entry, highlightLessonKey);
+
+      const backdrop = document.getElementById('chapterReaderBackdrop');
+      const dialog = document.getElementById('chapterReaderDialog');
+      const bodyEl = document.getElementById('chReaderBody');
+      if (!backdrop || !dialog) return;
+
+      const alreadyOpen = backdrop.classList.contains('open');
+      if (!alreadyOpen) {
+        backdrop.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!alreadyOpen && !reducedMotion && cardRect && cardRect.width > 0 && typeof dialog.animate === 'function') {
+        isReaderAnimating = true;
+        const dlgRect = dialog.getBoundingClientRect();
+        const dx = (cardRect.left + cardRect.width / 2) - (dlgRect.left + dlgRect.width / 2);
+        const dy = (cardRect.top + cardRect.height / 2) - (dlgRect.top + dlgRect.height / 2);
+        const sx = Math.max(0.28, cardRect.width / Math.max(1, dlgRect.width));
+        const sy = Math.max(0.18, cardRect.height / Math.max(1, dlgRect.height));
+
+        backdrop.animate([{ opacity: 0 }, { opacity: 1 }], {
+          duration: 240,
+          easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
+        });
+
+        const morph = dialog.animate(
+          [
+            {
+              transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`,
+              opacity: 0.72,
+              borderRadius: '20px'
+            },
+            {
+              transform: 'translate(0px, 0px) scale(1, 1)',
+              opacity: 1,
+              borderRadius: '26px'
+            }
+          ],
+          {
+            duration: 380,
+            easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
+          }
+        );
+
+        if (bodyEl && typeof bodyEl.animate === 'function') {
+          bodyEl.animate(
+            [
+              { opacity: 0, transform: 'translateY(10px)' },
+              { opacity: 1, transform: 'translateY(0px)' }
+            ],
+            {
+              duration: 320,
+              delay: 70,
+              easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+              fill: 'backwards'
+            }
+          );
         }
-      });
-      if (isOpen) {
-        card.classList.remove('open');
-        list.style.maxHeight = '0';
+
+        const unlock = () => { isReaderAnimating = false; };
+        morph.finished.then(unlock).catch(unlock);
+        setTimeout(unlock, 460);
+      }
+    }
+
+    function stepChapterReader(delta) {
+      if (!currentReaderCardKey || !chapterReaderRegistry[currentReaderCardKey]) return;
+      const entry = chapterReaderRegistry[currentReaderCardKey];
+      const orderList = gradeCardOrder[entry.gIdx] || [];
+      const curIdx = orderList.indexOf(currentReaderCardKey);
+      const nextIdx = curIdx + delta;
+      if (nextIdx < 0 || nextIdx >= orderList.length) return;
+
+      const nextKey = orderList[nextIdx];
+      const nextEntry = chapterReaderRegistry[nextKey];
+      if (!nextEntry) return;
+
+      currentReaderCardKey = nextKey;
+      populateChapterReader(nextEntry, null);
+
+      const bodyEl = document.getElementById('chReaderBody');
+      const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reducedMotion && bodyEl && typeof bodyEl.animate === 'function') {
+        bodyEl.animate(
+          [
+            { opacity: 0.35, transform: `translateX(${delta > 0 ? 18 : -18}px)` },
+            { opacity: 1, transform: 'translateX(0px)' }
+          ],
+          { duration: 220, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+        );
+      }
+    }
+
+    function closeChapterReader() {
+      const backdrop = document.getElementById('chapterReaderBackdrop');
+      const dialog = document.getElementById('chapterReaderDialog');
+      if (!backdrop || !backdrop.classList.contains('open') || isReaderAnimating) return;
+
+      const closeBtn = document.getElementById('chReaderCloseBtn');
+      if (closeBtn && window.PinUI && typeof window.PinUI.pressButton === 'function') {
+        window.PinUI.pressButton(closeBtn, 0.08);
+      }
+
+      const sourceCard = currentReaderCardKey
+        ? document.querySelector(`.ch-card[data-card-key="${currentReaderCardKey}"]`)
+        : null;
+      const cardRect = (sourceCard && typeof sourceCard.getBoundingClientRect === 'function')
+        ? sourceCard.getBoundingClientRect()
+        : null;
+
+      const finishClose = () => {
+        backdrop.classList.remove('open');
+        if (dialog) {
+          dialog.style.opacity = '';
+          dialog.style.transform = '';
+        }
+        backdrop.style.opacity = '';
+        document.body.style.overflow = '';
+        currentReaderCardKey = null;
+        isReaderAnimating = false;
+      };
+
+      const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reducedMotion && dialog && typeof dialog.animate === 'function' && cardRect && cardRect.width > 0) {
+        isReaderAnimating = true;
+        const dlgRect = dialog.getBoundingClientRect();
+        const dx = (cardRect.left + cardRect.width / 2) - (dlgRect.left + dlgRect.width / 2);
+        const dy = (cardRect.top + cardRect.height / 2) - (dlgRect.top + dlgRect.height / 2);
+        const sx = Math.max(0.28, cardRect.width / Math.max(1, dlgRect.width));
+        const sy = Math.max(0.18, cardRect.height / Math.max(1, dlgRect.height));
+
+        backdrop.animate([{ opacity: 1 }, { opacity: 0 }], {
+          duration: 240,
+          easing: 'cubic-bezier(0.32, 0.72, 0, 1)',
+          fill: 'forwards'
+        });
+
+        const morphOut = dialog.animate(
+          [
+            { transform: 'translate(0px, 0px) scale(1, 1)', opacity: 1, borderRadius: '26px' },
+            { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`, opacity: 0, borderRadius: '20px' }
+          ],
+          {
+            duration: 270,
+            easing: 'cubic-bezier(0.32, 0.72, 0, 1)',
+            fill: 'forwards'
+          }
+        );
+
+        morphOut.finished.then(finishClose).catch(finishClose);
+        setTimeout(() => { if (isReaderAnimating) finishClose(); }, 340);
       } else {
-        card.classList.add('open');
-        list.style.maxHeight = list.scrollHeight + 'px';
+        finishClose();
       }
     }
 
@@ -2149,11 +2756,35 @@
       return cleaned || 'CH';
     }
 
+    const SVG_EXPAND_ICON = '<svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
+
+    function buildCardPreviewHTML(items, isExam, isLocked, studentLop) {
+      const lines = (items || []).slice(0, 3).map((item) => `
+        <div class="ch-preview-line">
+          <span class="pl-num">${escapeHtmlAttr(item.num)}</span>
+          <span class="pl-title">${escapeHtmlAttr(item.title)}</span>
+        </div>
+      `).join('');
+
+      const pillLabel = isLocked
+        ? `${ICONS.lock} <span>Lớp ${escapeHtmlAttr(studentLop || '')}</span>`
+        : `<span>${isExam ? 'Mở bộ đề' : 'Mở chương'}</span>${SVG_EXPAND_ICON}`;
+
+      return `
+        <div class="ch-excerpt-preview">
+          <div class="ch-preview-lines">${lines}</div>
+          <div class="ch-open-pill">${pillLabel}</div>
+        </div>
+      `;
+    }
+
     function renderAll(data) {
       const tabsEl = document.getElementById('gradeTabs');
       const contentEl = document.getElementById('gradeContent');
       tabsEl.innerHTML = '';
       contentEl.innerHTML = '';
+      chapterReaderRegistry = {};
+      gradeCardOrder = {};
 
       const session = getSession();
       const studentLop = session ? session.lop : null;
@@ -2219,6 +2850,7 @@
         const cardsList = document.createElement('div');
         cardsList.className = 'cards-list';
         let completedInGradeCount = 0;
+        gradeCardOrder[gIdx] = [];
 
         const examsToRender = mockExams && mockExams.length > 0 ? mockExams : DEFAULT_MOCK_EXAMS;
         const matchingExams = examsToRender.filter(exam => {
@@ -2288,15 +2920,37 @@
               </div>`;
           }).join('');
 
+          const examCardKey = `g${gIdx}_exam`;
+          const examPreviewItems = matchingExams.slice(0, 3).map((ex, i) => ({
+            num: String(i + 1).padStart(2, '0'),
+            title: ex.title
+          }));
+          const examTagsHTML = `<span class="tag"><span class="tag-dot" style="background:var(--accent)"></span>Cấu trúc THPT Quốc gia</span>`;
+
+          if (!isLockedGrade) {
+            chapterReaderRegistry[examCardKey] = {
+              cardKey: examCardKey,
+              gIdx,
+              badge: 'ĐỀ',
+              isExam: true,
+              gradeLabel: shortGradeLabel,
+              chNum: 'Luyện đề tổng hợp',
+              chTitle: `Đề ôn thi thử ${shortGradeLabel}`,
+              tagsHTML: examTagsHTML,
+              lessonsHTML,
+              completedCount: completedMockCount,
+              totalCount: matchingExams.length
+            };
+            gradeCardOrder[gIdx].push(examCardKey);
+          }
+
           card.innerHTML = `
             <div class="ch-header">
               <div class="ch-badge is-exam">ĐỀ</div>
               <div class="ch-info">
                 <div class="ch-num">Luyện đề tổng hợp</div>
                 <div class="ch-title">Đề ôn thi thử ${isLockedGrade ? ICONS.lock : ''}</div>
-                <div class="tags">
-                  <span class="tag"><span class="tag-dot" style="background:var(--accent)"></span>Cấu trúc THPT Quốc gia</span>
-                </div>
+                <div class="tags">${examTagsHTML}</div>
                 ${isLockedGrade ? `
                 <div class="chapter-progress-text" style="color:var(--wrong);">Dành riêng cho lớp ${studentLop || ''}</div>
                 ` : `
@@ -2306,9 +2960,9 @@
                 <div class="chapter-progress-text">${completedMockCount}/${matchingExams.length} đề hoàn thành</div>
                 `}
               </div>
-              <div class="ch-arrow">${isLockedGrade ? ICONS.lock : ICONS.chevron}</div>
+              ${isLockedGrade ? `<div class="ch-arrow">${ICONS.lock}</div>` : ''}
             </div>
-            ${isLockedGrade ? '' : `<div class="lesson-list"><div class="lesson-inner">${lessonsHTML}</div></div>`}`;
+            ${buildCardPreviewHTML(examPreviewItems, true, isLockedGrade, studentLop)}`;
 
           wrapper.appendChild(card);
           cardsList.appendChild(wrapper);
@@ -2454,6 +3108,29 @@
             card.setAttribute('onclick', 'toggleCard(this)');
           }
 
+          const chCardKey = `g${gIdx}_c${chIdx}`;
+          const chPreviewItems = (ch.lessons || []).slice(0, 3).map((l) => ({
+            num: l.num,
+            title: l.title
+          }));
+
+          if (!isLockedGrade) {
+            chapterReaderRegistry[chCardKey] = {
+              cardKey: chCardKey,
+              gIdx,
+              badge: chapterCode,
+              isExam: false,
+              gradeLabel: shortGradeLabel,
+              chNum: ch.num,
+              chTitle: ch.title,
+              tagsHTML,
+              lessonsHTML,
+              completedCount,
+              totalCount: totalLessons
+            };
+            gradeCardOrder[gIdx].push(chCardKey);
+          }
+
           card.innerHTML = `
             <div class="ch-header">
               <div class="ch-badge">${chapterCode}</div>
@@ -2470,9 +3147,9 @@
                 <div class="chapter-progress-text">${completedCount}/${totalLessons} bài hoàn thành</div>
                 ` : '')}
               </div>
-              <div class="ch-arrow">${isLockedGrade ? ICONS.lock : ICONS.chevron}</div>
+              ${isLockedGrade ? `<div class="ch-arrow">${ICONS.lock}</div>` : ''}
             </div>
-            ${isLockedGrade ? '' : `<div class="lesson-list"><div class="lesson-inner">${lessonsHTML}</div></div>`}`;
+            ${buildCardPreviewHTML(chPreviewItems, false, isLockedGrade, studentLop)}`;
 
           wrapper.appendChild(card);
           cardsList.appendChild(wrapper);
@@ -2522,6 +3199,11 @@
         section.appendChild(cardsList);
         contentEl.appendChild(section);
       });
+
+      const readerBackdrop = document.getElementById('chapterReaderBackdrop');
+      if (readerBackdrop && readerBackdrop.classList.contains('open') && currentReaderCardKey && chapterReaderRegistry[currentReaderCardKey]) {
+        populateChapterReader(chapterReaderRegistry[currentReaderCardKey], null);
+      }
     }
 
     function openCardInGrade(gIdx, cardKey, lessonKey) {
@@ -2535,21 +3217,7 @@
           card.click();
           return;
         }
-        if (!card.classList.contains('open')) {
-          toggleCard(card);
-        }
-        setTimeout(() => {
-          if (lessonKey) {
-            const row = card.querySelector(`.lesson-row[data-lesson-key="${lessonKey}"]`);
-            if (row) {
-              row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              row.classList.add('flash-highlight');
-              setTimeout(() => row.classList.remove('flash-highlight'), 1800);
-              return;
-            }
-          }
-          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 180);
+        openChapterReader(card, lessonKey);
       }, 60);
     }
 
@@ -2680,6 +3348,39 @@
         }
         return;
       }
+      if (e.key === 'Escape') {
+        const videoModal = document.getElementById('videoModal');
+        if (videoModal && videoModal.classList.contains('visible')) {
+          e.preventDefault();
+          closeVideoModal();
+          return;
+        }
+        const readerBackdrop = document.getElementById('chapterReaderBackdrop');
+        const cmdBackdrop = document.getElementById('cmdPaletteBackdrop');
+        if (readerBackdrop && readerBackdrop.classList.contains('open') && (!cmdBackdrop || !cmdBackdrop.classList.contains('open'))) {
+          e.preventDefault();
+          closeChapterReader();
+          return;
+        }
+      }
+
+      const readerBackdrop = document.getElementById('chapterReaderBackdrop');
+      const cmdBackdrop = document.getElementById('cmdPaletteBackdrop');
+      if (readerBackdrop && readerBackdrop.classList.contains('open') && (!cmdBackdrop || !cmdBackdrop.classList.contains('open'))) {
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (tag !== 'input' && tag !== 'textarea') {
+          if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            stepChapterReader(-1);
+            return;
+          } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            stepChapterReader(1);
+            return;
+          }
+        }
+      }
+
       const backdrop = document.getElementById('cmdPaletteBackdrop');
       if (!backdrop || !backdrop.classList.contains('open')) return;
 
@@ -2754,7 +3455,8 @@
       const iframe = document.getElementById('videoPlayer');
       modal.classList.remove('visible');
       iframe.src = '';
-      document.body.style.overflow = '';
+      const readerBackdrop = document.getElementById('chapterReaderBackdrop');
+      document.body.style.overflow = (readerBackdrop && readerBackdrop.classList.contains('open')) ? 'hidden' : '';
     }
 
     function getSession() {
