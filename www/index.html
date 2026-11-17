@@ -4,27 +4,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zphysics - Hệ thống Vật lí THPT</title>
+  <title>Zphysics — Hệ thống Vật lí THPT</title>
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/auth.js?v=20261111_07"></script>
+  <link rel="stylesheet" href="assets/css/pinui.css">
+  <script src="assets/js/pinui.js"></script>
+  <script>PinUI.initTheme('light');</script>
   <style>
     :root {
-      --bg: #f0f4ff;
-      --card: rgba(255, 255, 255, 0.75);
-      --card-solid: #ffffff;
-      --glass: rgba(255, 255, 255, 0.55);
-      --border: rgba(255, 255, 255, 0.8);
-      --shadow: rgba(120, 140, 200, 0.18);
-      --text: #2d3561;
-      --muted: #8e97c5;
-      --teal: #2ec4b6;
+      --bg-deep: #f2ede4;
+      --bg: #f7f4ee;
+      --card: #fdfbf7;
+      --card-solid: #fdfbf7;
+      --raised: #efe9df;
+      --border: rgba(31, 27, 22, 0.08);
+      --border-strong: rgba(31, 27, 22, 0.14);
+      --shadow: rgba(31, 27, 22, 0.06);
+      --text: #1f1b16;
+      --text-secondary: #5e554a;
+      --muted: #7b7266;
+      --teal: #0d9488;
+      --accent: #0d9488;
+      --accent-hover: #0f766e;
+      --accent-subtle: rgba(13, 148, 136, 0.10);
+      --correct: #16a34a;
+      --wrong: #dc2626;
+      --warning: #d97706;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    * {
+    html[data-theme="dark"] {
+      --bg-deep: #07080d;
+      --bg: #0b0d14;
+      --card: #11141c;
+      --card-solid: #11141c;
+      --raised: #1a1e28;
+      --border: rgba(238, 240, 245, 0.08);
+      --border-strong: rgba(238, 240, 245, 0.14);
+      --shadow: rgba(0, 0, 0, 0.45);
+      --text: #eef0f5;
+      --text-secondary: #a3a9b8;
+      --muted: #7a8296;
+      --teal: #2dd4bf;
+      --accent: #2dd4bf;
+      --accent-hover: #14b8a6;
+      --accent-subtle: rgba(45, 212, 191, 0.12);
+      --correct: #4cc38a;
+      --wrong: #e5484d;
+      --warning: #f59e0b;
+    }
+
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -32,280 +67,534 @@
     }
 
     body {
-      font-family: 'Nunito', sans-serif;
+      font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
-      min-height: 100vh;
-      overflow-x: hidden;
       color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 180ms var(--ease), color 180ms var(--ease);
     }
 
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 10% 0%, #c8d8ff 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 90% 10%, #ffd6e8 0%, transparent 55%),
-        radial-gradient(ellipse 40% 50% at 80% 90%, #c8f5f2 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 10% 85%, #ffe8cc 0%, transparent 55%),
-        #f0f4ff;
-      pointer-events: none;
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
     }
 
-    .app {
-      position: relative;
-      z-index: 1;
-      max-width: 460px;
-      margin: 0 auto;
-      padding: 0 0 48px;
+    /* ── APP SHELL (DESKTOP SIDEBAR + FLUID CONTENT) ── */
+    .app-shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
       min-height: 100vh;
     }
 
-    /* ── HEADER ── */
-    .header {
-      padding: 52px 24px 6px;
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: var(--bg-deep);
+      border-right: 1px solid var(--border);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      z-index: 40;
+      overflow-y: auto;
+    }
+
+    .sidebar-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
+      position: relative;
     }
 
-    .header-left h2 {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      letter-spacing: 0.5px;
-    }
-
-    .header-left h1 {
-      font-size: 28px;
-      font-weight: 900;
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
       color: var(--text);
-      margin-top: 2px;
-      line-height: 1.2;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
     }
 
-    .header-left h1 span {
-      color: var(--teal);
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--text);
+      color: var(--bg);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .sidebar-user-line {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .plan-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--accent-subtle);
+      color: var(--accent);
     }
 
     .avatar-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: 18px;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
       background: var(--card);
-      border: 2px solid var(--border);
-      box-shadow: 0 4px 16px var(--shadow);
+      border: 1px solid var(--border-strong);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       cursor: pointer;
-      backdrop-filter: blur(12px);
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
       padding: 0;
       outline: none;
+      flex-shrink: 0;
+      transition: border-color 150ms var(--ease), transform 150ms var(--ease);
     }
 
     .avatar-btn:hover {
-      transform: scale(1.1) rotate(5deg);
-      box-shadow: 0 8px 24px var(--shadow);
+      border-color: var(--accent);
+    }
+
+    .avatar-btn:active {
+      transform: scale(0.97);
     }
 
     .avatar-btn img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 14px;
     }
 
-    /* ── GRADE TABS ── */
-    .grade-strip {
-      padding: 10px 20px 20px;
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .grade-strip::-webkit-scrollbar {
+    /* ── USER POPUP ── */
+    .user-popup {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 236px;
+      padding: 16px;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px var(--shadow);
+      border: 1px solid var(--border-strong);
+      z-index: 1000;
       display: none;
     }
 
-    .grade-pill {
-      flex-shrink: 0;
-      padding: 9px 22px;
-      border-radius: 50px;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      font-weight: 800;
+    .user-popup.visible {
+      display: block;
+    }
+
+    .user-popup-name {
       font-size: 14px;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      background: var(--glass);
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+      word-break: break-word;
+    }
+
+    .user-popup-email {
+      font-size: 12px;
       color: var(--muted);
-      border: 1.5px solid var(--border);
-      backdrop-filter: blur(10px);
+      margin-bottom: 8px;
+      word-break: break-all;
     }
 
-    .grade-pill.active {
-      background-size: 200% 200%;
-      animation: shimmer 3s ease infinite;
+    .user-popup-status {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      word-break: break-word;
     }
 
-    .grade-pill.grade-0.active {
-      background-image: linear-gradient(135deg, #43a047, #81c784, #43a047);
-      color: #fff;
-      border-color: transparent;
-      box-shadow: 0 6px 20px rgba(67, 160, 71, 0.4);
-      transform: scale(1.05);
-    }
-
-    .grade-pill.grade-1.active {
-      background-image: linear-gradient(135deg, #f9a825, #ffd54f, #f9a825);
-      color: #fff;
-      border-color: transparent;
-      box-shadow: 0 6px 20px rgba(249, 168, 37, 0.4);
-      transform: scale(1.05);
-    }
-
-    .grade-pill.grade-2.active {
-      background-image: linear-gradient(135deg, #e53935, #ef9a9a, #e53935);
-      color: #fff;
-      border-color: transparent;
-      box-shadow: 0 6px 20px rgba(229, 57, 53, 0.4);
-      transform: scale(1.05);
-    }
-
-    /* ── SECTION LABEL ── */
-    .section-label {
-      padding: 4px 24px 14px;
+    .btn-dashboard-open,
+    .premium-btn-popup,
+    .logout-btn {
+      width: 100%;
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease);
     }
 
-    .section-label h3 {
-      font-size: 19px;
-      font-weight: 900;
+    .btn-dashboard-open {
+      background: var(--raised);
+      border: 1px solid var(--border);
       color: var(--text);
     }
 
-    /* ── CHAPTER CARDS ── */
-    .cards-list {
-      padding: 0 16px;
+    .btn-dashboard-open:hover {
+      border-color: var(--border-strong);
+    }
+
+    .premium-btn-popup {
+      background: var(--accent-subtle);
+      border: 1px solid rgba(13, 148, 136, 0.25);
+      color: var(--accent);
+    }
+
+    .premium-btn-popup.is-active {
+      background: var(--raised);
+      border-color: var(--border);
+      color: var(--text-secondary);
+      pointer-events: none;
+    }
+
+    .logout-btn {
+      margin-bottom: 0;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--wrong);
+    }
+
+    .logout-btn:hover {
+      background: rgba(220, 38, 38, 0.08);
+      border-color: rgba(220, 38, 38, 0.3);
+    }
+
+    /* ── SIDEBAR GROUPS ── */
+    .sidebar-group-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+
+    .grade-strip {
+      width: 100%;
+      --seg-count: 3;
+      --seg-index: 0;
+    }
+
+    .grade-pill {
+      height: 32px;
+      padding: 0 4px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .grade-pill:hover {
+      color: var(--text);
+    }
+
+    .grade-pill.active {
+      color: var(--text);
+    }
+
+    .sidebar-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-nav-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 4px;
+    }
+
+    .sidebar-nav-btn {
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      text-decoration: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 150ms var(--ease), color 150ms var(--ease);
+    }
+
+    .sidebar-nav-btn:hover {
+      background: var(--raised);
+      color: var(--text);
+    }
+
+    /* ── THEME TOGGLE ── */
+    .theme-toggle-wrap {
+      display: none;
+    }
+
+    .theme-toggle {
+      width: 100%;
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease);
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--border-strong);
+      color: var(--text);
+    }
+
+    .theme-toggle-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-switch-track {
+      width: 32px;
+      height: 18px;
+      border-radius: 9px;
+      background: var(--raised);
+      border: 1px solid var(--border-strong);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .theme-toggle-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      transition: transform 150ms var(--ease);
+    }
+
+    body.premium-theme.premium-light .theme-toggle-knob {
+      transform: translateX(14px);
+    }
+
+    /* ── PREMIUM BANNER (SIDEBAR FOOTER FOR FREE USERS) ── */
+    .sidebar-footer {
+      margin-top: auto;
+    }
+
+    .premium-banner {
+      padding: 14px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      transition: border-color 150ms var(--ease);
+    }
+
+    .premium-banner:hover {
+      border-color: var(--accent);
+    }
+
+    .premium-banner-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .premium-banner-icon {
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .premium-banner-text h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .premium-banner-text p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+      line-height: 1.45;
+    }
+
+    .premium-banner-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 30px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* ── MAIN CONTENT AREA ── */
+    .main-content {
+      padding: 32px 40px 64px;
+      max-width: 1280px;
+      width: 100%;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .section-label h3 {
+      font-size: 26px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .section-summary {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .grade-section {
+      display: none;
+    }
+
+    .grade-section.active {
+      display: block;
+    }
+
+    /* ── CHAPTER CARDS GRID ── */
+    .cards-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (min-width: 1360px) {
+      .cards-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .ch-card-wrapper {
+      width: 100%;
+    }
+
+    .ch-card-glow {
+      display: none;
     }
 
     .ch-card {
-      border-radius: 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
       overflow: hidden;
-      background: var(--card-solid);
-      box-shadow: 0 4px 24px var(--shadow);
-      border: 1.5px solid var(--border);
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
-      animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      transition: border-color 150ms var(--ease);
     }
 
     .ch-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px var(--shadow);
+      border-color: var(--border-strong);
     }
 
-    .ch-card:nth-child(1) {
-      animation-delay: 0.04s;
+    .ch-card.open {
+      border-color: var(--border-strong);
     }
 
-    .ch-card:nth-child(2) {
-      animation-delay: 0.08s;
+    .ch-card.locked {
+      opacity: 0.65;
+      cursor: not-allowed;
     }
 
-    .ch-card:nth-child(3) {
-      animation-delay: 0.12s;
-    }
-
-    .ch-card:nth-child(4) {
-      animation-delay: 0.16s;
-    }
-
-    .ch-card:nth-child(5) {
-      animation-delay: 0.20s;
-    }
-
-    .ch-card:nth-child(6) {
-      animation-delay: 0.24s;
-    }
-
-    .ch-card:nth-child(7) {
-      animation-delay: 0.28s;
-    }
-
-    .ch-card:active {
-      transform: scale(0.98) translateY(0);
+    .ch-card.locked * {
+      pointer-events: none;
     }
 
     .ch-header {
-      padding: 16px 18px;
+      padding: 20px;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 14px;
       cursor: pointer;
       user-select: none;
     }
 
-    .ch-icon-wrap {
-      width: 56px;
-      height: 56px;
-      border-radius: 18px;
-      flex-shrink: 0;
+    .ch-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
-      overflow: visible;
+      flex-shrink: 0;
     }
 
-    .pill {
-      width: 38px;
-      height: 20px;
-      border-radius: 10px;
-      position: absolute;
-      transform-origin: center;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .pill-a {
-      transform: rotate(-30deg) translate(-4px, -4px);
-      opacity: 0.9;
-    }
-
-    .pill-b {
-      transform: rotate(50deg) translate(4px, 2px);
-      opacity: 0.85;
-      width: 22px;
-      height: 22px;
-      border-radius: 11px;
-    }
-
-    .pill-c {
-      transform: rotate(15deg) translate(0px, 6px);
-      opacity: 0.8;
-      width: 28px;
-      height: 14px;
-      border-radius: 7px;
-    }
-
-    .ch-card:hover .pill-a {
-      transform: rotate(-40deg) translate(-6px, -8px) scale(1.1);
-    }
-
-    .ch-card:hover .pill-b {
-      transform: rotate(65deg) translate(6px, 0px) scale(1.15);
-    }
-
-    .ch-card:hover .pill-c {
-      transform: rotate(5deg) translate(-2px, 8px) scale(1.05);
+    .ch-badge.is-exam {
+      background: var(--accent-subtle);
+      border-color: rgba(13, 148, 136, 0.25);
+      color: var(--accent);
     }
 
     .ch-info {
@@ -314,50 +603,86 @@
     }
 
     .ch-num {
-      font-size: 10px;
-      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
       color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
 
     .ch-title {
       font-size: 16px;
-      font-weight: 900;
+      font-weight: 600;
       color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      line-height: 1.35;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .tags {
       display: flex;
       gap: 6px;
-      margin-top: 8px;
+      margin-top: 10px;
       flex-wrap: wrap;
     }
 
     .tag {
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: 700;
-      border: 1.5px solid currentColor;
-      opacity: 0.85;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .chapter-progress-wrap {
+      width: 100%;
+      height: 4px;
+      background: var(--raised);
+      border-radius: 4px;
+      margin-top: 14px;
+      overflow: hidden;
+    }
+
+    .chapter-progress-bar {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+      transition: width 300ms var(--ease);
+    }
+
+    .chapter-progress-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
     }
 
     .ch-arrow {
       flex-shrink: 0;
+      color: var(--muted);
+      margin-top: 2px;
     }
 
     .ch-arrow svg {
-      width: 18px;
-      height: 18px;
-      stroke: var(--muted);
-      stroke-width: 2.5;
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 1.5;
       fill: none;
-      transition: 0.3s;
+      transition: transform 200ms var(--ease);
     }
 
     .ch-card.open .ch-arrow svg {
@@ -369,300 +694,188 @@
       max-height: 0;
       overflow: hidden;
       opacity: 0;
-      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-      background: rgba(240, 244, 255, 0.55);
+      border-top: 0 solid var(--border);
+      background: var(--bg);
+      transition: max-height 360ms var(--ease), opacity 220ms var(--ease);
     }
 
     .ch-card.open .lesson-list {
       max-height: 4000px;
       opacity: 1;
-      transition: max-height 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease 0.1s;
+      border-top-width: 1px;
     }
 
     .lesson-inner {
-      padding: 6px 14px 14px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    /* ── LESSON ROW ── */
     .lesson-row {
-      background: var(--card-solid);
-      border-radius: 18px;
-      box-shadow: 0 2px 10px rgba(120, 140, 200, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      overflow: hidden;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      transition: border-color 150ms var(--ease);
     }
 
     .lesson-row:hover {
-      box-shadow: 0 8px 24px var(--shadow);
-      transform: translateY(-2px) scale(1.01);
+      border-color: var(--border-strong);
     }
 
     .lesson-meta {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
+      justify-content: space-between;
       gap: 10px;
-      padding: 11px 14px 6px;
     }
 
-    .lesson-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
+    .lesson-meta-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .lesson-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 11px;
+      color: var(--muted);
+      padding-top: 2px;
       flex-shrink: 0;
     }
 
     .lesson-title {
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 500;
       color: var(--text);
+      line-height: 1.45;
       flex: 1;
-      line-height: 1.4;
     }
 
     .lesson-num {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
-      font-weight: 800;
-      color: var(--muted);
+      font-weight: 500;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--raised);
+      color: var(--text-secondary);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .lesson-num.is-vip {
+      background: var(--accent-subtle);
+      color: var(--accent);
+    }
+
+    .lesson-done-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      margin-left: 6px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(22, 163, 74, 0.12);
+      color: var(--correct);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      vertical-align: middle;
+    }
+
+    .lesson-done-tag.is-exam {
+      background: var(--accent-subtle);
+      color: var(--accent);
+    }
+
+    .exam-scheduled-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(217, 119, 6, 0.12);
+      border: 1px solid rgba(217, 119, 6, 0.3);
+      color: var(--warning);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
       white-space: nowrap;
     }
 
-    /* ── LINK BUTTONS ── */
     .lesson-links {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      padding: 0 14px 11px 32px;
+      margin-top: 10px;
+      padding-left: 24px;
     }
 
     .lnk {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 4px 11px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 800;
+      gap: 6px;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 6px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
       text-decoration: none;
-      transition: all 0.18s;
       white-space: nowrap;
-    }
-
-    .lnk svg {
-      width: 12px;
-      height: 12px;
-      flex-shrink: 0;
+      transition: border-color 150ms var(--ease), color 150ms var(--ease), background-color 150ms var(--ease);
     }
 
     .lnk:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.1);
+      border-color: var(--accent);
+      color: var(--text);
+      background: var(--card);
     }
 
-    /* Link colour variants */
-    .lnk-video {
-      background: #ffebee;
-      color: #c62828;
+    .lnk svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      stroke-width: 1.5;
+      fill: none;
+      flex-shrink: 0;
     }
 
-    .lnk-baiTap {
-      background: #e3f2fd;
-      color: #1565c0;
+    .lnk.lnk-disabled {
+      opacity: 0.4;
+      cursor: default;
+      pointer-events: none;
     }
 
-    .lnk-tracNghiem {
-      background: #fff3e0;
-      color: #e65100;
-    }
-
-    .lnk-dungSai {
-      background: #fce4ec;
-      color: #c62828;
-    }
-
-    .lnk-traLoiNgan {
-      background: #e8f5e9;
-      color: #2e7d32;
-    }
-
-    .lnk-phieuDapAn {
-      background: #ede7f6;
-      color: #4527a0;
-    }
-
-    .lnk-onTap {
-      background: #e0f7fa;
-      color: #00838f;
-    }
-    .lnk-luyenDe {
-      background: #f3e5f5;
-      color: #7b1fa2;
-    }
-
-    /* ── GRADE SECTIONS ── */
-    .grade-section {
-      display: none;
-    }
-
-    .grade-section.active {
-      display: block;
-      animation: sectionFadeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(24px) scale(0.95);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    @keyframes sectionFadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(15px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes shimmer {
-      0% {
-        background-position: 0% 50%;
-      }
-
-      50% {
-        background-position: 100% 50%;
-      }
-
-      100% {
-        background-position: 0% 50%;
-      }
-    }
-
-    /* ── LOADING STATE ── */
+    /* ── LOADING ── */
     .loading {
       text-align: center;
-      padding: 60px 24px;
+      padding: 64px 24px;
       color: var(--muted);
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 14px;
     }
 
-    .loading-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
+    .loading-spinner {
+      width: 24px;
+      height: 24px;
+      margin: 0 auto 12px;
+      border: 2px solid var(--border-strong);
+      border-top-color: var(--accent);
       border-radius: 50%;
-      background: var(--teal);
-      margin: 0 3px;
-      animation: bounce 1.2s infinite;
+      animation: spin 700ms linear infinite;
     }
 
-    .loading-dot:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .loading-dot:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes bounce {
-
-      0%,
-      80%,
-      100% {
-        transform: translateY(0);
-        opacity: 0.4;
-      }
-
-      40% {
-        transform: translateY(-8px);
-        opacity: 1;
-      }
-    }
-
-    /* ── RESPONSIVE DESIGN ── */
-    @media (min-width: 768px) {
-      .app {
-        max-width: 860px;
-        padding-bottom: 64px;
-      }
-
-      .header {
-        padding: 64px 32px 20px;
-      }
-
-      .header-left h1 {
-        font-size: 36px;
-        margin-top: 4px;
-      }
-
-      .header-left h2 {
-        font-size: 15px;
-      }
-
-      .avatar-btn {
-        width: 56px;
-        height: 56px;
-        border-radius: 20px;
-      }
-
-      .grade-strip {
-        padding: 16px 32px 32px;
-        justify-content: center;
-      }
-
-      .grade-pill {
-        font-size: 16px;
-        padding: 10px 28px;
-      }
-
-      .section-label {
-        padding: 12px 32px 24px;
-      }
-
-      .section-label h3 {
-        font-size: 22px;
-      }
-
-      .cards-list {
-        padding: 0 32px;
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 24px;
-        align-items: start;
-      }
-
-      .ch-header {
-        padding: 20px 24px;
-      }
-
-      .ch-title {
-        font-size: 18px;
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .app {
-        max-width: 1200px;
-      }
-
-      .cards-list {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 28px;
-      }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     /* ── LOGIN OVERLAY ── */
@@ -674,611 +887,81 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
-      background:
-        radial-gradient(ellipse 60% 50% at 10% 0%, #c8d8ff 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 90% 10%, #ffd6e8 0%, transparent 55%),
-        radial-gradient(ellipse 40% 50% at 80% 90%, #c8f5f2 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 10% 85%, #ffe8cc 0%, transparent 55%),
-        #f0f4ff;
-      animation: fadeIn 0.5s ease;
+      background: var(--bg);
+      transition: opacity 250ms var(--ease);
     }
 
     .login-overlay.hiding {
-      animation: fadeOut 0.4s ease forwards;
+      opacity: 0;
+      pointer-events: none;
     }
 
     .login-card {
       width: 100%;
       max-width: 400px;
-      background: var(--card-solid);
-      border-radius: 28px;
-      box-shadow: 0 8px 40px var(--shadow);
-      border: 1.5px solid var(--border);
-      padding: 40px 28px 36px;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px var(--shadow);
+      border: 1px solid var(--border-strong);
+      padding: 32px;
       text-align: center;
-      animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
     }
 
     .login-logo {
-      font-size: 36px;
-      font-weight: 900;
+      font-size: 24px;
+      font-weight: 600;
       color: var(--text);
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .login-logo span {
-      color: var(--teal);
+      color: var(--accent);
     }
 
     .login-subtitle {
       font-size: 14px;
-      font-weight: 600;
-      color: var(--muted);
-      margin-bottom: 28px;
-    }
-
-    .login-input-wrap {
-      position: relative;
-      margin-bottom: 12px;
-    }
-
-    .login-input-wrap .input-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px;
-      pointer-events: none;
-    }
-
-    .login-input {
-      width: 100%;
-      padding: 14px 16px 14px 46px;
-      border-radius: 16px;
-      border: 1.5px solid #e8eaf6;
-      background: rgba(240, 244, 255, 0.5);
-      font-family: 'Nunito', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-
-    .login-input::placeholder {
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    .login-input:focus {
-      border-color: var(--teal);
-      box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.15);
-    }
-
-    .login-input.error {
-      border-color: #e53935;
-    }
-
-    .login-error {
-      font-size: 12px;
-      font-weight: 700;
-      color: #e53935;
-      min-height: 20px;
-      margin-bottom: 8px;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .login-error.visible {
-      opacity: 1;
-    }
-
-    .login-btn {
-      width: 100%;
-      padding: 14px;
-      border-radius: 50px;
-      border: none;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      font-size: 16px;
-      font-weight: 900;
-      color: #fff;
-      background: linear-gradient(135deg, var(--teal), #26c6da);
-      box-shadow: 0 6px 24px rgba(46, 196, 182, 0.4);
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .login-btn:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 10px 32px rgba(46, 196, 182, 0.5);
-    }
-
-    .login-btn:active {
-      transform: scale(0.97);
-    }
-
-    .login-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none !important;
-      box-shadow: none !important;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
     }
 
     .google-login-btn {
       width: 100%;
-      padding: 14px 20px;
-      border-radius: 50px;
-      border: 1.5px solid #dadce0;
-      background: #ffffff;
-      color: #3c4043;
-      font-family: 'Nunito', sans-serif;
-      font-size: 15px;
-      font-weight: 800;
+      height: 44px;
+      padding: 0 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(60, 64, 67, 0.1);
-      transition: all 0.25s ease;
-      margin-top: 8px;
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease);
     }
 
     .google-login-btn:hover {
-      background: #f8fafd;
-      border-color: #d2e3fc;
-      box-shadow: 0 4px 16px rgba(66, 133, 244, 0.22);
-      transform: translateY(-2px);
-    }
-
-    .google-login-btn:active {
-      transform: scale(0.98);
+      background: var(--raised);
     }
 
     .google-icon {
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       flex-shrink: 0;
     }
 
-    .demo-btn {
-      padding: 8px 16px;
-      border-radius: 30px;
-      border: 1.5px solid rgba(142, 151, 197, 0.3);
-      background: rgba(240, 244, 255, 0.65);
-      font-family: 'Nunito', sans-serif;
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .demo-btn:hover {
-      border-color: var(--teal);
-      color: var(--teal);
-      background: #fff;
-    }
-
-    .login-spinner {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      border: 2.5px solid rgba(255, 255, 255, 0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      vertical-align: middle;
-      margin-right: 8px;
-    }
-
-    /* ── USER MENU POPUP ── */
-    .user-popup {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      width: 240px;
-      padding: 16px;
-      background: var(--card-solid);
-      border-radius: 20px;
-      box-shadow: 0 8px 32px var(--shadow);
-      border: 1.5px solid var(--border);
-      z-index: 1000;
-      display: none;
-      animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    }
-
-    .user-popup.visible {
-      display: block;
-    }
-
-    .user-popup-name {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 2px;
-      word-break: break-word;
-    }
-
-    .user-popup-email {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      margin-bottom: 14px;
-      word-break: break-all;
-    }
-
-    .logout-btn {
-      width: 100%;
-      padding: 10px;
-      border-radius: 14px;
-      border: 2px solid #e53935;
-      background: rgba(229, 57, 53, 0.06);
-      font-family: 'Nunito', sans-serif;
+    .login-error {
       font-size: 13px;
-      font-weight: 800;
-      color: #e53935;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .logout-btn:hover {
-      background: rgba(229, 57, 53, 0.12);
-      transform: translateY(-1px);
-    }
-
-    /* ── PREMIUM PROMO BANNER & POPUP BUTTON ── */
-    .premium-banner {
-      margin: 10px 20px 20px;
-      padding: 14px 18px;
-      background: linear-gradient(135deg, #121216 0%, #0a0a0c 100%);
-      border: 1.5px solid rgba(212, 175, 55, 0.3);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s, box-shadow 0.3s;
-    }
-
-    .premium-banner:hover {
-      transform: translateY(-2px);
-      border-color: #d4af37;
-      box-shadow: 0 8px 24px rgba(212, 175, 55, 0.25);
-    }
-
-    .premium-banner-content {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .premium-banner-icon {
-      font-size: 24px;
-      animation: float 2s ease-in-out infinite;
-    }
-
-    @keyframes float {
-
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-4px);
-      }
-    }
-
-    .premium-banner-text {
-      text-align: left;
-    }
-
-    .premium-banner-text h4 {
-      font-size: 14px;
-      font-weight: 900;
-      color: #ffe27a;
-    }
-
-    .premium-banner-text p {
-      font-size: 11px;
-      font-weight: 600;
-      color: #8e97c5;
-      margin-top: 2px;
-      line-height: 1.3;
-    }
-
-    .premium-banner-arrow {
-      background: linear-gradient(135deg, #ffe27a, #d4af37);
-      color: #000;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 6px 12px;
-      border-radius: 50px;
-      white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
-    }
-
-    .premium-btn-popup {
-      display: block;
-      text-align: center;
-      text-decoration: none;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #ffe27a, #d4af37);
-      color: #000;
-      font-weight: 800;
-      font-size: 13px;
-      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
-      transition: transform 0.2s;
-    }
-
-    .premium-btn-popup:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.05);
-    }
-
-    /* ── PREMIUM THEME OVERRIDES (DARK NEON MULTICOLOR GLOW) ── */
-    body.premium-theme:not(.premium-light) {
-      --bg: #0A0A0B;
-      --card: rgba(22, 22, 26, 0.7);
-      --card-solid: #16161a;
-      --glass: rgba(255, 255, 255, 0.04);
-      --border: rgba(255, 255, 255, 0.08);
-      --shadow: rgba(0, 0, 0, 0.5);
-      --text: #f5f5f7;
-      --muted: #a1a1aa;
-      --teal: #2ec4b6;
-    }
-
-    body.premium-theme:not(.premium-light)::before {
-      background:
-        radial-gradient(ellipse 60% 50% at 10% 0%, rgba(46, 196, 182, 0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 90% 10%, rgba(229, 57, 53, 0.08) 0%, transparent 55%),
-        radial-gradient(ellipse 40% 50% at 80% 90%, rgba(124, 77, 255, 0.12) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 10% 85%, rgba(249, 168, 37, 0.08) 0%, transparent 55%),
-        #0A0A0B;
-    }
-
-    body.premium-theme:not(.premium-light) .header-left h1 {
-      color: #ffffff;
-      text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-    }
-
-    body.premium-theme:not(.premium-light) .header-left h1 span {
-      background: linear-gradient(135deg, #7DD3FC 30%, #06B6D4 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent !important;
-      font-weight: 900;
-      text-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
-    }
-
-    body.premium-theme:not(.premium-light) #greetingText {
-      color: #a1a1aa !important;
-    }
-
-    /* Golden 'Z' Logo Avatar Button gets the rainbow border in Premium */
-    body.premium-theme:not(.premium-light) .avatar-btn {
-      background: linear-gradient(#16161a, #16161a) padding-box, linear-gradient(135deg, #ffe27a 0%, #d4af37 50%, #ffe27a 100%) border-box !important;
-      border: 2.5px solid transparent !important;
-      border-radius: 18px !important;
-      box-shadow: 0 0 15px rgba(212, 175, 55, 0.4) !important;
-    }
-
-    /* Grade Pills (Lớp 10, 11, 12) styled with borders in Premium */
-    body.premium-theme:not(.premium-light) .grade-pill {
-      background: rgba(255, 255, 255, 0.04) !important;
-      border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
-      color: #a1a1aa !important;
-    }
-
-    body.premium-theme:not(.premium-light) .grade-pill.grade-0.active {
-      background: linear-gradient(#0A0A0B, #0A0A0B) padding-box, linear-gradient(135deg, #43a047, #81c784) border-box !important;
-      border: 2px solid transparent !important;
-      color: #81c784 !important;
-      box-shadow: 0 0 15px rgba(67, 160, 71, 0.35) !important;
-      transform: scale(1.05);
-    }
-
-    body.premium-theme:not(.premium-light) .grade-pill.grade-1.active {
-      background: linear-gradient(#0A0A0B, #0A0A0B) padding-box, linear-gradient(135deg, #f9a825, #ffd54f) border-box !important;
-      border: 2px solid transparent !important;
-      color: #ffd54f !important;
-      box-shadow: 0 0 15px rgba(249, 168, 37, 0.35) !important;
-      transform: scale(1.05);
-    }
-
-    body.premium-theme:not(.premium-light) .grade-pill.grade-2.active {
-      background: linear-gradient(#0A0A0B, #0A0A0B) padding-box, linear-gradient(135deg, #e53935, #ef9a9a) border-box !important;
-      border: 2px solid transparent !important;
-      color: #ef9a9a !important;
-      box-shadow: 0 0 15px rgba(229, 57, 53, 0.35) !important;
-      transform: scale(1.05);
-    }
-
-    body.premium-theme:not(.premium-light) .grade-pill.grade-3.active {
-      background: linear-gradient(#0A0A0B, #0A0A0B) padding-box, linear-gradient(135deg, #7c4dff, #b388ff) border-box !important;
-      border: 2px solid transparent !important;
-      color: #b388ff !important;
-      box-shadow: 0 0 15px rgba(124, 77, 255, 0.4) !important;
-      transform: scale(1.05);
-    }
-
-    .premium-only-tab,
-    .premium-only-section {
-      display: none !important;
-    }
-
-    body.premium-theme .premium-only-tab {
-      display: inline-block !important;
-    }
-
-    body.premium-theme .premium-only-section.active {
-      display: block !important;
-    }
-
-    /* Chapter cards with Dynamic Glow - Replicating premium border-gradient style */
-    .ch-card-wrapper {
-      position: relative;
-      width: 100%;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    body.premium-theme:not(.premium-light) .ch-card-wrapper {
-      border-radius: 32px;
-    }
-
-    .ch-card-glow {
+      color: var(--wrong);
+      margin-top: 12px;
       display: none;
-      position: absolute;
-      inset: 4px;
-      opacity: 0;
-      border-radius: 28px;
-      pointer-events: none;
-      filter: blur(28px);
-      z-index: 0;
-      background: var(--glow-gradient);
-      transition: opacity 0.5s ease;
     }
 
-    body.premium-theme:not(.premium-light) .ch-card-glow {
+    .login-error.visible {
       display: block;
-    }
-
-    body.premium-theme:not(.premium-light) .ch-card-wrapper:hover .ch-card-glow {
-      opacity: 0.75;
-    }
-
-    body.premium-theme:not(.premium-light) .ch-card {
-      position: relative;
-      z-index: 10;
-      background-image: linear-gradient(#000000, #000000), var(--glow-gradient) !important;
-      background-origin: border-box !important;
-      background-clip: padding-box, border-box !important;
-      border: 4.5px solid transparent !important;
-      border-radius: 32px !important;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s !important;
-    }
-
-    body.premium-theme:not(.premium-light) .ch-card-wrapper:hover {
-      transform: translateY(-4px) scale(1.02);
-    }
-
-    body.premium-theme:not(.premium-light) .ch-card:hover {
-      transform: none !important;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
-    }
-
-    body.premium-theme:not(.premium-light) .ch-num {
-      color: var(--glow-color) !important;
-      opacity: 0.9;
-    }
-
-    body.premium-theme:not(.premium-light) .ch-title {
-      color: #ffffff !important;
-    }
-
-    body.premium-theme:not(.premium-light) .ch-arrow svg {
-      stroke: var(--glow-color) !important;
-    }
-
-    body.premium-theme:not(.premium-light) .lesson-list {
-      background: rgba(10, 10, 12, 0.5) !important;
-    }
-
-    body.premium-theme:not(.premium-light) .lesson-row {
-      background: rgba(26, 26, 32, 0.9) !important;
-      border: 1px solid rgba(255, 255, 255, 0.04) !important;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
-      transition: all 0.3s !important;
-    }
-
-    body.premium-theme:not(.premium-light) .lesson-row:hover {
-      border-color: var(--glow-color) !important;
-      box-shadow: 0 4px 15px var(--glow-shadow) !important;
-    }
-
-    body.premium-theme:not(.premium-light) .lesson-title {
-      color: #f5f5f7 !important;
-    }
-
-    body.premium-theme:not(.premium-light) .lesson-num {
-      color: var(--glow-color) !important;
-      opacity: 0.9;
-    }
-
-    body.premium-theme:not(.premium-light) .user-popup {
-      background: rgba(22, 22, 26, 0.96) !important;
-      border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
-    }
-
-    body.premium-theme:not(.premium-light) .user-popup-name {
-      color: #ffffff !important;
-    }
-
-    body.premium-theme:not(.premium-light) .user-popup-email {
-      color: #a1a1aa !important;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
-    }
-
-    @keyframes fadeOut {
-      from {
-        opacity: 1;
-      }
-
-      to {
-        opacity: 0;
-      }
-    }
-
-    @keyframes popIn {
-      from {
-        opacity: 0;
-        transform: scale(0.8) translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    @keyframes shakeX {
-
-      0%,
-      100% {
-        transform: translateX(0);
-      }
-
-      20%,
-      60% {
-        transform: translateX(-6px);
-      }
-
-      40%,
-      80% {
-        transform: translateX(6px);
-      }
     }
 
     /* ── VIDEO MODAL ── */
@@ -1299,29 +982,20 @@
     .video-modal-backdrop {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(8px);
-      animation: fadeIn 0.3s ease forwards;
+      background: rgba(11, 13, 20, 0.78);
+      backdrop-filter: blur(6px);
     }
 
     .video-modal-container {
       position: relative;
       z-index: 10001;
       width: 100%;
-      max-width: 800px;
-      background: #000;
-      border-radius: 20px;
+      max-width: 840px;
+      background: #07080d;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-      border: 1.5px solid rgba(255, 255, 255, 0.1);
-      transform: scale(0.9) translateY(20px);
-      opacity: 0;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .video-modal.visible .video-modal-container {
-      transform: scale(1) translateY(0);
-      opacity: 1;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
     }
 
     .video-modal-close {
@@ -1329,77 +1003,33 @@
       top: 12px;
       right: 12px;
       z-index: 10002;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 700;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: rgba(11, 13, 20, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.2s;
-      outline: none;
-    }
-
-    .video-modal-close:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: scale(1.1);
     }
 
     .video-ratio-box {
       position: relative;
       width: 100%;
       padding-top: 56.25%;
-      /* 16:9 Aspect Ratio */
     }
 
     .video-ratio-box iframe {
       position: absolute;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100%;
       height: 100%;
       border: none;
     }
-    /* ── PROGRESS & DASHBOARD STYLES ── */
-    .chapter-progress-wrap {
-      width: 100%;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 6px;
-      margin-top: 12px;
-      overflow: hidden;
-      position: relative;
-    }
-    .chapter-progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #2ec4b6, #7c4dff);
-      border-radius: 6px;
-      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .chapter-progress-text {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-      margin-top: 4px;
-      text-align: right;
-    }
-    .lesson-checkmark {
-      display: inline-block;
-      margin-left: 6px;
-      color: #2ec4b6;
-      font-weight: 900;
-      text-shadow: 0 0 8px rgba(46, 196, 182, 0.4);
-      animation: popIn 0.3s ease;
-    }
-    .lesson-checkmark.red {
-      color: #ff5252;
-      text-shadow: 0 0 8px rgba(255, 82, 82, 0.4);
-    }
+
+    /* ── DASHBOARD MODAL ── */
     .dashboard-modal {
       position: fixed;
       inset: 0;
@@ -1409,412 +1039,303 @@
       justify-content: center;
       padding: 16px;
     }
+
     .dashboard-modal.visible {
       display: flex;
     }
+
     .dashboard-backdrop {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(10px);
-      animation: fadeIn 0.3s ease forwards;
+      background: rgba(11, 13, 20, 0.65);
+      backdrop-filter: blur(6px);
     }
+
     .dashboard-container {
       position: relative;
       z-index: 10006;
       width: 100%;
-      max-width: 400px;
+      max-width: 440px;
       background: var(--card);
-      border-radius: 24px;
+      border-radius: 16px;
       padding: 24px;
-      border: 1.5px solid var(--border);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-      transform: scale(0.9) translateY(20px);
-      opacity: 0;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 16px 40px var(--shadow);
       color: var(--text);
     }
-    body.premium-theme:not(.premium-light) .dashboard-container {
-      background: rgba(22, 22, 26, 0.96);
-      border-color: rgba(255, 255, 255, 0.1);
-      color: #f5f5f7;
-    }
-    .dashboard-modal.visible .dashboard-container {
-      transform: scale(1) translateY(0);
-      opacity: 1;
-    }
+
     .dashboard-header {
-      font-size: 20px;
-      font-weight: 800;
-      margin-bottom: 20px;
-      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
     }
+
     .dashboard-stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin-bottom: 20px;
     }
+
     .stat-box {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      padding: 16px;
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .stat-val {
-      font-size: 24px;
-      font-weight: 900;
-      color: #ffd54f;
-      margin-bottom: 4px;
-      text-shadow: 0 0 10px rgba(255, 213, 79, 0.3);
-    }
-    .stat-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    .reminder-settings {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      padding: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      margin-bottom: 16px;
-      display: none; /* Chỉ hiện khi có Capacitor */
-    }
-    .reminder-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .reminder-label {
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .toggle-switch {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .toggle-switch.active {
-      background: #2ec4b6;
-    }
-    .toggle-knob {
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 20px;
-      height: 20px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .toggle-switch.active .toggle-knob {
-      transform: translateX(20px);
-    }
-    .time-input {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 700;
-      font-family: 'Nunito', sans-serif;
-      outline: none;
-      padding: 4px;
-    }
-    body.premium-theme:not(.premium-light) .time-input {
-      color: #fff;
-      color-scheme: dark;
-    }
-    .close-dashboard {
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #7c4dff, #b388ff);
-      color: #fff;
-      font-weight: 800;
-      border: none;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      font-size: 15px;
-    }
-    .btn-dashboard-open {
-      display: block;
-      width: 100%;
-      margin-top: 10px;
-      margin-bottom: 6px;
-      padding: 8px;
-      text-align: center;
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 12px;
-      color: var(--text);
-      font-weight: 700;
-      text-decoration: none;
-      font-size: 13px;
-      transition: background 0.2s;
-    }
-    .btn-dashboard-open:hover {
-      background: rgba(0, 0, 0, 0.1);
+      background: var(--raised);
+      border-radius: 10px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
     }
 
-    body.premium-theme:not(.premium-light) .btn-dashboard-open {
-      background: rgba(255, 255, 255, 0.1);
-      color: #ffffff;
-    }
-    body.premium-theme:not(.premium-light) .btn-dashboard-open:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-    /* ── THEME TOGGLE (Premium Only) ── */
-    .theme-toggle-wrap {
-      display: none;
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 9998;
-    }
-    .theme-toggle {
-      width: 72px;
-      height: 36px;
-      border-radius: 18px;
-      cursor: pointer;
-      border: none;
-      outline: none;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-      padding: 0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    .theme-toggle svg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-    .theme-toggle-knob {
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      width: 28px;
-      height: 28px;
-      background: #ffffff;
-      border-radius: 50%;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    body.premium-theme.premium-light .theme-toggle-knob {
-      transform: translateX(36px);
-    }
-    
-    /* ── LỊCH SỬ LÀM BÀI (DASHBOARD) ── */
-    .dashboard-section-title {
-      font-size: 14px;
-      font-weight: 800;
-      margin-top: 16px;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 26px;
+      font-weight: 500;
       color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      line-height: 1.1;
+      margin-bottom: 4px;
     }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .dashboard-section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
     .history-list {
-      max-height: 250px;
+      max-height: 260px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       padding-right: 4px;
     }
-    .history-list::-webkit-scrollbar {
-      width: 4px;
-    }
-    .history-list::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 4px;
-    }
-    .history-list::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 4px;
-    }
+
     .history-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 12px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
       gap: 12px;
-      transition: all 0.2s ease;
     }
-    body.premium-theme:not(.premium-light) .history-item {
-      background: rgba(255, 255, 255, 0.03);
-      border-color: rgba(255, 255, 255, 0.08);
-    }
-    .history-item:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-    body.premium-theme:not(.premium-light) .history-item:hover {
-      background: rgba(255, 255, 255, 0.06);
-    }
+
     .history-info {
       display: flex;
       flex-direction: column;
       gap: 4px;
-      flex-grow: 1;
+      flex: 1;
       min-width: 0;
     }
+
     .history-title {
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 500;
       color: var(--text);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .history-meta {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 10px;
+      gap: 8px;
+      font-size: 11px;
       color: var(--muted);
-      font-weight: 600;
     }
+
     .history-badge {
-      padding: 2px 6px;
+      padding: 1px 6px;
       border-radius: 4px;
-      font-size: 9px;
-      font-weight: 800;
-      text-transform: uppercase;
+      font-size: 10px;
+      font-weight: 500;
+      background: var(--raised);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
     }
+
     .history-badge.exam {
-      background: rgba(140, 44, 158, 0.15);
-      color: #c05cff;
-      border: 0.5px solid rgba(140, 44, 158, 0.3);
+      background: var(--accent-subtle);
+      color: var(--accent);
+      border-color: rgba(13, 148, 136, 0.25);
     }
-    .history-badge.quiz {
-      background: rgba(46, 196, 182, 0.15);
-      color: #2ec4b6;
-      border: 0.5px solid rgba(46, 196, 182, 0.3);
-    }
+
     .history-score-wrap {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       gap: 4px;
-      justify-content: center;
-      min-width: 60px;
+      flex-shrink: 0;
     }
+
     .history-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
       font-size: 14px;
-      font-weight: 900;
+      font-weight: 500;
     }
-    .history-score.high { color: var(--correct, #4caf50); }
-    .history-score.medium { color: #f9a825; }
-    .history-score.low { color: var(--wrong, #f44336); }
+
+    .history-score.high { color: var(--correct); }
+    .history-score.medium { color: var(--warning); }
+    .history-score.low { color: var(--wrong); }
+
     .history-action {
-      font-size: 10px;
-      font-weight: 800;
-      background: var(--teal);
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 8px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--raised);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      padding: 4px 8px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.2s;
+      transition: border-color 150ms var(--ease);
     }
+
     .history-action:hover {
-      opacity: 0.9;
-      transform: scale(1.05);
+      border-color: var(--accent);
     }
+
     .history-loading, .history-empty {
       text-align: center;
-      font-size: 12px;
+      font-size: 13px;
       color: var(--muted);
-      font-weight: 600;
       padding: 20px 0;
     }
-    
-    /* ── LOCKED CARD STYLE ── */
-    .ch-card.locked {
-      opacity: 0.65;
-      cursor: not-allowed !important;
-      filter: grayscale(40%);
-    }
-    .ch-card.locked:hover {
-      transform: none !important;
-      box-shadow: 0 4px 24px var(--shadow) !important;
-    }
-    .ch-card.locked * {
-      pointer-events: none;
-    }
 
-    /* ── GRADE SELECTION STYLE ── */
-    .grade-selection-label {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--text, #1d1d1f);
-      margin-bottom: 8px;
-      text-align: left;
-      padding-left: 4px;
-    }
-    .grade-buttons {
-      display: flex;
-      gap: 10px;
+    .reminder-settings {
+      background: var(--raised);
+      border-radius: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
       margin-bottom: 16px;
-    }
-    .grade-btn {
-      flex: 1;
-      padding: 10px;
-      border-radius: 12px;
-      border: 1.5px solid #e8eaf6;
-      background: rgba(240, 244, 255, 0.5);
-      font-family: 'Nunito', sans-serif;
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--text, #1d1d1f);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: center;
-    }
-    .grade-btn:hover {
-      background: rgba(46, 196, 182, 0.05);
-      border-color: var(--teal);
-    }
-    .grade-btn.active {
-      background: var(--teal);
-      border-color: var(--teal);
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(46, 196, 182, 0.3);
+      display: none;
     }
 
-    /* ── SCHEDULED EXAM BADGE ── */
-    .exam-scheduled-badge {
-      display: inline-flex;
+    .reminder-row {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 4px;
-      background: rgba(249, 168, 37, 0.15);
-      border: 1px solid rgba(249, 168, 37, 0.4);
-      color: #ffca28;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 2px 8px;
-      border-radius: 12px;
-      margin-left: 6px;
-      vertical-align: middle;
-      white-space: nowrap;
+      gap: 12px;
+    }
+
+    .reminder-row + .reminder-row {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .reminder-label {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      background: var(--border-strong);
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background-color 150ms var(--ease);
+    }
+
+    .toggle-switch.active {
+      background: var(--accent);
+    }
+
+    .toggle-knob {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      background: #ffffff;
+      border-radius: 50%;
+      transition: transform 150ms var(--ease);
+    }
+
+    .toggle-switch.active .toggle-knob {
+      transform: translateX(18px);
+    }
+
+    .time-input {
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      padding: 4px 8px;
+      outline: none;
+    }
+
+    .close-dashboard {
+      width: 100%;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--text);
+      color: var(--bg);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: opacity 150ms var(--ease);
+    }
+
+    .close-dashboard:hover {
+      opacity: 0.9;
+    }
+
+    /* ── RESPONSIVE MOBILE ── */
+    @media (max-width: 899px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 16px;
+        gap: 16px;
+      }
+
+      .grade-strip {
+        width: 100%;
+      }
+
+      .grade-pill {
+        height: 34px;
+        font-size: 13px;
+      }
+
+      .sidebar-tools-group,
+      .sidebar-footer {
+        display: none;
+      }
+
+      .main-content {
+        padding: 20px 16px 48px;
+      }
+
+      .section-label h3 {
+        font-size: 20px;
+      }
+
+      .cards-list {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -1824,10 +1345,10 @@
   <div class="login-overlay" id="loginOverlay">
     <div class="login-card">
       <div class="login-logo">Z<span>physics</span></div>
-      <div class="login-subtitle" id="loginSubtitle">Đăng nhập nhanh để tiếp tục học</div>
-      
+      <div class="login-subtitle" id="loginSubtitle">Đăng nhập bằng tài khoản Google để tiếp tục</div>
+
       <button type="button" class="google-login-btn" onclick="loginWithGoogle()">
-        <svg class="google-icon" viewBox="0 0 24 24">
+        <svg class="google-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
@@ -1836,7 +1357,7 @@
         <span>Tiếp tục với Google</span>
       </button>
 
-      <div class="login-error" id="loginError" style="margin-top:12px;"></div>
+      <div class="login-error" id="loginError"></div>
     </div>
   </div>
 
@@ -1844,7 +1365,9 @@
   <div class="video-modal" id="videoModal">
     <div class="video-modal-backdrop" onclick="closeVideoModal()"></div>
     <div class="video-modal-container">
-      <button class="video-modal-close" onclick="closeVideoModal()">✕</button>
+      <button class="video-modal-close" onclick="closeVideoModal()" aria-label="Đóng video">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
       <div class="video-ratio-box">
         <iframe id="videoPlayer" src="" frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -1853,116 +1376,123 @@
     </div>
   </div>
 
-  <div class="app">
+  <!-- ── APP SHELL ── -->
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-top">
+          <a href="#" class="brand">
+            <span class="brand-mark" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12c2.5-6 5-6 7.5 0s5 6 7.5 0 3.5-4.5 5-4.5" />
+              </svg>
+            </span>
+            Z<span>physics</span>
+          </a>
 
-    <div class="header">
-      <div class="header-left">
-        <h2 id="greetingText">Xin chào, bạn 👋</h2>
-        <h1>Z<span>physics</span></h1>
+          <div class="sidebar-top-actions">
+            <button type="button" class="pts-toggle" id="sidebarPinThemeBtn" onclick="PinUI.toggleTheme(this)" aria-label="Đổi giao diện sáng tối" aria-pressed="false">
+              <svg class="pts-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+              <svg class="pts-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            </button>
+            <button class="avatar-btn" id="avatarBtn" aria-label="Tài khoản">
+              <img src="https://i.postimg.cc/44LHDhL1/avatar.png" alt="Zphysics">
+            </button>
+          </div>
+
+          <div class="user-popup" id="userPopup">
+            <div class="user-popup-name" id="popupName"></div>
+            <div class="user-popup-email" id="popupEmail"></div>
+            <div class="user-popup-status" id="popupStatus"></div>
+            <a href="javascript:void(0)" class="btn-dashboard-open" id="btnDashboard" onclick="openDashboard()" style="display: none;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+              Tiến độ học tập
+            </a>
+            <a href="premium.html" class="premium-btn-popup">Nâng cấp Premium</a>
+            <button class="logout-btn" id="logoutBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Đăng xuất
+            </button>
+          </div>
+        </div>
+        <div class="sidebar-user-line" id="greetingText">Đang tải hồ sơ</div>
       </div>
-      <div style="position:relative">
-        <button class="avatar-btn" id="avatarBtn">
-          <img src="https://i.postimg.cc/44LHDhL1/avatar.png" alt="Z">
-        </button>
-        <div class="user-popup" id="userPopup">
-          <div class="user-popup-name" id="popupName"></div>
-          <div class="user-popup-email" id="popupEmail" style="margin-bottom: 4px;"></div>
-          <div class="user-popup-status" id="popupStatus" style="font-size: 11px; font-weight: 800; color: var(--muted); margin-bottom: 12px; word-break: break-word;"></div>
-          <a href="javascript:void(0)" class="btn-dashboard-open" id="btnDashboard" onclick="openDashboard()" style="display: none;">📊 Tiến độ học tập</a>
-          <a href="premium.html" class="premium-btn-popup">👑 Nâng cấp Premium</a>
-          <button class="logout-btn" id="logoutBtn">🚪 Đăng xuất</button>
+
+      <div>
+        <div class="sidebar-group-label">Khối lớp</div>
+        <div class="grade-strip seg-control" id="gradeTabs"></div>
+      </div>
+
+      <div class="sidebar-tools-group">
+        <div class="sidebar-group-label">Công cụ</div>
+        <div class="sidebar-nav-list">
+          <button type="button" class="sidebar-nav-btn" id="sidebarDashboardBtn" onclick="openDashboard()" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            Tiến độ &amp; Lịch sử
+          </button>
+          <a href="premium.html" class="sidebar-nav-btn" id="sidebarPremiumLink">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Gói Premium
+          </a>
+          <div class="theme-toggle-wrap" id="themeToggleWrap">
+            <button class="theme-toggle" id="themeToggle" onclick="togglePremiumThemeMode()" aria-label="Đổi giao diện sáng/tối">
+              <span class="theme-toggle-left">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>
+                <span id="themeLabel">Giao diện Tối</span>
+              </span>
+              <span class="theme-switch-track">
+                <span id="darkToggleBg" style="display:none;"></span>
+                <span class="theme-toggle-knob"></span>
+              </span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="grade-strip" id="gradeTabs">
-      <!-- Tabs được render động từ JSON -->
-    </div>
-
-    <!-- Grade sections được render động từ baihoc.json -->
-    <div id="gradeContent">
-      <div class="loading">
-        <span class="loading-dot"></span>
-        <span class="loading-dot"></span>
-        <span class="loading-dot"></span>
+      <div class="sidebar-footer">
+        <div class="premium-banner" onclick="window.location.href='premium.html'">
+          <div class="premium-banner-content">
+            <span class="premium-banner-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+            </span>
+            <div class="premium-banner-text">
+              <h4>Mở khóa toàn bộ lộ trình</h4>
+              <p>Truy cập trọn bộ video bài giảng, tài liệu và phòng luyện đề PDF.</p>
+            </div>
+          </div>
+          <div class="premium-banner-arrow">Kích hoạt Premium</div>
+        </div>
       </div>
-    </div>
+    </aside>
 
-    <!-- ── THEME TOGGLE (Premium Only) ── -->
-    <div class="theme-toggle-wrap" id="themeToggleWrap">
-      <button class="theme-toggle" id="themeToggle" onclick="togglePremiumThemeMode()" aria-label="Đổi giao diện sáng/tối">
-        <!-- SVG for Light Mode (Clouds) -->
-        <svg viewBox="0 0 72 36" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="lightBg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#FFD1D1" />
-              <stop offset="50%" stop-color="#D1D4FF" />
-              <stop offset="100%" stop-color="#9AD7F8" />
-            </linearGradient>
-            <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="white" stop-opacity="0.9" />
-              <stop offset="100%" stop-color="white" stop-opacity="0.4" />
-            </linearGradient>
-          </defs>
-          <!-- Background -->
-          <rect width="72" height="36" fill="url(#lightBg)" />
-          <!-- Small Cloud -->
-          <path d="M 45,18 a 4,4 0 0,1 4,-4 a 5,5 0 0,1 8,2 a 4,4 0 0,1 2,6 h -14 a 4,4 0 0,1 0,-4 z" fill="url(#cloudGrad)" />
-          <!-- Big Cloud -->
-          <path d="M 52,28 a 6,6 0 0,1 6,-6 a 8,8 0 0,1 12,4 a 6,6 0 0,1 4,8 h -22 a 6,6 0 0,1 0,-6 z" fill="url(#cloudGrad)" />
-        </svg>
-
-        <!-- SVG for Dark Mode (Stars/Space) - Default opacity 0, fades in on dark mode -->
-        <svg id="darkToggleBg" viewBox="0 0 72 36" preserveAspectRatio="none" style="opacity: 0; transition: opacity 0.5s;">
-          <defs>
-            <linearGradient id="darkBg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#2D1B68" />
-              <stop offset="50%" stop-color="#8C2C9E" />
-              <stop offset="100%" stop-color="#F35A9C" />
-            </linearGradient>
-            <linearGradient id="nebulaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="white" stop-opacity="0.4" />
-              <stop offset="100%" stop-color="white" stop-opacity="0.1" />
-            </linearGradient>
-          </defs>
-          <!-- Background -->
-          <rect width="72" height="36" fill="url(#darkBg)" />
-          <!-- Nebula shapes -->
-          <path d="M 15,25 a 8,8 0 0,1 8,-8 a 10,10 0 0,1 12,4 a 8,8 0 0,1 6,12 h -26 a 8,8 0 0,1 0,-8 z" fill="url(#nebulaGrad)" />
-          <path d="M 22,32 a 6,6 0 0,1 6,-6 a 8,8 0 0,1 10,3 a 6,6 0 0,1 4,8 h -20 a 6,6 0 0,1 0,-5 z" fill="url(#nebulaGrad)" />
-          <!-- Stars -->
-          <path d="M 38,12 Q 38,15 41,15 Q 38,15 38,18 Q 38,15 35,15 Q 38,15 38,12 Z" fill="#FFD700" opacity="0.8" />
-          <path d="M 20,18 Q 20,20 22,20 Q 20,20 20,22 Q 20,20 18,20 Q 20,20 20,18 Z" fill="white" opacity="0.6" />
-          <circle cx="28" cy="11" r="1.5" fill="white" opacity="0.7" />
-          <circle cx="45" cy="22" r="1" fill="white" opacity="0.5" />
-          <circle cx="15" cy="15" r="1" fill="white" opacity="0.4" />
-        </svg>
-
-        <div class="theme-toggle-knob"></div>
-      </button>
-    </div>
-
+    <main class="main-content">
+      <div id="gradeContent">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          Đang tải danh mục bài học...
+        </div>
+      </div>
+    </main>
   </div>
 
+  <!-- ── DASHBOARD MODAL ── -->
   <div id="dashboardModal" class="dashboard-modal">
     <div class="dashboard-backdrop" onclick="closeDashboard()"></div>
     <div class="dashboard-container">
-      <div class="dashboard-header">Tiến Độ Học Tập 🚀</div>
-      
+      <div class="dashboard-header">Tiến độ học tập</div>
+
       <div class="dashboard-stats">
         <div class="stat-box">
           <div class="stat-val" id="statAverageScore">-</div>
-          <div class="stat-label">Điểm trung bình ⭐</div>
+          <div class="stat-label">Điểm trung bình</div>
         </div>
         <div class="stat-box">
           <div class="stat-val" id="statCompleted">0</div>
-          <div class="stat-label">Bài hoàn thành 📚</div>
+          <div class="stat-label">Bài đã hoàn thành</div>
         </div>
       </div>
 
-      <div class="dashboard-section-title">
-        Lịch Sử Làm Bài ⏳
-      </div>
+      <div class="dashboard-section-title">Lịch sử làm bài</div>
       <div class="history-list" id="historyList">
         <div class="history-loading">Đang tải lịch sử...</div>
       </div>
@@ -1975,7 +1505,7 @@
           </div>
         </div>
         <div class="reminder-row" id="reminderTimeRow" style="display: none;">
-          <div class="reminder-label">Giờ nhắc:</div>
+          <div class="reminder-label">Giờ nhắc</div>
           <input type="time" id="reminderTime" class="time-input" value="20:00" onchange="saveReminderTime()">
         </div>
       </div>
@@ -1985,7 +1515,6 @@
   </div>
 
   <script>
-    // Tự động làm sạch URL trên trình duyệt (loại bỏ .html)
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
       const path = window.location.pathname;
       if (path.endsWith('.html')) {
@@ -1997,53 +1526,54 @@
       }
     }
 
-    // ── Định nghĩa label và icon cho từng loại link ──
-    const LINK_CONFIG = {
-      video: { label: 'Video bài học', cls: 'lnk-video', icon: '▶️' },
-      baiTap: { label: 'Tài liệu / Lý thuyết', cls: 'lnk-baiTap', icon: '📄' },
-      luyenTap: { label: 'Bài tập về nhà', cls: 'lnk-tracNghiem', icon: '☑️' },
-      onTap: { label: 'Ôn tập', cls: 'lnk-onTap', icon: '🔄' },
-      phieuDapAn: { label: 'Phiếu đáp án', cls: 'lnk-phieuDapAn', icon: '📋' }
+    const ICONS = {
+      video: '<svg viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>',
+      file: '<svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>',
+      checkSquare: '<svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>',
+      refresh: '<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>',
+      clipboard: '<svg viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>',
+      edit: '<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+      lock: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+      chevron: '<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>'
     };
 
-    // ── Danh sách Đề ôn thi thử tốt nghiệp THPT Quốc gia (Premium Only) ──
+    const LINK_CONFIG = {
+      video: { label: 'Video bài học', cls: 'lnk-video', icon: ICONS.video },
+      baiTap: { label: 'Tài liệu / Lý thuyết', cls: 'lnk-baiTap', icon: ICONS.file },
+      luyenTap: { label: 'Bài tập về nhà', cls: 'lnk-tracNghiem', icon: ICONS.checkSquare },
+      onTap: { label: 'Ôn tập', cls: 'lnk-onTap', icon: ICONS.refresh },
+      phieuDapAn: { label: 'Phiếu đáp án', cls: 'lnk-phieuDapAn', icon: ICONS.clipboard }
+    };
+
     let mockExams = [];
     let studentProgressMap = {};
     let globalLessonsData = [];
 
-    // ── LỊCH SỬ LÀM BÀI LOGIC ──
     function getLessonTitleByCode(code) {
       if (!code) return 'Không rõ đề';
-      
+
       const matchedExam = mockExams.find(ex => ex.id === code);
       if (matchedExam) return matchedExam.title;
-      
+
       const parts = code.split('_');
       if (parts.length >= 4) {
         const gradeNum = parts[1];
         const chapterNum = parseInt(parts[2].replace('c', ''), 10);
         const lessonNum = parseInt(parts[3].replace('b', ''), 10);
-        
+
         const gradeObj = globalLessonsData.find(g => {
           const match = g.grade.match(/\d+/);
           return match && match[0] === gradeNum;
         });
-        
+
         if (gradeObj) {
-          let chapterObj = gradeObj.chapters.find(ch => {
-            const chMatch = ch.num.match(/[IVXLCDM]+/i);
-            return false;
-          });
-          if (!chapterObj && gradeObj.chapters[chapterNum - 1]) {
-            chapterObj = gradeObj.chapters[chapterNum - 1];
-          }
+          let chapterObj = gradeObj.chapters[chapterNum - 1];
           if (chapterObj) {
             const lessonObj = chapterObj.lessons.find(l => parseInt(l.num, 10) === lessonNum);
             if (lessonObj) return lessonObj.title;
           }
         }
-        
-        // Fallback to parseQuizCode
+
         const typeMap = { 'cauhoi': 'Trắc nghiệm', 'đs': 'Đúng/Sai', 'tln': 'Trả lời ngắn', 'baitap': 'Bài tập', 'ontap': 'Ôn tập' };
         const typeStr = typeMap[parts[0]] || parts[0];
         return `Vật lí ${parts[1]} - Chương ${parts[2].toUpperCase().replace('C', '')} - Bài ${parseInt(parts[3].toUpperCase().replace('B', ''), 10)} (${typeStr})`;
@@ -2059,9 +1589,9 @@
         document.getElementById('statAverageScore').textContent = '-';
         return;
       }
-      
+
       historyListEl.innerHTML = '<div class="history-loading">Đang tải lịch sử...</div>';
-      
+
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/student_progress?email=eq.${encodeURIComponent(session.gmail)}&select=*&order=completed_at.desc`, {
           headers: {
@@ -2071,14 +1601,13 @@
         });
         if (!res.ok) throw new Error('Failed to load');
         const data = await res.json();
-        
+
         if (!data || data.length === 0) {
           historyListEl.innerHTML = '<div class="history-empty">Chưa có lịch sử làm bài.</div>';
           document.getElementById('statAverageScore').textContent = '-';
           return;
         }
 
-        // Calculate average score of best attempt for each lesson
         const bestScores = {};
         data.forEach(item => {
           if (item.score !== null && item.score !== undefined) {
@@ -2091,41 +1620,41 @@
             }
           }
         });
-        
+
         let totalScore = 0;
         let scoreCount = 0;
         for (const lid in bestScores) {
           totalScore += bestScores[lid];
           scoreCount++;
         }
-        
+
         const avgScore = scoreCount > 0 ? (totalScore / scoreCount).toFixed(2) : '-';
         document.getElementById('statAverageScore').textContent = avgScore;
         document.getElementById('statCompleted').textContent = scoreCount;
-        
+
         historyListEl.innerHTML = '';
         data.forEach(item => {
           const isExam = item.type.startsWith('exam');
           const title = getLessonTitleByCode(item.lesson_id);
           const score = item.score !== null ? parseFloat(item.score).toFixed(2) : '-';
-          
+
           let scoreClass = 'low';
           if (item.score >= 8.0) scoreClass = 'high';
           else if (item.score >= 5.0) scoreClass = 'medium';
-          
+
           const dateStr = new Date(item.completed_at).toLocaleString('vi-VN', {
             hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric'
           });
-          
+
           const typeBadge = isExam ? '<span class="history-badge exam">Thi thử VIP</span>' : '<span class="history-badge quiz">Luyện tập</span>';
-          
+
           const html = `
             <div class="history-item">
               <div class="history-info">
                 <div class="history-title" title="${title}">${title}</div>
                 <div class="history-meta">
                   ${typeBadge}
-                  <span class="history-date">${dateStr}</span>
+                  <span class="history-date mono">${dateStr}</span>
                 </div>
               </div>
               <div class="history-score-wrap">
@@ -2149,23 +1678,17 @@
       }
     }
 
-    // ── DASHBOARD & NHẮC NHỞ LOGIC ──
     function openDashboard() {
       document.getElementById('dashboardModal').classList.add('visible');
-      
-      // Initialize Average Score to '-'
       document.getElementById('statAverageScore').textContent = '-';
 
-      // Compute Completed
       const completedCount = Object.keys(studentProgressMap).length;
       if (completedCount > 0) {
         document.getElementById('statCompleted').textContent = completedCount;
       }
 
-      // Tải lịch sử làm bài
       loadHistoryList();
 
-      // Init reminder UI if Capacitor
       if (window.Capacitor) {
         document.getElementById('reminderSettings').style.display = 'block';
         const isEnabled = localStorage.getItem('zphysics_reminder_enabled') === 'true';
@@ -2189,12 +1712,12 @@
       const toggle = document.getElementById('reminderToggle');
       const timeRow = document.getElementById('reminderTimeRow');
       const isCurrentlyEnabled = toggle.classList.contains('active');
-      
+
       if (!isCurrentlyEnabled) {
         if (window.Capacitor && window.Capacitor.Plugins.LocalNotifications) {
           const perm = await window.Capacitor.Plugins.LocalNotifications.requestPermissions();
           if (perm.display !== 'granted') {
-            alert('Cần cấp quyền thông báo để sử dụng tính năng này!');
+            alert('Cần cấp quyền thông báo để sử dụng tính năng này.');
             return;
           }
         }
@@ -2224,13 +1747,13 @@
       if (!window.Capacitor || !window.Capacitor.Plugins.LocalNotifications) return;
       const timeVal = localStorage.getItem('zphysics_reminder_time') || '20:00';
       const [hours, minutes] = timeVal.split(':').map(Number);
-      
+
       await window.Capacitor.Plugins.LocalNotifications.cancel({ notifications: [{ id: 1 }] });
       await window.Capacitor.Plugins.LocalNotifications.schedule({
         notifications: [
           {
-            title: "Đến giờ học Vật lý rồi! 🚀",
-            body: "Hãy vào Zphysics để hoàn thành mục tiêu hôm nay nhé!",
+            title: "Đến giờ học Vật lý",
+            body: "Vào Zphysics để hoàn thành mục tiêu ôn tập hôm nay.",
             id: 1,
             schedule: {
               on: { hour: hours, minute: minutes },
@@ -2251,6 +1774,7 @@
         scheduleLocalNotification();
       }
     });
+
     const DEFAULT_MOCK_EXAMS = [
       {
         id: "de_thi_thu_10_c1",
@@ -2310,21 +1834,23 @@
 
     let activeGrade = 0;
 
-    // Kiểm tra bài học có được miễn phí xem video & tài liệu không
     function isLessonFree(gradeNum, cNum, lIdx) {
       const g = String(gradeNum);
       if (g === '10') {
-        if (cNum === 1 && lIdx < 3) return true; // 3 bài đầu chương 1
-        if (cNum === 2 && lIdx < 2) return true; // 2 bài đầu chương 2
+        if (cNum === 1 && lIdx < 3) return true;
+        if (cNum === 2 && lIdx < 2) return true;
       } else if (g === '11' || g === '12') {
-        if (cNum === 1 && lIdx < 3) return true; // 3 bài đầu chương 1
+        if (cNum === 1 && lIdx < 3) return true;
       }
       return false;
     }
 
-    // ── Chuyển lớp ──
     function switchGrade(idx) {
       activeGrade = idx;
+      const tabsEl = document.getElementById('gradeTabs');
+      if (tabsEl) {
+        tabsEl.style.setProperty('--seg-index', String(idx));
+      }
       document.querySelectorAll('.grade-pill').forEach((b, i) => {
         b.classList.toggle('active', i === idx);
       });
@@ -2334,7 +1860,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ── Toggle card ──
     function toggleCard(card) {
       const list = card.querySelector('.lesson-list');
       const isOpen = card.classList.contains('open');
@@ -2353,7 +1878,6 @@
       }
     }
 
-    // --- Helper function for text normalization ---
     function normalizeText(text) {
       if (!text) return '';
       return text.toLowerCase()
@@ -2364,58 +1888,46 @@
         .replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u")
         .replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y")
         .replace(/đ/g, "d")
-        .replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, "") 
+        .replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, "")
         .replace(/\u02C6|\u0306|\u031B/g, "")
         .replace(/[^a-z0-9\s]/g, "")
         .replace(/\s+/g, ' ')
         .trim();
     }
 
-    // --- Helper function to find matching exams ---
     function findMatchingExamsForLesson(gradeNum, cNum, lNum, lessonTitle, exams) {
       if (!exams || !Array.isArray(exams)) return [];
-      const matchCriteria1 = `${gradeNum}_c${cNum}_b${lNum}`; // e.g., "12_c1_b04"
-      const normLessonTitle = normalizeText(lessonTitle);
-      
+      const matchCriteria1 = `${gradeNum}_c${cNum}_b${lNum}`;
       return exams.filter(exam => {
-        // Must match grade (lop) if provided
         if (exam.lop && exam.lop != gradeNum) return false;
-        
-        // Exact match by ID
         if (exam.id && exam.id.includes(matchCriteria1)) return true;
-        
-        // Đã bỏ tính năng tự động khớp bằng tiêu đề để tránh bị trùng lặp,
-        // hiện tại bắt buộc phải khớp bằng ID (ví dụ 12_c1_b04)
         return false;
       });
     }
 
-    // --- Helper function to check grade access ---
     function hasGradeAccess(studentLop, targetGrade) {
-      if (!studentLop) return true; // Trống nghĩa là có quyền tất cả
+      if (!studentLop) return true;
       const studentDigits = studentLop.match(/\d+/);
       const targetDigits = targetGrade.match(/\d+/);
       if (studentDigits && targetDigits) {
         return studentDigits[0] === targetDigits[0];
       }
-      return studentLop.toLowerCase().includes(targetGrade.toLowerCase()) || 
+      return studentLop.toLowerCase().includes(targetGrade.toLowerCase()) ||
              targetGrade.toLowerCase().includes(studentLop.toLowerCase());
     }
 
-    // --- Helper function to show locked grade modal ---
     function showLockedGradeModal(gradeName) {
       const session = getSession();
       const studentLop = session ? session.lop : '';
-      alert(`Bài học này thuộc ${gradeName}.\nTài khoản của em được phân quyền học lớp ${studentLop || '(Chưa xếp lớp)'}.\nHãy liên hệ thầy cô để được cập nhật lớp học đúng nhé!`);
+      alert(`Bài học này thuộc ${gradeName}.\nTài khoản của em được phân quyền học lớp ${studentLop || '(Chưa xếp lớp)'}.\nHãy liên hệ thầy cô để được cập nhật lớp học đúng.`);
     }
 
-    // --- Helper function to parse exam scheduled open time ---
     function parseExamOpenTime(exam) {
       if (!exam) return null;
       let rawStr = '';
       if (exam.openAt) rawStr = String(exam.openAt).trim();
       else if (exam.open_at) rawStr = String(exam.open_at).trim();
-      
+
       const descText = exam.desc || exam.description || '';
       const match = descText.match(/\[OPEN:\s*([^\]]+)\]/i);
       if (match && match[1]) rawStr = match[1].trim();
@@ -2424,22 +1936,12 @@
 
       const timeDateMatch = rawStr.match(/^(\d{1,2})[:h](\d{2})\s+(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/i);
       if (timeDateMatch) {
-        const hours = parseInt(timeDateMatch[1], 10);
-        const mins = parseInt(timeDateMatch[2], 10);
-        const day = parseInt(timeDateMatch[3], 10);
-        const month = parseInt(timeDateMatch[4], 10) - 1;
-        const year = parseInt(timeDateMatch[5], 10);
-        const d = new Date(year, month, day, hours, mins, 0);
+        const d = new Date(parseInt(timeDateMatch[5], 10), parseInt(timeDateMatch[4], 10) - 1, parseInt(timeDateMatch[3], 10), parseInt(timeDateMatch[1], 10), parseInt(timeDateMatch[2], 10), 0);
         if (!isNaN(d.getTime())) return d;
       }
       const dateTimeMatch = rawStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})\s+(\d{1,2})[:h](\d{2})$/i);
       if (dateTimeMatch) {
-        const day = parseInt(dateTimeMatch[1], 10);
-        const month = parseInt(dateTimeMatch[2], 10) - 1;
-        const year = parseInt(dateTimeMatch[3], 10);
-        const hours = parseInt(dateTimeMatch[4], 10);
-        const mins = parseInt(dateTimeMatch[5], 10);
-        const d = new Date(year, month, day, hours, mins, 0);
+        const d = new Date(parseInt(dateTimeMatch[3], 10), parseInt(dateTimeMatch[2], 10) - 1, parseInt(dateTimeMatch[1], 10), parseInt(dateTimeMatch[4], 10), parseInt(dateTimeMatch[5], 10), 0);
         if (!isNaN(d.getTime())) return d;
       }
       const parsed = new Date(rawStr);
@@ -2447,7 +1949,12 @@
       return null;
     }
 
-    // ── Render toàn bộ giao diện từ JSON ──
+    function extractChapterCode(chNumStr) {
+      if (!chNumStr) return 'CH';
+      const cleaned = chNumStr.replace(/chương/i, '').trim();
+      return cleaned || 'CH';
+    }
+
     function renderAll(data) {
       const tabsEl = document.getElementById('gradeTabs');
       const contentEl = document.getElementById('gradeContent');
@@ -2457,70 +1964,72 @@
       const session = getSession();
       const studentLop = session ? session.lop : null;
 
-      // Tìm khối lớp kích hoạt mặc định đầu tiên học sinh có quyền truy cập
-      let defaultActiveIdx = 0;
+      let defaultActiveIdx = activeGrade || 0;
+      let hasSetDefault = false;
       for (let i = 0; i < data.length; i++) {
         const gradeNum = data[i].grade.match(/\d+/) ? data[i].grade.match(/\d+/)[0] : '';
-        if (hasGradeAccess(studentLop, gradeNum)) {
-          defaultActiveIdx = i;
-          break;
+        if (hasGradeAccess(studentLop, gradeNum) && !hasSetDefault) {
+          if (activeGrade === 0 || !hasGradeAccess(studentLop, (data[activeGrade]?.grade.match(/\d+/) || [''])[0])) {
+            defaultActiveIdx = i;
+          }
+          hasSetDefault = true;
         }
       }
+
+      tabsEl.style.setProperty('--seg-count', String(Math.max(1, data.length)));
+      tabsEl.style.setProperty('--seg-index', String(defaultActiveIdx));
+      const thumbEl = document.createElement('span');
+      thumbEl.className = 'seg-thumb';
+      thumbEl.id = 'gradeSegThumb';
+      tabsEl.appendChild(thumbEl);
 
       data.forEach((gradeObj, gIdx) => {
         const gradeNum = gradeObj.grade.match(/\d+/) ? gradeObj.grade.match(/\d+/)[0] : '';
         const isLockedGrade = !hasGradeAccess(studentLop, gradeNum);
+        const shortGradeLabel = gradeNum ? `Lớp ${gradeNum}` : gradeObj.grade;
 
-        // --- Tab button ---
         const btn = document.createElement('button');
-        btn.className = 'grade-pill grade-' + gIdx + (gIdx === defaultActiveIdx ? ' active' : '');
+        btn.className = 'grade-pill seg-btn grade-' + gIdx + (gIdx === defaultActiveIdx ? ' active' : '');
         if (isLockedGrade) {
-          btn.innerHTML = gradeObj.grade + ' 🔒';
+          btn.innerHTML = `<span>${shortGradeLabel}</span>${ICONS.lock}`;
           btn.onclick = (e) => {
             e.stopPropagation();
             showLockedGradeModal(gradeObj.grade);
           };
         } else {
-          btn.textContent = gradeObj.grade;
+          btn.textContent = shortGradeLabel;
           btn.onclick = () => switchGrade(gIdx);
         }
         tabsEl.appendChild(btn);
 
-        // --- Section container ---
         const section = document.createElement('div');
         section.className = 'grade-section' + (gIdx === defaultActiveIdx ? ' active' : '');
         section.id = gradeObj.id;
 
-        // Section label
+        const totalLessonsInGrade = gradeObj.chapters.reduce((sum, ch) => sum + (ch.lessons ? ch.lessons.length : 0), 0);
+
         const labelDiv = document.createElement('div');
         labelDiv.className = 'section-label';
-        labelDiv.innerHTML = `<h3>Danh sách bài học — ${gradeObj.grade}</h3>`;
+        labelDiv.innerHTML = `
+          <h3>Danh mục bài học — ${gradeObj.grade}</h3>
+          <span class="section-summary">${gradeObj.chapters.length} chương · ${totalLessonsInGrade} bài học</span>
+        `;
         section.appendChild(labelDiv);
 
-        // Cards list
         const cardsList = document.createElement('div');
         cardsList.className = 'cards-list';
 
-        // Prepend "đề thi/bài tập" card before chapter cards
         const examsToRender = mockExams && mockExams.length > 0 ? mockExams : DEFAULT_MOCK_EXAMS;
         const matchingExams = examsToRender.filter(exam => {
           let examLop = '';
           if (exam.lop !== undefined && exam.lop !== null && exam.lop !== '') {
             examLop = String(exam.lop).match(/\d+/) ? String(exam.lop).match(/\d+/)[0] : '';
           } else {
-            // Guess grade from title or description
             const textToSearch = (exam.title + ' ' + (exam.desc || '')).toLowerCase();
             const match = textToSearch.match(/\b(10|11|12)\b/) || textToSearch.match(/(10|11|12)/);
-            if (match) {
-              examLop = match[1];
-            } else {
-              // Default to 12 if not specified
-              examLop = '12';
-            }
+            examLop = match ? match[1] : '12';
           }
           if (examLop !== gradeNum) return false;
-          
-          // Loại bỏ các bài tập dựa trên mã đề có dạng lớp_cChương_bBài
           const hasLessonPattern = exam.id && /\d+_c\d+_b\d+/i.test(exam.id);
           return !hasLessonPattern;
         });
@@ -2528,19 +2037,6 @@
         if (matchingExams.length > 0) {
           const wrapper = document.createElement('div');
           wrapper.className = 'ch-card-wrapper';
-
-          const dotColor = '#7c4dff'; // Purple theme color for exams
-          const glowShadow = 'rgba(124, 77, 255, 0.35)';
-          const glowGradient = `linear-gradient(137deg, #7c4dff 0%, #b388ff 50%, #e0aeff 100%)`;
-
-          wrapper.style.setProperty('--glow-color', dotColor);
-          wrapper.style.setProperty('--glow-shadow', glowShadow);
-          wrapper.style.setProperty('--glow-gradient', glowGradient);
-
-          const glow = document.createElement('div');
-          glow.className = 'ch-card-glow';
-          // Glow background styling is handled via CSS var(--glow-gradient)
-          wrapper.appendChild(glow);
 
           const card = document.createElement('div');
           card.className = 'ch-card' + (isLockedGrade ? ' locked' : '');
@@ -2550,28 +2046,17 @@
             card.setAttribute('onclick', 'toggleCard(this)');
           }
 
-          card.style.setProperty('--glow-color', dotColor);
-          card.style.setProperty('--glow-shadow', glowShadow);
-          card.style.setProperty('--glow-gradient', glowGradient);
-
-          // Card background styling is handled via CSS var(--glow-gradient)
-
-          const pillsHTML = `
-            <div class="pill pill-a" style="background:linear-gradient(135deg,#7c4dff,#b388ff)"></div>
-            <div class="pill pill-b" style="background:linear-gradient(135deg,#9d4edd,#c77dff)"></div>
-            <div class="pill pill-c" style="background:linear-gradient(135deg,#ffffff,#b388ff)"></div>`;
-
           let completedMockCount = 0;
-          const lessonsHTML = matchingExams.map(exam => {
+          const lessonsHTML = matchingExams.map((exam, exIdx) => {
             const clickAction = `event.stopPropagation(); const session = getSession(); if (session && session.premium) { window.location.href='l.html#${exam.id}'; } else { window.location.href='premium.html'; }`;
+            const hasVideo = exam.videoUrl &&
+              exam.videoUrl !== '#' &&
+              exam.videoUrl.trim() !== '' &&
+              exam.videoUrl.trim() !== 'null' &&
+              exam.videoUrl.trim() !== 'undefined';
 
-            const hasVideo = exam.videoUrl && 
-                             exam.videoUrl !== '#' && 
-                             exam.videoUrl.trim() !== '' && 
-                             exam.videoUrl.trim() !== 'null' && 
-                             exam.videoUrl.trim() !== 'undefined';
             const videoBtnHTML = hasVideo
-              ? `<a href="javascript:void(0)" class="lnk lnk-video" onclick="event.stopPropagation(); openVideoModal('${exam.videoUrl}')">▶️ Video chữa</a>`
+              ? `<a href="javascript:void(0)" class="lnk lnk-video" onclick="event.stopPropagation(); openVideoModal('${exam.videoUrl}')">${ICONS.video} Video chữa</a>`
               : '';
 
             let lockBadge = '';
@@ -2579,44 +2064,47 @@
             if (openDate && openDate.getTime() > Date.now()) {
               const pad = n => String(n).padStart(2, '0');
               const timeStr = `${pad(openDate.getHours())}:${pad(openDate.getMinutes())} ${pad(openDate.getDate())}/${pad(openDate.getMonth() + 1)}`;
-              lockBadge = `<span class="exam-scheduled-badge" title="Đề thi sẽ mở vào lúc ${timeStr}">🔒 Mở ${timeStr}</span>`;
+              lockBadge = `<span class="exam-scheduled-badge" title="Đề thi sẽ mở vào lúc ${timeStr}">${ICONS.lock} Mở ${timeStr}</span>`;
             }
 
-            const làmBàiBtnHTML = `<a href="javascript:void(0)" class="lnk lnk-tracNghiem" onclick="${clickAction}">📝 Làm bài (${exam.duration || 50} phút)</a>`;
+            const lamBaiBtnHTML = `<a href="javascript:void(0)" class="lnk lnk-tracNghiem" onclick="${clickAction}">${ICONS.edit} Làm bài (${exam.duration || 50} phút)</a>`;
 
             const isCompleted = studentProgressMap[exam.id] || 0;
             if (isCompleted > 0) completedMockCount++;
+            const numCode = String(exIdx + 1).padStart(2, '0');
 
             return `
               <div class="lesson-row ${isCompleted > 0 ? 'completed' : ''}">
                 <div class="lesson-meta">
-                  <span class="lesson-dot" style="background:#7c4dff"></span>
-                  <span class="lesson-title">${exam.title} ${isCompleted > 0 ? `<span class="lesson-checkmark red">✓${isCompleted > 1 ? `x${isCompleted}` : ''}</span>` : ''} ${lockBadge}</span>
-                  <span class="lesson-num" style="color:#b388ff">VIP</span>
+                  <div class="lesson-meta-left">
+                    <span class="lesson-code">${numCode}</span>
+                    <span class="lesson-title">${exam.title}${isCompleted > 0 ? `<span class="lesson-done-tag is-exam">Đã làm${isCompleted > 1 ? ` · ${isCompleted}` : ''}</span>` : ''}${lockBadge}</span>
+                  </div>
+                  <span class="lesson-num is-vip">VIP</span>
                 </div>
-                <div class="lesson-links">${làmBàiBtnHTML}${videoBtnHTML ? ' ' + videoBtnHTML : ''}</div>
+                <div class="lesson-links">${lamBaiBtnHTML}${videoBtnHTML ? ' ' + videoBtnHTML : ''}</div>
               </div>`;
           }).join('');
 
           card.innerHTML = `
             <div class="ch-header">
-              <div class="ch-icon-wrap">${pillsHTML}</div>
+              <div class="ch-badge is-exam">ĐỀ</div>
               <div class="ch-info">
-                <div class="ch-num" style="color:#b388ff !important">ĐỀ THI THỬ</div>
-                <div class="ch-title">👑 Đề ôn thi thử ${isLockedGrade ? '🔒' : ''}</div>
+                <div class="ch-num">Luyện đề tổng hợp</div>
+                <div class="ch-title">Đề ôn thi thử ${isLockedGrade ? ICONS.lock : ''}</div>
                 <div class="tags">
-                  <span class="tag" style="color:#b388ff;border-color:#b388ff30;background:#b388ff0d">Đề ôn thi thử tốt nghiệp THPT Quốc gia</span>
+                  <span class="tag"><span class="tag-dot" style="background:var(--accent)"></span>Cấu trúc THPT Quốc gia</span>
                 </div>
                 ${isLockedGrade ? `
-                <div class="chapter-progress-text" style="color:#ff4d4d; font-weight:bold;">🔒 Dành riêng cho lớp ${studentLop || ''}</div>
-                ` : (matchingExams.length > 0 ? `
+                <div class="chapter-progress-text" style="color:var(--wrong);">Dành riêng cho lớp ${studentLop || ''}</div>
+                ` : `
                 <div class="chapter-progress-wrap">
-                  <div class="chapter-progress-bar" style="width: ${Math.round((completedMockCount / matchingExams.length) * 100)}%; background: linear-gradient(135deg, #7c4dff, #b388ff)"></div>
+                  <div class="chapter-progress-bar" style="width: ${Math.round((completedMockCount / matchingExams.length) * 100)}%"></div>
                 </div>
-                <div class="chapter-progress-text" style="color: #b388ff">${completedMockCount}/${matchingExams.length} đề hoàn thành</div>
-                ` : '')}
+                <div class="chapter-progress-text">${completedMockCount}/${matchingExams.length} đề hoàn thành</div>
+                `}
               </div>
-              <div class="ch-arrow">${isLockedGrade ? '🔒' : '<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>'}</div>
+              <div class="ch-arrow">${isLockedGrade ? ICONS.lock : ICONS.chevron}</div>
             </div>
             ${isLockedGrade ? '' : `<div class="lesson-list"><div class="lesson-inner">${lessonsHTML}</div></div>`}`;
 
@@ -2625,29 +2113,22 @@
         }
 
         gradeObj.chapters.forEach(ch => {
-          const [p0, p1, p2] = ch.pillColors;
+          const dotColor = ch.dotColor || 'var(--accent)';
+          const chapterCode = extractChapterCode(ch.num);
 
-          // Pill icons
-          const pillsHTML = `
-            <div class="pill pill-a" style="background:linear-gradient(135deg,${p0[0]},${p0[1]})"></div>
-            <div class="pill pill-b" style="background:linear-gradient(135deg,${p1[0]},${p1[1]})"></div>
-            <div class="pill pill-c" style="background:linear-gradient(135deg,${p2[0]},${p2[1]})"></div>`;
-
-          // Tags
-          const tagsHTML = ch.tags.map(t =>
-            `<span class="tag" style="color:${t.color};border-color:${t.color}30;background:${t.color}0d">${t.label}</span>`
+          const tagsHTML = (ch.tags || []).map(t =>
+            `<span class="tag"><span class="tag-dot" style="background:${t.color || dotColor}"></span>${t.label}</span>`
           ).join('');
 
           let completedCount = 0;
           const totalLessons = ch.lessons.length;
 
           const lessonsHTML = ch.lessons.map((l, lIdx) => {
-            // Tự động sinh mã đề nếu chưa có, để người dùng không phải deploy lại mỗi khi thêm đề mới
-            const gradeNum = gradeObj.grade.match(/\d+/) ? gradeObj.grade.match(/\d+/)[0] : '10';
+            const gradeNumCur = gradeObj.grade.match(/\d+/) ? gradeObj.grade.match(/\d+/)[0] : '10';
             const romanMap = { 'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10 };
             let cRaw = ch.num.replace(/chương/i, '').trim().toUpperCase();
             const cNum = romanMap[cRaw] || parseInt(cRaw) || 1;
-            const lNum = l.num; // '04'
+            const lNum = l.num;
 
             const autoLinks = {};
             if (l.links && l.links.video && typeof l.links.video === 'string' && l.links.video.trim() !== '' && l.links.video.trim() !== '#') {
@@ -2655,45 +2136,42 @@
             }
             if (l.links && l.links.baiTap) autoLinks.baiTap = l.links.baiTap;
 
-            // Tìm đề thi luyện đề (VIP) phù hợp - ("Bài tập")
             if (typeof mockExams !== 'undefined' && mockExams.length > 0) {
-              const matchedExams = findMatchingExamsForLesson(gradeNum, cNum, lNum, l.title, mockExams);
+              const matchedExams = findMatchingExamsForLesson(gradeNumCur, cNum, lNum, l.title, mockExams);
               if (matchedExams && matchedExams.length > 0) {
                 matchedExams.forEach((exam, idx) => {
                   const suffix = matchedExams.length > 1 ? ` ${idx + 1}` : '';
                   const key = `luyenDe_${exam.id}`;
-                  LINK_CONFIG[key] = { label: `Bài tập${suffix}`, cls: 'lnk-luyenDe', icon: '📝' };
+                  LINK_CONFIG[key] = { label: `Bài tập${suffix}`, cls: 'lnk-luyenDe', icon: ICONS.edit };
                   autoLinks[key] = `l.html#${exam.id}`;
                 });
               }
             }
-            
+
             let ltLink = (l.links && (l.links.luyenTap || l.links.tracNghiem)) || '#';
-            if (!ltLink || ltLink === '#') ltLink = `q.html#baitap_${gradeNum}_c${cNum}_b${lNum}`;
+            if (!ltLink || ltLink === '#') ltLink = `q.html#baitap_${gradeNumCur}_c${cNum}_b${lNum}`;
             autoLinks.luyenTap = ltLink;
 
-            let let_otLink = (l.links && l.links.onTap) || '#';
-            if (!let_otLink || let_otLink === '#') let_otLink = `q.html#ontap_${gradeNum}_c${cNum}_b${lNum}`;
-            autoLinks.onTap = let_otLink;
+            let otLink = (l.links && l.links.onTap) || '#';
+            if (!otLink || otLink === '#') otLink = `q.html#ontap_${gradeNumCur}_c${cNum}_b${lNum}`;
+            autoLinks.onTap = otLink;
 
             if (l.links && l.links.phieuDapAn) autoLinks.phieuDapAn = l.links.phieuDapAn;
 
-            // Build link buttons
             const linksHTML = Object.entries(autoLinks)
               .map(([key, url]) => {
                 const cfg = LINK_CONFIG[key];
                 if (!cfg || url === '#') {
-                  return `<span class="lnk ${cfg ? cfg.cls : ''}" style="opacity:0.4;cursor:default">${cfg ? cfg.icon + ' ' + cfg.label : key}</span>`;
+                  return `<span class="lnk ${cfg ? cfg.cls : ''} lnk-disabled">${cfg ? cfg.icon + ' ' + cfg.label : key}</span>`;
                 }
 
-                // Tự động chuẩn hóa link trắc nghiệm/luyện đề sang định dạng q.html và l.html mới
                 let normalizedUrl = url;
                 if (typeof url === 'string') {
                   if (url.includes('tracnghiem.html')) {
                     const match = url.match(/quiz=([^&]+)/);
                     let quizCode = match ? match[1] : '';
                     if (!quizCode || quizCode === 'cauhoi') {
-                      quizCode = `baitap_${gradeNum}_c${cNum}_b${lNum}`;
+                      quizCode = `baitap_${gradeNumCur}_c${cNum}_b${lNum}`;
                     } else if (quizCode.startsWith('cauhoi_')) {
                       quizCode = quizCode.replace('cauhoi_', 'baitap_');
                     }
@@ -2705,14 +2183,13 @@
                   }
                 }
 
-                // Kiểm tra xem phím bấm này có bị giới hạn Premium không (chỉ khóa video, tài liệu bài tập, phiếu đáp án)
                 const isRestrictedKey = (key === 'video' || key === 'phieuDapAn' || key === 'baiTap');
-                const session = getSession();
-                const hasAccess = (session && session.premium) || isLessonFree(gradeNum, cNum, lIdx);
+                const curSession = getSession();
+                const hasAccess = (curSession && curSession.premium) || isLessonFree(gradeNumCur, cNum, lIdx);
 
                 if (isRestrictedKey && !hasAccess) {
                   const premiumAction = `event.stopPropagation(); window.location.href='premium.html';`;
-                  return `<a href="javascript:void(0)" class="lnk ${cfg.cls}" onclick="${premiumAction}" title="Bài học Premium">${cfg.icon} ${cfg.label} 👑</a>`;
+                  return `<a href="javascript:void(0)" class="lnk ${cfg.cls}" onclick="${premiumAction}" title="Nội dung Premium">${cfg.icon} ${cfg.label} ${ICONS.lock}</a>`;
                 }
 
                 if (key === 'video') {
@@ -2721,17 +2198,16 @@
                 return `<a href="${normalizedUrl}" class="lnk ${cfg.cls}" target="_blank" onclick="event.stopPropagation()">${cfg.icon} ${cfg.label}</a>`;
               }).join('');
 
-            const isFree = isLessonFree(gradeNum, cNum, lIdx);
+            const isFree = isLessonFree(gradeNumCur, cNum, lIdx);
             const numDisplay = isFree
-              ? `<span class="lesson-num">${l.num}</span>`
-              : `<span class="lesson-num" style="color:#b388ff; font-weight:800;">VIP</span>`;
+              ? `<span class="lesson-num">Free</span>`
+              : `<span class="lesson-num is-vip">VIP</span>`;
 
-            let homeworkCompleted = (studentProgressMap[`baitap_${gradeNum}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`cauhoi_${gradeNum}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`đs_${gradeNum}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`tln_${gradeNum}_c${cNum}_b${lNum}`] || 0);
-            
-            // Check progress for dynamically matched exams
+            let homeworkCompleted = (studentProgressMap[`baitap_${gradeNumCur}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`cauhoi_${gradeNumCur}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`đs_${gradeNumCur}_c${cNum}_b${lNum}`] || 0) + (studentProgressMap[`tln_${gradeNumCur}_c${cNum}_b${lNum}`] || 0);
+
             let examCompleted = 0;
             if (typeof mockExams !== 'undefined' && mockExams.length > 0) {
-              const matchedExams = findMatchingExamsForLesson(gradeNum, cNum, lNum, l.title, mockExams);
+              const matchedExams = findMatchingExamsForLesson(gradeNumCur, cNum, lNum, l.title, mockExams);
               matchedExams.forEach(exam => {
                 examCompleted += (studentProgressMap[exam.id] || 0) + (studentProgressMap[`đs_${exam.id}`] || 0) + (studentProgressMap[`tln_${exam.id}`] || 0);
               });
@@ -2742,42 +2218,28 @@
 
             let checkmarksHtml = '';
             if (homeworkCompleted > 0) {
-              checkmarksHtml += `<span class="lesson-checkmark">✓${homeworkCompleted > 1 ? `x${homeworkCompleted}` : ''}</span>`;
+              checkmarksHtml += `<span class="lesson-done-tag">Đã làm${homeworkCompleted > 1 ? ` · ${homeworkCompleted}` : ''}</span>`;
             }
             if (examCompleted > 0) {
-              checkmarksHtml += `<span class="lesson-checkmark red">✓${examCompleted > 1 ? `x${examCompleted}` : ''}</span>`;
+              checkmarksHtml += `<span class="lesson-done-tag is-exam">Đã nộp${examCompleted > 1 ? ` · ${examCompleted}` : ''}</span>`;
             }
 
             return `
               <div class="lesson-row ${totalCompleted > 0 ? 'completed' : ''}">
                 <div class="lesson-meta">
-                  <span class="lesson-dot" style="background:${ch.dotColor}"></span>
-                  <span class="lesson-title">${l.num}. ${l.title} ${checkmarksHtml}</span>
+                  <div class="lesson-meta-left">
+                    <span class="lesson-code">${l.num}</span>
+                    <span class="lesson-title">${l.title}${checkmarksHtml}</span>
+                  </div>
                   ${numDisplay}
                 </div>
                 <div class="lesson-links">${linksHTML}</div>
               </div>`;
           }).join('');
 
-          // Wrapper element (used for premium glow layer behind the card)
           const wrapper = document.createElement('div');
           wrapper.className = 'ch-card-wrapper';
 
-          const dotColor = ch.dotColor || '#2ec4b6';
-          const glowShadow = dotColor.startsWith('#') ? `${dotColor}4d` : dotColor;
-          const glowGradient = `linear-gradient(137deg, ${p0[0]} 0%, ${p1[1]} 50%, ${p2[1]} 100%)`;
-
-          wrapper.style.setProperty('--glow-color', dotColor);
-          wrapper.style.setProperty('--glow-shadow', glowShadow);
-          wrapper.style.setProperty('--glow-gradient', glowGradient);
-
-          // Glow element
-          const glow = document.createElement('div');
-          glow.className = 'ch-card-glow';
-          // Glow background styling is handled via CSS var(--glow-gradient)
-          wrapper.appendChild(glow);
-
-          // Card element
           const card = document.createElement('div');
           card.className = 'ch-card' + (isLockedGrade ? ' locked' : '');
           if (isLockedGrade) {
@@ -2786,21 +2248,15 @@
             card.setAttribute('onclick', 'toggleCard(this)');
           }
 
-          card.style.setProperty('--glow-color', dotColor);
-          card.style.setProperty('--glow-shadow', glowShadow);
-          card.style.setProperty('--glow-gradient', glowGradient);
-
-          // Card background styling is handled via CSS var(--glow-gradient)
-
           card.innerHTML = `
             <div class="ch-header">
-              <div class="ch-icon-wrap">${pillsHTML}</div>
+              <div class="ch-badge">${chapterCode}</div>
               <div class="ch-info">
                 <div class="ch-num">${ch.num}</div>
-                <div class="ch-title">${ch.title} ${isLockedGrade ? '🔒' : ''}</div>
+                <div class="ch-title">${ch.title} ${isLockedGrade ? ICONS.lock : ''}</div>
                 <div class="tags">${tagsHTML}</div>
                 ${isLockedGrade ? `
-                <div class="chapter-progress-text" style="color:#ff4d4d; font-weight:bold;">🔒 Dành riêng cho lớp ${studentLop || ''}</div>
+                <div class="chapter-progress-text" style="color:var(--wrong);">Dành riêng cho lớp ${studentLop || ''}</div>
                 ` : (totalLessons > 0 ? `
                 <div class="chapter-progress-wrap">
                   <div class="chapter-progress-bar" style="width: ${Math.round((completedCount / totalLessons) * 100)}%"></div>
@@ -2808,7 +2264,7 @@
                 <div class="chapter-progress-text">${completedCount}/${totalLessons} bài hoàn thành</div>
                 ` : '')}
               </div>
-              <div class="ch-arrow">${isLockedGrade ? '🔒' : '<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>'}</div>
+              <div class="ch-arrow">${isLockedGrade ? ICONS.lock : ICONS.chevron}</div>
             </div>
             ${isLockedGrade ? '' : `<div class="lesson-list"><div class="lesson-inner">${lessonsHTML}</div></div>`}`;
 
@@ -2821,19 +2277,14 @@
       });
     }
 
-    // ── SESSION / LOGIN ──
-    // === CẤU HÌNH SUPABASE & SHEETS API ===
     var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
     var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
     var SHEETS_API_URL = window.SHEETS_API_URL || 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
-    // ======================================
     var SESSION_KEY = window.SESSION_KEY || 'zphysics_session';
 
-    // ── HÀM TRỢ GIÚP CHO VIDEO PLAYER ──
     function getYouTubeEmbedUrl(url) {
       if (!url) return '';
       let videoId = '';
-
       const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
       const match = url.match(regExp);
 
@@ -2845,7 +2296,7 @@
           if (urlObj.hostname.includes('youtube.com')) {
             videoId = urlObj.searchParams.get('v');
           }
-        } catch (e) { }
+        } catch (e) {}
       }
 
       if (videoId) {
@@ -2875,7 +2326,6 @@
         const s = localStorage.getItem(SESSION_KEY);
         if (!s) return null;
         const session = JSON.parse(s);
-        // Tự động hạ cấp phiên đăng nhập cục bộ nếu đã hết hạn premium
         if (session.premium && session.premium_until) {
           const expDate = new Date(session.premium_until);
           if (expDate < new Date()) {
@@ -2884,14 +2334,16 @@
           }
         }
         return session;
-      } catch { return null; }
+      } catch {
+        return null;
+      }
     }
 
     function saveSession(gmail, ten, premium, premiumUntil = null, lop = null) {
-      localStorage.setItem(SESSION_KEY, JSON.stringify({ 
-        gmail, 
-        ten, 
-        premium: !!premium, 
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        gmail,
+        ten,
+        premium: !!premium,
         premium_until: premiumUntil,
         lop: lop
       }));
@@ -2901,75 +2353,80 @@
       localStorage.removeItem(SESSION_KEY);
     }
 
+    function updateThemeToggleLabel(isLight) {
+      const labelEl = document.getElementById('themeLabel');
+      if (labelEl) {
+        labelEl.textContent = isLight ? 'Giao diện Sáng' : 'Giao diện Tối';
+      }
+      const darkToggleBg = document.getElementById('darkToggleBg');
+      if (darkToggleBg) {
+        darkToggleBg.style.opacity = isLight ? '0' : '1';
+      }
+    }
+
     function showApp(ten, premium) {
       const isPremium = premium !== undefined ? !!premium : (getSession() ? !!getSession().premium : false);
       const statusEl = document.getElementById('popupStatus');
 
       const btnDashboard = document.getElementById('btnDashboard');
       if (btnDashboard) {
-        btnDashboard.style.display = isPremium ? 'block' : 'none';
+        btnDashboard.style.display = isPremium ? 'flex' : 'none';
+      }
+      const sidebarDashboardBtn = document.getElementById('sidebarDashboardBtn');
+      if (sidebarDashboardBtn) {
+        sidebarDashboardBtn.style.display = isPremium ? 'flex' : 'none';
+      }
+      const sidebarPremiumLink = document.getElementById('sidebarPremiumLink');
+      if (sidebarPremiumLink) {
+        sidebarPremiumLink.style.display = isPremium ? 'none' : 'flex';
       }
 
       if (isPremium) {
         document.body.classList.add('premium-theme');
-        
-        // --- Restore Premium Light Mode ---
+        const explicitTheme = localStorage.getItem('zphysics_theme');
         const savedMode = localStorage.getItem('zphysics_premium_mode');
-        if (savedMode === 'light') {
-          document.body.classList.add('premium-light');
-          document.getElementById('darkToggleBg').style.opacity = '0';
-        } else {
-          document.body.classList.remove('premium-light');
-          document.getElementById('darkToggleBg').style.opacity = '1';
-        }
-        document.getElementById('themeToggleWrap').style.display = 'block';
-        document.getElementById('greetingText').innerHTML = `Xin chào, ${ten} <span style="background: linear-gradient(135deg, #ffe27a, #d4af37); color: #000; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; margin-left: 6px; box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3); display: inline-block; vertical-align: middle;">PREMIUM</span>`;
-        document.getElementById('popupName').innerHTML = `${ten} <span style="background: linear-gradient(135deg, #ffe27a, #d4af37); color: #000; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 20px; display: inline-block; vertical-align: middle; margin-left: 4px;">PREMIUM</span>`;
+        const resolved = (explicitTheme === 'light' || explicitTheme === 'dark')
+          ? explicitTheme
+          : (savedMode === 'light' ? 'light' : 'dark');
+        PinUI.applyTheme(resolved);
 
-        // Hiển thị thời hạn sử dụng Premium
+        document.getElementById('themeToggleWrap').style.display = 'block';
+        document.getElementById('greetingText').innerHTML = `<span>${ten}</span> <span class="plan-tag">Premium</span>`;
+        document.getElementById('popupName').innerHTML = `${ten} <span class="plan-tag">Premium</span>`;
+
         const session = getSession();
-        const lopStr = session && session.lop ? ` (Lớp: ${session.lop})` : '';
+        const lopStr = session && session.lop ? ` · Lớp ${session.lop}` : '';
         if (statusEl) {
           if (session && session.premium_until) {
             const date = new Date(session.premium_until);
             const dateStr = date.toLocaleDateString('vi-VN');
             const timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
             statusEl.textContent = `Hạn dùng: ${dateStr} ${timeStr}${lopStr}`;
-            statusEl.style.color = '#7dd3fc';
           } else {
-            statusEl.textContent = `Hạn dùng: Trọn đời ♾️${lopStr}`;
-            statusEl.style.color = '#ffe27a';
+            statusEl.textContent = `Hạn dùng: Trọn đời${lopStr}`;
           }
         }
 
-        // Ẩn banner quảng cáo Premium nếu đã nâng cấp
         const banner = document.querySelector('.premium-banner');
         if (banner) banner.style.display = 'none';
 
-        // Đổi trạng thái nút bấm trong popup
         const pBtn = document.querySelector('.premium-btn-popup');
         if (pBtn) {
-          pBtn.innerHTML = '💎Premium';
-          pBtn.style.pointerEvents = 'none';
-          pBtn.style.background = 'linear-gradient(135deg, #2d3561, #121216)';
-          pBtn.style.color = '#ffe27a';
-          pBtn.style.border = '1px solid rgba(212,175,55,0.3)';
-          pBtn.style.boxShadow = 'none';
+          pBtn.textContent = 'Gói Premium đã kích hoạt';
+          pBtn.classList.add('is-active');
         }
-
-        // Đã xóa phần Áp dụng kiểu viền phát sáng inline vì CSS đã lo phần việc này và để không gây lỗi khi chuyển sang Light Mode.
       } else {
         document.body.classList.remove('premium-theme');
-        document.body.classList.remove('premium-light');
+        const explicitTheme = localStorage.getItem('zphysics_theme');
+        PinUI.applyTheme(explicitTheme === 'dark' ? 'dark' : 'light');
         document.getElementById('themeToggleWrap').style.display = 'none';
-        document.getElementById('greetingText').textContent = `Xin chào, ${ten} 👋`;
+        document.getElementById('greetingText').textContent = ten;
         document.getElementById('popupName').textContent = ten;
 
         const session = getSession();
-        const lopStr = session && session.lop ? ` (Lớp: ${session.lop})` : '';
+        const lopStr = session && session.lop ? ` · Lớp ${session.lop}` : '';
         if (statusEl) {
           statusEl.textContent = `Gói: Miễn phí${lopStr}`;
-          statusEl.style.color = '#a1a1aa';
         }
 
         const banner = document.querySelector('.premium-banner');
@@ -2977,32 +2434,16 @@
 
         const pBtn = document.querySelector('.premium-btn-popup');
         if (pBtn) {
-          pBtn.innerHTML = '👑 Nâng cấp Premium';
-          pBtn.style.pointerEvents = 'auto';
-          pBtn.style.background = 'linear-gradient(135deg, #ffe27a, #d4af37)';
-          pBtn.style.color = '#000';
-          pBtn.style.border = 'none';
-          pBtn.style.boxShadow = '0 4px 12px rgba(212, 175, 55, 0.25)';
+          pBtn.textContent = 'Nâng cấp Premium';
+          pBtn.classList.remove('is-active');
         }
-
-        // Xóa kiểu viền phát sáng inline để trở về giao diện Free gốc
-        document.querySelectorAll('.ch-card-wrapper').forEach(wrapper => {
-          const glow = wrapper.querySelector('.ch-card-glow');
-          const card = wrapper.querySelector('.ch-card');
-          if (glow) glow.style.background = '';
-          if (card) {
-            card.style.backgroundImage = '';
-            card.style.backgroundOrigin = '';
-            card.style.backgroundClip = '';
-          }
-        });
       }
 
       const session = getSession();
       document.getElementById('popupEmail').textContent = session ? session.gmail : '';
       const overlay = document.getElementById('loginOverlay');
       overlay.classList.add('hiding');
-      setTimeout(() => overlay.style.display = 'none', 400);
+      setTimeout(() => { overlay.style.display = 'none'; }, 250);
     }
 
     function showLogin() {
@@ -3011,8 +2452,8 @@
       overlay.classList.remove('hiding');
     }
 
-    let isRegistering = false; // Biến đánh dấu đang trong trạng thái đăng ký tài khoản mới
-    let selectedGrade = '10'; // Lớp được chọn mặc định
+    let isRegistering = false;
+    let selectedGrade = '10';
 
     function selectGrade(grade) {
       selectedGrade = String(grade);
@@ -3026,169 +2467,35 @@
       });
     }
 
-    function cancelRegistration() {
-      isRegistering = false;
-      const emailInput = document.getElementById('loginEmail');
-      const nameInput = document.getElementById('loginName');
-      const nameWrap = document.getElementById('loginNameWrap');
-      const subtitleEl = document.getElementById('loginSubtitle');
-      const btn = document.getElementById('loginBtn');
-      const errorEl = document.getElementById('loginError');
-
-      emailInput.disabled = false;
-      btn.disabled = false;
-      nameWrap.style.display = 'none';
-      nameInput.value = '';
-      errorEl.classList.remove('visible');
-      subtitleEl.textContent = 'Đăng nhập bằng Gmail để tiếp tục';
-      btn.innerHTML = '🚀 Đăng nhập';
-      
-      // Reset về lớp 10 mặc định
-      selectGrade(10);
-      
-      emailInput.focus();
-    }
-
-    async function doLogin() {
-      const emailInput = document.getElementById('loginEmail');
-      const nameInput = document.getElementById('loginName');
-      const nameWrap = document.getElementById('loginNameWrap');
-      const subtitleEl = document.getElementById('loginSubtitle');
-      const errorEl = document.getElementById('loginError');
-      const btn = document.getElementById('loginBtn');
-      const gmail = emailInput.value.trim().toLowerCase();
-
-      // Reset
-      errorEl.classList.remove('visible');
-      emailInput.classList.remove('error');
-      nameInput.classList.remove('error');
-
-      if (!gmail) {
-        errorEl.textContent = '⚠️ Vui lòng nhập Gmail';
-        errorEl.classList.add('visible');
-        emailInput.classList.add('error');
-        emailInput.style.animation = 'shakeX 0.5s ease';
-        setTimeout(() => emailInput.style.animation = '', 500);
-        emailInput.focus();
-        return;
-      }
-
-      // Xử lý khi đang ở giao diện đăng ký học sinh mới
-      if (isRegistering) {
-        const fullName = nameInput.value.trim();
-        if (!fullName) {
-          errorEl.textContent = '⚠️ Vui lòng nhập Họ và Tên để kích hoạt';
-          errorEl.classList.add('visible');
-          nameInput.classList.add('error');
-          nameInput.style.animation = 'shakeX 0.5s ease';
-          setTimeout(() => nameInput.style.animation = '', 500);
-          nameInput.focus();
-          return;
-        }
-
-        btn.disabled = true;
-        btn.innerHTML = '<span class="login-spinner"></span> Đang kích hoạt...';
-
-        try {
-          const regUrl = `${SHEETS_API_URL}?action=registerStudent&gmail=${encodeURIComponent(gmail)}&name=${encodeURIComponent(fullName)}&lop=${encodeURIComponent(selectedGrade)}`;
-          const response = await fetch(regUrl);
-          if (!response.ok) throw new Error('Không thể kết nối Web App để kích hoạt');
-          const result = await response.json();
-
-          if (result && result.success) {
-            saveSession(gmail, result.ten || fullName, false, null, result.lop || selectedGrade); // Mới đăng ký mặc định là Free (premium = false)
-            window.location.reload();
-          } else {
-            throw new Error(result.error || result.message || 'Lỗi xử lý kích hoạt.');
-          }
-        } catch (err) {
-          console.error(err);
-          errorEl.textContent = '❌ Lỗi kích hoạt: ' + (err.message || 'Lỗi mạng, hãy thử lại.');
-          errorEl.classList.add('visible');
-        } finally {
-          btn.disabled = false;
-          if (isRegistering) {
-            btn.innerHTML = '✨ Kích hoạt tài khoản Free';
-          }
-        }
-        return;
-      }
-
-      // Trạng thái đăng nhập kiểm tra thông thường
-      btn.disabled = true;
-      btn.innerHTML = '<span class="login-spinner"></span> Đang kiểm tra...';
-
-      try {
-        const url = `${SUPABASE_URL}/rest/v1/students?email=eq.${encodeURIComponent(gmail)}&select=*`;
-        const res = await fetch(url, {
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-          }
-        });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const students = await res.json();
-
-        if (students && students.length > 0) {
-          const student = students[0];
-          const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
-          saveSession(gmail, student.full_name || gmail, isPremium, student.premium_until, student.lop);
-          window.location.reload();
-        } else {
-          // Gmail chưa tồn tại trong hệ thống -> Mở form đăng ký tự động
-          isRegistering = true;
-          emailInput.disabled = true; // Khóa trường email để tránh đổi khi đang nhập tên
-          nameWrap.style.display = 'block';
-          subtitleEl.innerHTML = '<span style="color:var(--teal); font-weight:800;">TÀI KHOẢN MỚI</span><br>Nhập Họ & Tên của em để kích hoạt tài khoản Free';
-          btn.innerHTML = '✨ Kích hoạt tài khoản Free';
-          btn.disabled = false; // Kích hoạt lại nút bấm để học sinh bấm đăng ký
-          nameInput.focus();
-        }
-      } catch (err) {
-        console.error(err);
-        errorEl.textContent = '⚠️ Lỗi kết nối. Vui lòng thử lại.';
-        errorEl.classList.add('visible');
-      } finally {
-        if (!isRegistering) {
-          btn.disabled = false;
-          btn.innerHTML = '🚀 Đăng nhập';
-        }
-      }
-    }
+    function cancelRegistration() {}
+    async function doLogin() {}
 
     function doLogout() {
       logoutStudent();
     }
 
-    // ── Xử lý popup avatar: chỉ dùng 1 listener duy nhất ──
     document.addEventListener('click', function (e) {
       const popup = document.getElementById('userPopup');
-      // Click vào avatar (hoặc bất kỳ phần tử con nào của nó trừ popup)
       if (e.target.closest('#avatarBtn') && !e.target.closest('#userPopup')) {
         popup.classList.toggle('visible');
         return;
       }
-      // Click vào nút đăng xuất
       if (e.target.closest('#logoutBtn')) {
         doLogout();
         return;
       }
-      // Click ra ngoài → đóng popup
       if (!e.target.closest('#userPopup')) {
         popup.classList.remove('visible');
       }
     });
 
-    // ── KHỞI ĐỘNG XÁC THỰC GOOGLE OAUTH & SUPABASE AUTH ──
     (async function initAuthFlow() {
-      // Đang có hash OAuth (vừa từ Google redirect về)
       const hasAuthHash = window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error'));
       if (hasAuthHash) {
         const sub = document.getElementById('loginSubtitle');
-        if (sub) sub.textContent = 'Đang đồng bộ tài khoản Google... Vui lòng đợi';
+        if (sub) sub.textContent = 'Đang đồng bộ tài khoản Google...';
       }
 
-      // Kiểm tra và đồng bộ phiên đăng nhập từ Supabase
       const session = await syncAndGetAuthSession();
       if (session && session.gmail) {
         try {
@@ -3200,42 +2507,30 @@
         }
         initApp();
       } else {
-        // Nếu vừa từ Google về mà gặp lỗi thì giữ lại thông báo, không vội redirect làm mất dấu vết
         if (hasAuthHash) {
           const sub = document.getElementById('loginSubtitle');
-          if (sub) sub.textContent = 'Đăng nhập không thành công. Vui lòng bấm thử lại!';
+          if (sub) sub.textContent = 'Đăng nhập không thành công. Vui lòng thử lại.';
           return;
         }
-        // Chưa đăng nhập bình thường -> Chuyển hướng sang Landing Page
         window.location.href = 'landing.html';
       }
     })();
-    // Nếu chưa login → overlay tự hiện (mặc định display: flex)
 
-    // ── THEME TOGGLE LOGIC ──
     function togglePremiumThemeMode() {
-      const isLight = document.body.classList.toggle('premium-light');
-      localStorage.setItem('zphysics_premium_mode', isLight ? 'light' : 'dark');
-      
-      const darkToggleBg = document.getElementById('darkToggleBg');
-      if (darkToggleBg) {
-        darkToggleBg.style.opacity = isLight ? '0' : '1';
-      }
+      const btn = document.getElementById('sidebarPinThemeBtn') || document.getElementById('themeToggle');
+      PinUI.toggleTheme(btn);
     }
 
-    // ── Fetch JSON + Google Sheets links và khởi động ──
     async function initApp() {
       try {
-        // 1. Tải trước từ cache đề thi để hiển thị đề VIP tức thì (<10ms)
         try {
           const cachedExams = localStorage.getItem('zphysics_exams_cache');
           if (cachedExams) {
             const parsed = JSON.parse(cachedExams);
             if (Array.isArray(parsed) && parsed.length > 0) mockExams = parsed;
           }
-        } catch(e) {}
+        } catch (e) {}
 
-        // 2. Tải baihoc.json trước và render ngay lập tức (<50ms), không để người dùng phải chờ Supabase
         const baihocPromise = fetch('baihoc.json').then(res => {
           if (!res.ok) throw new Error('Không thể tải baihoc.json');
           return res.json();
@@ -3248,7 +2543,6 @@
         const abortCtrl = new AbortController();
         const timeoutId = setTimeout(() => abortCtrl.abort(), 4000);
 
-        // 3. Tải danh sách đề thi luyện đề VIP từ Supabase trong nền
         const luyendePromise = fetch(`${SUPABASE_URL}/rest/v1/exams?select=*`, {
           signal: abortCtrl.signal,
           headers: {
@@ -3261,31 +2555,29 @@
             const data = await res.json();
             return data.map(item => ({
               ...item,
-              desc: item.description, // Khớp trường desc mà frontend sử dụng
-              lop: item.grade,         // Khớp trường lop để phân chia theo lớp 10, 11, 12
-              pdfUrl: item.pdf_url,     // Khớp trường pdfUrl
-              videoUrl: item.video_url, // Khớp trường videoUrl
+              desc: item.description,
+              lop: item.grade,
+              pdfUrl: item.pdf_url,
+              videoUrl: item.video_url,
               mcAnswers: item.mc_answers,
               tfAnswers: item.tf_answers,
               saAnswers: item.sa_answers,
               openAt: item.open_at || ''
             }));
           })
-          .catch(err => {
-            console.warn('Lỗi tải đề từ Supabase, chuyển sang dùng luyende.json offline:', err);
+          .catch(() => {
             try {
               const cached = localStorage.getItem('zphysics_exams_cache');
               if (cached) {
                 const parsed = JSON.parse(cached);
                 if (Array.isArray(parsed) && parsed.length > 0) return parsed;
               }
-            } catch(e) {}
+            } catch (e) {}
             return fetch('luyende.json?v=' + Date.now())
               .then(res => res.json())
               .catch(() => []);
           });
 
-        // Tải các link động từ Supabase
         const linksPromise = fetch(`${SUPABASE_URL}/rest/v1/lessons?select=*`, {
           signal: abortCtrl.signal,
           headers: {
@@ -3303,10 +2595,7 @@
               baiTap: item.exercise_url
             }));
           })
-          .catch(err => {
-            console.warn('Lỗi tải Supabase lessons links:', err);
-            return [];
-          });
+          .catch(() => []);
 
         const session = getSession();
         let progressPromise = Promise.resolve([]);
@@ -3320,7 +2609,6 @@
           }).then(res => res.ok ? res.json() : []).catch(() => []);
         }
 
-        // 4. Đồng bộ dữ liệu Supabase ngầm và làm mới giao diện mượt mà khi dữ liệu về
         Promise.all([linksPromise, luyendePromise, progressPromise]).then(([sheetLinks, luyendeData, progressData]) => {
           clearTimeout(timeoutId);
           let needUpdate = false;
@@ -3329,7 +2617,7 @@
             mockExams = luyendeData;
             try {
               localStorage.setItem('zphysics_exams_cache', JSON.stringify(luyendeData));
-            } catch(e) {}
+            } catch (e) {}
             needUpdate = true;
           }
 
@@ -3380,7 +2668,7 @@
       } catch (err) {
         console.error(err);
         document.getElementById('gradeContent').innerHTML =
-          `<p style="color:#e53935;text-align:center;padding:40px 24px;font-weight:700">⚠️ Không tải được dữ liệu bài học.<br><small style="font-weight:600;opacity:.7">${err.message || 'Lỗi kết nối'}</small></p>`;
+          `<p style="color:var(--wrong);text-align:center;padding:40px 24px;font-weight:500">Không tải được dữ liệu bài học.<br><small style="opacity:.7">${err.message || 'Lỗi kết nối'}</small></p>`;
       }
     }
   </script>

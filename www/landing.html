@@ -4,516 +4,1245 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zphysics — Học Vật Lý THPT Hiệu Quả</title>
-  <meta name="description" content="Zphysics — Nền tảng học Vật lý THPT số 1 Việt Nam. Luyện đề trắc nghiệm, bài học tương tác và theo dõi tiến trình học tập.">
+  <title>Zphysics — Học và luyện đề Vật lý THPT</title>
+  <meta name="description" content="Zphysics — Nền tảng học Vật lý THPT. Luyện đề trắc nghiệm 3 phần chuẩn GDPT 2018, bài giảng và phòng luyện đề PDF.">
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/auth.js?v=20261111_07"></script>
+  <link rel="stylesheet" href="assets/css/pinui.css">
+  <script src="assets/js/pinui.js"></script>
+  <script>PinUI.initTheme('light');</script>
   <style>
     :root {
-      --teal: #2ec4b6;
-      --teal-dark: #1fa99d;
-      --teal-glow: rgba(46,196,182,0.35);
-      --navy: #1a2255;
-      --text: #2d3561;
-      --muted: #8e97c5;
-      --bg: #f0f4ff;
-      --card: rgba(255,255,255,0.78);
-      --card-solid: #ffffff;
-      --border: rgba(255,255,255,0.85);
-      --shadow: rgba(100,120,200,0.14);
-      --pink: #ff6b9d;
-      --amber: #ffb703;
-      --purple: #7c5cbf;
-    }
-    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-    html { scroll-behavior:smooth; }
-    body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; line-height:1.6; }
-
-    /* BG */
-    .bg-canvas {
-      position:fixed; inset:0; z-index:0;
-      background:
-        radial-gradient(ellipse 60% 55% at 8% 0%, #c8d8ff 0%, transparent 60%),
-        radial-gradient(ellipse 50% 45% at 92% 8%, #ffd6e8 0%, transparent 55%),
-        radial-gradient(ellipse 40% 55% at 82% 92%, #c8f5f2 0%, transparent 55%),
-        radial-gradient(ellipse 55% 45% at 8% 88%, #ffe8cc 0%, transparent 55%),
-        radial-gradient(ellipse 35% 35% at 50% 50%, #e8d5ff 0%, transparent 60%),
-        #f0f4ff;
-      pointer-events:none;
-    }
-    .orb { position:fixed; border-radius:50%; filter:blur(80px); opacity:0.22; pointer-events:none; z-index:0; animation:floatOrb 12s ease-in-out infinite; }
-    .orb-1 { width:500px; height:500px; background:#2ec4b6; top:-100px; left:-150px; animation-delay:0s; }
-    .orb-2 { width:400px; height:400px; background:#ff6b9d; bottom:10%; right:-120px; animation-delay:-4s; }
-    .orb-3 { width:350px; height:350px; background:#7c5cbf; top:50%; left:50%; animation-delay:-8s; }
-    @keyframes floatOrb {
-      0%,100% { transform:translate(0,0) scale(1); }
-      33% { transform:translate(30px,-40px) scale(1.05); }
-      66% { transform:translate(-20px,20px) scale(0.95); }
+      --bg-deep: #f2ede4;
+      --bg: #f7f4ee;
+      --card: #fdfbf7;
+      --raised: #efe9df;
+      --border: rgba(31, 27, 22, 0.08);
+      --border-strong: rgba(31, 27, 22, 0.14);
+      --text: #1f1b16;
+      --text-secondary: #5e554a;
+      --muted: #7b7266;
+      --accent: #0d9488;
+      --accent-hover: #0f766e;
+      --accent-subtle: rgba(13, 148, 136, 0.10);
+      --correct: #16a34a;
+      --correct-subtle: rgba(22, 163, 74, 0.10);
+      --wrong: #dc2626;
+      --wrong-subtle: rgba(220, 38, 38, 0.08);
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    /* LAYOUT */
-    .page { position:relative; z-index:1; max-width:1160px; margin:0 auto; padding:0 24px; }
-
-    /* NAVBAR */
-    nav { position:fixed; top:0; left:0; right:0; z-index:9000; padding:0 24px; }
-    .nav-inner {
-      max-width:1160px; margin:0 auto;
-      display:flex; align-items:center; justify-content:space-between;
-      padding:14px 28px; margin-top:14px;
-      background:rgba(255,255,255,0.65);
-      backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-      border-radius:20px; border:1.5px solid rgba(255,255,255,0.8);
-      box-shadow:0 8px 32px rgba(100,120,200,0.12);
-      transition:all 0.4s ease;
-    }
-    .nav-logo { font-size:24px; font-weight:900; color:var(--text); text-decoration:none; }
-    .nav-logo span { color:var(--teal); }
-    .nav-links { display:flex; align-items:center; gap:28px; list-style:none; }
-    .nav-links a { font-size:15px; font-weight:700; color:var(--muted); text-decoration:none; transition:color 0.2s; }
-    .nav-links a:hover { color:var(--text); }
-    .nav-cta {
-      padding:10px 22px; border-radius:50px;
-      background:linear-gradient(135deg,var(--teal),#26c6da);
-      color:#fff !important; font-weight:900 !important;
-      box-shadow:0 4px 16px var(--teal-glow);
-      transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1) !important;
-    }
-    .nav-cta:hover { transform:translateY(-2px) scale(1.04) !important; box-shadow:0 8px 24px var(--teal-glow) !important; color:#fff !important; }
-
-    /* HERO */
-    .hero { min-height:100vh; display:flex; align-items:center; padding-top:120px; padding-bottom:80px; position:relative; z-index:1; }
-    .hero-content { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; width:100%; }
-    .hero-badge {
-      display:inline-flex; align-items:center; gap:8px;
-      padding:7px 18px; border-radius:50px;
-      background:rgba(46,196,182,0.1); border:1.5px solid rgba(46,196,182,0.3);
-      font-size:13px; font-weight:800; color:var(--teal-dark);
-      margin-bottom:22px; animation:fadeInUp 0.6s ease both;
-    }
-    .hero-badge .dot { width:8px; height:8px; border-radius:50%; background:var(--teal); animation:pulseDot 2s ease infinite; }
-    @keyframes pulseDot { 0%,100% { box-shadow:0 0 0 0 rgba(46,196,182,0.5); } 50% { box-shadow:0 0 0 6px rgba(46,196,182,0); } }
-    .hero-title { font-size:clamp(38px,5vw,62px); font-weight:900; line-height:1.08; color:var(--text); margin-bottom:18px; animation:fadeInUp 0.6s 0.1s ease both; }
-    .hero-title .accent { color:var(--teal); }
-    .hero-title .brand { color:var(--navy); }
-    .hero-subtitle { font-size:17px; font-weight:600; color:var(--muted); line-height:1.65; margin-bottom:36px; max-width:480px; animation:fadeInUp 0.6s 0.2s ease both; }
-    .hero-actions { display:flex; gap:14px; flex-wrap:wrap; animation:fadeInUp 0.6s 0.3s ease both; }
-    .btn-primary {
-      display:inline-flex; align-items:center; gap:10px;
-      padding:14px 28px; border-radius:50px; border:none; cursor:pointer;
-      font-family:'Nunito',sans-serif; font-size:16px; font-weight:900; color:#fff;
-      background:linear-gradient(135deg,var(--teal),#26c6da);
-      box-shadow:0 8px 28px var(--teal-glow);
-      transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1); text-decoration:none;
-    }
-    .btn-primary:hover { transform:translateY(-4px) scale(1.04); box-shadow:0 16px 44px var(--teal-glow); }
-    .btn-primary:active { transform:scale(0.97); }
-    .btn-secondary {
-      display:inline-flex; align-items:center; gap:10px;
-      padding:14px 28px; border-radius:50px; border:2px solid rgba(46,196,182,0.3); cursor:pointer;
-      font-family:'Nunito',sans-serif; font-size:16px; font-weight:800; color:var(--text);
-      background:rgba(255,255,255,0.6); backdrop-filter:blur(12px);
-      transition:all 0.3s ease; text-decoration:none;
-    }
-    .btn-secondary:hover { border-color:var(--teal); background:rgba(255,255,255,0.9); transform:translateY(-2px); }
-
-    /* PHYSICS CARDS */
-    .hero-visual { position:relative; height:520px; animation:fadeInRight 0.8s 0.2s ease both; }
-    @keyframes fadeInRight { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
-    .physics-card {
-      position:absolute;
-      background:var(--card); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-      border-radius:24px; border:1.5px solid var(--border); box-shadow:0 12px 48px var(--shadow);
-      padding:18px 22px; animation:floatCard 6s ease-in-out infinite;
-    }
-    .pc-main { top:50%; left:50%; transform:translate(-50%,-50%); width:280px; text-align:center; background:rgba(255,255,255,0.92); animation:floatCardCenter 6s ease-in-out infinite; }
-    @keyframes floatCardCenter { 0%,100% { transform:translate(-50%,-50%) scale(1); } 50% { transform:translate(-50%,calc(-50% - 12px)) scale(1.02); } }
-    .pc-topleft { top:40px; left:20px; width:158px; padding:13px 16px; animation-delay:-2s; }
-    .pc-topright { top:30px; right:0; width:168px; padding:13px 16px; animation-delay:-4s; }
-    .pc-bottomleft { bottom:60px; left:0; width:153px; padding:13px 16px; animation-delay:-1s; }
-    .pc-bottomright { bottom:40px; right:10px; width:173px; padding:13px 16px; animation-delay:-3s; }
-    @keyframes floatCard { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-14px); } }
-    .pc-label { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:10px; }
-    .pc-formula { font-size:30px; font-weight:900; color:var(--text); margin-bottom:7px; }
-    .pc-formula span { color:var(--teal); }
-    .pc-name { font-size:12px; font-weight:700; color:var(--muted); }
-    .pc-mini-label { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:5px; }
-    .pc-mini-val { font-size:19px; font-weight:900; color:var(--text); }
-    .pc-mini-val .c { color:var(--teal); }
-    .pc-mini-sub { font-size:11px; font-weight:700; color:var(--muted); margin-top:2px; }
-    .score-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 11px; border-radius:50px; font-size:11px; font-weight:900; margin-top:5px; }
-    .chip-green { background:rgba(67,160,71,0.12); color:#388e3c; }
-    .chip-orange { background:rgba(249,168,37,0.15); color:#f9a825; }
-    .chip-pink { background:rgba(255,107,157,0.12); color:#e91e8c; }
-    .chip-blue { background:rgba(46,196,182,0.12); color:var(--teal-dark); }
-
-    /* STATS */
-    .stats-bar { padding:48px 0; position:relative; z-index:1; }
-    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
-    .stat-card { background:var(--card); backdrop-filter:blur(16px); border-radius:24px; border:1.5px solid var(--border); box-shadow:0 6px 28px var(--shadow); padding:26px 20px; text-align:center; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.3s; }
-    .stat-card:hover { transform:translateY(-6px); box-shadow:0 16px 48px var(--shadow); }
-    .stat-icon { font-size:30px; margin-bottom:10px; display:block; }
-    .stat-number { font-size:32px; font-weight:900; color:var(--text); line-height:1.1; }
-    .stat-number span { color:var(--teal); }
-    .stat-label { font-size:13px; font-weight:700; color:var(--muted); margin-top:4px; }
-
-    /* SECTION HEAD */
-    .section-head { text-align:center; margin-bottom:52px; }
-    .section-eyebrow { display:inline-block; font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:2px; color:var(--teal-dark); background:rgba(46,196,182,0.1); border:1.5px solid rgba(46,196,182,0.25); border-radius:50px; padding:5px 16px; margin-bottom:16px; }
-    .section-title { font-size:clamp(26px,4vw,42px); font-weight:900; color:var(--text); line-height:1.15; margin-bottom:12px; }
-    .section-title .accent { color:var(--teal); }
-    .section-desc { font-size:16px; font-weight:600; color:var(--muted); max-width:560px; margin:0 auto; }
-
-    /* FEATURES */
-    .features { padding:80px 0; position:relative; z-index:1; }
-    .features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
-    .feat-card { background:var(--card); backdrop-filter:blur(16px); border-radius:28px; border:1.5px solid var(--border); box-shadow:0 8px 32px var(--shadow); padding:32px 24px; transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1); position:relative; overflow:hidden; }
-    .feat-card::before { content:''; position:absolute; top:-1px; left:-1px; right:-1px; height:4px; border-radius:28px 28px 0 0; opacity:0; transition:opacity 0.3s; }
-    .feat-card:hover { transform:translateY(-8px); box-shadow:0 24px 64px var(--shadow); }
-    .feat-card:hover::before { opacity:1; }
-    .fc-teal::before { background:linear-gradient(90deg,var(--teal),#26c6da); }
-    .fc-pink::before { background:linear-gradient(90deg,var(--pink),#ff9a9e); }
-    .fc-purple::before { background:linear-gradient(90deg,var(--purple),#a78bfa); }
-    .fc-amber::before { background:linear-gradient(90deg,var(--amber),#ffd60a); }
-    .fc-green::before { background:linear-gradient(90deg,#43a047,#81c784); }
-    .fc-blue::before { background:linear-gradient(90deg,#2196f3,#64b5f6); }
-    .feat-icon { width:56px; height:56px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:16px; }
-    .bg-teal { background:rgba(46,196,182,0.12); }
-    .bg-pink { background:rgba(255,107,157,0.12); }
-    .bg-purple { background:rgba(124,92,191,0.12); }
-    .bg-amber { background:rgba(255,183,3,0.12); }
-    .bg-green { background:rgba(67,160,71,0.12); }
-    .bg-blue { background:rgba(33,150,243,0.12); }
-    .feat-title { font-size:17px; font-weight:900; color:var(--text); margin-bottom:9px; }
-    .feat-desc { font-size:14px; font-weight:600; color:var(--muted); line-height:1.65; }
-
-    /* HOW */
-    .how { padding:80px 0; position:relative; z-index:1; }
-    .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:0; position:relative; }
-    .steps::before { content:''; position:absolute; top:50px; left:16.5%; right:16.5%; height:2px; background:linear-gradient(90deg,var(--teal),#26c6da,var(--teal)); opacity:0.28; }
-    .step { display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 24px; }
-    .step-num { width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,var(--teal),#26c6da); display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:900; color:#fff; box-shadow:0 8px 28px var(--teal-glow); position:relative; z-index:1; margin-bottom:22px; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-    .step:hover .step-num { transform:scale(1.12) rotate(-4deg); }
-    .step-title { font-size:17px; font-weight:900; color:var(--text); margin-bottom:8px; }
-    .step-desc { font-size:14px; font-weight:600; color:var(--muted); line-height:1.6; }
-
-    /* TESTIMONIALS */
-    .testimonials { padding:80px 0; position:relative; z-index:1; }
-    .testi-track { overflow:hidden; position:relative; }
-    .testi-track::before,.testi-track::after { content:''; position:absolute; top:0; bottom:0; width:80px; z-index:2; pointer-events:none; }
-    .testi-track::before { left:0; background:linear-gradient(to right,var(--bg),transparent); }
-    .testi-track::after { right:0; background:linear-gradient(to left,var(--bg),transparent); }
-    .testi-scroll { display:flex; gap:18px; animation:scrollTestis 32s linear infinite; width:max-content; }
-    .testi-scroll:hover { animation-play-state:paused; }
-    @keyframes scrollTestis { 0% { transform:translateX(0); } 100% { transform:translateX(-50%); } }
-    .testi-card { flex-shrink:0; width:295px; background:var(--card); backdrop-filter:blur(16px); border-radius:24px; border:1.5px solid var(--border); box-shadow:0 6px 24px var(--shadow); padding:22px; }
-    .testi-stars { display:flex; gap:3px; margin-bottom:12px; }
-    .testi-stars span { font-size:14px; }
-    .testi-text { font-size:14px; font-weight:700; color:var(--text); line-height:1.6; margin-bottom:15px; }
-    .testi-author { display:flex; align-items:center; gap:11px; }
-    .testi-avatar { width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:900; color:#fff; flex-shrink:0; }
-    .testi-name { font-size:13px; font-weight:900; color:var(--text); }
-    .testi-info { font-size:12px; font-weight:700; color:var(--muted); }
-
-    /* CTA + LOGIN */
-    .cta-section { padding:80px 0 120px; position:relative; z-index:1; }
-    .cta-wrapper { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
-    .cta-left h2 { font-size:clamp(26px,3.5vw,42px); font-weight:900; color:var(--text); line-height:1.15; margin-bottom:14px; }
-    .cta-left h2 .accent { color:var(--teal); }
-    .cta-left > p { font-size:16px; font-weight:600; color:var(--muted); margin-bottom:24px; line-height:1.65; }
-    .perks { display:flex; flex-direction:column; gap:11px; }
-    .perk { display:flex; align-items:center; gap:12px; font-size:15px; font-weight:700; color:var(--text); }
-    .perk-icon { width:36px; height:36px; border-radius:12px; background:rgba(46,196,182,0.1); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
-    .login-card { background:rgba(255,255,255,0.88); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-radius:32px; border:1.5px solid var(--border); box-shadow:0 16px 64px var(--shadow); padding:44px 36px 40px; text-align:center; }
-    .login-logo-text { font-size:34px; font-weight:900; color:var(--text); margin-bottom:6px; }
-    .login-logo-text span { color:var(--teal); }
-    .login-tag { display:inline-block; font-size:12px; font-weight:800; color:var(--teal-dark); background:rgba(46,196,182,0.1); border-radius:50px; padding:4px 14px; margin-bottom:20px; }
-    .login-subtitle { font-size:15px; font-weight:700; color:var(--muted); margin-bottom:24px; }
-    .login-input-wrap { position:relative; margin-bottom:12px; }
-    .login-input-wrap .input-icon { position:absolute; left:16px; top:50%; transform:translateY(-50%); font-size:17px; pointer-events:none; }
-    .login-input { width:100%; padding:13px 16px 13px 46px; border-radius:16px; border:1.5px solid #e8eaf6; background:rgba(240,244,255,0.55); font-family:'Nunito',sans-serif; font-size:15px; font-weight:700; color:var(--text); outline:none; transition:border-color 0.3s,box-shadow 0.3s; }
-    .login-input::placeholder { color:var(--muted); font-weight:600; }
-    .login-input:focus { border-color:var(--teal); box-shadow:0 0 0 4px rgba(46,196,182,0.13); }
-    .login-input.error { border-color:#e53935; }
-    .login-error { font-size:12px; font-weight:700; color:#e53935; min-height:18px; margin-bottom:8px; opacity:0; transition:opacity 0.3s; text-align:left; }
-    .login-error.visible { opacity:1; }
-    .login-btn { width:100%; padding:14px; border-radius:50px; border:none; cursor:pointer; font-family:'Nunito',sans-serif; font-size:16px; font-weight:900; color:#fff; background:linear-gradient(135deg,var(--teal),#26c6da); box-shadow:0 8px 26px rgba(46,196,182,0.4); transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1); margin-top:4px; }
-    .login-btn:hover { transform:translateY(-3px) scale(1.02); box-shadow:0 14px 38px rgba(46,196,182,0.5); }
-    .login-btn:active { transform:scale(0.97); }
-    .login-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none !important; box-shadow:none !important; }
-    #loginNameWrap { display:none; margin-top:12px; }
-    .login-divider { display:flex; align-items:center; gap:12px; margin:17px 0; font-size:12px; font-weight:700; color:var(--muted); }
-    .login-divider::before,.login-divider::after { content:''; flex:1; height:1px; background:rgba(142,151,197,0.2); }
-    .google-login-btn { width:100%; padding:14px 20px; border-radius:50px; border:1.5px solid #dadce0; background:#fff; color:#3c4043; font-family:'Nunito',sans-serif; font-size:16px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:12px; cursor:pointer; box-shadow:0 3px 10px rgba(60,64,67,0.1); transition:all 0.25s ease; margin-top:8px; }
-    .google-login-btn:hover { background:#f8fafd; border-color:#d2e3fc; box-shadow:0 6px 20px rgba(66,133,244,0.22); transform:translateY(-2px); }
-    .google-login-btn:active { transform:scale(0.98); }
-    .google-icon { width:22px; height:22px; flex-shrink:0; }
-    .demo-actions { display:flex; gap:10px; justify-content:center; margin-top:4px; }
-    .demo-btn { padding:9px 18px; border-radius:30px; border:1.5px solid rgba(142,151,197,0.3); background:rgba(240,244,255,0.65); font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; color:var(--text); cursor:pointer; transition:all 0.2s ease; }
-    .demo-btn:hover { border-color:var(--teal); color:var(--teal-dark); background:#fff; transform:translateY(-1px); }
-    .login-note { font-size:12px; font-weight:700; color:var(--muted); }
-    .login-note a { color:var(--teal-dark); text-decoration:none; }
-    .login-note a:hover { text-decoration:underline; }
-    .login-spinner { display:inline-block; width:16px; height:16px; border:2.5px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.6s linear infinite; vertical-align:middle; margin-right:7px; }
-
-    /* FOOTER */
-    footer { position:relative; z-index:1; border-top:1.5px solid rgba(142,151,197,0.15); padding:34px 0 26px; }
-    .footer-inner { max-width:1160px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; }
-    .footer-brand { font-size:20px; font-weight:900; color:var(--text); }
-    .footer-brand span { color:var(--teal); }
-    .footer-copy { font-size:13px; font-weight:700; color:var(--muted); }
-    .footer-links { display:flex; gap:24px; }
-    .footer-links a { font-size:13px; font-weight:700; color:var(--muted); text-decoration:none; transition:color 0.2s; }
-    .footer-links a:hover { color:var(--teal); }
-
-    /* KEYFRAMES */
-    @keyframes fadeInUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.7s ease,transform 0.7s ease; }
-    .reveal.visible { opacity:1; transform:translateY(0); }
-
-    /* RESPONSIVE */
-    @media (max-width:900px) {
-      .hero-content { grid-template-columns:1fr; gap:48px; }
-      .hero-visual { height:360px; }
-      .stats-grid { grid-template-columns:repeat(2,1fr); }
-      .features-grid { grid-template-columns:1fr 1fr; }
-      .steps { grid-template-columns:1fr; gap:40px; }
-      .steps::before { display:none; }
-      .cta-wrapper { grid-template-columns:1fr; gap:48px; }
-      .footer-inner { flex-direction:column; gap:16px; text-align:center; }
-      .footer-links { justify-content:center; }
-    }
-    @media (max-width:600px) {
-      .nav-links li:not(:last-child) { display:none; }
-      .features-grid { grid-template-columns: 1fr; }
-      .hero-visual { display:none; }
-      .login-card { padding: 30px 20px 26px; }
-      .stats-grid { grid-template-columns: repeat(2,1fr); }
-    }
-    @media (max-width:480px) {
-      .nav-inner { padding: 10px 16px; margin-top: 8px; }
-      .nav-logo { font-size: 20px; }
-      .nav-cta { padding: 8px 16px; font-size: 13px !important; }
-      .hero { padding-top: 100px; padding-bottom: 48px; }
-      .hero-title { font-size: 32px; }
-      .hero-subtitle { font-size: 15px; margin-bottom: 28px; }
-      .stats-grid { grid-template-columns: 1fr; gap: 16px; }
-      .stat-card { padding: 20px 16px; }
-      .features { padding: 48px 0; }
-      .how { padding: 48px 0; }
-      .testimonials { padding: 48px 0; }
-      .cta-section { padding: 48px 0 80px; }
-      .login-card { padding: 26px 16px 22px; }
+    html[data-theme="dark"] {
+      --bg-deep: #07080d;
+      --bg: #0b0d14;
+      --card: #11141c;
+      --raised: #1a1e28;
+      --border: rgba(238, 240, 245, 0.08);
+      --border-strong: rgba(238, 240, 245, 0.14);
+      --text: #eef0f5;
+      --text-secondary: #a3a9b8;
+      --muted: #7a8296;
+      --accent: #2dd4bf;
+      --accent-hover: #14b8a6;
+      --accent-subtle: rgba(45, 212, 191, 0.12);
+      --correct: #4cc38a;
+      --correct-subtle: rgba(76, 195, 138, 0.12);
+      --wrong: #e5484d;
+      --wrong-subtle: rgba(229, 72, 77, 0.12);
     }
 
-    /* ── GRADE SELECTION STYLE ── */
-    .grade-selection-label {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--text, #1d1d1f);
-      margin-bottom: 8px;
-      text-align: left;
-      padding-left: 4px;
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
-    .grade-buttons {
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── HEADER ── */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      z-index: 1000;
+      background: rgba(247, 244, 238, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      transition: background-color 180ms var(--ease), border-color 180ms var(--ease);
+    }
+
+    html[data-theme="dark"] .nav {
+      background: rgba(11, 13, 20, 0.88);
+    }
+
+    html[data-theme="dark"] .nav-cta:hover {
+      background: #d8dce6;
+    }
+
+    html[data-theme="dark"] .btn-primary {
+      color: #07080d;
+    }
+
+    html[data-theme="dark"] .btn-secondary:hover {
+      background: #222734;
+    }
+
+    .nav-actions {
       display: flex;
+      align-items: center;
       gap: 10px;
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--text);
+      color: var(--card);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 150ms var(--ease);
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 8px;
+      background: var(--text);
+      color: var(--card) !important;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background-color 150ms var(--ease), transform 150ms var(--ease);
+    }
+
+    .nav-cta:hover {
+      background: #332c24;
+    }
+
+    .nav-cta:active {
+      transform: scale(0.98);
+    }
+
+    /* ── HERO (ASYMMETRIC SPLIT) ── */
+    .hero {
+      padding: 120px 0 80px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.04fr 0.96fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .mono-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--raised);
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+    }
+
+    .hero-title {
+      font-size: clamp(34px, 4.2vw, 52px);
+      font-weight: 500;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    .hero-title .accent {
+      color: var(--accent);
+    }
+
+    .hero-subtitle {
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin-bottom: 32px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      padding: 0 20px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 150ms var(--ease), transform 150ms var(--ease);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      padding: 0 20px;
+      border-radius: 8px;
+      background: var(--raised);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease), transform 150ms var(--ease);
+    }
+
+    .btn-secondary:hover {
+      background: #e7dfd2;
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.98);
+    }
+
+    /* ── HERO PRODUCT PREVIEW (THE MOMENT) ── */
+    .preview-frame {
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(31, 27, 22, 0.06);
+      overflow: hidden;
+    }
+
+    .preview-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--bg-deep);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .preview-bar-title {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .preview-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .preview-lesson-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .preview-lesson-head h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .preview-eq {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    .graph-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 12px 8px;
+    }
+
+    .graph-caption {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .preview-tf {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .preview-tf-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .preview-tf-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .preview-tf-btns {
+      flex-shrink: 0;
+    }
+
+    .ptf-btn {
+      padding: 5px 12px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .ptf-btn:hover {
+      color: var(--text);
+    }
+
+    .preview-note {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--raised);
+      border-left: 2px solid var(--accent);
+    }
+
+    /* ── STATS BAR ── */
+    .stats-section {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .stat-item {
+      padding: 28px 24px;
+      border-right: 1px solid var(--border);
+    }
+
+    .stat-item:last-child {
+      border-right: none;
+    }
+
+    .stat-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 30px;
+      font-weight: 500;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .stat-number span {
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ── SECTIONS ── */
+    .section {
+      padding: 88px 0;
+    }
+
+    .section-head {
+      max-width: 620px;
+      margin-bottom: 48px;
+    }
+
+    .section-index {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 3.2vw, 36px);
+      font-weight: 500;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .section-desc {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .feat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color 150ms var(--ease), background-color 150ms var(--ease);
+    }
+
+    .feat-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .feat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin-bottom: 16px;
     }
-    .grade-btn {
-      flex: 1;
-      padding: 10px;
-      border-radius: 12px;
-      border: 1.5px solid #e8eaf6;
-      background: rgba(240, 244, 255, 0.5);
-      font-family: 'Nunito', sans-serif;
+
+    .feat-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .feat-desc {
       font-size: 14px;
-      font-weight: 800;
-      color: var(--text, #1d1d1f);
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      position: relative;
+    }
+
+    .step-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--raised);
+      border: 1px solid var(--border-strong);
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .step-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── TESTIMONIALS (STATIC GRID) ── */
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .testi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .testi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .testi-delta {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+    }
+
+    .testi-class {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .testi-quote {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text);
+    }
+
+    .testi-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .testi-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--raised);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .testi-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* ── CTA + LOGIN ── */
+    .cta-section {
+      padding: 88px 0 96px;
+      border-top: 1px solid var(--border);
+    }
+
+    .cta-grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .cta-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .cta-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .cta-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 8px 24px rgba(31, 27, 22, 0.05);
+    }
+
+    .login-card-head {
+      margin-bottom: 24px;
+    }
+
+    .login-card-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .google-login-btn {
+      width: 100%;
+      height: 44px;
+      padding: 0 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
       cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: center;
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease), transform 150ms var(--ease);
     }
-    .grade-btn:hover {
-      background: rgba(46, 196, 182, 0.05);
-      border-color: var(--teal);
+
+    .google-login-btn:hover {
+      background: var(--raised);
+      border-color: rgba(31, 27, 22, 0.24);
     }
-    .grade-btn.active {
-      background: var(--teal);
-      border-color: var(--teal);
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(46, 196, 182, 0.3);
+
+    .google-login-btn:active {
+      transform: scale(0.98);
+    }
+
+    .google-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .login-error {
+      font-size: 13px;
+      color: var(--wrong);
+      margin-top: 12px;
+      display: none;
+    }
+
+    .login-error.visible {
+      display: block;
+    }
+
+    .login-note {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .login-note a {
+      color: var(--text-secondary);
+      text-decoration: underline;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+      background: var(--bg-deep);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .footer-brand {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .footer-brand span {
+      color: var(--accent);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 150ms var(--ease);
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+    }
+
+    /* ── ENTRANCE MOTION ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 380ms var(--ease), transform 380ms var(--ease);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      .hero-grid,
+      .cta-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stat-item:nth-child(2) {
+        border-right: none;
+      }
+
+      .stat-item:nth-child(1),
+      .stat-item:nth-child(2) {
+        border-bottom: 1px solid var(--border);
+      }
+
+      .features-grid,
+      .steps-grid,
+      .testi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        padding: 96px 0 56px;
+      }
+
+      .section {
+        padding: 56px 0;
+      }
+
+      .features-grid,
+      .steps-grid,
+      .testi-grid,
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-item {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .stat-item:last-child {
+        border-bottom: none;
+      }
+
+      .login-card {
+        padding: 24px;
+      }
     }
   </style>
 </head>
+
 <body>
 
-  <div class="bg-canvas"></div>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-
-  <!-- NAVBAR -->
-  <nav>
+  <nav class="nav">
     <div class="nav-inner">
-      <a href="#" class="nav-logo">Z<span>physics</span></a>
+      <a href="#" class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12c2.5-6 5-6 7.5 0s5 6 7.5 0 3.5-4.5 5-4.5" />
+          </svg>
+        </span>
+        Z<span>physics</span>
+      </a>
       <ul class="nav-links">
         <li><a href="#features">Tính năng</a></li>
-        <li><a href="#how">Cách học</a></li>
-        <li><a href="#reviews">Đánh giá</a></li>
-        <li><a href="#login" class="nav-cta">Bắt đầu ngay 🚀</a></li>
+        <li><a href="#how">Lộ trình</a></li>
+        <li><a href="#reviews">Kết quả</a></li>
       </ul>
+      <div class="nav-actions">
+        <button type="button" class="pts-toggle" onclick="PinUI.toggleTheme(this)" aria-label="Đổi giao diện sáng tối" aria-pressed="false">
+          <svg class="pts-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+          <svg class="pts-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+        <a href="#login" class="nav-cta">Bắt đầu học</a>
+      </div>
     </div>
   </nav>
 
-  <!-- HERO -->
   <section class="hero">
-    <div class="page">
-      <div class="hero-content">
-        <div class="hero-left">
-          <div class="hero-badge"><span class="dot"></span>Nền tảng học Vật lý #1 Việt Nam</div>
-          <h1 class="hero-title">Chinh phục<br><span class="accent">Vật Lý THPT</span><br><span class="brand">cùng Zphysics</span></h1>
-          <p class="hero-subtitle">Hệ thống bài học tương tác, luyện đề trắc nghiệm thông minh và theo dõi tiến trình — giúp bạn đạt điểm cao hiệu quả nhất.</p>
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <div class="hero-meta">
+            <span class="mono-tag">GDPT 2018</span>
+            <span>Lớp 10 · Lớp 11 · Lớp 12</span>
+          </div>
+          <h1 class="hero-title">Học và luyện đề <span class="accent">Vật lý THPT</span> với độ chính xác thực nghiệm</h1>
+          <p class="hero-subtitle">Hệ thống bài giảng, bài tập tự luyện 3 phần chuẩn cấu trúc Bộ GD&amp;ĐT và phòng luyện đề PDF giúp học sinh nắm chắc bản chất vật lý và theo dõi tiến độ theo từng chương.</p>
           <div class="hero-actions">
-            <a href="#login" class="btn-primary">🚀 Bắt đầu ngay</a>
-            <a href="#how" class="btn-secondary">📖 Xem cách học</a>
+            <a href="#login" class="btn-primary">Bắt đầu học miễn phí</a>
+            <a href="#features" class="btn-secondary">Xem cấu trúc bài học</a>
           </div>
         </div>
-        <div class="hero-visual" aria-hidden="true">
-          <div class="physics-card pc-topleft">
-            <div class="pc-mini-label">Định luật II Newton</div>
-            <div class="pc-mini-val">F = m<span class="c">a</span></div>
-            <div class="pc-mini-sub">Lực — Gia tốc</div>
-            <div class="score-chip chip-orange">⚡ Chương 2</div>
+
+        <div class="preview-frame" aria-label="Mô phỏng bài học Dao động điều hòa">
+          <div class="preview-bar">
+            <span class="preview-bar-title">Chương I · Dao động cơ</span>
+            <span class="mono-tag">Bài 01</span>
           </div>
-          <div class="physics-card pc-topright">
-            <div class="pc-mini-label">Năng lượng</div>
-            <div class="pc-mini-val">E = m<span class="c">c²</span></div>
-            <div class="pc-mini-sub">Einstein</div>
-            <div class="score-chip chip-pink">🔥 Nâng cao</div>
-          </div>
-          <div class="physics-card pc-main">
-            <div class="pc-label">Công thức cốt lõi</div>
-            <div class="pc-formula"><span>v²</span> = v₀² + 2<span>as</span></div>
-            <div class="pc-name">Phương trình động học</div>
-            <br>
-            <div class="score-chip chip-blue">🎯 Điểm của bạn: 9.5</div>
-          </div>
-          <div class="physics-card pc-bottomleft">
-            <div class="pc-mini-label">Chu kỳ dao động</div>
-            <div class="pc-mini-val">T=2π<span class="c">√L/g</span></div>
-            <div class="pc-mini-sub">Con lắc đơn</div>
-            <div class="score-chip chip-green">✅ Hoàn thành</div>
-          </div>
-          <div class="physics-card pc-bottomright">
-            <div class="pc-mini-label">Tiến trình hôm nay</div>
-            <div class="pc-mini-val" style="font-size:24px">🔥 12</div>
-            <div class="pc-mini-sub">câu hỏi liên tiếp</div>
-            <div class="score-chip chip-orange">🏆 Streak!</div>
+          <div class="preview-body">
+            <div class="preview-lesson-head">
+              <h3>Đồ thị li độ — thời gian</h3>
+              <span class="preview-eq">x(t) = 4cos(2πt - π/3)</span>
+            </div>
+
+            <div class="graph-box">
+              <svg viewBox="0 0 420 156" style="width: 100%; height: auto; display: block;" role="img" aria-label="Đồ thị dao động điều hòa hình sin">
+                <!-- Grid lines -->
+                <g stroke="var(--border-strong)" stroke-width="1" opacity="0.65">
+                  <line x1="36" y1="24" x2="404" y2="24" stroke-dasharray="3 3" />
+                  <line x1="36" y1="78" x2="404" y2="78" />
+                  <line x1="36" y1="132" x2="404" y2="132" stroke-dasharray="3 3" />
+                  <line x1="128" y1="14" x2="128" y2="142" stroke-dasharray="3 3" />
+                  <line x1="220" y1="14" x2="220" y2="142" stroke-dasharray="3 3" />
+                  <line x1="312" y1="14" x2="312" y2="142" stroke-dasharray="3 3" />
+                  <line x1="404" y1="14" x2="404" y2="142" stroke-dasharray="3 3" />
+                </g>
+                <!-- Axes -->
+                <line x1="36" y1="12" x2="36" y2="144" stroke="var(--muted)" stroke-width="1.2" />
+                <line x1="36" y1="78" x2="408" y2="78" stroke="var(--muted)" stroke-width="1.2" />
+                <!-- Labels -->
+                <g fill="var(--muted)" font-family="'JetBrains Mono', monospace" font-size="10">
+                  <text x="8" y="28">+4</text>
+                  <text x="16" y="82">0</text>
+                  <text x="8" y="136">-4</text>
+                  <text x="118" y="152">0.5</text>
+                  <text x="210" y="152">1.0</text>
+                  <text x="302" y="152">1.5</text>
+                  <text x="392" y="152">t(s)</text>
+                </g>
+                <!-- Sine curve for x(t) = 4 cos(2*pi*t - pi/3) over t in [0, 2]s -->
+                <path d="M 36,51 C 46,35 55,24 67,24 C 86,24 102,78 113,78 C 124,78 140,132 159,132 C 178,132 194,78 205,78 C 216,78 232,24 251,24 C 270,24 286,78 297,78 C 308,78 324,132 343,132 C 362,132 378,78 389,78 C 396,78 400,66 404,51"
+                      fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
+                <!-- Highlight point at t=0, x=+2cm and peak at t=1/6s -->
+                <circle cx="36" cy="51" r="3.5" fill="var(--card)" stroke="var(--accent)" stroke-width="2" />
+                <circle cx="251" cy="24" r="3.5" fill="var(--accent)" />
+              </svg>
+              <div class="graph-caption">
+                <span class="mono">A = 4 cm</span>
+                <span class="mono">T = 1.0 s</span>
+                <span class="mono">f = 1.0 Hz</span>
+              </div>
+            </div>
+
+            <div class="preview-tf">
+              <div class="preview-tf-label">Câu hỏi kiểm tra nhanh (Đúng / Sai)</div>
+              <div class="preview-tf-row">
+                <span><strong>a)</strong> Biên độ dao động của vật bằng 4 cm</span>
+                <div class="preview-tf-btns seg-control tf-seg" data-selected="0" style="--seg-index: 0;">
+                  <span class="seg-thumb"></span>
+                  <button type="button" class="ptf-btn seg-btn tf-btn selected" data-val="Đ" onclick="togglePreviewBtn(this, 0)">Đúng</button>
+                  <button type="button" class="ptf-btn seg-btn tf-btn" data-val="S" onclick="togglePreviewBtn(this, 1)">Sai</button>
+                </div>
+              </div>
+              <div class="preview-tf-row">
+                <span><strong>b)</strong> Chu kỳ dao động của vật bằng 0,5 s</span>
+                <div class="preview-tf-btns seg-control tf-seg" data-selected="1" style="--seg-index: 1;">
+                  <span class="seg-thumb"></span>
+                  <button type="button" class="ptf-btn seg-btn tf-btn" data-val="Đ" onclick="togglePreviewBtn(this, 0)">Đúng</button>
+                  <button type="button" class="ptf-btn seg-btn tf-btn selected" data-val="S" onclick="togglePreviewBtn(this, 1)">Sai</button>
+                </div>
+              </div>
+              <div class="preview-note" id="previewNote">
+                Lời giải: Từ đồ thị, vật thực hiện một dao động toàn phần trong 1,0 s nên T = 1,0 s.
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- STATS -->
-  <section class="stats-bar">
-    <div class="page">
+  <section class="stats-section">
+    <div class="container">
       <div class="stats-grid reveal">
-        <div class="stat-card"><span class="stat-icon">👩‍🎓</span><div class="stat-number">5,000<span>+</span></div><div class="stat-label">Học sinh đang học</div></div>
-        <div class="stat-card"><span class="stat-icon">📚</span><div class="stat-number">200<span>+</span></div><div class="stat-label">Bài học tương tác</div></div>
-        <div class="stat-card"><span class="stat-icon">❓</span><div class="stat-number">3,500<span>+</span></div><div class="stat-label">Câu hỏi luyện tập</div></div>
-        <div class="stat-card"><span class="stat-icon">🏆</span><div class="stat-number">98<span>%</span></div><div class="stat-label">Hài lòng sau khóa học</div></div>
+        <div class="stat-item">
+          <div class="stat-number">5,000<span>+</span></div>
+          <div class="stat-label">Học sinh theo học trên hệ thống</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">200<span>+</span></div>
+          <div class="stat-label">Bài học phân theo chương lớp 10–12</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">3,500<span>+</span></div>
+          <div class="stat-label">Câu hỏi trắc nghiệm 3 phần</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">98<span>%</span></div>
+          <div class="stat-label">Học sinh phản hồi hài lòng</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- FEATURES -->
-  <section class="features" id="features">
-    <div class="page">
+  <section class="section" id="features">
+    <div class="container">
       <div class="section-head reveal">
-        <span class="section-eyebrow">✨ Tính năng nổi bật</span>
-        <h2 class="section-title">Mọi thứ bạn cần để<br><span class="accent">học Vật lý hiệu quả</span></h2>
-        <p class="section-desc">Từ bài học lý thuyết đến luyện đề trắc nghiệm — tất cả trong một nền tảng.</p>
+        <span class="section-index">01 · Tính năng</span>
+        <h2 class="section-title">Cấu trúc học tập bám sát chương trình Vật lý phổ thông</h2>
+        <p class="section-desc">Mỗi bài học được tách rõ lý thuyết, bài tập tự luyện theo định dạng mới và đề thi thử tính giờ.</p>
       </div>
       <div class="features-grid">
-        <div class="feat-card fc-teal reveal"><div class="feat-icon bg-teal">📖</div><div class="feat-title">Bài học tương tác</div><p class="feat-desc">Nội dung trực quan với hình ảnh minh họa và video bài giảng chất lượng cao từ giáo viên kinh nghiệm.</p></div>
-        <div class="feat-card fc-pink reveal" style="transition-delay:0.08s"><div class="feat-icon bg-pink">🎯</div><div class="feat-title">Luyện đề thông minh</div><p class="feat-desc">Câu hỏi tự động điều chỉnh độ khó theo năng lực, giúp bạn tiến bộ nhanh hơn mỗi ngày.</p></div>
-        <div class="feat-card fc-purple reveal" style="transition-delay:0.16s"><div class="feat-icon bg-purple">📊</div><div class="feat-title">Theo dõi tiến trình</div><p class="feat-desc">Dashboard trực quan hiển thị điểm số, thống kê và chủ đề cần ôn — học đúng trọng tâm.</p></div>
-        <div class="feat-card fc-amber reveal" style="transition-delay:0.04s"><div class="feat-icon bg-amber">⚡</div><div class="feat-title">Giải thích chi tiết</div><p class="feat-desc">Mỗi câu hỏi có đáp án và giải thích từng bước, giúp bạn hiểu sâu thay vì học vẹt.</p></div>
-        <div class="feat-card fc-green reveal" style="transition-delay:0.12s"><div class="feat-icon bg-green">🔥</div><div class="feat-title">Chuỗi học liên tiếp</div><p class="feat-desc">Hệ thống streak khuyến khích học hàng ngày, xây dựng thói quen học tập bền vững.</p></div>
-        <div class="feat-card fc-blue reveal" style="transition-delay:0.2s"><div class="feat-icon bg-blue">🌟</div><div class="feat-title">Gói Premium</div><p class="feat-desc">Mở khóa đề thi thử, tài liệu nâng cao và hỗ trợ 1-1 với giáo viên để bứt phá điểm số.</p></div>
+        <div class="feat-card reveal">
+          <div class="feat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+          </div>
+          <h3 class="feat-title">Mục lục theo chương lớp 10–12</h3>
+          <p class="feat-desc">Tài liệu lý thuyết và video bài giảng được sắp xếp tuần tự theo từng chương của sách giáo khoa mới.</p>
+        </div>
+        <div class="feat-card reveal">
+          <div class="feat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <h3 class="feat-title">Định dạng đề thi 3 phần</h3>
+          <p class="feat-desc">Hỗ trợ đầy đủ trắc nghiệm nhiều lựa chọn, câu hỏi Đúng/Sai tính điểm từng ý và điền đáp số ngắn.</p>
+        </div>
+        <div class="feat-card reveal">
+          <div class="feat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          </div>
+          <h3 class="feat-title">Theo dõi tiến độ làm bài</h3>
+          <p class="feat-desc">Ghi nhận số lượt hoàn thành từng bài, tính điểm trung bình và lưu lại lịch sử các lần thi thử.</p>
+        </div>
+        <div class="feat-card reveal">
+          <div class="feat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7V4H6l6 8-6 8h12v-3"/></svg>
+          </div>
+          <h3 class="feat-title">Hiển thị công thức KaTeX</h3>
+          <p class="feat-desc">Ký hiệu vật lý, vectơ, phân số và lời giải chi tiết được kết xuất rõ ràng trên mọi kích thước màn hình.</p>
+        </div>
+        <div class="feat-card reveal">
+          <div class="feat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/></svg>
+          </div>
+          <h3 class="feat-title">Phòng luyện đề PDF chia đôi</h3>
+          <p class="feat-desc">Đọc trực tiếp đề PDF bên trái và điền phiếu đáp án bên phải với đồng hồ đếm ngược 50 phút.</p>
+        </div>
+        <div class="feat-card reveal">
+          <div class="feat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+          </div>
+          <h3 class="feat-title">Chế độ ôn tập từng câu</h3>
+          <p class="feat-desc">Trộn ngẫu nhiên câu hỏi trong bài, chấm đáp án ngay lập tức sau mỗi lần chọn để ghi nhớ nhanh.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- HOW -->
-  <section class="how" id="how">
-    <div class="page">
+  <section class="section how-section" id="how">
+    <div class="container">
       <div class="section-head reveal">
-        <span class="section-eyebrow">🗺️ Cách học</span>
-        <h2 class="section-title">Chỉ <span class="accent">3 bước</span> để bắt đầu</h2>
-        <p class="section-desc">Đơn giản, hiệu quả và được thiết kế riêng cho học sinh THPT Việt Nam.</p>
+        <span class="section-index">02 · Lộ trình</span>
+        <h2 class="section-title">Ba bước bắt đầu ôn luyện</h2>
+        <p class="section-desc">Quy trình gọn nhẹ để bạn vào thẳng bài học hoặc đề thi trong chưa đầy một phút.</p>
       </div>
-      <div class="steps reveal">
-        <div class="step"><div class="step-num">1</div><div class="step-title">Đăng nhập bằng Gmail</div><p class="step-desc">Chỉ cần Gmail của bạn — không cần mật khẩu, không mất thời gian đăng ký dài dòng.</p></div>
-        <div class="step"><div class="step-num">2</div><div class="step-title">Chọn bài học &amp; luyện tập</div><p class="step-desc">Duyệt bài học theo chương trình THPT, chọn chủ đề và bắt đầu làm câu hỏi ngay.</p></div>
-        <div class="step"><div class="step-num">3</div><div class="step-title">Xem điểm &amp; cải thiện</div><p class="step-desc">Nhận phản hồi ngay, xem giải thích chi tiết và theo dõi tiến bộ theo thời gian.</p></div>
+      <div class="steps-grid reveal">
+        <div class="step-card">
+          <span class="step-num">01</span>
+          <h3 class="step-title">Đăng nhập bằng Google</h3>
+          <p class="step-desc">Sử dụng tài khoản Google để xác thực và đồng bộ lịch sử làm bài giữa máy tính và điện thoại.</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">02</span>
+          <h3 class="step-title">Chọn lớp và chuyên đề</h3>
+          <p class="step-desc">Mở chương tương ứng ở Lớp 10, 11 hoặc 12, xem video lý thuyết hoặc làm phiếu bài tập.</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">03</span>
+          <h3 class="step-title">Nộp bài và rà soát lỗi</h3>
+          <p class="step-desc">Hệ thống chấm điểm tự động theo thang điểm Bộ GD&amp;ĐT và mở lời giải chi tiết cho từng câu.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- TESTIMONIALS -->
-  <section class="testimonials" id="reviews">
-    <div class="page">
+  <section class="section" id="reviews">
+    <div class="container">
       <div class="section-head reveal">
-        <span class="section-eyebrow">💬 Học sinh nói gì</span>
-        <h2 class="section-title">Hàng nghìn học sinh<br><span class="accent">tin tưởng Zphysics</span></h2>
+        <span class="section-index">03 · Kết quả</span>
+        <h2 class="section-title">Ghi nhận từ học sinh THPT</h2>
       </div>
-    </div>
-    <div class="testi-track">
-      <div class="testi-scroll">
-        <div class="testi-card"><div class="testi-stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><p class="testi-text">"Mình đã tăng từ 6.5 lên 8.5 điểm Vật lý sau 2 tháng học với Zphysics. Cách giải thích rõ ràng lắm!"</p><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#2ec4b6,#26c6da)">N</div><div><div class="testi-name">Nguyễn Anh Thư</div><div class="testi-info">Lớp 12A — Hà Nội</div></div></div></div>
-        <div class="testi-card"><div class="testi-stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><p class="testi-text">"Tính năng luyện đề thích nhất! Câu hỏi đa dạng, có giải thích chi tiết. Không còn sợ Vật lý nữa 🎉"</p><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#ff6b9d,#ff9a9e)">T</div><div><div class="testi-name">Trần Minh Khôi</div><div class="testi-info">Lớp 11B — TP.HCM</div></div></div></div>
-        <div class="testi-card"><div class="testi-stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><p class="testi-text">"Giao diện đẹp, dễ dùng trên điện thoại. Hay ôn bài trên xe buýt rất tiện. Điểm thi thử tăng rõ rệt!"</p><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#7c5cbf,#a78bfa)">L</div><div><div class="testi-name">Lê Hương Giang</div><div class="testi-info">Lớp 12C — Đà Nẵng</div></div></div></div>
-        <div class="testi-card"><div class="testi-stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><p class="testi-text">"Premium xứng đáng! Đề thi thử chất lượng, sát đề thật. Mình đạt 9.0 Vật lý kỳ thi THPTQG."</p><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#f9a825,#ffd54f)">P</div><div><div class="testi-name">Phạm Văn Đức</div><div class="testi-info">Lớp 12 — Cần Thơ</div></div></div></div>
-        <div class="testi-card"><div class="testi-stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><p class="testi-text">"Hệ thống streak giúp mình học mỗi ngày. Bây giờ học Vật lý như chơi game vậy!"</p><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#43a047,#81c784)">H</div><div><div class="testi-name">Hoàng Thị Mai</div><div class="testi-info">Lớp 11A — Hải Phòng</div></div></div></div>
-        <div class="testi-card"><div class="testi-stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><p class="testi-text">"Zphysics có đầy đủ kiến thức lớp 10-12. Dùng để ôn lại từ đầu và tiến bộ rất nhanh!"</p><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#2196f3,#64b5f6)">V</div><div><div class="testi-name">Võ Thành Long</div><div class="testi-info">Lớp 12 — Bình Dương</div></div></div></div>
-        <!-- Duplicate for loop -->
-        <div class="testi-card"><div class="testi-stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><p class="testi-text">"Mình đã tăng từ 6.5 lên 8.5 điểm Vật lý sau 2 tháng học với Zphysics. Cách giải thích rõ ràng lắm!"</p><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#2ec4b6,#26c6da)">N</div><div><div class="testi-name">Nguyễn Anh Thư</div><div class="testi-info">Lớp 12A — Hà Nội</div></div></div></div>
-        <div class="testi-card"><div class="testi-stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><p class="testi-text">"Tính năng luyện đề thích nhất! Câu hỏi đa dạng, có giải thích chi tiết. Không còn sợ Vật lý nữa 🎉"</p><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#ff6b9d,#ff9a9e)">T</div><div><div class="testi-name">Trần Minh Khôi</div><div class="testi-info">Lớp 11B — TP.HCM</div></div></div></div>
-        <div class="testi-card"><div class="testi-stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><p class="testi-text">"Giao diện đẹp, dễ dùng trên điện thoại. Hay ôn bài trên xe buýt rất tiện. Điểm thi thử tăng rõ rệt!"</p><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#7c5cbf,#a78bfa)">L</div><div><div class="testi-name">Lê Hương Giang</div><div class="testi-info">Lớp 12C — Đà Nẵng</div></div></div></div>
-        <div class="testi-card"><div class="testi-stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><p class="testi-text">"Premium xứng đáng! Đề thi thử chất lượng, sát đề thật. Mình đạt 9.0 Vật lý kỳ thi THPTQG."</p><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#f9a825,#ffd54f)">P</div><div><div class="testi-name">Phạm Văn Đức</div><div class="testi-info">Lớp 12 — Cần Thơ</div></div></div></div>
-        <div class="testi-card"><div class="testi-stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><p class="testi-text">"Hệ thống streak giúp mình học mỗi ngày. Bây giờ học Vật lý như chơi game vậy!"</p><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#43a047,#81c784)">H</div><div><div class="testi-name">Hoàng Thị Mai</div><div class="testi-info">Lớp 11A — Hải Phòng</div></div></div></div>
-        <div class="testi-card"><div class="testi-stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><p class="testi-text">"Zphysics có đầy đủ kiến thức lớp 10-12. Dùng để ôn lại từ đầu và tiến bộ rất nhanh!"</p><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#2196f3,#64b5f6)">V</div><div><div class="testi-name">Võ Thành Long</div><div class="testi-info">Lớp 12 — Bình Dương</div></div></div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA + LOGIN -->
-  <section class="cta-section" id="login">
-    <div class="page">
-      <div class="cta-wrapper">
-        <div class="cta-left reveal">
-          <span class="section-eyebrow">🚀 Bắt đầu ngay hôm nay</span>
-          <h2>Sẵn sàng để<br><span class="accent">chinh phục Vật lý?</span></h2>
-          <p>Hàng nghìn học sinh đã bắt đầu hành trình cải thiện điểm số với Zphysics. Đến lượt bạn!</p>
-          <div class="perks">
-            <div class="perk"><div class="perk-icon">✅</div>Miễn phí hoàn toàn để bắt đầu</div>
-            <div class="perk"><div class="perk-icon">📱</div>Học mọi lúc, mọi nơi trên điện thoại</div>
-            <div class="perk"><div class="perk-icon">🎯</div>Nội dung chuẩn chương trình THPT Việt Nam</div>
+      <div class="testi-grid reveal">
+        <div class="testi-card">
+          <div>
+            <div class="testi-top">
+              <span class="testi-delta">6.5 → 8.5</span>
+              <span class="testi-class">Lớp 12A · Hà Nội</span>
+            </div>
+            <p class="testi-quote" style="margin-top: 16px;">Mình tăng từ 6,5 lên 8,5 điểm Vật lý sau hai tháng luyện tập trên Zphysics. Phần lời giải từng bước rất dễ theo dõi khi tự học ở nhà.</p>
+          </div>
+          <div class="testi-author">
+            <div class="testi-avatar">AT</div>
+            <div class="testi-name">Nguyễn Anh Thư</div>
           </div>
         </div>
-        <div class="login-card reveal" style="transition-delay:0.15s">
-          <div class="login-logo-text">Z<span>physics</span></div>
-          <div class="login-tag">✨ Miễn phí — Bắt đầu ngay</div>
-          <div class="login-subtitle" id="loginSubtitle">Đăng nhập 1-chạm để bắt đầu học tập</div>
-          
+        <div class="testi-card">
+          <div>
+            <div class="testi-top">
+              <span class="testi-delta">Đề thi thử · 9.0</span>
+              <span class="testi-class">Lớp 12 · Cần Thơ</span>
+            </div>
+            <p class="testi-quote" style="margin-top: 16px;">Phòng luyện đề PDF chia hai cột rất tiện khi làm bài trên laptop. Đồng hồ đếm ngược và phiếu tô đáp án sát với tâm lý thi thật.</p>
+          </div>
+          <div class="testi-author">
+            <div class="testi-avatar">PĐ</div>
+            <div class="testi-name">Phạm Văn Đức</div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div>
+            <div class="testi-top">
+              <span class="testi-delta">Lớp 11 → 12</span>
+              <span class="testi-class">Lớp 11B · TP.HCM</span>
+            </div>
+            <p class="testi-quote" style="margin-top: 16px;">Dạng câu hỏi Đúng/Sai và trả lời ngắn được tách rõ ràng theo đúng cấu trúc mới. Mình thường dùng chế độ ôn tập để rà lại công thức.</p>
+          </div>
+          <div class="testi-author">
+            <div class="testi-avatar">MK</div>
+            <div class="testi-name">Trần Minh Khôi</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section" id="login">
+    <div class="container">
+      <div class="cta-grid">
+        <div class="reveal">
+          <span class="section-index">04 · Tài khoản</span>
+          <h2 class="section-title">Sẵn sàng vào không gian học tập Zphysics</h2>
+          <p class="section-desc">Truy cập ngay các bài học miễn phí đầu chương và lưu toàn bộ kết quả luyện tập về tài khoản của bạn.</p>
+          <ul class="cta-list">
+            <li>
+              <span class="cta-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              Miễn phí các bài học mở đầu ở cả ba khối lớp 10, 11, 12
+            </li>
+            <li>
+              <span class="cta-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              Đồng bộ trên trình duyệt web và ứng dụng Android
+            </li>
+            <li>
+              <span class="cta-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              Bám sát cấu trúc đề thi tốt nghiệp THPT từ 2025
+            </li>
+          </ul>
+        </div>
+
+        <div class="login-card reveal">
+          <div class="login-card-head">
+            <div class="login-card-title">Đăng nhập Zphysics</div>
+            <div class="login-subtitle" id="loginSubtitle">Đăng nhập một chạm qua Google để bắt đầu học</div>
+          </div>
+
           <button type="button" class="google-login-btn" onclick="loginWithGoogle()">
-            <svg class="google-icon" viewBox="0 0 24 24">
+            <svg class="google-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
@@ -522,34 +1251,49 @@
             <span>Tiếp tục với Google</span>
           </button>
 
-          <div class="login-note" style="margin-top: 18px;">Bảo mật chuẩn Google OAuth & Supabase. Bằng cách đăng nhập, bạn đồng ý với <a href="#">Điều khoản</a>.</div>
+          <div class="login-error" id="loginError"></div>
+
+          <div class="login-note">
+            Xác thực bảo mật qua Google OAuth &amp; Supabase. Bằng việc tiếp tục, bạn đồng ý với <a href="#">Điều khoản sử dụng</a>.
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer>
-    <div class="footer-inner">
-      <div class="footer-brand">Z<span>physics</span></div>
-      <div class="footer-copy">© 2025 Zphysics. Học Vật Lý hiệu quả hơn mỗi ngày.</div>
-      <div class="footer-links"><a href="#">Về chúng tôi</a><a href="premium.html">Premium</a><a href="#">Liên hệ</a></div>
+    <div class="container footer-inner">
+      <div class="footer-left">
+        <span class="footer-brand">Z<span>physics</span></span>
+        <span>© 2026 Zphysics. Hệ thống học Vật lý THPT.</span>
+      </div>
+      <div class="footer-links">
+        <a href="#features">Tính năng</a>
+        <a href="premium.html">Premium</a>
+        <a href="#login">Đăng nhập</a>
+      </div>
     </div>
   </footer>
 
   <script>
+    function togglePreviewBtn(btn, idx) {
+      const group = btn.parentElement;
+      group.querySelectorAll('.ptf-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      group.setAttribute('data-selected', String(idx));
+      group.style.setProperty('--seg-index', String(idx));
+    }
+
     /* SCROLL REVEAL */
     const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
-    }, { threshold: 0.1 });
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
-    /* NAV SCROLL */
-    window.addEventListener('scroll', () => {
-      const nav = document.querySelector('.nav-inner');
-      if (window.scrollY > 40) { nav.style.background='rgba(255,255,255,0.9)'; nav.style.boxShadow='0 8px 40px rgba(100,120,200,0.18)'; }
-      else { nav.style.background='rgba(255,255,255,0.65)'; nav.style.boxShadow='0 8px 32px rgba(100,120,200,0.12)'; }
-    });
 
     /* ── CONFIG ── */
     var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
@@ -558,30 +1302,33 @@
     var SESSION_KEY = window.SESSION_KEY || 'zphysics_session';
 
     function saveSession(gmail, ten, premium, premiumUntil = null, lop = null) {
-      localStorage.setItem(SESSION_KEY, JSON.stringify({ 
-        gmail, 
-        ten, 
-        premium, 
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        gmail,
+        ten,
+        premium,
         premium_until: premiumUntil,
         lop: lop
       }));
     }
+
     function loadSession() {
       try {
         const raw = localStorage.getItem(SESSION_KEY);
         if (!raw) return null;
         const s = JSON.parse(raw);
-        if (s.premium_until && new Date(s.premium_until) < new Date()) { 
-          s.premium = false; 
-          s.premium_until = null; 
-          localStorage.setItem(SESSION_KEY, JSON.stringify(s)); 
+        if (s.premium_until && new Date(s.premium_until) < new Date()) {
+          s.premium = false;
+          s.premium_until = null;
+          localStorage.setItem(SESSION_KEY, JSON.stringify(s));
         }
         return s;
-      } catch { return null; }
+      } catch {
+        return null;
+      }
     }
 
     let isRegistering = false;
-    let selectedGrade = '10'; // Lớp được chọn mặc định
+    let selectedGrade = '10';
 
     function selectGrade(grade) {
       selectedGrade = String(grade);
@@ -597,27 +1344,36 @@
 
     function showError(msg) {
       const el = document.getElementById('loginError');
-      el.textContent = msg;
-      el.classList.add('visible');
-      document.getElementById('loginEmail').classList.add('error');
+      if (el) {
+        el.textContent = msg;
+        el.classList.add('visible');
+      }
+      const emailEl = document.getElementById('loginEmail');
+      if (emailEl) emailEl.classList.add('error');
     }
+
     function clearError() {
-      document.getElementById('loginError').classList.remove('visible');
-      document.getElementById('loginEmail').classList.remove('error');
-      document.getElementById('loginName').classList.remove('error');
+      const el = document.getElementById('loginError');
+      if (el) el.classList.remove('visible');
+      const emailEl = document.getElementById('loginEmail');
+      if (emailEl) emailEl.classList.remove('error');
+      const nameEl = document.getElementById('loginName');
+      if (nameEl) nameEl.classList.remove('error');
     }
+
     function cancelRegistration() {
       isRegistering = false;
-      document.getElementById('loginNameWrap').style.display = 'none';
-      document.getElementById('loginSubtitle').textContent = 'Đăng nhập bằng Gmail để tiếp tục';
-      document.getElementById('loginEmail').value = '';
-      document.getElementById('loginName').value = '';
-      document.getElementById('loginBtn').innerHTML = '🚀 Đăng nhập';
-      document.getElementById('loginEmail').disabled = false;
-      
-      // Reset về lớp 10 mặc định
+      const nameWrap = document.getElementById('loginNameWrap');
+      const subEl = document.getElementById('loginSubtitle');
+      const emailEl = document.getElementById('loginEmail');
+      const nameEl = document.getElementById('loginName');
+      const btnEl = document.getElementById('loginBtn');
+      if (nameWrap) nameWrap.style.display = 'none';
+      if (subEl) subEl.textContent = 'Đăng nhập bằng tài khoản Google để tiếp tục';
+      if (emailEl) { emailEl.value = ''; emailEl.disabled = false; }
+      if (nameEl) nameEl.value = '';
+      if (btnEl) btnEl.textContent = 'Đăng nhập';
       selectGrade(10);
-      
       clearError();
     }
 
@@ -628,33 +1384,30 @@
       const subtitleEl = document.getElementById('loginSubtitle');
       const errorEl = document.getElementById('loginError');
       const btn = document.getElementById('loginBtn');
+      if (!emailInput || !btn) return;
       const gmail = emailInput.value.trim().toLowerCase();
 
       clearError();
-
       if (!gmail) {
-        showError('⚠️ Vui lòng nhập Gmail');
+        showError('Vui lòng nhập Gmail.');
         return;
       }
 
-      if (isRegistering) {
+      if (isRegistering && nameInput) {
         const fullName = nameInput.value.trim();
         if (!fullName) {
-          showError('⚠️ Vui lòng nhập Họ và Tên để kích hoạt');
+          showError('Vui lòng nhập Họ và Tên để kích hoạt.');
           nameInput.classList.add('error');
           nameInput.focus();
           return;
         }
-
         btn.disabled = true;
-        btn.innerHTML = '<span class="login-spinner"></span> Đang kích hoạt...';
-
+        btn.textContent = 'Đang kích hoạt...';
         try {
           const regUrl = `${SHEETS_API_URL}?action=registerStudent&gmail=${encodeURIComponent(gmail)}&name=${encodeURIComponent(fullName)}&lop=${encodeURIComponent(selectedGrade)}`;
           const response = await fetch(regUrl);
           if (!response.ok) throw new Error('Không thể kết nối Web App để kích hoạt');
           const result = await response.json();
-
           if (result && result.success) {
             saveSession(gmail, result.ten || fullName, false, null, result.lop || selectedGrade);
             window.location.href = 'index.html';
@@ -663,20 +1416,19 @@
           }
         } catch (err) {
           console.error(err);
-          errorEl.textContent = '❌ Lỗi kích hoạt: ' + (err.message || 'Lỗi mạng, hãy thử lại.');
-          errorEl.classList.add('visible');
+          if (errorEl) {
+            errorEl.textContent = 'Lỗi kích hoạt: ' + (err.message || 'Lỗi mạng, hãy thử lại.');
+            errorEl.classList.add('visible');
+          }
         } finally {
           btn.disabled = false;
-          if (isRegistering) {
-            btn.innerHTML = '✨ Kích hoạt tài khoản Free';
-          }
+          if (isRegistering) btn.textContent = 'Kích hoạt tài khoản Free';
         }
         return;
       }
 
       btn.disabled = true;
-      btn.innerHTML = '<span class="login-spinner"></span> Đang kiểm tra...';
-
+      btn.textContent = 'Đang kiểm tra...';
       try {
         const url = `${SUPABASE_URL}/rest/v1/students?email=eq.${encodeURIComponent(gmail)}&select=*`;
         const res = await fetch(url, {
@@ -687,7 +1439,6 @@
         });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const students = await res.json();
-
         if (students && students.length > 0) {
           const student = students[0];
           const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
@@ -696,20 +1447,22 @@
         } else {
           isRegistering = true;
           emailInput.disabled = true;
-          nameWrap.style.display = 'block';
-          subtitleEl.innerHTML = '<span style="color:var(--teal); font-weight:800;">TÀI KHOẢN MỚI</span><br>Nhập Họ & Tên của em để kích hoạt tài khoản Free';
-          btn.innerHTML = '✨ Kích hoạt tài khoản Free';
+          if (nameWrap) nameWrap.style.display = 'block';
+          if (subtitleEl) subtitleEl.textContent = 'Tài khoản mới: Nhập Họ & Tên để kích hoạt gói miễn phí';
+          btn.textContent = 'Kích hoạt tài khoản Free';
           btn.disabled = false;
-          nameInput.focus();
+          if (nameInput) nameInput.focus();
         }
       } catch (err) {
         console.error(err);
-        errorEl.textContent = '⚠️ Lỗi kết nối. Vui lòng thử lại.';
-        errorEl.classList.add('visible');
+        if (errorEl) {
+          errorEl.textContent = 'Lỗi kết nối. Vui lòng thử lại.';
+          errorEl.classList.add('visible');
+        }
       } finally {
         if (!isRegistering) {
           btn.disabled = false;
-          btn.innerHTML = '🚀 Đăng nhập';
+          btn.textContent = 'Đăng nhập';
         }
       }
     }
@@ -727,4 +1480,5 @@
     });
   </script>
 </body>
+
 </html>

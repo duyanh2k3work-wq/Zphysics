@@ -7,28 +7,67 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <title>Zphysics — Phòng Luyện Đề VIP</title>
+  <title>Zphysics — Phòng luyện đề</title>
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/pinui.css">
+  <script src="assets/js/pinui.js"></script>
+  <script>PinUI.initTheme('dark');</script>
   <style>
     :root {
-      --bg: #0A0A0B;
-      --card: rgba(22, 22, 26, 0.7);
-      --card-solid: #16161a;
-      --glass: rgba(255, 255, 255, 0.04);
-      --border: rgba(255, 255, 255, 0.08);
-      --shadow: rgba(0, 0, 0, 0.5);
-      --text: #f5f5f7;
-      --muted: #a1a1aa;
-      --teal: #2ec4b6;
-      --correct: #43a047;
-      --wrong: #e53935;
-      --gold: #b388ff;
-      --gold-gradient: linear-gradient(135deg, #7c4dff 0%, #b388ff 50%, #e0aeff 100%);
+      --bg-deep: #07080d;
+      --bg: #0b0d14;
+      --card: #11141c;
+      --card-solid: #11141c;
+      --raised: #1a1e28;
+      --border: rgba(238, 240, 245, 0.08);
+      --border-strong: rgba(238, 240, 245, 0.14);
+      --shadow: rgba(0, 0, 0, 0.45);
+      --text: #eef0f5;
+      --text-secondary: #a3a9b8;
+      --muted: #7a8296;
+      --teal: #2dd4bf;
+      --accent: #2dd4bf;
+      --accent-subtle: rgba(45, 212, 191, 0.12);
+      --correct: #4cc38a;
+      --correct-subtle: rgba(76, 195, 138, 0.12);
+      --wrong: #e5484d;
+      --wrong-subtle: rgba(229, 72, 77, 0.12);
+      --warning: #f59e0b;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    * {
+    html[data-theme="light"] {
+      --bg-deep: #f2ede4;
+      --bg: #f7f4ee;
+      --card: #fdfbf7;
+      --card-solid: #fdfbf7;
+      --raised: #efe9df;
+      --border: rgba(31, 27, 22, 0.08);
+      --border-strong: rgba(31, 27, 22, 0.14);
+      --shadow: rgba(31, 27, 22, 0.06);
+      --text: #1f1b16;
+      --text-secondary: #5e554a;
+      --muted: #7b7266;
+      --teal: #0d9488;
+      --accent: #0d9488;
+      --accent-subtle: rgba(13, 148, 136, 0.10);
+      --correct: #16a34a;
+      --correct-subtle: rgba(22, 163, 74, 0.10);
+      --wrong: #dc2626;
+      --wrong-subtle: rgba(220, 38, 38, 0.08);
+      --warning: #d97706;
+    }
+
+    html[data-theme="light"] .mcq-btn.selected,
+    html[data-theme="light"] .mcq-btn.is-correct {
+      color: #ffffff !important;
+    }
+
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -36,119 +75,76 @@
     }
 
     body {
-      font-family: 'Nunito', sans-serif;
+      font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
-      min-height: 100vh;
       color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
       overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 10% 0%, rgba(46, 196, 182, 0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 90% 10%, rgba(229, 57, 53, 0.08) 0%, transparent 55%),
-        radial-gradient(ellipse 40% 50% at 80% 90%, rgba(124, 77, 255, 0.12) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 10% 85%, rgba(249, 168, 37, 0.08) 0%, transparent 55%),
-        #0A0A0B;
-      pointer-events: none;
+      -webkit-font-smoothing: antialiased;
     }
 
     .app {
-      position: relative;
-      z-index: 1;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
-    /* ── HEADER ── */
+    /* ── HEADER (56px) ── */
     .header {
-      padding: 20px 24px;
+      height: 56px;
+      padding: 0 20px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       border-bottom: 1px solid var(--border);
-      background: rgba(10, 10, 11, 0.8);
-      backdrop-filter: blur(12px);
+      background: var(--bg);
       position: sticky;
       top: 0;
       z-index: 100;
     }
 
-    .back-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+    .back-btn,
+    .music-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       text-decoration: none;
-      transition: all 0.2s;
+      flex-shrink: 0;
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease);
     }
 
-    .back-btn:hover {
-      transform: scale(1.05);
-      background: rgba(255, 255, 255, 0.1);
+    .back-btn:hover,
+    .music-btn:hover {
+      background: var(--raised);
+      color: var(--text);
+      border-color: var(--accent);
     }
 
-    .back-btn svg {
-      width: 20px;
-      height: 20px;
-      stroke: #fff;
-      stroke-width: 2.5;
+    .back-btn svg,
+    .music-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 1.5;
       fill: none;
     }
 
-    .music-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 17px;
-      color: #fff;
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-      user-select: none;
-      flex-shrink: 0;
-    }
-
-    .music-btn:hover {
-      transform: scale(1.08);
-      background: rgba(255, 255, 255, 0.12);
-      border-color: var(--teal);
-    }
-
-    .music-btn:active {
-      transform: scale(0.95);
-    }
-
     .music-btn.playing {
-      background: rgba(46, 196, 182, 0.12);
-      border-color: var(--teal);
-      box-shadow: 0 0 12px rgba(46, 196, 182, 0.25);
-      animation: musicPulse 2s infinite ease-in-out;
+      background: var(--accent-subtle);
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
     .music-btn.muted {
-      opacity: 0.55;
-      border-color: rgba(255, 255, 255, 0.08);
-    }
-
-    @keyframes musicPulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.06); }
-      100% { transform: scale(1); }
+      opacity: 0.65;
     }
 
     .header-info {
@@ -157,52 +153,45 @@
     }
 
     .header-info h1 {
-      font-size: 18px;
-      font-weight: 900;
-      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .header-info p {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--gold);
-      margin-top: 1px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      font-size: 12px;
+      color: var(--muted);
     }
 
     .header-timer-wrap {
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 6px 14px;
-      border-radius: 20px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 8px;
+      color: var(--muted);
     }
 
     .timer-text {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--teal);
-      font-family: monospace;
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--accent);
     }
 
     .timer-text.warning {
-      color: #f9a825;
+      color: var(--warning);
     }
 
     .timer-text.danger {
       color: var(--wrong);
-      animation: pulse 1s infinite alternate;
-    }
-
-    @keyframes pulse {
-      from { transform: scale(1); opacity: 1; }
-      to { transform: scale(1.05); opacity: 0.8; }
     }
 
     /* ── MAIN SCREEN LAYOUT ── */
@@ -217,22 +206,22 @@
       flex: 6.5;
       display: flex;
       flex-direction: column;
-      border-right: 1.5px solid var(--border);
-      background: #0e0e12;
-      height: calc(100vh - 81px);
+      border-right: 1px solid var(--border);
+      background: var(--bg-deep);
+      height: calc(100vh - 56px);
       position: sticky;
-      top: 81px;
+      top: 56px;
     }
 
     .pdf-fallback-bar {
-      padding: 10px 16px;
-      background: rgba(20, 20, 26, 0.95);
+      height: 44px;
+      padding: 0 16px;
+      background: var(--bg);
       border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      flex-wrap: wrap;
       z-index: 10;
     }
 
@@ -243,146 +232,131 @@
     }
 
     .pdf-status-badge {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--teal);
-      background: rgba(46, 196, 182, 0.1);
-      border: 1px solid rgba(46, 196, 182, 0.25);
-      padding: 4px 10px;
-      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
       white-space: nowrap;
-      user-select: none;
     }
 
     .pdf-tip-text {
-      font-size: 11px;
-      font-weight: 700;
-      color: #b388ff;
-      user-select: none;
+      font-size: 12px;
+      color: var(--muted);
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 960px) {
       .pdf-tip-text {
         display: none;
       }
     }
 
-    .btn-pdf-popout {
-      background: rgba(255, 255, 255, 0.06);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 6px 12px;
-      border-radius: 8px;
+    .btn-pdf-popout,
+    .btn-pdf-fallback {
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 6px;
+      font-family: inherit;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 500;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      transition: all 0.2s;
+      gap: 6px;
+      text-decoration: none;
       white-space: nowrap;
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease);
+    }
+
+    .btn-pdf-popout {
+      background: var(--card);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-strong);
     }
 
     .btn-pdf-popout:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: var(--teal);
-      color: var(--teal);
-      transform: translateY(-1px);
+      background: var(--raised);
+      color: var(--text);
+      border-color: var(--accent);
     }
 
     .btn-pdf-fallback {
-      background: var(--gold-gradient);
-      color: #000;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 900;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.2s;
-      white-space: nowrap;
-      box-shadow: 0 2px 10px rgba(124, 77, 255, 0.3);
+      background: var(--raised);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
     }
 
     .btn-pdf-fallback:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 18px rgba(124, 77, 255, 0.5);
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
     .pdf-viewer-iframe {
       width: 100%;
       flex: 1;
       border: none;
-      background: #1e1e1e;
+      background: #14161e;
     }
 
     /* Right Pane - Answers */
     .answers-pane {
       flex: 3.5;
-      height: calc(100vh - 81px);
+      height: calc(100vh - 56px);
       overflow-y: auto;
-      background: rgba(10, 10, 12, 0.5);
-      padding: 24px;
+      background: var(--bg);
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
     }
 
-    /* Student Name Card */
     .student-card {
-      background: var(--card-solid);
-      border-radius: 20px;
-      border: 1.5px solid var(--border);
-      box-shadow: 0 4px 20px var(--shadow);
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
       padding: 16px;
     }
 
     .student-card label {
       display: block;
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
       margin-bottom: 8px;
     }
 
     .student-input {
       width: 100%;
-      padding: 11px 14px;
-      border-radius: 12px;
-      border: 1.5px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.02);
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-deep);
       font-family: inherit;
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
       outline: none;
-      transition: all 0.2s;
+      transition: border-color 150ms var(--ease);
     }
 
     .student-input:focus {
-      border-color: var(--teal);
-      box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.15);
+      border-color: var(--accent);
     }
 
     .student-input:disabled {
-      opacity: 0.6;
+      opacity: 0.65;
       cursor: not-allowed;
     }
 
-    /* Score banner */
     .score-banner {
-      background: var(--card-solid);
-      border-radius: 20px;
-      border: 2px solid rgba(124, 77, 255, 0.3);
-      box-shadow: 0 8px 32px var(--shadow);
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--border-strong);
       padding: 20px;
       text-align: center;
       display: none;
-      animation: popIn 0.5s ease both;
     }
 
     .score-banner.visible {
@@ -390,141 +364,145 @@
     }
 
     .score-value {
-      font-size: 38px;
-      font-weight: 900;
-      line-height: 1;
-      color: var(--gold);
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 36px;
+      font-weight: 500;
+      line-height: 1.1;
+      color: var(--accent);
       margin-bottom: 6px;
     }
 
     .score-label {
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 12px;
       color: var(--muted);
     }
 
     .score-msg {
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 500;
+      color: var(--text);
       margin-top: 8px;
     }
 
-    /* Answer Sections */
     .answer-section {
-      background: var(--card-solid);
-      border-radius: 24px;
-      border: 1.5px solid var(--border);
-      box-shadow: 0 4px 20px var(--shadow);
-      padding: 20px;
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
     }
 
     .answer-section-title {
-      font-size: 15px;
-      font-weight: 900;
-      color: #fff;
-      border-left: 4px solid var(--gold);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      border-left: 2px solid var(--accent);
       padding-left: 10px;
-      letter-spacing: 0.3px;
     }
 
-    /* Part I: MCQ grid layout */
+    /* Part I: MCQ grid */
     .mcq-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      gap: 8px;
     }
 
     .mcq-col {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 6px;
     }
 
     .mcq-row {
-      background: rgba(255, 255, 255, 0.01);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 12px;
-      padding: 8px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 4px;
+      gap: 6px;
     }
 
     .mcq-qnum {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
       font-size: 12px;
-      font-weight: 900;
+      font-weight: 500;
       color: var(--muted);
-      width: 20px;
+      min-width: 20px;
+      text-align: right;
     }
 
     .mcq-options {
       display: flex;
-      gap: 5px;
+      gap: 4px;
     }
 
     .mcq-btn {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(255, 255, 255, 0.15);
-      background: rgba(255, 255, 255, 0.02);
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 800;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid var(--border-strong);
+      background: var(--card);
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.2s;
       user-select: none;
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease);
     }
 
     .mcq-btn:hover {
-      border-color: var(--teal);
-      color: var(--teal);
+      border-color: var(--accent);
+      color: var(--text);
+      background: var(--raised);
     }
 
     .mcq-btn.selected {
-      background: var(--teal);
-      color: #000;
-      border-color: var(--teal);
-      font-weight: 900;
+      background: var(--accent);
+      color: var(--bg-deep);
+      border-color: var(--accent);
+      font-weight: 600;
     }
 
     .mcq-btn.is-correct {
       background: var(--correct) !important;
-      color: #fff !important;
+      color: #07080d !important;
       border-color: var(--correct) !important;
     }
 
     .mcq-btn.is-wrong {
       background: var(--wrong) !important;
-      color: #fff !important;
+      color: #ffffff !important;
       border-color: var(--wrong) !important;
     }
 
-    /* Part II: True/False rows */
+    /* Part II: True/False */
     .tf-grid {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 10px;
     }
 
     .tf-question-box {
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      background: rgba(255, 255, 255, 0.01);
-      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 8px;
       padding: 12px;
     }
 
     .tf-qtitle {
       font-size: 13px;
-      font-weight: 800;
-      color: #fff;
+      font-weight: 600;
+      color: var(--text);
       margin-bottom: 8px;
     }
 
@@ -533,47 +511,52 @@
       justify-content: space-between;
       align-items: center;
       padding: 6px 0;
-      border-bottom: 1px dashed rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid var(--border);
     }
 
     .tf-statement-row:last-child {
       border-bottom: none;
+      padding-bottom: 0;
     }
 
     .tf-statement-label {
       font-size: 12px;
-      font-weight: 700;
-      color: var(--muted);
+      color: var(--text-secondary);
     }
 
     .tf-btns-wrap {
-      display: flex;
-      gap: 6px;
+      flex-shrink: 0;
     }
 
     .tf-btn {
-      padding: 4px 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      background: rgba(255, 255, 255, 0.02);
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 5px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
       user-select: none;
+      text-align: center;
+      transition: color 150ms var(--ease), border-color 150ms var(--ease);
+    }
+
+    .tf-btn:hover {
+      color: var(--text);
     }
 
     .tf-btn.selected[data-val="Đ"] {
-      background: var(--correct);
-      color: #fff;
-      border-color: var(--correct);
+      color: #07080d;
+    }
+
+    html[data-theme="light"] .tf-btn.selected[data-val="Đ"] {
+      color: #ffffff;
     }
 
     .tf-btn.selected[data-val="S"] {
-      background: var(--wrong);
-      color: #fff;
-      border-color: var(--wrong);
+      color: #ffffff;
     }
 
     .tf-btn.is-correct-key {
@@ -590,158 +573,172 @@
       opacity: 1;
     }
 
-    /* Part III: Short Answer rows */
+    /* Part III: Short Answer */
     .sa-grid {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }
 
     .sa-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      background: rgba(255, 255, 255, 0.01);
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      gap: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
       padding: 8px 12px;
-      border-radius: 12px;
+      border-radius: 8px;
     }
 
     .sa-qlabel {
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
     }
 
     .sa-input {
       width: 140px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 1.5px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.02);
-      font-family: inherit;
-      font-size: 16px;
-      font-weight: 800;
-      color: #fff;
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-strong);
+      background: var(--card);
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
       text-align: right;
       outline: none;
-      transition: all 0.2s;
+      transition: border-color 150ms var(--ease);
     }
 
     .sa-input:focus {
-      border-color: var(--teal);
+      border-color: var(--accent);
     }
 
     .sa-input.is-correct {
       border-color: var(--correct) !important;
-      background: rgba(67, 160, 71, 0.1) !important;
+      background: var(--correct-subtle) !important;
     }
 
     .sa-input.is-wrong {
       border-color: var(--wrong) !important;
-      background: rgba(229, 57, 53, 0.08) !important;
+      background: var(--wrong-subtle) !important;
     }
 
     .sa-feedback {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
-      font-weight: 800;
       color: var(--correct);
       margin-top: 4px;
       display: none;
     }
 
-    /* Control panel submit wrap */
+    /* Submit */
     .submit-wrap {
-      text-align: center;
-      margin-top: 10px;
-      padding-bottom: 20px;
+      margin-top: 4px;
+      padding-bottom: 16px;
     }
 
     .submit-btn {
       width: 100%;
-      padding: 14px;
-      border-radius: 50px;
+      height: 44px;
+      border-radius: 8px;
       border: none;
       cursor: pointer;
       font-family: inherit;
-      font-size: 15px;
-      font-weight: 900;
-      color: #000;
-      background: var(--gold-gradient);
-      box-shadow: 0 6px 24px rgba(124, 77, 255, 0.3);
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--bg-deep);
+      background: var(--text);
+      transition: opacity 150ms var(--ease), transform 150ms var(--ease);
     }
 
-    .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(124, 77, 255, 0.4);
+    .submit-btn:hover:not(:disabled) {
+      opacity: 0.9;
     }
 
-    .submit-btn:active {
+    .submit-btn:active:not(:disabled) {
       transform: scale(0.98);
     }
 
     .submit-btn:disabled {
-      opacity: 0.5;
+      opacity: 0.45;
       cursor: not-allowed;
-      transform: none !important;
-      box-shadow: none !important;
     }
 
-    /* Mobile Footer Navigation & Controls */
+    /* Mobile Footer */
     .mobile-footer {
       display: none;
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(10, 10, 12, 0.95);
-      border-top: 1.5px solid var(--border);
-      backdrop-filter: blur(16px);
-      padding: 12px 20px;
+      height: 60px;
+      background: var(--bg);
+      border-top: 1px solid var(--border-strong);
+      padding: 0 16px;
       z-index: 1000;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
     }
 
     .mobile-footer-timer {
-      font-size: 16px;
-      font-weight: 900;
-      color: var(--teal);
-      font-family: monospace;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--accent);
     }
 
     .mobile-footer-timer.danger {
       color: var(--wrong);
-      animation: pulse 1s infinite alternate;
     }
 
     .mobile-footer-btns {
       display: flex;
+      align-items: center;
       gap: 8px;
     }
 
-    .btn-mobile-nav {
-      padding: 8px 16px;
-      border-radius: 20px;
+    .mobile-view-seg {
+      --seg-count: 2;
+      --seg-index: 0;
+    }
+
+    .mobile-view-seg .seg-btn {
+      height: 28px;
+      padding: 0 10px;
       font-size: 12px;
-      font-weight: 800;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .btn-mobile-nav {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid var(--border-strong);
+      background: var(--card);
+      color: var(--text);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.2s;
     }
 
     .btn-mobile-nav.primary {
-      background: var(--gold-gradient);
-      color: #000;
+      background: var(--text);
+      color: var(--bg-deep);
       border-color: transparent;
     }
 
@@ -755,25 +752,20 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 12px;
     }
 
     .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(46, 196, 182, 0.15);
-      border-top-color: var(--teal);
+      width: 28px;
+      height: 28px;
+      border: 2.5px solid var(--border-strong);
+      border-top-color: var(--accent);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 750ms linear infinite;
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
-    }
-
-    @keyframes popIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
     }
 
     /* ── EXAM LOCK & COUNTDOWN SCREEN ── */
@@ -782,11 +774,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: calc(100vh - 81px);
-      padding: 30px 20px 60px 20px;
+      min-height: calc(100vh - 56px);
+      padding: 32px 20px;
       text-align: center;
-      z-index: 50;
-      position: relative;
     }
 
     .exam-lock-screen.visible {
@@ -794,38 +784,34 @@
     }
 
     .lock-card {
-      max-width: 580px;
+      max-width: 520px;
       width: 100%;
-      background: rgba(22, 22, 28, 0.85);
-      border: 1.5px solid rgba(124, 77, 255, 0.35);
-      border-radius: 28px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(124, 77, 255, 0.15);
-      backdrop-filter: blur(20px);
-      padding: 36px 28px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 32px 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 18px;
-      animation: popIn 0.5s ease both;
+      gap: 16px;
     }
 
     .lock-icon-badge {
-      width: 68px;
-      height: 68px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, rgba(124, 77, 255, 0.2), rgba(249, 168, 37, 0.15));
-      border: 1.5px solid rgba(249, 168, 37, 0.3);
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--raised);
+      border: 1px solid var(--border-strong);
+      color: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     }
 
     .lock-title {
-      font-size: 22px;
-      font-weight: 900;
-      color: #fff;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
       line-height: 1.35;
     }
 
@@ -833,104 +819,106 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 8px 16px;
-      border-radius: 20px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 6px;
       font-size: 13px;
-      font-weight: 800;
-      color: var(--teal);
+      color: var(--text-secondary);
+    }
+
+    .lock-schedule-info strong {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-weight: 500;
     }
 
     .countdown-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
+      gap: 10px;
       width: 100%;
-      max-width: 440px;
-      margin-top: 6px;
+      max-width: 400px;
+      margin-top: 4px;
     }
 
     .countdown-box {
-      background: rgba(10, 10, 14, 0.7);
-      border: 1.5px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 14px 6px;
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 12px 6px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
     }
 
     .countdown-num {
-      font-size: 30px;
-      font-weight: 900;
-      color: var(--gold);
-      font-family: monospace;
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--text);
       line-height: 1;
       margin-bottom: 6px;
     }
 
     .countdown-lbl {
       font-size: 11px;
-      font-weight: 800;
       color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .lock-subtext {
       font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      line-height: 1.5;
+      color: var(--text-secondary);
+      line-height: 1.55;
     }
 
     .btn-lock-back {
-      background: rgba(255, 255, 255, 0.06);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 10px 22px;
-      border-radius: 24px;
+      background: var(--raised);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      height: 38px;
+      padding: 0 18px;
+      border-radius: 8px;
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 500;
       text-decoration: none;
-      transition: all 0.2s;
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      transition: border-color 150ms var(--ease);
     }
 
     .btn-lock-back:hover {
-      background: rgba(255, 255, 255, 0.12);
-      transform: translateY(-1px);
+      border-color: var(--accent);
     }
 
-    /* ── RESPONSIVE RESPONSIVENESS ── */
+    /* ── RESPONSIVE ── */
     @media (max-width: 767px) {
       .pdf-pane {
         flex: 1;
         width: 100%;
-        height: calc(100vh - 146px); /* Extra space for footer */
+        height: calc(100vh - 116px);
         position: relative;
         top: 0;
+        border-right: none;
       }
 
       .answers-pane {
         flex: 1;
         width: 100%;
-        height: calc(100vh - 146px);
-        background: transparent;
+        height: calc(100vh - 116px);
         padding: 16px;
       }
 
       .screen-container {
         flex-direction: column;
-        margin-bottom: 65px; /* Offset for mobile footer */
+        margin-bottom: 60px;
       }
 
-      .pdf-pane.hidden, .answers-pane.hidden {
+      .pdf-pane.hidden,
+      .answers-pane.hidden {
         display: none;
       }
 
@@ -938,7 +926,6 @@
         display: flex;
       }
 
-      /* Hide header timer on mobile to avoid duplication */
       .header-timer-wrap {
         display: none;
       }
@@ -948,64 +935,27 @@
       .answers-pane {
         padding: 12px;
       }
-      .answer-section {
-        padding: 14px;
-        border-radius: 18px;
-        gap: 12px;
-      }
-      .mcq-grid {
-        gap: 8px;
-      }
-      .mcq-col {
-        gap: 8px;
-      }
-      .mcq-row {
-        padding: 6px 8px;
-        border-radius: 10px;
-        gap: 2px;
-      }
-      .mcq-qnum {
-        font-size: 11px;
-        width: 16px;
-      }
-      .mcq-options {
-        gap: 3px;
-      }
+
       .mcq-btn {
-        width: 23px;
-        height: 23px;
-        font-size: 10px;
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
       }
-      .tf-question-box {
-        padding: 10px 8px;
-        border-radius: 12px;
-      }
-      .tf-btn {
-        padding: 3px 8px;
-        font-size: 10px;
-        border-radius: 6px;
-      }
-      .sa-row {
-        padding: 6px 10px;
-        border-radius: 10px;
-      }
+
       .sa-input {
-        width: 100px;
-        padding: 4px 8px;
-        font-size: 16px;
+        width: 110px;
       }
+    }
   </style>
 </head>
 
 <body>
-  <!-- LOADING SCREEN -->
   <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
-    <div style="font-weight:700; color:var(--muted); font-size:14px;">Đang chuẩn bị đề thi VIP...</div>
+    <div style="font-weight:500; color:var(--muted); font-size:14px;">Đang chuẩn bị đề thi...</div>
   </div>
 
   <div class="app">
-    <!-- HEADER -->
     <div class="header">
       <a class="back-btn" href="./" title="Quay lại">
         <svg viewBox="0 0 24 24">
@@ -1014,26 +964,36 @@
       </a>
       <div class="header-info">
         <h1 id="examTitle">Đang tải đề thi...</h1>
-        <p>Phòng Luyện Đề VIP</p>
+        <p>Phòng luyện đề</p>
       </div>
+      <button type="button" class="pts-toggle" onclick="PinUI.toggleTheme(this)" aria-label="Đổi giao diện sáng tối" aria-pressed="true">
+        <svg class="pts-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        <svg class="pts-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
       <button class="music-btn" id="musicToggleBtn" onclick="toggleMusic()" title="Bật/Tắt nhạc nền tập trung">
-        <span id="musicIcon">🎵</span>
+        <span id="musicIcon">
+          <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>
+        </span>
       </button>
       <div class="header-timer-wrap">
-        ⏱️ <span class="timer-text" id="headerTimer">50:00</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="timer-text" id="headerTimer">50:00</span>
       </div>
     </div>
 
-    <!-- LOCK SCREEN (HẸN GIỜ MỞ ĐỀ) -->
+    <!-- LOCK SCREEN -->
     <div class="exam-lock-screen" id="examLockScreen">
       <div class="lock-card">
-        <div class="lock-icon-badge">🔒</div>
+        <div class="lock-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
         <div class="lock-title" id="lockExamTitle">Đề thi chưa đến giờ mở</div>
         <div class="lock-schedule-info">
-          <span>⏰ Thời gian mở đề:</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Thời gian mở đề:</span>
           <strong id="lockTargetTimeStr">--:-- --/--/----</strong>
         </div>
-        
+
         <div class="countdown-grid">
           <div class="countdown-box">
             <div class="countdown-num" id="cdDays">00</div>
@@ -1054,100 +1014,96 @@
         </div>
 
         <p class="lock-subtext">
-          Đề thi đang được khóa và sẽ tự động mở ra ngay khi đồng hồ đếm ngược kết thúc.<br>
-          Các em vui lòng chuẩn bị nháp, máy tính và giữ nguyên màn hình.
+          Đề thi sẽ tự động mở khi đồng hồ đếm ngược kết thúc. Chuẩn bị nháp và máy tính cầm tay trước khi bắt đầu.
         </p>
 
         <a href="./" class="btn-lock-back">
-          <span>‹</span> Quay lại danh sách đề
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Quay lại danh sách đề
         </a>
       </div>
     </div>
 
     <!-- MAIN CONTAINER -->
     <div class="screen-container">
-      <!-- LEFT COLUMN: PDF VIEW -->
       <div class="pdf-pane" id="pdfPane">
         <div class="pdf-fallback-bar">
           <div class="pdf-toolbar-group">
-            <span class="pdf-status-badge" id="pdfPageBadge">📄 Đề thi (PDF)</span>
-            <span class="pdf-tip-text">💡 Không cuộn hết trang?</span>
+            <span class="pdf-status-badge" id="pdfPageBadge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Đề thi PDF
+            </span>
+            <span class="pdf-tip-text">Mở tab mới nếu khung PDF không hiển thị hết trang</span>
           </div>
           <div class="pdf-toolbar-group">
             <button type="button" class="btn-pdf-popout" id="btnPdfPopout" title="Mở cửa sổ đề riêng bên cạnh để vừa đọc đề vừa điền đáp án">
-              🪟 Cửa sổ riêng
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/></svg>
+              Cửa sổ riêng
             </button>
-            <a class="btn-pdf-fallback" id="btnPdfOpen" href="#" target="_blank" title="Mở đầy đủ toàn bộ đề thi trong tab mới của trình duyệt">
-              📂 Mở tab mới ↗
+            <a class="btn-pdf-fallback" id="btnPdfOpen" href="#" target="_blank" title="Mở đầy đủ toàn bộ đề thi trong tab mới">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Mở tab mới
             </a>
           </div>
         </div>
-        <!-- Khung nhúng đề thi chính thức -->
         <iframe class="pdf-viewer-iframe" id="pdfViewer" src="" allow="fullscreen; autoplay; clipboard-read; clipboard-write; storage-access *" allowfullscreen loading="lazy"></iframe>
       </div>
 
-      <!-- RIGHT COLUMN: ANSWER SHEET -->
       <div class="answers-pane hidden" id="answersPane">
-        <!-- Student Identity -->
         <div class="student-card" id="studentCard">
           <label for="studentName">Họ và tên học sinh <span style="color:var(--wrong)">*</span></label>
-          <input type="text" class="student-input" id="studentName" placeholder="Nhập họ tên của em để nộp bài...">
+          <input type="text" class="student-input" id="studentName" placeholder="Nhập họ tên của em để nộp bài">
         </div>
 
-        <!-- Score display -->
         <div class="score-banner" id="scoreBanner">
           <div class="score-value" id="scoreValue">0.0 / 10.0</div>
           <div class="score-label">Điểm số đạt được</div>
-          <div class="score-msg" id="scoreMsg">Hãy ôn tập chăm chỉ nhé!</div>
+          <div class="score-msg" id="scoreMsg">Hãy ôn tập chăm chỉ.</div>
         </div>
 
         <form id="answerForm" onsubmit="event.preventDefault(); submitExam(false);">
-          <!-- Part I: MCQ -->
           <div class="answer-section" id="mcqSection">
-            <div class="answer-section-title" id="mcqSectionTitle">PHẦN I: Trắc nghiệm (18 câu - 4.5đ)</div>
-            <div class="mcq-grid" id="mcqGrid">
-              <!-- RENDERED BY JS -->
-            </div>
+            <div class="answer-section-title" id="mcqSectionTitle">Phần I: Trắc nghiệm (18 câu - 4.5đ)</div>
+            <div class="mcq-grid" id="mcqGrid"></div>
           </div>
 
-          <!-- Part II: True/False -->
-          <div class="answer-section" id="tfSection">
-            <div class="answer-section-title" id="tfSectionTitle">PHẦN II: Đúng / Sai (4 câu - 4.0đ)</div>
-            <div class="tf-grid" id="tfGrid">
-              <!-- RENDERED BY JS -->
-            </div>
+          <div class="answer-section" id="tfSection" style="margin-top: 16px;">
+            <div class="answer-section-title" id="tfSectionTitle">Phần II: Đúng / Sai (4 câu - 4.0đ)</div>
+            <div class="tf-grid" id="tfGrid"></div>
           </div>
 
-          <!-- Part III: Short Answer -->
-          <div class="answer-section" id="saSection">
-            <div class="answer-section-title" id="saSectionTitle">PHẦN III: Trả lời ngắn (6 câu - 1.5đ)</div>
-            <div class="sa-grid" id="saGrid">
-              <!-- RENDERED BY JS -->
-            </div>
+          <div class="answer-section" id="saSection" style="margin-top: 16px;">
+            <div class="answer-section-title" id="saSectionTitle">Phần III: Trả lời ngắn (6 câu - 1.5đ)</div>
+            <div class="sa-grid" id="saGrid"></div>
           </div>
 
-          <!-- SUBMIT BUTTON -->
-          <div class="submit-wrap">
-            <button type="submit" class="submit-btn" id="submitBtn">🚀 Xác nhận Nộp bài</button>
+          <div class="submit-wrap" style="margin-top: 16px;">
+            <button type="submit" class="submit-btn" id="submitBtn">Xác nhận nộp bài</button>
           </div>
         </form>
       </div>
     </div>
 
-    <!-- MOBILE CONTROL FOOTER -->
     <div class="mobile-footer">
       <div class="mobile-footer-timer">
-        ⏱️ <span id="mobileTimer">50:00</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span id="mobileTimer">50:00</span>
       </div>
       <div class="mobile-footer-btns">
-        <button class="btn-mobile-nav" id="btnToggleView" onclick="toggleView()">✍️ Điền đáp án</button>
-        <button class="btn-mobile-nav primary" id="btnMobileSubmit" onclick="submitExam(false);">🚀 Nộp bài</button>
+        <div class="seg-control mobile-view-seg" id="mobileViewSeg" style="--seg-count: 2; --seg-index: 0;">
+          <span class="seg-thumb"></span>
+          <button type="button" class="seg-btn active" id="btnViewPdf" onclick="toggleView('pdf')">Đề PDF</button>
+          <button type="button" class="seg-btn" id="btnViewAnswers" onclick="toggleView('answers')">Đáp án</button>
+        </div>
+        <button class="btn-mobile-nav primary" id="btnMobileSubmit" onclick="submitExam(false);">Nộp bài</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Tự động làm sạch URL trên trình duyệt (loại bỏ .html và đồng bộ với hash)
+    const SVG_VOL_ON = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
+    const SVG_VOL_OFF = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>';
+
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
       const path = window.location.pathname;
       if (path.endsWith('.html')) {
@@ -1159,10 +1115,7 @@
       }
     }
 
-    // ══════════════════════════════════════════════
-    // CẤU HÌNH & KIỂM TRA ĐĂNG NHẬP
     var SESSION_KEY = window.SESSION_KEY || 'zphysics_session';
-    // === CẤU HÌNH SUPABASE ===
     var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
     var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
     const SHEETS_API_URL = localStorage.getItem('ZPHYSICS_API_URL') || 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
@@ -1172,7 +1125,6 @@
         const s = localStorage.getItem(SESSION_KEY);
         if (!s) return null;
         const session = JSON.parse(s);
-        // Tự động hạ cấp phiên đăng nhập cục bộ nếu đã hết hạn premium
         if (session.premium && session.premium_until) {
           const expDate = new Date(session.premium_until);
           if (expDate < new Date()) {
@@ -1181,10 +1133,11 @@
           }
         }
         return session;
-      } catch { return null; }
+      } catch {
+        return null;
+      }
     }
 
-    // Xác thực quyền Premium
     const currentSession = getSession();
     function parseUrlExamParams() {
       const searchParams = new URLSearchParams(window.location.search);
@@ -1210,7 +1163,7 @@
         }
       }
       if (!eId) eId = '';
-      try { eId = decodeURIComponent(eId).trim(); } catch(e) {}
+      try { eId = decodeURIComponent(eId).trim(); } catch (e) {}
       return { examId: eId, demoMode: dMode };
     }
 
@@ -1223,7 +1176,6 @@
       return list.find(e => e && e.id && String(e.id).trim().toLowerCase() === norm) || null;
     }
 
-    // Tự động làm đẹp URL bằng cách chuyển đổi từ query sang hash
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
       const cleanPath = window.location.pathname.replace(/\.html$/, '');
       if (window.location.search.includes('exam=')) {
@@ -1239,16 +1191,14 @@
       }
     }
 
-    // Biến toàn cục chứa thông tin đề
     let examData = null;
-    let timeRemaining = 3000; // 50 phút = 3000 giây
+    let timeRemaining = 3000;
     let timerInterval = null;
     let submitted = false;
-    let currentMobileView = 'pdf'; // 'pdf' hoặc 'answers'
+    let currentMobileView = 'pdf';
     let countdownTimerId = null;
     let isExamUnlocked = false;
 
-    // ── HẸN GIỜ MỞ ĐỀ & ĐẾM NGƯỢC ──
     function parseExamOpenTime(data) {
       if (!data) return null;
       let rawStr = '';
@@ -1258,50 +1208,30 @@
 
       const descText = data.desc || data.description || '';
       const match = descText.match(/\[OPEN:\s*([^\]]+)\]/i);
-      if (match && match[1]) {
-        rawStr = match[1].trim();
-      }
+      if (match && match[1]) rawStr = match[1].trim();
 
       if (!rawStr) return null;
 
-      // Format: 10:00 19/09/2026 hoặc 10h00 19-09-2026
       const timeDateMatch = rawStr.match(/^(\d{1,2})[:h](\d{2})\s+(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/i);
       if (timeDateMatch) {
-        const hours = parseInt(timeDateMatch[1], 10);
-        const mins = parseInt(timeDateMatch[2], 10);
-        const day = parseInt(timeDateMatch[3], 10);
-        const month = parseInt(timeDateMatch[4], 10) - 1;
-        const year = parseInt(timeDateMatch[5], 10);
-        const d = new Date(year, month, day, hours, mins, 0);
+        const d = new Date(parseInt(timeDateMatch[5], 10), parseInt(timeDateMatch[4], 10) - 1, parseInt(timeDateMatch[3], 10), parseInt(timeDateMatch[1], 10), parseInt(timeDateMatch[2], 10), 0);
         if (!isNaN(d.getTime())) return d;
       }
 
-      // Format: 19/09/2026 10:00
       const dateTimeMatch = rawStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})\s+(\d{1,2})[:h](\d{2})$/i);
       if (dateTimeMatch) {
-        const day = parseInt(dateTimeMatch[1], 10);
-        const month = parseInt(dateTimeMatch[2], 10) - 1;
-        const year = parseInt(dateTimeMatch[3], 10);
-        const hours = parseInt(dateTimeMatch[4], 10);
-        const mins = parseInt(dateTimeMatch[5], 10);
-        const d = new Date(year, month, day, hours, mins, 0);
+        const d = new Date(parseInt(dateTimeMatch[3], 10), parseInt(dateTimeMatch[2], 10) - 1, parseInt(dateTimeMatch[1], 10), parseInt(dateTimeMatch[4], 10), parseInt(dateTimeMatch[5], 10), 0);
         if (!isNaN(d.getTime())) return d;
       }
 
       const parsed = new Date(rawStr);
       if (!isNaN(parsed.getTime())) return parsed;
-
       return null;
     }
 
     function formatTimeDisplay(date) {
       const pad = (n) => String(n).padStart(2, '0');
-      const d = pad(date.getDate());
-      const m = pad(date.getMonth() + 1);
-      const y = date.getFullYear();
-      const h = pad(date.getHours());
-      const min = pad(date.getMinutes());
-      return `${h}:${min} ngày ${d}/${m}/${y}`;
+      return `${pad(date.getHours())}:${pad(date.getMinutes())} ngày ${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
     }
 
     function checkAndLoadExam(data) {
@@ -1316,7 +1246,6 @@
         }
       }
 
-      // Đã đến giờ hoặc không hẹn giờ
       const lockScreen = document.getElementById('examLockScreen');
       if (lockScreen && lockScreen.classList.contains('visible')) {
         unlockAndStartExam(data);
@@ -1330,18 +1259,18 @@
       document.getElementById('examTitle').textContent = data.title || 'Đề thi VIP';
       const headerTimer = document.getElementById('headerTimer');
       if (headerTimer) headerTimer.textContent = 'Chưa mở';
-      
+
       const lockScreen = document.getElementById('examLockScreen');
       const mainContainer = document.querySelector('.screen-container');
       const mobileFooter = document.querySelector('.mobile-footer');
-      
+
       lockScreen.classList.add('visible');
       if (mainContainer) mainContainer.style.display = 'none';
       if (mobileFooter) mobileFooter.style.display = 'none';
-      
+
       document.getElementById('lockExamTitle').textContent = data.title || 'Đề thi VIP';
       document.getElementById('lockTargetTimeStr').textContent = formatTimeDisplay(openDate);
-      
+
       function updateCountdown() {
         const diff = openDate.getTime() - Date.now();
         if (diff <= 0) {
@@ -1350,20 +1279,20 @@
           unlockAndStartExam(data);
           return;
         }
-        
+
         const secTotal = Math.floor(diff / 1000);
         const days = Math.floor(secTotal / 86400);
         const hours = Math.floor((secTotal % 86400) / 3600);
         const minutes = Math.floor((secTotal % 3600) / 60);
         const seconds = secTotal % 60;
-        
+
         const pad = (n) => String(n).padStart(2, '0');
         document.getElementById('cdDays').textContent = pad(days);
         document.getElementById('cdHours').textContent = pad(hours);
         document.getElementById('cdMinutes').textContent = pad(minutes);
         document.getElementById('cdSeconds').textContent = pad(seconds);
       }
-      
+
       updateCountdown();
       if (countdownTimerId) clearInterval(countdownTimerId);
       countdownTimerId = setInterval(updateCountdown, 1000);
@@ -1378,11 +1307,11 @@
       const lockScreen = document.getElementById('examLockScreen');
       const mainContainer = document.querySelector('.screen-container');
       const mobileFooter = document.querySelector('.mobile-footer');
-      
+
       if (lockScreen) lockScreen.classList.remove('visible');
       if (mainContainer) mainContainer.style.display = '';
       if (mobileFooter) mobileFooter.style.display = '';
-      
+
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (AudioContext) {
@@ -1398,14 +1327,12 @@
           osc.start();
           osc.stop(audioCtx.currentTime + 0.8);
         }
-      } catch(e) {}
-      
+      } catch (e) {}
+
       initExam(data);
     }
 
-    // ── KHỞI TẠO TRANG ──
     async function initExamPage() {
-      // Điền sẵn tên học sinh nếu có trong session
       const nameInput = document.getElementById('studentName');
       if (currentSession && currentSession.ten) {
         nameInput.value = currentSession.ten;
@@ -1415,20 +1342,16 @@
         }
       }
 
-      // Xác nhận khi bấm nút thoát
       const backBtn = document.querySelector('.back-btn');
       if (backBtn) {
         backBtn.addEventListener('click', (e) => {
           if (!submitted) {
             const confirmExit = confirm('Bạn có chắc chắn muốn thoát? Kết quả làm bài sẽ không được lưu.');
-            if (!confirmExit) {
-              e.preventDefault();
-            }
+            if (!confirmExit) e.preventDefault();
           }
         });
       }
 
-      // Cảnh báo khi reload hoặc đóng tab
       window.addEventListener('beforeunload', (e) => {
         if (!submitted) {
           e.preventDefault();
@@ -1436,24 +1359,18 @@
         }
       });
 
-      // ── TỐI ƯU TẢI ĐỀ (CACHE-FIRST + ĐỒNG BỘ NGẦM) ──
       let list = [];
-
-      // 1. Đọc từ cache localStorage để hiển thị đề tức thì (< 50ms)
       try {
         const cached = localStorage.getItem('zphysics_exams_cache');
         if (cached) {
           list = JSON.parse(cached);
           if (Array.isArray(list) && list.length > 0) {
             const found = findExamById(list, examId);
-            if (found) {
-              checkAndLoadExam(found);
-            }
+            if (found) checkAndLoadExam(found);
           }
         }
       } catch (e) {}
 
-      // 2. Fetch Supabase (không timeout, để trình duyệt tự quản lý như bản gốc)
       const fetchExamData = async () => {
         try {
           const response = await fetch(`${SUPABASE_URL}/rest/v1/exams?select=*`, {
@@ -1480,7 +1397,7 @@
           if (freshList && freshList.length > 0) {
             try {
               localStorage.setItem('zphysics_exams_cache', JSON.stringify(freshList));
-            } catch(e) {}
+            } catch (e) {}
             const freshExam = findExamById(freshList, examId) || (!examId ? freshList[0] : null);
             if (freshExam) {
               const isDifferent = !examData ||
@@ -1499,7 +1416,6 @@
           }
         } catch (err) {
           console.warn('Supabase chậm hoặc lỗi, dùng dữ liệu offline:', err);
-          // Nếu chưa có đề hiển thị, nạp từ file luyende.json cục bộ
           if (!isExamUnlocked && !examData) {
             try {
               const res = await fetch('luyende.json?v=' + Date.now());
@@ -1507,7 +1423,7 @@
                 const offlineList = await res.json();
                 try {
                   localStorage.setItem('zphysics_exams_cache', JSON.stringify(offlineList));
-                } catch(e) {}
+                } catch (e) {}
                 const offExam = findExamById(offlineList, examId) || (!examId ? offlineList[0] : null);
                 if (offExam) {
                   checkAndLoadExam(offExam);
@@ -1546,10 +1462,10 @@
     }
 
     function showError(msg) {
-      document.getElementById('loadingOverlay').innerHTML = 
-        `<div style="color:var(--wrong); font-weight:900; font-size:16px; text-align:center; padding:24px;">
-          ⚠️ LỖI: ${msg}<br><br>
-          <a href="./" style="color:var(--teal); text-decoration:none; font-size:14px;">Quay lại trang chủ</a>
+      document.getElementById('loadingOverlay').innerHTML =
+        `<div style="color:var(--wrong); font-weight:500; font-size:15px; text-align:center; padding:24px;">
+          Lỗi: ${msg}<br><br>
+          <a href="./" style="color:var(--accent); text-decoration:none; font-size:14px;">Quay lại trang chủ</a>
          </div>`;
     }
 
@@ -1565,15 +1481,13 @@
     function initExam(data) {
       isExamUnlocked = true;
       document.getElementById('examTitle').textContent = data.title;
-      
+
       const fileId = extractDriveFileId(data.pdfUrl);
       const pdfOpenBtn = document.getElementById('btnPdfOpen');
       const popoutBtn = document.getElementById('btnPdfPopout');
       const iframe = document.getElementById('pdfViewer');
 
-      if (pdfOpenBtn) {
-        pdfOpenBtn.href = data.pdfUrl;
-      }
+      if (pdfOpenBtn) pdfOpenBtn.href = data.pdfUrl;
 
       if (popoutBtn) {
         popoutBtn.onclick = (e) => {
@@ -1584,62 +1498,61 @@
         };
       }
 
-      // Nhúng đề thi trực tiếp qua Google Drive Preview
       if (fileId) {
         iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
       } else {
         iframe.src = data.pdfUrl;
       }
 
-      // Thiết lập thời gian
       const durationMin = data.duration || 50;
       timeRemaining = durationMin * 60;
       updateTimerDisplay();
 
-      // Render phiếu đáp án gộp
       renderMCQGrid();
       renderTFGrid();
       renderSAGrid();
 
-      // Ẩn màn hình loading
       document.getElementById('loadingOverlay').style.display = 'none';
 
-      // Trên desktop, hiển thị cả 2 pane bên cạnh nhau
-      if (window.innerWidth >= 768) {
-        document.getElementById('answersPane').classList.remove('hidden');
+      syncResponsivePanes();
+      if (!window.__zphysicsResizeBound) {
+        window.__zphysicsResizeBound = true;
+        window.addEventListener('resize', syncResponsivePanes);
       }
 
-      // Bắt đầu đếm ngược
       if (timerInterval) clearInterval(timerInterval);
       startTimer();
     }
 
-    // ── HELPER PHÂN TÍCH ĐÁP ÁN & CẤU TRÚC ĐỀ ĐỘNG TỪ SHEET ──
+    function syncResponsivePanes() {
+      const pdf = document.getElementById('pdfPane');
+      const answers = document.getElementById('answersPane');
+      if (!pdf || !answers) return;
+      if (window.innerWidth >= 768) {
+        pdf.classList.remove('hidden');
+        answers.classList.remove('hidden');
+      } else {
+        pdf.classList.toggle('hidden', currentMobileView !== 'pdf');
+        answers.classList.toggle('hidden', currentMobileView !== 'answers');
+      }
+    }
+
     function parseMCKeys(data) {
       const raw = data && (data.mcAnswers || data.mc_answers);
       if (!raw) return [];
-      return String(raw)
-        .split(',')
-        .map(s => s.trim().toUpperCase())
-        .filter(Boolean);
+      return String(raw).split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     }
 
     function parseTFKeys(data) {
       const raw = data && (data.tfAnswers || data.tf_answers);
       if (!raw) return [];
-      return String(raw)
-        .split(';')
-        .map(q => q.trim().replace(/[,;\s]+$/g, '').replace(/D/g, 'Đ').toUpperCase())
-        .filter(Boolean);
+      return String(raw).split(';').map(q => q.trim().replace(/[,;\s]+$/g, '').replace(/D/g, 'Đ').toUpperCase()).filter(Boolean);
     }
 
     function parseSAKeys(data) {
       const raw = data && (data.saAnswers || data.sa_answers);
       if (!raw) return [];
-      return String(raw)
-        .split(';')
-        .map(s => s.trim().toLowerCase())
-        .filter(s => s !== '');
+      return String(raw).split(';').map(s => s.trim().toLowerCase()).filter(s => s !== '');
     }
 
     function getExamStructure(data) {
@@ -1658,25 +1571,13 @@
       const saMaxScore = saCount > 0 ? (remaining > 0 ? remaining : Math.round(saCount * 0.25 * 100) / 100) : 0;
       const saPointEach = saCount > 0 ? saMaxScore / saCount : 0.25;
 
-      return {
-        mcKeys,
-        tfKeys,
-        saKeys,
-        mcCount,
-        tfCount,
-        saCount,
-        mcMaxScore,
-        tfMaxScore,
-        saMaxScore,
-        saPointEach
-      };
+      return { mcKeys, tfKeys, saKeys, mcCount, tfCount, saCount, mcMaxScore, tfMaxScore, saMaxScore, saPointEach };
     }
 
     function formatScoreBadge(score) {
       return Number.isInteger(score) ? `${score}.0` : `${score}`;
     }
 
-    // ── RENDER PHẦN I: TRẮC NGHIỆM MCQ (TỰ ĐỘNG THEO SHEET) ──
     function renderMCQGrid() {
       const { mcCount, mcMaxScore } = getExamStructure(examData);
       const section = document.getElementById('mcqSection');
@@ -1686,7 +1587,7 @@
 
       if (section) section.style.display = mcCount > 0 ? '' : 'none';
       if (titleEl) {
-        titleEl.textContent = `PHẦN I: Trắc nghiệm (${mcCount} câu - ${formatScoreBadge(mcMaxScore)}đ)`;
+        titleEl.textContent = `Phần I: Trắc nghiệm (${mcCount} câu - ${formatScoreBadge(mcMaxScore)}đ)`;
       }
 
       if (mcCount <= 0) return;
@@ -1702,7 +1603,7 @@
         const row = document.createElement('div');
         row.className = 'mcq-row';
         row.innerHTML = `
-          <span class="mcq-qnum">${i}</span>
+          <span class="mcq-qnum">${String(i).padStart(2, '0')}</span>
           <div class="mcq-options" data-q="${i}">
             <div class="mcq-btn" data-opt="A" onclick="selectMCQ(this, ${i}, 'A')">A</div>
             <div class="mcq-btn" data-opt="B" onclick="selectMCQ(this, ${i}, 'B')">B</div>
@@ -1710,17 +1611,12 @@
             <div class="mcq-btn" data-opt="D" onclick="selectMCQ(this, ${i}, 'D')">D</div>
           </div>
         `;
-        if (i <= half) {
-          col1.appendChild(row);
-        } else {
-          col2.appendChild(row);
-        }
+        if (i <= half) col1.appendChild(row);
+        else col2.appendChild(row);
       }
 
       grid.appendChild(col1);
-      if (mcCount > 1) {
-        grid.appendChild(col2);
-      }
+      if (mcCount > 1) grid.appendChild(col2);
     }
 
     function selectMCQ(btn, qNum, option) {
@@ -1730,7 +1626,6 @@
       btn.classList.add('selected');
     }
 
-    // ── RENDER PHẦN II: ĐÚNG / SAI TF (TỰ ĐỘNG THEO SHEET) ──
     function renderTFGrid() {
       const { tfCount, tfMaxScore } = getExamStructure(examData);
       const section = document.getElementById('tfSection');
@@ -1740,21 +1635,22 @@
 
       if (section) section.style.display = tfCount > 0 ? '' : 'none';
       if (titleEl) {
-        titleEl.textContent = `PHẦN II: Đúng / Sai (${tfCount} câu - ${formatScoreBadge(tfMaxScore)}đ)`;
+        titleEl.textContent = `Phần II: Đúng / Sai (${tfCount} câu - ${formatScoreBadge(tfMaxScore)}đ)`;
       }
 
       for (let i = 1; i <= tfCount; i++) {
         const box = document.createElement('div');
         box.className = 'tf-question-box';
-        
+
         let statementsHTML = '';
         ['a', 'b', 'c', 'd'].forEach(sub => {
           statementsHTML += `
             <div class="tf-statement-row" data-q="${i}" data-sub="${sub}">
               <span class="tf-statement-label">Ý ${sub})</span>
-              <div class="tf-btns-wrap">
-                <button type="button" class="tf-btn" data-val="Đ" onclick="selectTF(this, ${i}, '${sub}', 'Đ')">Đúng</button>
-                <button type="button" class="tf-btn" data-val="S" onclick="selectTF(this, ${i}, '${sub}', 'S')">Sai</button>
+              <div class="tf-btns-wrap seg-control tf-seg" data-selected="none">
+                <span class="seg-thumb"></span>
+                <button type="button" class="tf-btn seg-btn" data-val="Đ" onclick="selectTF(this, ${i}, '${sub}', 'Đ')">Đúng</button>
+                <button type="button" class="tf-btn seg-btn" data-val="S" onclick="selectTF(this, ${i}, '${sub}', 'S')">Sai</button>
               </div>
             </div>
           `;
@@ -1762,9 +1658,7 @@
 
         box.innerHTML = `
           <div class="tf-qtitle">Câu ${i}</div>
-          <div class="tf-statement-grid">
-            ${statementsHTML}
-          </div>
+          <div class="tf-statement-grid">${statementsHTML}</div>
         `;
         grid.appendChild(box);
       }
@@ -1775,9 +1669,11 @@
       const parent = btn.parentElement;
       parent.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
+      const idx = val === 'Đ' ? '0' : '1';
+      parent.setAttribute('data-selected', idx);
+      parent.style.setProperty('--seg-index', idx);
     }
 
-    // ── RENDER PHẦN III: TRẢ LỜI NGẮN SA (TỰ ĐỘNG THEO SHEET) ──
     function renderSAGrid() {
       const { saCount, saMaxScore } = getExamStructure(examData);
       const section = document.getElementById('saSection');
@@ -1787,7 +1683,7 @@
 
       if (section) section.style.display = saCount > 0 ? '' : 'none';
       if (titleEl) {
-        titleEl.textContent = `PHẦN III: Trả lời ngắn (${saCount} câu - ${formatScoreBadge(saMaxScore)}đ)`;
+        titleEl.textContent = `Phần III: Trả lời ngắn (${saCount} câu - ${formatScoreBadge(saMaxScore)}đ)`;
       }
 
       for (let i = 1; i <= saCount; i++) {
@@ -1796,7 +1692,7 @@
         row.innerHTML = `
           <span class="sa-qlabel">Câu ${i}</span>
           <div style="text-align:right;">
-            <input type="text" class="sa-input" data-q="${i}" placeholder="Nhập đáp số...">
+            <input type="text" class="sa-input" data-q="${i}" placeholder="Nhập đáp số">
             <div class="sa-feedback" id="sa-feedback-${i}">Đúng: </div>
           </div>
         `;
@@ -1804,7 +1700,6 @@
       }
     }
 
-    // ── ĐỒNG HỒ ĐẾM NGƯỢC ──
     function startTimer() {
       timerInterval = setInterval(() => {
         timeRemaining--;
@@ -1812,7 +1707,6 @@
 
         if (timeRemaining <= 0) {
           clearInterval(timerInterval);
-          // Hết giờ -> Tự động nộp bài
           submitExam(true);
         }
       }, 1000);
@@ -1822,13 +1716,12 @@
       const min = Math.floor(timeRemaining / 60);
       const sec = timeRemaining % 60;
       const displayStr = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-      
+
       const timerEls = [document.getElementById('headerTimer'), document.getElementById('mobileTimer')];
       timerEls.forEach(el => {
         if (el) {
           el.textContent = displayStr;
-          // Đổi màu cảnh báo
-          el.className = 'timer-text';
+          el.className = el.id === 'headerTimer' ? 'timer-text' : '';
           if (timeRemaining <= 60) {
             el.classList.add('danger');
           } else if (timeRemaining <= 300) {
@@ -1838,24 +1731,34 @@
       });
     }
 
-    // ── ĐỔI VIEW TRÊN DI ĐỘNG (XEM ĐỀ <=> ĐIỀN ĐÁP ÁN) ──
-    function toggleView() {
+    function toggleView(targetView) {
       const pdf = document.getElementById('pdfPane');
       const answers = document.getElementById('answersPane');
-      const toggleBtn = document.getElementById('btnToggleView');
+      const seg = document.getElementById('mobileViewSeg');
+      const btnPdf = document.getElementById('btnViewPdf');
+      const btnAns = document.getElementById('btnViewAnswers');
 
-      if (currentMobileView === 'pdf') {
+      const nextView = (targetView === 'pdf' || targetView === 'answers')
+        ? targetView
+        : (currentMobileView === 'pdf' ? 'answers' : 'pdf');
+
+      if (nextView === currentMobileView && targetView) return;
+
+      if (nextView === 'answers') {
         pdf.classList.add('hidden');
         answers.classList.remove('hidden');
-        toggleBtn.textContent = '📄 Xem đề bài';
         currentMobileView = 'answers';
+        if (seg) seg.style.setProperty('--seg-index', '1');
+        if (btnPdf) btnPdf.classList.remove('active');
+        if (btnAns) btnAns.classList.add('active');
       } else {
         answers.classList.add('hidden');
         pdf.classList.remove('hidden');
-        toggleBtn.textContent = '✍️ Điền đáp án';
         currentMobileView = 'pdf';
-        // Tự động căn chỉnh độ rộng vừa vặn màn hình điện thoại
-        if (viewerMode === 'pdfjs' && currentPdfDoc && !isRenderingPdf) {
+        if (seg) seg.style.setProperty('--seg-index', '0');
+        if (btnPdf) btnPdf.classList.add('active');
+        if (btnAns) btnAns.classList.remove('active');
+        if (typeof viewerMode !== 'undefined' && viewerMode === 'pdfjs' && typeof currentPdfDoc !== 'undefined' && currentPdfDoc && typeof isRenderingPdf !== 'undefined' && !isRenderingPdf && typeof fitWidth === 'function') {
           setTimeout(fitWidth, 120);
         }
       }
@@ -1870,10 +1773,10 @@
           dates.sort((a, b) => new Date(b) - new Date(a));
           localStorage.setItem('zphysics_activity_dates', JSON.stringify(dates));
         }
-      } catch(e){}
+      } catch (e) {}
 
       if (!currentSession || !currentSession.premium || currentSession.gmail.startsWith('demo_')) return;
-      
+
       const uniqueType = type + '_' + Date.now();
       const payload = { email: email, lesson_id: lessonId, type: uniqueType, score: score };
       const authHeader = (currentSession && currentSession.access_token) ? `Bearer ${currentSession.access_token}` : `Bearer ${SUPABASE_ANON_KEY}`;
@@ -1889,7 +1792,6 @@
       }).catch(err => console.error('Lỗi lưu tiến trình:', err));
     }
 
-    // So sánh đáp án trả lời ngắn (chấp nhận cả dấu chấm và dấu phẩy, ví dụ: 1.5 và 1,5)
     function isShortAnswerMatch(studentAns, correctAns) {
       if (studentAns === undefined || studentAns === null) return false;
       if (correctAns === undefined || correctAns === null) return false;
@@ -1900,19 +1802,16 @@
       if (!s || !c) return false;
       if (s === c) return true;
 
-      // Hỗ trợ trường hợp đáp án có nhiều phương án đúng phân tách bởi dấu gạch đứng (|)
       const options = c.includes('|') ? c.split('|').map(opt => opt.trim()).filter(Boolean) : [c];
 
       for (const opt of options) {
         if (s === opt) return true;
 
-        // Chuẩn hóa dấu phẩy (,) thành dấu chấm (.) và loại bỏ khoảng trắng thừa
         const sNorm = s.replace(/,/g, '.').replace(/\s+/g, '');
         const optNorm = opt.replace(/,/g, '.').replace(/\s+/g, '');
 
         if (sNorm === optNorm) return true;
 
-        // So sánh theo giá trị số nếu cả hai đều là số hợp lệ
         const sNum = Number(sNorm);
         const optNum = Number(optNorm);
         if (!isNaN(sNum) && !isNaN(optNum) && sNorm !== '' && optNorm !== '') {
@@ -1923,33 +1822,25 @@
       return false;
     }
 
-    // ── NỘP BÀI VÀ CHẤM ĐIỂM ──
     function submitExam(isTimeout = false) {
       if (submitted) return;
 
       const nameInput = document.getElementById('studentName');
       let studentName = nameInput.value.trim();
 
-      // Nếu nộp thủ công (chưa hết giờ) thì bắt buộc nhập tên
       if (!isTimeout && !studentName) {
         const studentCard = document.getElementById('studentCard');
         studentCard.style.borderColor = 'var(--wrong)';
-        studentCard.style.animation = 'shakeX 0.5s ease';
         nameInput.focus();
-        setTimeout(() => {
-          studentCard.style.borderColor = '';
-          studentCard.style.animation = '';
-        }, 1500);
-        
-        // Nếu ở màn hình PDF, nhắc học sinh mở bảng đáp án
+        setTimeout(() => { studentCard.style.borderColor = ''; }, 1500);
+
         if (currentMobileView === 'pdf' && window.innerWidth < 768) {
           toggleView();
-          alert('Vui lòng nhập Họ tên trước khi nộp bài!');
+          alert('Vui lòng nhập Họ tên trước khi nộp bài.');
         }
         return;
       }
 
-      // Nếu hết giờ mà chưa nhập tên -> Điền tên ẩn danh
       if (isTimeout && !studentName) {
         studentName = 'Học sinh ẩn danh (Tự động nộp)';
         nameInput.value = studentName;
@@ -1958,38 +1849,29 @@
       submitted = true;
       clearInterval(timerInterval);
 
-      // Khóa tất cả các nút và ô nhập liệu
       nameInput.disabled = true;
       document.querySelectorAll('.mcq-btn').forEach(btn => btn.style.pointerEvents = 'none');
       document.querySelectorAll('.tf-btn').forEach(btn => btn.classList.add('locked'));
       document.querySelectorAll('.sa-input').forEach(inp => inp.disabled = true);
       document.getElementById('submitBtn').disabled = true;
-      
+
       const mobileSubmitBtn = document.getElementById('btnMobileSubmit');
       if (mobileSubmitBtn) mobileSubmitBtn.disabled = true;
 
-      // ── BẮT ĐẦU CHẤM ĐIỂM (ĐỘNG THEO CẤU TRÚC ĐỀ TRÊN SHEET) ──
       const { mcKeys, tfKeys: tfQuestionKeys, saKeys, mcCount, tfCount, saCount, saPointEach } = getExamStructure(examData);
       let scorePart1 = 0;
       let scorePart2 = 0;
       let scorePart3 = 0;
-      
       let wrongList = [];
 
-      // 1. Chấm Phần I (Trắc nghiệm)
       for (let i = 1; i <= mcCount; i++) {
         const correctKey = mcKeys[i - 1] || '';
         const selectedBtn = document.querySelector(`.mcq-options[data-q="${i}"] .mcq-btn.selected`);
         const studentAns = selectedBtn ? selectedBtn.dataset.opt : '';
 
-        // Hiển thị kết quả trực quan
         document.querySelectorAll(`.mcq-options[data-q="${i}"] .mcq-btn`).forEach(btn => {
-          if (btn.dataset.opt === correctKey) {
-            btn.classList.add('is-correct');
-          }
-          if (btn.classList.contains('selected') && studentAns !== correctKey) {
-            btn.classList.add('is-wrong');
-          }
+          if (btn.dataset.opt === correctKey) btn.classList.add('is-correct');
+          if (btn.classList.contains('selected') && studentAns !== correctKey) btn.classList.add('is-wrong');
         });
 
         if (studentAns === correctKey) {
@@ -1999,11 +1881,9 @@
         }
       }
 
-      // 2. Chấm Phần II (Đúng / Sai)
-      // Định dạng đáp án đúng sai: Đ,S,Đ,S;S,Đ,S,Đ...
       for (let i = 1; i <= tfCount; i++) {
         const correctStr = tfQuestionKeys[i - 1] || 'ĐĐĐĐ';
-        const correctAnswers = correctStr.split(',').map(s => s.trim()).filter(Boolean); // Hỗ trợ dấu phẩy hoặc kí tự liền nhau
+        const correctAnswers = correctStr.split(',').map(s => s.trim()).filter(Boolean);
         const cleanCorrectAnswers = correctAnswers.length >= 4 ? correctAnswers : correctStr.replace(/[,;\s]/g, '').split('');
 
         let correctStatementsCount = 0;
@@ -2015,11 +1895,8 @@
           const selectedBtn = row.querySelector('.tf-btn.selected');
           const studentVal = selectedBtn ? selectedBtn.dataset.val : '';
 
-          // Gợi ý đáp án đúng bằng viền xanh
           row.querySelectorAll('.tf-btn').forEach(btn => {
-            if (btn.dataset.val === correctVal) {
-              btn.classList.add('is-correct-key');
-            }
+            if (btn.dataset.val === correctVal) btn.classList.add('is-correct-key');
           });
 
           if (studentVal === correctVal) {
@@ -2029,7 +1906,6 @@
           }
         });
 
-        // Điểm theo quy chế thi Bộ GD (1 ý: 0.1đ; 2 ý: 0.25đ; 3 ý: 0.5đ; 4 ý: 1.0đ)
         let qScore = 0;
         if (correctStatementsCount === 1) qScore = 0.1;
         else if (correctStatementsCount === 2) qScore = 0.25;
@@ -2042,7 +1918,6 @@
         }
       }
 
-      // 3. Chấm Phần III (Trả lời ngắn)
       for (let i = 1; i <= saCount; i++) {
         const correctVal = saKeys[i - 1] || '';
         const input = document.querySelector(`.sa-input[data-q="${i}"]`);
@@ -2055,8 +1930,7 @@
           } else {
             input.classList.add('is-wrong');
             wrongList.push(`- Câu ${i} (Phần III): Điền "${studentVal || 'Bỏ trống'}" (Đáp án đúng: ${correctVal})`);
-            
-            // Show correct answer feedback
+
             const feedbackEl = document.getElementById(`sa-feedback-${i}`);
             if (feedbackEl) {
               feedbackEl.textContent = `Đáp án đúng: ${correctVal}`;
@@ -2066,55 +1940,49 @@
         }
       }
 
-      // Tính tổng điểm
       const totalScore = Math.round((scorePart1 + scorePart2 + scorePart3) * 100) / 100;
-      
-      // Hiển thị điểm số lên UI
+
       const scoreBanner = document.getElementById('scoreBanner');
       const scoreValue = document.getElementById('scoreValue');
       const scoreMsg = document.getElementById('scoreMsg');
 
       scoreValue.textContent = `${totalScore.toFixed(2)} / 10.0`;
-      
+
       if (totalScore >= 8.5) {
         scoreValue.style.color = 'var(--correct)';
-        scoreMsg.textContent = '🎉 Xuất sắc! Em làm bài rất tốt!';
+        scoreMsg.textContent = 'Kết quả xuất sắc, hoàn thành tốt bài thi.';
       } else if (totalScore >= 7.0) {
-        scoreValue.style.color = 'var(--teal)';
-        scoreMsg.textContent = '👏 Rất giỏi! Hãy tiếp tục phát huy nhé!';
+        scoreValue.style.color = 'var(--accent)';
+        scoreMsg.textContent = 'Kết quả tốt, xem lại các câu sai để củng cố.';
       } else if (totalScore >= 5.0) {
-        scoreValue.style.color = '#f9a825';
-        scoreMsg.textContent = '💪 Khá tốt! Luyện tập nhiều hơn để nâng điểm nhé!';
+        scoreValue.style.color = 'var(--warning)';
+        scoreMsg.textContent = 'Mức khá, cần ôn thêm các chuyên đề còn sót.';
       } else {
         scoreValue.style.color = 'var(--wrong)';
-        scoreMsg.textContent = '📚 Cần cố gắng ôn tập kĩ hơn nữa nhé!';
+        scoreMsg.textContent = 'Cần rà soát lại kiến thức nền trước khi thi lại.';
       }
 
       scoreBanner.classList.add('visible');
       scoreBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-      // Nếu trên di động, hiển thị ngay bảng kết quả cho học sinh xem
       if (window.innerWidth < 768 && currentMobileView === 'pdf') {
         toggleView();
       }
 
-      // Gửi báo cáo kết quả về Telegram của giáo viên
       sendToTelegram(studentName, totalScore, wrongList);
 
-      // Lưu tiến trình học tập vào Supabase
       if (currentSession && currentSession.gmail) {
         saveProgressToSupabase(currentSession.gmail, examId, 'exam', totalScore);
       }
     }
 
-    // ── GỬI BÁO CÁO TELEGRAM (Qua Backend Google Apps Script để ẩn danh Token) ──
     async function sendToTelegram(studentName, score, wrongList) {
       let message = `🏆 KẾT QUẢ THI VIP (PDF):\n`;
       message += `- Đề thi: ${examData.title}\n`;
       message += `- Học sinh: ${studentName}\n`;
       message += `- Điểm số: ${score.toFixed(2)} / 10.0\n`;
       message += `- Thời gian nộp: ${new Date().toLocaleTimeString('vi-VN')} ${new Date().toLocaleDateString('vi-VN')}\n`;
-      
+
       if (wrongList.length > 0) {
         message += `\n❌ Các câu làm sai / bỏ trống:\n${wrongList.join('\n')}`;
       } else {
@@ -2124,10 +1992,7 @@
       try {
         await fetch(SHEETS_API_URL, {
           method: 'POST',
-          body: JSON.stringify({
-            action: 'sendReport',
-            message: message
-          })
+          body: JSON.stringify({ action: 'sendReport', message: message })
         });
       } catch (err) {
         console.warn('Lỗi gửi báo cáo thi về Telegram:', err);
@@ -2135,23 +2000,21 @@
     }
   </script>
 
-  <!-- BACKGROUND MUSIC CONTROLLER -->
   <audio id="bgMusic" loop preload="none"></audio>
 
   <script>
-    // ── GENTLE BACKGROUND MUSIC SYSTEM WITH TOGGLE ──
     function updateMusicButton(isPlaying) {
       const btn = document.getElementById('musicToggleBtn');
       const icon = document.getElementById('musicIcon');
       if (!btn || !icon) return;
 
       if (isPlaying) {
-        icon.textContent = '🎵';
+        icon.innerHTML = SVG_VOL_ON;
         btn.classList.add('playing');
         btn.classList.remove('muted');
         btn.title = 'Tắt nhạc nền (đang phát)';
       } else {
-        icon.textContent = '🔇';
+        icon.innerHTML = SVG_VOL_OFF;
         btn.classList.remove('playing');
         btn.classList.add('muted');
         btn.title = 'Bật nhạc nền (đang tắt)';
@@ -2184,21 +2047,14 @@
     function initMusicPlayer() {
       const audio = document.getElementById('bgMusic');
       if (!audio) return;
-      
+
       audio.volume = 0.35;
       const isMuted = localStorage.getItem('zphysics_music_muted') === 'true';
+      updateMusicButton(false);
+      if (isMuted) return;
 
-      if (isMuted) {
-        updateMusicButton(false);
-        return;
-      } else {
-        updateMusicButton(false);
-      }
-      
-      // Chỉ tải và phát nhạc nhẹ khi người dùng đã chủ động tương tác
       const events = ['click', 'touchstart', 'keydown'];
       const playOnFirstInteraction = (e) => {
-        // Nếu người dùng tương tác trực tiếp vào nút toggleMusic thì để toggleMusic tự xử lý
         if (e && e.target && e.target.closest && e.target.closest('#musicToggleBtn')) return;
 
         if (localStorage.getItem('zphysics_music_muted') === 'true') {
@@ -2220,10 +2076,10 @@
           events.forEach(evt => document.removeEventListener(evt, playOnFirstInteraction));
         }
       };
-      
+
       events.forEach(event => document.addEventListener(event, playOnFirstInteraction, { passive: true }));
     }
-    
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => setTimeout(initMusicPlayer, 500));
     } else {

@@ -4,45 +4,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zphysics - Trắc nghiệm Vật lí</title>
+  <title>Zphysics — Trắc nghiệm Vật lí</title>
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-  <!-- KaTeX CSS & JS (Optimized with preconnect) -->
+  <!-- KaTeX CSS & JS -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"
     onload="if(typeof triggerKaTeX==='function'){triggerKaTeX(document.body);}else if(typeof renderMathInElement==='function'){renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],throwOnError:false});}"></script>
+  <link rel="stylesheet" href="assets/css/pinui.css">
+  <script src="assets/js/pinui.js"></script>
+  <script>PinUI.initTheme('light');</script>
 
   <style>
-    .part-header {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--teal);
-      margin-top: 24px;
-      margin-bottom: 12px;
-      padding-bottom: 6px;
-      border-bottom: 2px solid rgba(45, 212, 191, 0.2);
-    }
     :root {
-      --bg: #f0f4ff;
-      --card: rgba(255, 255, 255, 0.75);
-      --card-solid: #ffffff;
-      --glass: rgba(255, 255, 255, 0.55);
-      --border: rgba(255, 255, 255, 0.8);
-      --shadow: rgba(120, 140, 200, 0.18);
-      --text: #2d3561;
-      --muted: #8e97c5;
-      --teal: #2ec4b6;
-      --correct: #43a047;
-      --wrong: #e53935;
+      --bg-deep: #f2ede4;
+      --bg: #f7f4ee;
+      --card: #fdfbf7;
+      --card-solid: #fdfbf7;
+      --raised: #efe9df;
+      --border: rgba(31, 27, 22, 0.08);
+      --border-strong: rgba(31, 27, 22, 0.14);
+      --shadow: rgba(31, 27, 22, 0.06);
+      --text: #1f1b16;
+      --text-secondary: #5e554a;
+      --muted: #7b7266;
+      --teal: #0d9488;
+      --accent: #0d9488;
+      --accent-hover: #0f766e;
+      --accent-subtle: rgba(13, 148, 136, 0.10);
+      --correct: #16a34a;
+      --correct-subtle: rgba(22, 163, 74, 0.10);
+      --wrong: #dc2626;
+      --wrong-subtle: rgba(220, 38, 38, 0.08);
+      --warning: #d97706;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    * {
+    html[data-theme="dark"] {
+      --bg-deep: #07080d;
+      --bg: #0b0d14;
+      --card: #11141c;
+      --card-solid: #11141c;
+      --raised: #1a1e28;
+      --border: rgba(238, 240, 245, 0.08);
+      --border-strong: rgba(238, 240, 245, 0.14);
+      --shadow: rgba(0, 0, 0, 0.45);
+      --text: #eef0f5;
+      --text-secondary: #a3a9b8;
+      --muted: #7a8296;
+      --teal: #2dd4bf;
+      --accent: #2dd4bf;
+      --accent-hover: #14b8a6;
+      --accent-subtle: rgba(45, 212, 191, 0.12);
+      --correct: #4cc38a;
+      --correct-subtle: rgba(76, 195, 138, 0.12);
+      --wrong: #e5484d;
+      --wrong-subtle: rgba(229, 72, 77, 0.12);
+      --warning: #f59e0b;
+    }
+
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -50,70 +78,72 @@
     }
 
     body {
-      font-family: 'Nunito', sans-serif;
+      font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
-      min-height: 100vh;
-      overflow-x: hidden;
       color: var(--text);
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 10% 0%, #c8d8ff 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 90% 10%, #ffd6e8 0%, transparent 55%),
-        radial-gradient(ellipse 40% 50% at 80% 90%, #c8f5f2 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 10% 85%, #ffe8cc 0%, transparent 55%),
-        #f0f4ff;
-      pointer-events: none;
+      min-height: 100vh;
+      line-height: 1.55;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
     .app {
-      position: relative;
-      z-index: 1;
-      max-width: 680px;
+      max-width: 780px;
       margin: 0 auto;
-      padding: 0 16px 60px;
+      padding: 0 16px 80px;
       min-height: 100vh;
     }
 
     /* ── HEADER ── */
     .header {
-      padding: 48px 8px 6px;
+      padding: 24px 0 16px;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .back-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      background: var(--glass);
-      border: 1.5px solid var(--border);
-      backdrop-filter: blur(10px);
+    .back-btn,
+    .music-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       text-decoration: none;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+      flex-shrink: 0;
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease);
     }
 
-    .back-btn:hover {
-      transform: scale(1.08);
-      box-shadow: 0 4px 16px var(--shadow);
+    .back-btn:hover,
+    .music-btn:hover {
+      background: var(--raised);
+      color: var(--text);
+      border-color: var(--accent);
     }
 
-    .back-btn svg {
-      width: 20px;
-      height: 20px;
-      stroke: var(--text);
-      stroke-width: 2.5;
+    .back-btn svg,
+    .music-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 1.5;
       fill: none;
+    }
+
+    .music-btn.playing {
+      background: var(--accent-subtle);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .music-btn.muted {
+      opacity: 0.65;
     }
 
     .header-info {
@@ -121,81 +151,164 @@
       min-width: 0;
     }
 
-    .music-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      background: var(--glass);
-      border: 1.5px solid var(--border);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 18px;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s, background 0.3s;
-      flex-shrink: 0;
-      color: var(--text);
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .music-btn:hover {
-      transform: scale(1.08);
-      box-shadow: 0 4px 16px var(--shadow);
-      border-color: var(--teal);
-    }
-
-    .music-btn:active {
-      transform: scale(0.95);
-    }
-
-    .music-btn.playing {
-      background: rgba(46, 196, 182, 0.15);
-      border-color: var(--teal);
-      box-shadow: 0 0 12px rgba(46, 196, 182, 0.3);
-      animation: musicPulse 2s infinite ease-in-out;
-    }
-
-    .music-btn.muted {
-      opacity: 0.6;
-    }
-
-    @keyframes musicPulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.06); }
-      100% { transform: scale(1); }
-    }
-
     .header-info h1 {
-      font-size: 22px;
-      font-weight: 900;
+      font-size: 18px;
+      font-weight: 600;
       color: var(--text);
-      line-height: 1.2;
+      line-height: 1.25;
     }
 
     .header-info h1 span {
-      color: var(--teal);
+      color: var(--accent);
     }
 
     .header-info p {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
+      font-size: 13px;
+      color: var(--text-secondary);
       margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── STUDENT CARD ── */
+    .student-card {
+      margin: 20px 0 16px;
+      padding: 16px 20px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+    }
+
+    .student-card.error {
+      border-color: var(--wrong);
+    }
+
+    .student-card label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .label-icon {
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .student-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      outline: none;
+      transition: border-color 150ms var(--ease);
+    }
+
+    .student-input::placeholder {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .student-input:focus {
+      border-color: var(--accent);
+    }
+
+    .student-card.error .student-input {
+      border-color: var(--wrong);
+    }
+
+    .student-error {
+      font-size: 12px;
+      color: var(--wrong);
+      margin-top: 6px;
+      display: none;
+    }
+
+    .student-card.error .student-error {
+      display: block;
+    }
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap {
+      position: sticky;
+      top: 12px;
+      z-index: 100;
+      margin: 16px 0 24px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 4px 16px var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .progress-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 6px;
+      border-radius: 4px;
+      background: var(--raised);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--accent);
+      transition: width 300ms var(--ease);
+      width: 0%;
+    }
+
+    .quiz-timer {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      background: var(--accent-subtle);
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .quiz-timer.urgent {
+      color: var(--wrong);
+      background: var(--wrong-subtle);
     }
 
     /* ── SCORE BANNER ── */
     .score-banner {
-      margin: 16px 0;
-      padding: 20px 24px;
-      border-radius: 20px;
-      background: var(--card-solid);
-      box-shadow: 0 4px 24px var(--shadow);
-      border: 1.5px solid var(--border);
+      margin: 16px 0 24px;
+      padding: 24px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
       text-align: center;
       display: none;
-      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
     }
 
     .score-banner.visible {
@@ -203,161 +316,125 @@
     }
 
     .score-value {
-      font-size: 48px;
-      font-weight: 900;
-      line-height: 1;
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 40px;
+      font-weight: 500;
+      line-height: 1.05;
     }
 
     .score-label {
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 13px;
       color: var(--muted);
       margin-top: 6px;
     }
 
     .score-msg {
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 500;
+      color: var(--text);
       margin-top: 10px;
     }
 
-    /* ── PROGRESS BAR ── */
-    .progress-wrap {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      margin: 16px 0 20px;
-      padding: 14px 20px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 2px 12px var(--shadow);
-      border: 1.5px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      transition: box-shadow 0.3s;
-    }
-
-    .progress-text {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .quiz-timer {
+    /* ── PART HEADERS ── */
+    .part-header {
       font-size: 14px;
-      font-weight: 800;
-      color: var(--teal);
-      background: rgba(46, 196, 182, 0.1);
-      padding: 4px 10px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-    }
-    body.premium-theme .quiz-timer {
-      background: rgba(46, 196, 182, 0.2);
-    }
-    .quiz-timer.urgent {
-      color: var(--wrong);
-      background: rgba(229, 57, 53, 0.1);
-      animation: pulseTimer 1s infinite;
-    }
-    @keyframes pulseTimer {
-      0% { opacity: 1; }
-      50% { opacity: 0.6; }
-      100% { opacity: 1; }
-    }
-
-    .progress-bar {
-      flex: 1;
-      height: 8px;
-      border-radius: 4px;
-      background: #e8eaf6;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 4px;
-      background: linear-gradient(135deg, var(--teal), #26c6da);
-      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-      width: 0%;
+      font-weight: 600;
+      color: var(--text);
+      margin: 28px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-strong);
     }
 
     /* ── QUESTION CARD ── */
     .question-card {
       margin-bottom: 16px;
-      border-radius: 24px;
-      background: var(--card-solid);
-      box-shadow: 0 4px 24px var(--shadow);
-      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
       overflow: hidden;
-      animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-      transition: border-color 0.4s, box-shadow 0.4s;
+      transition: border-color 180ms var(--ease);
     }
 
     .question-card.correct-card {
-      border-color: rgba(67, 160, 71, 0.5);
-      box-shadow: 0 4px 24px rgba(67, 160, 71, 0.15);
+      border-color: var(--correct);
     }
 
     .question-card.wrong-card {
-      border-color: rgba(229, 57, 53, 0.4);
-      box-shadow: 0 4px 24px rgba(229, 57, 53, 0.12);
+      border-color: var(--wrong);
     }
 
     .q-header {
-      padding: 18px 20px 10px;
+      padding: 20px 24px 12px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .q-num {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--teal), #26c6da);
-      color: #fff;
-      font-size: 15px;
-      font-weight: 900;
-      display: flex;
+      min-width: 28px;
+      height: 28px;
+      padding: 0 8px;
+      border-radius: 6px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
 
     .q-badge {
-      font-size: 11px;
-      font-weight: 800;
+      font-size: 13px;
       color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
     }
 
     .q-result-icon {
       margin-left: auto;
-      font-size: 22px;
       display: none;
-      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .q-result-icon.is-correct {
+      background: var(--correct-subtle);
+      color: var(--correct);
+    }
+
+    .q-result-icon.is-wrong {
+      background: var(--wrong-subtle);
+      color: var(--wrong);
     }
 
     .q-text {
-      padding: 0 20px 14px;
+      padding: 0 24px 16px;
       font-size: 15px;
-      font-weight: 700;
-      line-height: 1.7;
+      font-weight: 400;
+      line-height: 1.65;
       color: var(--text);
+    }
+
+    .q-text img,
+    .answer-text img,
+    .explanation img {
+      max-width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin: 8px 0;
     }
 
     /* ── ANSWER OPTIONS ── */
     .answers-list {
-      padding: 0 14px 14px;
+      padding: 0 20px 20px;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -365,34 +442,25 @@
 
     .answer-option {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 12px;
       padding: 12px 16px;
-      border-radius: 16px;
-      border: 1.5px solid #e8eaf6;
-      background: rgba(240, 244, 255, 0.5);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       user-select: none;
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease);
     }
 
     .answer-option:hover {
-      border-color: var(--teal);
-      background: rgba(46, 196, 182, 0.06);
-      transform: translateX(4px);
+      background: var(--raised);
+      border-color: var(--border-strong);
     }
 
     .answer-option.selected {
-      border-color: var(--teal);
-      background: rgba(46, 196, 182, 0.1);
-    }
-
-    .answer-option.selected .radio-dot {
-      border-color: var(--teal);
-    }
-
-    .answer-option.selected .radio-dot::after {
-      transform: scale(1);
+      border-color: var(--accent);
+      background: var(--accent-subtle);
     }
 
     .answer-option.locked {
@@ -400,8 +468,44 @@
     }
 
     .answer-option.is-correct {
-      border-color: var(--correct);
-      background: rgba(67, 160, 71, 0.1);
+      border-color: var(--correct) !important;
+      background: var(--correct-subtle) !important;
+    }
+
+    .answer-option.is-wrong {
+      border-color: var(--wrong) !important;
+      background: var(--wrong-subtle) !important;
+    }
+
+    .radio-dot {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 1.5px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 150ms var(--ease);
+    }
+
+    .radio-dot::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      transform: scale(0);
+      transition: transform 150ms var(--ease);
+    }
+
+    .answer-option.selected .radio-dot {
+      border-color: var(--accent);
+    }
+
+    .answer-option.selected .radio-dot::after {
+      transform: scale(1);
     }
 
     .answer-option.is-correct .radio-dot {
@@ -413,11 +517,6 @@
       transform: scale(1);
     }
 
-    .answer-option.is-wrong {
-      border-color: var(--wrong);
-      background: rgba(229, 57, 53, 0.08);
-    }
-
     .answer-option.is-wrong .radio-dot {
       border-color: var(--wrong);
     }
@@ -427,58 +526,74 @@
       transform: scale(1);
     }
 
-    .radio-dot {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      border: 2.5px solid #c5cae9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: border-color 0.3s;
-    }
-
-    .radio-dot::after {
-      content: '';
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--teal);
-      transform: scale(0);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .answer-key {
-      font-size: 14px;
-      font-weight: 900;
-      color: var(--muted);
-      width: 24px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
     .answer-text {
       font-size: 14px;
-      font-weight: 700;
       color: var(--text);
-      line-height: 1.5;
+      line-height: 1.55;
       flex: 1;
+    }
+
+    /* ── TRUE / FALSE STATEMENTS ── */
+    .tf-statement {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .tf-text {
+      flex: 1;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .tf-toggles {
+      flex-shrink: 0;
+    }
+
+    .tf-btn {
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: 1px solid transparent;
+      background: transparent;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      text-align: center;
+      transition: color 150ms var(--ease), border-color 150ms var(--ease);
+    }
+
+    .tf-btn:hover {
+      color: var(--text);
+    }
+
+    .tf-btn.selected[data-val="Đ"] {
+      color: #ffffff;
+    }
+
+    .tf-btn.selected[data-val="S"] {
+      color: #ffffff;
     }
 
     /* ── EXPLANATION ── */
     .explanation {
-      margin: 0 14px 14px;
+      margin: 0 20px 20px;
       padding: 14px 16px;
-      border-radius: 14px;
-      background: rgba(46, 196, 182, 0.08);
-      border-left: 4px solid var(--teal);
+      border-radius: 8px;
+      background: var(--raised);
+      border-left: 2px solid var(--accent);
       font-size: 13px;
-      font-weight: 600;
       color: var(--text);
-      line-height: 1.7;
+      line-height: 1.65;
       display: none;
-      animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
     }
 
     .explanation.visible {
@@ -486,113 +601,70 @@
     }
 
     .explanation strong {
-      font-weight: 900;
-      color: var(--teal);
-    }
-
-    /* ── ĐÚNG/SAI UI ── */
-    .tf-statement {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      background: #fafafa;
-    }
-    .tf-statement:last-child {
-      border-bottom: none;
-      border-radius: 0 0 16px 16px;
-    }
-    .tf-text {
-      flex: 1;
-      font-size: 14px;
       font-weight: 600;
-      color: var(--text);
-      margin-right: 12px;
-    }
-    .tf-toggles {
-      display: flex;
-      gap: 6px;
-    }
-    .tf-btn {
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: 1.5px solid #d1d5db;
-      font-weight: 800;
-      font-size: 13px;
-      color: #6b7280;
-      cursor: pointer;
-      transition: all 0.25s;
-      user-select: none;
-      background: white;
-    }
-    .tf-btn.selected[data-val="Đ"] {
-      background: var(--correct);
-      color: white;
-      border-color: var(--correct);
-      box-shadow: 0 4px 12px rgba(67, 160, 71, 0.3);
-    }
-    .tf-btn.selected[data-val="S"] {
-      background: var(--wrong);
-      color: white;
-      border-color: var(--wrong);
-      box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
+      color: var(--accent);
     }
 
-    /* ── SUBMIT BUTTON ── */
+    /* ── SUBMIT & RETRY ── */
     .submit-wrap {
       text-align: center;
       margin-top: 24px;
-      animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-      animation-delay: 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
     }
 
     .submit-btn {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 14px 40px;
-      border-radius: 50px;
+      justify-content: center;
+      gap: 8px;
+      height: 44px;
+      padding: 0 32px;
+      border-radius: 8px;
       border: none;
       cursor: pointer;
-      font-family: "Segoe UI", Arial, sans-serif;
-      font-size: 16px;
-      font-weight: 900;
-      color: #fff;
-      background: linear-gradient(135deg, var(--teal), #26c6da);
-      box-shadow: 0 6px 24px rgba(46, 196, 182, 0.4);
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      color: #ffffff;
+      background: var(--accent);
+      transition: background-color 150ms var(--ease), transform 150ms var(--ease);
     }
 
-    .submit-btn:hover {
-      transform: translateY(-3px) scale(1.03);
-      box-shadow: 0 10px 32px rgba(46, 196, 182, 0.5);
+    .submit-btn:hover:not(:disabled) {
+      background: var(--accent-hover);
     }
 
-    .submit-btn:active {
-      transform: scale(0.97);
+    .submit-btn:active:not(:disabled) {
+      transform: scale(0.98);
     }
 
     .submit-btn:disabled {
-      opacity: 0.4;
+      opacity: 0.45;
       cursor: not-allowed;
-      transform: none !important;
-      box-shadow: none !important;
+    }
+
+    html[data-theme="dark"] .submit-btn,
+    html[data-theme="dark"] .grade-btn,
+    html[data-theme="dark"] .review-end-btn {
+      color: #07080d;
     }
 
     .retry-btn {
       display: none;
-      margin-top: 12px;
-      padding: 12px 32px;
-      border-radius: 50px;
-      border: 2px solid var(--teal);
-      background: transparent;
-      font-family: "Segoe UI", Arial, sans-serif;
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--teal);
+      height: 40px;
+      padding: 0 24px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--card);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease);
     }
 
     .retry-btn.visible {
@@ -602,588 +674,223 @@
     }
 
     .retry-btn:hover {
-      background: rgba(46, 196, 182, 0.1);
-      transform: translateY(-2px);
+      background: var(--raised);
+      border-color: var(--accent);
     }
 
     /* ── LOADING ── */
     .loading {
       text-align: center;
-      padding: 80px 24px;
+      padding: 64px 24px;
       color: var(--muted);
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    .loading-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--teal);
-      margin: 0 3px;
-      animation: bounce 1.2s infinite;
-    }
-
-    .loading-dot:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .loading-dot:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(24px) scale(0.95);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes popIn {
-      from {
-        opacity: 0;
-        transform: scale(0.5);
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    @keyframes bounce {
-
-      0%,
-      80%,
-      100% {
-        transform: translateY(0);
-        opacity: 0.4;
-      }
-
-      40% {
-        transform: translateY(-8px);
-        opacity: 1;
-      }
-    }
-
-    @keyframes confetti {
-      0% {
-        transform: translateY(0) rotate(0);
-        opacity: 1;
-      }
-
-      100% {
-        transform: translateY(-60px) rotate(360deg);
-        opacity: 0;
-      }
-    }
-
-    @keyframes shakeX {
-
-      0%,
-      100% {
-        transform: translateX(0);
-      }
-
-      20%,
-      60% {
-        transform: translateX(-6px);
-      }
-
-      40%,
-      80% {
-        transform: translateX(6px);
-      }
-    }
-
-    @keyframes toastIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.9);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    @keyframes toastOut {
-      from {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-
-      to {
-        opacity: 0;
-        transform: translateY(20px) scale(0.9);
-      }
-    }
-
-    /* ── STUDENT NAME INPUT ── */
-    .student-card {
-      margin: 16px 0;
-      padding: 20px;
-      border-radius: 20px;
-      background: var(--card-solid);
-      box-shadow: 0 4px 24px var(--shadow);
-      border: 1.5px solid var(--border);
-      animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-      transition: border-color 0.3s;
-    }
-
-    .student-card.error {
-      border-color: var(--wrong);
-      animation: shakeX 0.5s ease;
-    }
-
-    .student-card label {
-      display: flex;
-      align-items: center;
-      gap: 10px;
       font-size: 14px;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 10px;
     }
 
-    .student-card label .label-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #7c4dff, #b388ff);
-      color: #fff;
-      font-size: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+    .loading-spinner {
+      width: 24px;
+      height: 24px;
+      margin: 0 auto 12px;
+      border: 2px solid var(--border-strong);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 700ms linear infinite;
     }
 
-    .student-input {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 14px;
-      border: 1.5px solid #e8eaf6;
-      background: rgba(240, 244, 255, 0.5);
-      font-family: 'Nunito', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.3s, box-shadow 0.3s;
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
-    .student-input::placeholder {
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    .student-input:focus {
-      border-color: var(--teal);
-      box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.15);
-    }
-
-    .student-card.error .student-input {
-      border-color: var(--wrong);
-    }
-
-    .student-error {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--wrong);
-      margin-top: 8px;
-      display: none;
-    }
-
-    .student-card.error .student-error {
-      display: block;
-    }
-
-    /* ── TOAST NOTIFICATION ── */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 12px 24px;
-      border-radius: 16px;
-      font-family: 'Nunito', sans-serif;
-      font-size: 13px;
-      font-weight: 800;
-      color: #fff;
-      z-index: 9999;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-      animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .toast.success {
-      background: linear-gradient(135deg, #43a047, #66bb6a);
-    }
-
-    .toast.error {
-      background: linear-gradient(135deg, #e53935, #ef5350);
-    }
-
-    .toast.hide {
-      animation: toastOut 0.3s ease forwards;
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (min-width: 768px) {
-      .app {
-        max-width: 760px;
-      }
-
-      .header {
-        padding: 56px 8px 12px;
-      }
-
-      .header-info h1 {
-        font-size: 28px;
-      }
-
-      .q-text {
-        font-size: 16px;
-      }
-
-      .answer-text {
-        font-size: 15px;
-      }
-
-      .student-input {
-        font-size: 16px;
-        padding: 14px 18px;
-      }
-    }
-
-    /* ── PREMIUM THEME OVERRIDES (DARK NEON MULTICOLOR GLOW) ── */
-    body.premium-theme {
-      --bg: #0A0A0B;
-      --card: rgba(22, 22, 26, 0.7);
-      --card-solid: #16161a;
-      --glass: rgba(255, 255, 255, 0.04);
-      --border: rgba(255, 255, 255, 0.08);
-      --shadow: rgba(0, 0, 0, 0.5);
-      --text: #f5f5f7;
-      --muted: #a1a1aa;
-      --teal: #2ec4b6;
-    }
-
-    body.premium-theme::before {
-      background:
-        radial-gradient(ellipse 60% 50% at 10% 0%, rgba(46, 196, 182, 0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 90% 10%, rgba(229, 57, 53, 0.08) 0%, transparent 55%),
-        radial-gradient(ellipse 40% 50% at 80% 90%, rgba(124, 77, 255, 0.12) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 10% 85%, rgba(249, 168, 37, 0.08) 0%, transparent 55%),
-        #0A0A0B;
-    }
-
-    body.premium-theme .back-btn {
-      background: rgba(255, 255, 255, 0.05) !important;
-      border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-    body.premium-theme .back-btn svg {
-      stroke: #ffffff !important;
-    }
-
-    body.premium-theme .music-btn {
-      background: rgba(255, 255, 255, 0.05) !important;
-      border-color: rgba(255, 255, 255, 0.1) !important;
-      color: #ffffff !important;
-    }
-    body.premium-theme .music-btn.playing {
-      background: rgba(46, 196, 182, 0.15) !important;
-      border-color: var(--teal) !important;
-      box-shadow: 0 0 12px rgba(46, 196, 182, 0.3) !important;
-    }
-    
-    body.premium-theme .header-info h1 {
-      color: #ffffff !important;
-    }
-    body.premium-theme .header-info h1 span {
-      background: linear-gradient(135deg, #7DD3FC, #06B6D4);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent !important;
-    }
-
-    body.premium-theme .progress-wrap {
-      background: rgba(22, 22, 26, 0.9) !important;
-      border-color: rgba(255, 255, 255, 0.08) !important;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
-    }
-    body.premium-theme .progress-bar {
-      background: #2a2a35 !important;
-    }
-
-    body.premium-theme .score-banner {
-      background: #16161a !important;
-      border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
-    }
-    body.premium-theme .score-value {
-      color: #ffffff !important;
-    }
-
-    body.premium-theme .student-card {
-      background: #16161a !important;
-      border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5) !important;
-    }
-    body.premium-theme .student-card label {
-      color: #f5f5f7 !important;
-    }
-    body.premium-theme .student-card label .label-icon {
-      background: linear-gradient(135deg, #7c4dff, #b388ff) !important;
-    }
-    body.premium-theme .student-input {
-      background: rgba(255, 255, 255, 0.02) !important;
-      border-color: rgba(255, 255, 255, 0.08) !important;
-      color: #f5f5f7 !important;
-    }
-    body.premium-theme .student-input:focus {
-      border-color: var(--teal) !important;
-      box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.15) !important;
-    }
-
-    /* Question cards styling in Premium (high-tech glowing borders) */
-    body.premium-theme .question-card {
-      position: relative;
-      background-image: linear-gradient(#16161a, #16161a), linear-gradient(135deg, #06B6D4, #7C4DFF) !important;
-      background-origin: border-box !important;
-      background-clip: padding-box, border-box !important;
-      border: 3.5px solid transparent !important;
-      border-radius: 24px !important;
-      box-shadow: 0 4px 24px rgba(6, 182, 212, 0.15) !important;
-      transition: all 0.4s ease;
-    }
-    body.premium-theme .question-card.correct-card {
-      background-image: linear-gradient(#16161a, #16161a), linear-gradient(135deg, #43a047, #2ec4b6) !important;
-      box-shadow: 0 4px 24px rgba(67, 160, 71, 0.25) !important;
-    }
-    body.premium-theme .question-card.wrong-card {
-      background-image: linear-gradient(#16161a, #16161a), linear-gradient(135deg, #e53935, #ff7f00) !important;
-      box-shadow: 0 4px 24px rgba(229, 57, 53, 0.2) !important;
-    }
-
-    body.premium-theme .answer-option {
-      background: rgba(255, 255, 255, 0.02) !important;
-      border-color: rgba(255, 255, 255, 0.06) !important;
-    }
-    body.premium-theme .answer-option:hover {
-      background: rgba(46, 196, 182, 0.06) !important;
-      border-color: var(--teal) !important;
-    }
-    body.premium-theme .answer-option.selected {
-      background: rgba(46, 196, 182, 0.1) !important;
-      border-color: var(--teal) !important;
-    }
-    body.premium-theme .radio-dot {
-      border-color: rgba(255, 255, 255, 0.2) !important;
-    }
-    body.premium-theme .answer-text {
-      color: #f5f5f7 !important;
-    }
-
-    body.premium-theme .answer-option.is-correct {
-      background: rgba(67, 160, 71, 0.12) !important;
-      border-color: var(--correct) !important;
-    }
-    body.premium-theme .answer-option.is-wrong {
-      background: rgba(229, 57, 53, 0.1) !important;
-      border-color: var(--wrong) !important;
-    }
-
-    body.premium-theme .explanation {
-      background: rgba(46, 196, 182, 0.06) !important;
-      color: #f5f5f7 !important;
-    }
-
-    body.premium-theme .tf-statement {
-      background: rgba(255, 255, 255, 0.01) !important;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
-    }
-    body.premium-theme .tf-text {
-      color: #f5f5f7 !important;
-    }
-    body.premium-theme .tf-btn {
-      background: rgba(255, 255, 255, 0.02) !important;
-      border-color: rgba(255, 255, 255, 0.1) !important;
-      color: #a1a1aa !important;
-    }
-    body.premium-theme .tf-btn.selected[data-val="Đ"] {
-      background: var(--correct) !important;
-      border-color: var(--correct) !important;
-      color: white !important;
-    }
-    body.premium-theme .tf-btn.selected[data-val="S"] {
-      background: var(--wrong) !important;
-      border-color: var(--wrong) !important;
-      color: white !important;
-    }
-
-    /* ── REVIEW MODE STYLES ── */
+    /* ── REVIEW MODE ── */
     .review-bar {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(0, 0, 0, 0.08);
-      padding: 14px 20px;
+      background: var(--card);
+      border-top: 1px solid var(--border-strong);
+      padding: 12px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.08);
+      gap: 12px;
       z-index: 9999;
-      font-weight: 800;
-      font-size: 13px;
-      color: var(--text);
     }
-    body.premium-theme .review-bar {
-      background: rgba(22, 22, 26, 0.85);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.3);
-      color: #f5f5f7;
-    }
+
     .review-stats {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 16px;
       flex-wrap: wrap;
-    }
-    .review-end-btn {
-      padding: 10px 20px;
-      border-radius: 50px;
-      background: linear-gradient(135deg, var(--teal), #00bcd4);
-      color: white;
-      border: none;
-      font-family: "Segoe UI", Arial, sans-serif;
-      font-weight: 900;
       font-size: 13px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(46, 196, 182, 0.3);
-      transition: all 0.2s ease;
-      white-space: nowrap;
+      color: var(--text-secondary);
     }
-    .review-end-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(46, 196, 182, 0.4);
-    }
-    .review-end-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    .question-card.correct-card,
-    .question-card.wrong-card {
-      transition: all 0.3s ease;
-    }
-    .question-card.correct-card {
-      border: 1.5px solid var(--correct) !important;
-      box-shadow: 0 8px 24px rgba(67, 160, 71, 0.1) !important;
-    }
-    .question-card.wrong-card {
-      border: 1.5px solid var(--wrong) !important;
-      box-shadow: 0 8px 24px rgba(229, 57, 53, 0.08) !important;
-    }
-    .grade-btn {
-      transition: all 0.2s ease;
-    }
-    .grade-btn:hover {
-      filter: brightness(1.1);
-      transform: translateY(-1px);
-    }
-    /* Flashcard animations */
-    .review-card-enter {
-      animation: reviewCardIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    }
-    .review-card-exit {
-      animation: reviewCardOut 0.3s ease both;
-    }
-    @keyframes reviewCardIn {
-      from { opacity: 0; transform: translateX(60px) scale(0.95); }
-      to { opacity: 1; transform: translateX(0) scale(1); }
-    }
-    @keyframes reviewCardOut {
-      from { opacity: 1; transform: translateX(0) scale(1); }
-      to { opacity: 0; transform: translateX(-60px) scale(0.95); }
-    }
-    .skip-btn {
+
+    .rv-stat {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 12px 24px;
-      border-radius: 50px;
-      background: rgba(0,0,0,0.04);
-      border: 1.5px solid rgba(0,0,0,0.08);
-      color: var(--muted);
-      font-family: "Segoe UI", Arial, sans-serif;
-      font-weight: 800;
-      font-size: 14px;
+    }
+
+    .rv-stat strong {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+    }
+
+    .review-end-btn {
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 4px;
+      white-space: nowrap;
+      transition: background-color 150ms var(--ease);
     }
-    .skip-btn:hover {
-      background: rgba(0,0,0,0.08);
-      transform: translateY(-1px);
+
+    .review-end-btn:hover {
+      background: var(--accent-hover);
     }
-    body.premium-theme .skip-btn {
-      background: rgba(255,255,255,0.04);
-      border-color: rgba(255,255,255,0.1);
-      color: #a1a1aa;
+
+    .review-end-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
     }
-    body.premium-theme .skip-btn:hover {
-      background: rgba(255,255,255,0.08);
-    }
+
     .review-actions {
       display: flex;
       justify-content: center;
       gap: 12px;
-      padding: 8px 14px 18px;
+      padding: 4px 20px 20px;
     }
+
+    .skip-btn,
+    .grade-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease);
+    }
+
+    .skip-btn {
+      background: var(--raised);
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+    }
+
+    .skip-btn:hover {
+      color: var(--text);
+    }
+
+    .grade-btn {
+      background: var(--accent);
+      border: none;
+      color: #ffffff;
+    }
+
+    .grade-btn:hover {
+      background: var(--accent-hover);
+    }
+
     .review-done-msg {
       text-align: center;
-      padding: 60px 24px;
-      animation: reviewCardIn 0.4s ease both;
+      padding: 56px 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
     }
+
     .review-done-msg h2 {
-      font-size: 22px;
-      font-weight: 900;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
       margin-bottom: 8px;
-      color: var(--teal);
     }
+
     .review-done-msg p {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--muted);
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .review-card-enter {
+      animation: fadeEnter 240ms var(--ease) both;
+    }
+
+    .review-card-exit {
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity 200ms var(--ease), transform 200ms var(--ease);
+    }
+
+    @keyframes fadeEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #ffffff;
+      z-index: 9999;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      animation: fadeEnter 200ms var(--ease) both;
+    }
+
+    .toast.success {
+      background: var(--correct);
+    }
+
+    .toast.error {
+      background: var(--wrong);
+    }
+
+    .toast.hide {
+      opacity: 0;
+      transition: opacity 200ms var(--ease);
+    }
+
+    @media (max-width: 600px) {
+      .q-header,
+      .q-text {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .answers-list,
+      .explanation {
+        padding-left: 16px;
+        padding-right: 16px;
+        margin-left: 16px;
+        margin-right: 16px;
+      }
+
+      .answers-list {
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      .tf-statement {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
@@ -1201,19 +908,26 @@
         <h1>Z<span>physics</span> — Trắc nghiệm</h1>
         <p id="headerSubtitle">Kiểm tra kiến thức Vật lí</p>
       </div>
+      <button type="button" class="pts-toggle" onclick="PinUI.toggleTheme(this)" aria-label="Đổi giao diện sáng tối" aria-pressed="false">
+        <svg class="pts-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        <svg class="pts-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
       <button class="music-btn" id="musicToggleBtn" onclick="toggleMusic()" title="Bật/Tắt nhạc nền tập trung">
-        <span id="musicIcon">🎵</span>
+        <span id="musicIcon">
+          <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>
+        </span>
       </button>
     </div>
 
     <div class="student-card" id="studentCard">
-      <label>
-        <span class="label-icon">👤</span>
+      <label for="studentName">
+        <span class="label-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </span>
         Họ và tên học sinh <span style="color:var(--wrong)">*</span>
       </label>
-      <input type="text" class="student-input" id="studentName" placeholder="Nhập họ và tên của em..."
-        autocomplete="name">
-      <div class="student-error" id="studentError">⚠️ Vui lòng nhập họ và tên trước khi nộp bài!</div>
+      <input type="text" class="student-input" id="studentName" placeholder="Nhập họ và tên của em" autocomplete="name">
+      <div class="student-error" id="studentError">Vui lòng nhập họ và tên trước khi nộp bài.</div>
     </div>
 
     <div class="progress-wrap">
@@ -1221,7 +935,7 @@
       <div class="progress-bar">
         <div class="progress-fill" id="progressFill"></div>
       </div>
-      <div class="quiz-timer" id="quizTimer" style="display:none">⏱ 30:00</div>
+      <div class="quiz-timer" id="quizTimer" style="display:none">30:00</div>
     </div>
 
     <div class="score-banner" id="scoreBanner">
@@ -1232,30 +946,27 @@
 
     <div id="quizContainer">
       <div class="loading">
-        <span class="loading-dot"></span>
-        <span class="loading-dot"></span>
-        <span class="loading-dot"></span>
-        <p style="margin-top:16px;font-size:14px;font-weight:700;color:var(--muted)">Đang tải đề thi...</p>
+        <div class="loading-spinner"></div>
+        Đang tải câu hỏi...
       </div>
     </div>
 
     <div class="submit-wrap">
       <button class="submit-btn" id="submitBtn" disabled onclick="submitQuiz()">
-        ✍️ Nộp bài
+        Nộp bài
       </button>
-      <br>
       <button class="retry-btn" id="retryBtn" onclick="retryQuiz()">
-        🔄 Làm lại
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+        Làm lại
       </button>
     </div>
 
-    <!-- Sticky bottom bar cho chế độ ôn tập -->
     <div class="review-bar" id="reviewBar" style="display:none">
       <div class="review-stats">
-        ✅<span id="rvCorrect" style="color:var(--correct)">0</span>
-        &nbsp;❌<span id="rvWrong" style="color:var(--wrong)">0</span>
-        &nbsp;⏭<span id="rvSkipped" style="color:var(--muted)">0</span>
-        &nbsp;│&nbsp;Đã làm: <span id="rvDone" style="color:var(--teal)">0</span>
+        <span class="rv-stat">Đúng <strong id="rvCorrect" style="color:var(--correct)">0</strong></span>
+        <span class="rv-stat">Sai <strong id="rvWrong" style="color:var(--wrong)">0</strong></span>
+        <span class="rv-stat">Bỏ qua <strong id="rvSkipped" style="color:var(--muted)">0</strong></span>
+        <span class="rv-stat">Đã làm <strong id="rvDone" style="color:var(--accent)">0</strong></span>
       </div>
       <button class="review-end-btn" id="rvEndBtn" onclick="endReview()">
         Kết thúc
@@ -1265,7 +976,12 @@
   </div>
 
   <script>
-    // Tự động làm sạch URL trên trình duyệt (loại bỏ .html và đồng bộ với hash)
+    const SVG_CHECK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    const SVG_X = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    const SVG_CLOCK = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+    const SVG_VOL_ON = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
+    const SVG_VOL_OFF = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>';
+
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
       const path = window.location.pathname;
       if (path.endsWith('.html')) {
@@ -1277,12 +993,8 @@
       }
     }
 
-    // ══════════════════════════════════════════════
-    // 🔒 CẤU HÌNH API & KIỂM TRA ĐĂNG NHẬP
-    // === CẤU HÌNH SUPABASE ===
     var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
     var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
-    // ========================
     var SESSION_KEY = window.SESSION_KEY || 'zphysics_session';
 
     function getSession() {
@@ -1290,7 +1002,6 @@
         const s = localStorage.getItem(SESSION_KEY);
         if (!s) return null;
         const session = JSON.parse(s);
-        // Tự động hạ cấp phiên đăng nhập cục bộ nếu đã hết hạn premium
         if (session.premium && session.premium_until) {
           const expDate = new Date(session.premium_until);
           if (expDate < new Date()) {
@@ -1299,21 +1010,28 @@
           }
         }
         return session;
-      } catch { return null; }
+      } catch {
+        return null;
+      }
     }
 
     const currentSession = getSession();
     if (!currentSession || !currentSession.gmail) {
       window.location.href = './';
     } else {
-      // Áp dụng chủ đề Premium ngay lập tức nếu session ghi nhận là Premium
       if (currentSession.premium) {
         document.body.classList.add('premium-theme');
+        const explicitTheme = localStorage.getItem('zphysics_theme');
+        const resolved = (explicitTheme === 'light' || explicitTheme === 'dark')
+          ? explicitTheme
+          : (localStorage.getItem('zphysics_premium_mode') === 'light' ? 'light' : 'dark');
+        PinUI.applyTheme(resolved);
+      } else {
+        const explicitTheme = localStorage.getItem('zphysics_theme');
+        PinUI.applyTheme(explicitTheme === 'dark' ? 'dark' : 'light');
       }
 
       if (currentSession.gmail.startsWith('demo_')) {
-        // Bỏ qua xác thực online với tài khoản demo để dễ dàng kiểm thử
-        // Điền sẵn tên học sinh demo
         window.addEventListener('DOMContentLoaded', () => {
           const nameInput = document.getElementById('studentName');
           if (nameInput) {
@@ -1323,7 +1041,6 @@
           }
         });
       } else {
-        // Xác thực lại với Supabase
         const authHeader = currentSession.access_token ? `Bearer ${currentSession.access_token}` : `Bearer ${SUPABASE_ANON_KEY}`;
         const checkUrl = `${SUPABASE_URL}/rest/v1/students?email=eq.${encodeURIComponent(currentSession.gmail)}&select=*`;
         fetch(checkUrl, {
@@ -1338,26 +1055,30 @@
           })
           .then(students => {
             if (!students || students.length === 0) {
-              // Đã bị xóa -> Xóa session và đẩy về trang đăng nhập
               localStorage.removeItem(SESSION_KEY);
               window.location.href = './';
             } else {
               const student = students[0];
               const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
-              // Cập nhật lại thông tin mới nhất
-              localStorage.setItem(SESSION_KEY, JSON.stringify({ 
-                gmail: currentSession.gmail, 
-                ten: student.full_name || currentSession.gmail, 
-                premium: isPremium, 
+              localStorage.setItem(SESSION_KEY, JSON.stringify({
+                gmail: currentSession.gmail,
+                ten: student.full_name || currentSession.gmail,
+                premium: isPremium,
                 premium_until: student.premium_until,
                 access_token: currentSession.access_token
               }));
-              
-              // Nếu quyền thay đổi trực tuyến, kích hoạt giao diện
+
               if (isPremium) {
                 document.body.classList.add('premium-theme');
+                const explicitTheme = localStorage.getItem('zphysics_theme');
+                const resolved = (explicitTheme === 'light' || explicitTheme === 'dark')
+                  ? explicitTheme
+                  : (localStorage.getItem('zphysics_premium_mode') === 'light' ? 'light' : 'dark');
+                PinUI.applyTheme(resolved);
               } else {
                 document.body.classList.remove('premium-theme');
+                const explicitTheme = localStorage.getItem('zphysics_theme');
+                PinUI.applyTheme(explicitTheme === 'dark' ? 'dark' : 'light');
               }
 
               const nameInput = document.getElementById('studentName');
@@ -1372,7 +1093,6 @@
       }
     }
 
-    // Tự điền tên học sinh khi trang load xong
     window.addEventListener('DOMContentLoaded', () => {
       if (currentSession && currentSession.ten && !currentSession.gmail.startsWith('demo_')) {
         const nameInput = document.getElementById('studentName');
@@ -1383,20 +1103,16 @@
         }
       }
 
-      // Xác nhận khi bấm nút thoát
       const backBtn = document.querySelector('.back-btn');
       if (backBtn) {
         backBtn.addEventListener('click', (e) => {
           if (!submitted) {
             const confirmExit = confirm('Bạn có chắc chắn muốn thoát? Kết quả làm bài sẽ không được lưu.');
-            if (!confirmExit) {
-              e.preventDefault();
-            }
+            if (!confirmExit) e.preventDefault();
           }
         });
       }
 
-      // Cảnh báo khi reload hoặc đóng tab
       window.addEventListener('beforeunload', (e) => {
         if (!submitted) {
           e.preventDefault();
@@ -1404,51 +1120,37 @@
         }
       });
     });
-    // ══════════════════════════════════════════════
 
-    // Cấu hình API Endpoint Google Apps Script (Sử dụng để gửi kết quả thi bảo mật)
     const SHEETS_API_URL = localStorage.getItem('ZPHYSICS_API_URL') || 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
 
     let quizData = [];
     let submitted = false;
     let lessonInfo = null;
 
-    // ── Timer state ──
     let timerInterval = null;
-    let timeRemaining = 30 * 60; // 30 phút
+    let timeRemaining = 30 * 60;
 
-    // ── Review mode state ──
     let rvIndex = 0;
     let rvCorrect = 0;
     let rvWrong = 0;
     let rvSkipped = 0;
-    let rvResults = []; // { qId, isCorrect, skipped }
+    let rvResults = [];
 
-    // Phân tích mã đề trong trường hợp không tìm thấy trong baihoc.json
     function parseQuizCode(code) {
       if (!code) return null;
       const parts = code.split('_');
       if (parts.length >= 4) {
-        const typeMap = {
-          'cauhoi': 'Trắc nghiệm',
-          'đs': 'Đúng/Sai',
-          'tln': 'Trả lời ngắn'
-        };
-        const typeStr = typeMap[parts[0]] || parts[0];
-        const gradeStr = `Vật lí ${parts[1]}`;
-        const chapterStr = `Chương ${parts[2].toUpperCase().replace('C', '')}`;
-        const lessonStr = `Bài ${parseInt(parts[3].toUpperCase().replace('B', ''), 10)}`;
+        const typeMap = { 'cauhoi': 'Trắc nghiệm', 'đs': 'Đúng/Sai', 'tln': 'Trả lời ngắn' };
         return {
-          grade: gradeStr,
-          chapter: chapterStr,
-          lesson: lessonStr,
-          type: typeStr
+          grade: `Vật lí ${parts[1]}`,
+          chapter: `Chương ${parts[2].toUpperCase().replace('C', '')}`,
+          lesson: `Bài ${parseInt(parts[3].toUpperCase().replace('B', ''), 10)}`,
+          type: typeMap[parts[0]] || parts[0]
         };
       }
       return null;
     }
 
-    // ── Gửi kết quả về Telegram (Qua Backend Google Apps Script để ẩn danh Token) ──
     function sendResultToTelegram(studentName, score, total, wrongAnswersList) {
       let quizDetails = '';
       if (lessonInfo) {
@@ -1463,7 +1165,7 @@
       }
 
       let message = `📚 Báo cáo kết quả:${quizDetails}\n- Học sinh: ${studentName}\n- Điểm số: ${score}/${total}`;
-      
+
       if (wrongAnswersList && wrongAnswersList.length > 0) {
         message += `\n\n❌ Các câu làm sai:\n${wrongAnswersList.join('\n')}`;
       } else if (wrongAnswersList && wrongAnswersList.length === 0) {
@@ -1472,24 +1174,16 @@
 
       fetch(SHEETS_API_URL, {
         method: 'POST',
-        body: JSON.stringify({
-          action: 'sendReport',
-          message: message
-        })
+        body: JSON.stringify({ action: 'sendReport', message: message })
       })
         .then(res => {
-          if (res.ok) {
-            showToast('✅ Đã nộp bài thành công!', 'success');
-          } else {
-            showToast('✅ Đã nộp bài!', 'success');
-          }
+          showToast(res.ok ? 'Đã nộp bài thành công' : 'Đã nộp bài', 'success');
         })
         .catch(() => {
-          showToast('✅ Đã nộp bài!', 'success');
+          showToast('Đã nộp bài', 'success');
         });
     }
 
-    // ── Hiển thị thông báo nhỏ (Toast) ──
     function showToast(msg, type) {
       const existing = document.querySelector('.toast');
       if (existing) existing.remove();
@@ -1501,15 +1195,13 @@
 
       setTimeout(() => {
         toast.classList.add('hide');
-        setTimeout(() => toast.remove(), 400);
-      }, 4000);
+        setTimeout(() => toast.remove(), 300);
+      }, 3600);
     }
 
-    // ── Google Sheets API (Apps Script Web App) ──
     const params = new URLSearchParams(window.location.search);
     let quizFile = params.get('quiz');
-    
-    // Hỗ trợ Hash Routing cho đề thi trắc nghiệm
+
     if (!quizFile && window.location.hash) {
       const hashVal = window.location.hash.substring(1);
       const hashParams = new URLSearchParams(hashVal);
@@ -1520,21 +1212,18 @@
       }
     }
     if (!quizFile || quizFile === 'cauhoi') quizFile = 'baitap_10_c1_b01';
-    try { quizFile = decodeURIComponent(quizFile); } catch(e) {}
+    try { quizFile = decodeURIComponent(quizFile); } catch (e) {}
     if (quizFile === 'cauhoi') quizFile = 'baitap_10_c1_b01';
-    
+
     const isReviewMode = quizFile.startsWith('ontap_');
 
-    // Tự động làm đẹp URL thanh địa chỉ bằng cách chuyển đổi từ query sang hash
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
       const cleanPath = window.location.pathname.replace(/\.html$/, '');
       if (window.location.search.includes('quiz=')) {
         history.replaceState(null, '', cleanPath + '#' + quizFile);
       }
     }
-    // SHEETS_API_URL đã được định nghĩa ở đầu thẻ script
 
-    // Tải thông tin bài học từ baihoc.json
     function loadLessonInfo() {
       fetch('baihoc.json')
         .then(res => res.json())
@@ -1570,12 +1259,11 @@
                     chapter: chapterItem.num + (chapterItem.title ? `: ${chapterItem.title}` : ''),
                     lesson: `Bài ${lessonItem.num}: ${lessonItem.title}`
                   };
-                  
-                  // Cập nhật tiêu đề và mô tả chế độ trên UI
+
                   const subtitleEl = document.getElementById('headerSubtitle');
                   if (subtitleEl) {
-                    const modeText = isReviewMode ? 'Chế độ Ôn tập chuyên sâu 🔄' : (quizFile.startsWith('baitap_') ? 'Chế độ Bài tập về nhà ☑️' : 'Kiểm tra kiến thức Vật lí');
-                    subtitleEl.textContent = `${lessonInfo.lesson} (${modeText})`;
+                    const modeText = isReviewMode ? 'Ôn tập chuyên sâu' : (quizFile.startsWith('baitap_') ? 'Bài tập về nhà' : 'Kiểm tra kiến thức Vật lí');
+                    subtitleEl.textContent = `${lessonInfo.lesson} · ${modeText}`;
                   }
                   const h1El = document.querySelector('.header-info h1');
                   if (h1El) {
@@ -1647,7 +1335,7 @@
         part2 = part2.slice(0, 2);
         part3 = part3.slice(0, 3);
       } else if (quizFile.startsWith('ontap_')) {
-        // Chế độ ôn tập: không slice, lấy toàn bộ câu hỏi
+        // Keep all questions
       } else if (quizFile.startsWith('cauhoi')) {
         part1 = part1.slice(0, 18); part2 = []; part3 = [];
       } else if (quizFile.startsWith('đs')) {
@@ -1657,12 +1345,11 @@
       }
 
       let mappedData = [...part1, ...part2, ...part3];
-      
-      // Trộn ngẫu nhiên tất cả các phần nếu là chế độ ôn tập
+
       if (quizFile.startsWith('ontap_')) {
         mappedData = shuffle(mappedData);
       }
-      
+
       quizData = mappedData;
       renderQuiz(mappedData);
       startTimer();
@@ -1673,7 +1360,6 @@
       const cacheKey = 'zphysics_quiz_cache_' + quizFile;
       let hasRendered = false;
 
-      // 1. Kiểm tra cache local để nạp đề tức thì (< 50ms)
       try {
         const cached = localStorage.getItem(cacheKey);
         if (cached) {
@@ -1684,9 +1370,8 @@
         }
       } catch (e) {}
 
-      // 2. Fetch Supabase (không timeout, để trình duyệt tự quản lý như bản gốc)
       let url = `${SUPABASE_URL}/rest/v1/questions?made=eq.${encodeURIComponent(quizFile)}&select=*`;
-      
+
       if (quizFile.startsWith('baitap_') || quizFile.startsWith('ontap_')) {
         const prefix = quizFile.startsWith('baitap_') ? 'baitap_' : 'ontap_';
         const rest = quizFile.substring(prefix.length);
@@ -1712,7 +1397,7 @@
 
           try {
             localStorage.setItem(cacheKey, JSON.stringify(data));
-          } catch(e) {}
+          } catch (e) {}
 
           if (!hasRendered) {
             processQuizData(data);
@@ -1722,7 +1407,7 @@
           console.error(err);
           if (!hasRendered) {
             document.getElementById('quizContainer').innerHTML =
-              '<div class="loading"><p style="color:#e53935;font-weight:700;font-size:14px">⚠️ Không tải được đề từ Database Supabase.<br><small style="font-weight:600;opacity:.7">'
+              '<div class="loading"><p style="color:var(--wrong);font-weight:500;font-size:14px">Không tải được đề từ Database Supabase.<br><small style="opacity:.7">'
               + (err.message || 'Hãy kiểm tra lại kết nối mạng và mã đề thi.')
               + '</small></p></div>';
           }
@@ -1731,13 +1416,9 @@
 
     loadQuizFromSupabase();
 
-    // ══════════════════════════════════════════════
-    // 🧮 XỬ LÝ & CHUẨN HÓA CÔNG THỨC TOÁN / VẬT LÍ (KaTeX)
-    // ══════════════════════════════════════════════
     function preprocessMath(text) {
       if (!text) return '';
 
-      // 1. Chuẩn hóa các ký hiệu động năng trung bình và đại lượng vật lí viết tắt bằng LaTeX
       let res = text
         .replace(/\\bar\{Ed1\}/g, '\\overline{E_{d1}}')
         .replace(/\\bar\{Ed2\}/g, '\\overline{E_{d2}}')
@@ -1751,13 +1432,11 @@
         .replace(/\\bar\{\\Delta\s*t\}/g, '\\overline{\\Delta t}')
         .replace(/\\bar\{Δt\}/g, '\\overline{\\Delta t}');
 
-      // 2. Tách các khối đã có delimiter ($...$, $$...$$, \(...\), \[...\]) để không bọc đè
       const mathRegex = /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\$[^\$\n]+?\$|\\\([\s\S]*?\\\))/g;
       const parts = res.split(mathRegex);
       const tokens = [];
 
       for (let i = 0; i < parts.length; i++) {
-        // Khối đã có delimiter sẵn -> giữ nguyên
         if (i % 2 === 1) {
           tokens.push(parts[i]);
           continue;
@@ -1766,10 +1445,9 @@
         let p = parts[i];
         if (!p) continue;
 
-        // Nếu phần văn bản chứa lệnh LaTeX chưa có delimiter $
         if (p.includes('\\')) {
           const hasVietnamese = /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(p);
-          
+
           if (!hasVietnamese && (/[=><≈±\/\^]/.test(p) || p.trim().startsWith('\\'))) {
             let clean = p.trim();
             let endPunct = '';
@@ -1779,7 +1457,6 @@
             }
             tokens.push('$' + clean + '$' + endPunct);
           } else {
-            // Có chứa chữ tiếng Việt: bọc các lệnh / công thức LaTeX riêng lẻ
             let replaced = p.replace(/(\\(?:overline|bar|hat|vec|dot|ddot|frac|sqrt)\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}|\\(?:Delta|delta|alpha|beta|gamma|lambda|mu|omega|Omega|pi|theta|sigma|rho|tau|phi|varphi|pm|approx|le|ge|times|cdot|ne|neq|Rightarrow|to)(?:\s+[a-zA-Z0-9_]+)?)/g, (m, g1) => '$' + g1.trim() + '$');
             tokens.push(replaced);
           }
@@ -1822,52 +1499,38 @@
 
     function formatText(text) {
       if (!text) return '';
-
-      // Tự động chuẩn hóa và nhận diện công thức LaTeX (bao gồm \bar{Ed} -> \overline{E_d})
       text = preprocessMath(text);
 
-      // 1. Xử lý cú pháp [img]URL[/img] trước
       let html = text.replace(/\[img\](.*?)\[\/img\]/gi, '\n__IMG__$1__ENDIMG__\n');
-
-      // 2. Tự động nhận diện URL ảnh trực tiếp (không có tag)
-      // Hỗ trợ: đuôi file ảnh thông thường + Google Drive + ibb.co + imgur + postimg
       const imgUrlRegex = /(https?:\/\/[^\s<>"]+?(?:\.(?:jpg|jpeg|png|gif|webp|svg|bmp)(?:[?#][^\s<>"]*)?|(?:drive\.google\.com\/(?:file\/d\/[^/\s]+\/view|uc\?[^\s<>"]*export=download[^\s<>"]*|uc\?[^\s<>"]*id=[^\s<>"]+)|i\.imgur\.com\/[^\s<>"]+|ibb\.co\/[^\s<>"]+|postimg\.cc\/[^\s<>"]+|i\.postimg\.cc\/[^\s<>"]+)))/gi;
       html = html.replace(imgUrlRegex, '\n__IMG__$1__ENDIMG__\n');
 
-      // 3. Chuyển đổi Google Drive link sang direct link nếu có
       html = html.replace(/__IMG__(https?:\/\/drive\.google\.com\/file\/d\/([^/\s]+)\/view[^\s]*)__ENDIMG__/gi,
-        function(match, url, fileId) {
+        function (match, url, fileId) {
           return `__IMG__https://drive.google.com/uc?export=view&id=${fileId}__ENDIMG__`;
         }
       );
 
-      // 4. Render các placeholder ảnh thành thẻ <img>
       html = html.replace(/__IMG__(.*?)__ENDIMG__/gi,
-        '<br><img src="$1" style="max-width:100%; border-radius:12px; margin: 8px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);" onerror="this.style.display=\'none\'" loading="lazy"><br>'
+        '<br><img src="$1" onerror="this.style.display=\'none\'" loading="lazy"><br>'
       );
 
-      // 5. Xử lý xuống dòng
       html = html.replace(/\n/g, '<br>');
-
-      // 6. Dọn dẹp các <br> thừa liền nhau
       html = html.replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>');
-
       return html;
     }
 
-    // ── Render tất cả câu hỏi ──
     function renderQuiz(data) {
       const container = document.getElementById('quizContainer');
       container.innerHTML = '';
       document.getElementById('progressText').textContent = `0 / ${data.length}`;
-      
+
       if (isReviewMode) {
         const submitBtn = document.getElementById('submitBtn');
         if (submitBtn) submitBtn.style.display = 'none';
         const reviewBar = document.getElementById('reviewBar');
         if (reviewBar) reviewBar.style.display = 'flex';
-        
-        // Reset review state
+
         rvIndex = 0;
         rvCorrect = 0;
         rvWrong = 0;
@@ -1877,7 +1540,7 @@
         showReviewCard();
         return;
       }
-      
+
       const submitBtn = document.getElementById('submitBtn');
       if (submitBtn) submitBtn.style.display = '';
       const reviewBar = document.getElementById('reviewBar');
@@ -1893,29 +1556,29 @@
       data.forEach((q, idx) => {
         if (quizFile.startsWith('baitap_')) {
           if (idx === 0 && p1Count > 0) {
-            container.insertAdjacentHTML('beforeend', `<div class="part-header">PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn</div>`);
+            container.insertAdjacentHTML('beforeend', `<div class="part-header">Phần I. Câu trắc nghiệm nhiều phương án lựa chọn</div>`);
           } else if (idx === p1Count && p2Count > 0) {
-            container.insertAdjacentHTML('beforeend', `<div class="part-header">PHẦN II. Câu trắc nghiệm đúng sai</div>`);
+            container.insertAdjacentHTML('beforeend', `<div class="part-header">Phần II. Câu trắc nghiệm đúng sai</div>`);
           } else if (idx === p1Count + p2Count && p3Count > 0) {
-            container.insertAdjacentHTML('beforeend', `<div class="part-header">PHẦN III. Câu trắc nghiệm trả lời ngắn</div>`);
+            container.insertAdjacentHTML('beforeend', `<div class="part-header">Phần III. Câu trắc nghiệm trả lời ngắn</div>`);
           }
         }
 
         const card = document.createElement('div');
         card.className = 'question-card';
-        card.style.animationDelay = (idx * 0.08) + 's';
         card.dataset.id = q.id;
 
         const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
         let answersHTML = '';
-        
+
         if (q.type === 'đs' && validAnswers.length > 0) {
           answersHTML = validAnswers.map(a => `
             <div class="tf-statement" id="tf-${q.id}-${a.key}">
               <div class="tf-text"><strong>${a.key}.</strong> ${formatText(a.text)}</div>
-              <div class="tf-toggles">
-                <div class="tf-btn" data-val="Đ" onclick="selectTF(this, ${q.id}, '${a.key}', 'Đ')">Đúng</div>
-                <div class="tf-btn" data-val="S" onclick="selectTF(this, ${q.id}, '${a.key}', 'S')">Sai</div>
+              <div class="tf-toggles seg-control tf-seg" data-selected="none">
+                <span class="seg-thumb"></span>
+                <div class="tf-btn seg-btn" data-val="Đ" onclick="selectTF(this, ${q.id}, '${a.key}', 'Đ')">Đúng</div>
+                <div class="tf-btn seg-btn" data-val="S" onclick="selectTF(this, ${q.id}, '${a.key}', 'S')">Sai</div>
               </div>
             </div>
           `).join('');
@@ -1928,16 +1591,16 @@
           `).join('');
         } else {
           answersHTML = `
-            <div style="padding: 10px 14px;">
-              <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời..." oninput="inputShortAnswer()">
+            <div>
+              <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời" oninput="inputShortAnswer()">
             </div>
           `;
         }
 
         card.innerHTML = `
           <div class="q-header">
-            <div class="q-num">${idx + 1}</div>
-            <span class="q-badge">Câu hỏi ${idx + 1}</span>
+            <div class="q-num">${String(idx + 1).padStart(2, '0')}</div>
+            <span class="q-badge">Câu ${idx + 1}</span>
             <span class="q-result-icon" id="icon-${q.id}"></span>
           </div>
           <div class="q-text">${formatText(q.question)}</div>
@@ -1952,26 +1615,23 @@
         container.appendChild(card);
       });
 
-      // Render KaTeX cho nội dung vừa tạo
       triggerKaTeX(container);
     }
 
-    // ── REVIEW MODE: Hiển thị từng câu một ──
     function showReviewCard() {
       const container = document.getElementById('quizContainer');
       container.innerHTML = '';
-      
+
       if (rvIndex >= quizData.length) {
-        // Đã hết câu hỏi
         container.innerHTML = `
           <div class="review-done-msg">
-            <h2>🎉 Đã hết câu hỏi!</h2>
-            <p>Em đã duyệt qua ${quizData.length} câu hỏi.<br>Bấm <strong>"Kết thúc"</strong> ở thanh bên dưới để xem kết quả tổng hợp.</p>
+            <h2>Đã hoàn thành toàn bộ câu hỏi</h2>
+            <p>Em đã duyệt qua ${quizData.length} câu hỏi. Bấm <strong>Kết thúc</strong> ở thanh bên dưới để xem kết quả.</p>
           </div>
         `;
         return;
       }
-      
+
       const q = quizData[rvIndex];
       const card = document.createElement('div');
       card.className = 'question-card review-card-enter';
@@ -1980,14 +1640,15 @@
       const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
       let answersHTML = '';
       const typeLabel = q.type === 'đs' ? 'Đúng / Sai' : (q.type === 'cauhoi' ? 'Trắc nghiệm' : 'Trả lời ngắn');
-      
+
       if (q.type === 'đs' && validAnswers.length > 0) {
         answersHTML = validAnswers.map(a => `
           <div class="tf-statement" id="tf-${q.id}-${a.key}">
             <div class="tf-text"><strong>${a.key}.</strong> ${formatText(a.text)}</div>
-            <div class="tf-toggles">
-              <div class="tf-btn" data-val="Đ" onclick="selectTF(this, ${q.id}, '${a.key}', 'Đ')">Đúng</div>
-              <div class="tf-btn" data-val="S" onclick="selectTF(this, ${q.id}, '${a.key}', 'S')">Sai</div>
+            <div class="tf-toggles seg-control tf-seg" data-selected="none">
+              <span class="seg-thumb"></span>
+              <div class="tf-btn seg-btn" data-val="Đ" onclick="selectTF(this, ${q.id}, '${a.key}', 'Đ')">Đúng</div>
+              <div class="tf-btn seg-btn" data-val="S" onclick="selectTF(this, ${q.id}, '${a.key}', 'S')">Sai</div>
             </div>
           </div>
         `).join('');
@@ -2000,17 +1661,17 @@
         `).join('');
       } else {
         answersHTML = `
-          <div style="padding: 10px 14px; display: flex; gap: 10px;">
-            <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời..." style="flex: 1;" onkeydown="if(event.key === 'Enter') gradeShortAnswer(${q.id})">
-            <button type="button" class="grade-btn" id="grade-btn-${q.id}" onclick="gradeShortAnswer(${q.id})" style="padding: 8px 16px; border-radius: 12px; background: var(--teal); color: white; border: none; font-weight: 800; font-family: 'Segoe UI', Arial, sans-serif; cursor: pointer;">Gửi</button>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời" style="flex: 1;" onkeydown="if(event.key === 'Enter') gradeShortAnswer(${q.id})">
+            <button type="button" class="grade-btn" id="grade-btn-${q.id}" onclick="gradeShortAnswer(${q.id})">Gửi</button>
           </div>
         `;
       }
 
       card.innerHTML = `
         <div class="q-header">
-          <div class="q-num">${rvIndex + 1}</div>
-          <span class="q-badge">Câu ${rvIndex + 1} — ${typeLabel}</span>
+          <div class="q-num">${String(rvIndex + 1).padStart(2, '0')}</div>
+          <span class="q-badge">Câu ${rvIndex + 1} · ${typeLabel}</span>
           <span class="q-result-icon" id="icon-${q.id}"></span>
         </div>
         <div class="q-text">${formatText(q.question)}</div>
@@ -2021,16 +1682,13 @@
           <strong>Lời giải:</strong> ${formatText(q.explanation)}
         </div>
         <div class="review-actions" id="reviewActions-${q.id}">
-          <button class="skip-btn" onclick="skipReviewQuestion()">⏭ Bỏ qua</button>
+          <button class="skip-btn" onclick="skipReviewQuestion()">Bỏ qua câu này</button>
         </div>
       `;
 
       container.appendChild(card);
-      
-      // Render KaTeX
       triggerKaTeX(card);
-      
-      // Update progress bar
+
       const done = rvCorrect + rvWrong + rvSkipped;
       document.getElementById('progressText').textContent = `Đã làm: ${done} câu`;
       document.querySelector('.progress-bar').style.display = 'none';
@@ -2055,7 +1713,7 @@
           rvIndex++;
           updateReviewBar();
           showReviewCard();
-        }, 300);
+        }, 220);
       } else {
         rvIndex++;
         updateReviewBar();
@@ -2070,15 +1728,14 @@
       advanceReviewCard();
     }
 
-    // ── Chọn đáp án Trắc nghiệm ──
     function selectAnswer(el, qId) {
       if (submitted) return;
       const answersEl = document.getElementById('answers-' + qId);
       if (isReviewMode && answersEl.querySelector('.answer-option.locked')) return;
-      
+
       answersEl.querySelectorAll('.answer-option').forEach(opt => opt.classList.remove('selected'));
       el.classList.add('selected');
-      
+
       if (isReviewMode) {
         gradeQuestion(qId);
       } else {
@@ -2087,21 +1744,27 @@
       }
     }
 
-    // ── Chọn Đúng/Sai ──
     function selectTF(el, qId, key, val) {
       if (submitted) return;
       const answersEl = document.getElementById('answers-' + qId);
-      
+
       if (isReviewMode) {
         const parent = document.getElementById(`tf-${qId}-${key}`);
         if (parent.querySelector('.tf-btn[style*="pointer-events: none"]')) return;
       }
-      
+
       const parent = document.getElementById(`tf-${qId}-${key}`);
       parent.querySelectorAll('.tf-btn').forEach(btn => btn.classList.remove('selected'));
       el.classList.add('selected');
       el.dataset.val = val;
-      
+
+      const seg = el.closest('.tf-toggles');
+      if (seg) {
+        const idx = val === 'Đ' ? '0' : '1';
+        seg.setAttribute('data-selected', idx);
+        seg.style.setProperty('--seg-index', idx);
+      }
+
       if (isReviewMode) {
         const q = quizData.find(item => item.id === qId);
         const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
@@ -2124,7 +1787,6 @@
       checkAllAnswered();
     }
 
-    // ── Đếm số câu đã làm ──
     function getAnsweredCount() {
       let answered = 0;
       quizData.forEach(q => {
@@ -2149,27 +1811,22 @@
       return answered;
     }
 
-    // ── Cập nhật thanh tiến trình ──
     function updateProgress() {
       const total = quizData.length;
       const answered = getAnsweredCount();
       document.getElementById('progressText').textContent = `${answered} / ${total}`;
       document.querySelector('.progress-bar').style.display = 'block';
       document.getElementById('progressFill').style.width = ((answered / total) * 100) + '%';
-      
+
       if (isReviewMode) {
-        // In flashcard mode, use state variables directly
         const done = rvCorrect + rvWrong + rvSkipped;
         document.getElementById('progressText').textContent = `Đã làm: ${done} câu`;
         document.querySelector('.progress-bar').style.display = 'none';
-        return;
       }
     }
 
-    // ── Kiểm tra đã trả lời hết chưa ──
     function checkAllAnswered() {
       if (isReviewMode) {
-        // In flashcard mode, the end button is always enabled
         const rvEndBtn = document.getElementById('rvEndBtn');
         if (rvEndBtn) rvEndBtn.disabled = false;
       } else {
@@ -2178,7 +1835,6 @@
       }
     }
 
-    // So sánh đáp án trả lời ngắn (chấp nhận cả dấu chấm và dấu phẩy, ví dụ: 1.5 và 1,5)
     function isShortAnswerMatch(studentAns, correctAns) {
       if (studentAns === undefined || studentAns === null) return false;
       if (correctAns === undefined || correctAns === null) return false;
@@ -2189,19 +1845,14 @@
       if (!s || !c) return false;
       if (s === c) return true;
 
-      // Hỗ trợ trường hợp đáp án có nhiều phương án đúng phân tách bởi dấu gạch đứng (|)
       const options = c.includes('|') ? c.split('|').map(opt => opt.trim()).filter(Boolean) : [c];
 
       for (const opt of options) {
         if (s === opt) return true;
-
-        // Chuẩn hóa dấu phẩy (,) thành dấu chấm (.) và loại bỏ khoảng trắng thừa
         const sNorm = s.replace(/,/g, '.').replace(/\s+/g, '');
         const optNorm = opt.replace(/,/g, '.').replace(/\s+/g, '');
-
         if (sNorm === optNorm) return true;
 
-        // So sánh theo giá trị số nếu cả hai đều là số hợp lệ
         const sNum = Number(sNorm);
         const optNum = Number(optNorm);
         if (!isNaN(sNum) && !isNaN(optNum) && sNorm !== '' && optNorm !== '') {
@@ -2212,11 +1863,19 @@
       return false;
     }
 
-    // ── Chấm điểm từng câu riêng biệt trong chế độ ôn tập ──
+    function setResultBadge(qId, isCorrect) {
+      const icon = document.getElementById('icon-' + qId);
+      if (!icon) return;
+      icon.style.display = 'inline-flex';
+      icon.classList.remove('is-correct', 'is-wrong');
+      icon.classList.add(isCorrect ? 'is-correct' : 'is-wrong');
+      icon.innerHTML = isCorrect ? `${SVG_CHECK} Đúng` : `${SVG_X} Sai`;
+    }
+
     function gradeQuestion(qId) {
       const q = quizData.find(item => item.id === qId);
       if (!q) return;
-      
+
       const card = document.querySelector(`.question-card[data-id="${q.id}"]`);
       const answersEl = document.getElementById('answers-' + q.id);
       const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
@@ -2226,41 +1885,39 @@
         let correctCount = 0;
         const correctKey = q.correct ? q.correct.toString().toUpperCase().trim() : '';
         const correctArr = correctKey.replace(/D/g, 'Đ').split('');
-        
+
         validAnswers.forEach((a, idx) => {
           const parent = document.getElementById(`tf-${q.id}-${a.key}`);
           const selected = parent.querySelector('.tf-btn.selected');
           const studentVal = selected ? selected.dataset.val : 'Không chọn';
           const exactCorrectVal = correctArr[idx] || 'Đ';
-          
+
           parent.querySelectorAll('.tf-btn').forEach(btn => {
             btn.style.pointerEvents = 'none';
             btn.style.opacity = '0.5';
             if (btn.dataset.val === exactCorrectVal) {
               btn.style.borderColor = 'var(--correct)';
-              btn.style.borderWidth = '2px';
               btn.style.opacity = '1';
               btn.style.color = 'var(--correct)';
             }
           });
-          
+
           if (studentVal === exactCorrectVal) {
             correctCount++;
             if (selected) {
               selected.style.backgroundColor = 'var(--correct)';
-              selected.style.color = 'white';
+              selected.style.color = '#ffffff';
             }
           } else {
             if (selected) {
               selected.style.backgroundColor = 'var(--wrong)';
-              selected.style.color = 'white';
+              selected.style.color = '#ffffff';
               selected.style.borderColor = 'var(--wrong)';
             }
           }
         });
-        
+
         isCorrect = (correctCount === validAnswers.length);
-        
       } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
         const selected = answersEl.querySelector('.answer-option.selected');
         const selectedKey = selected ? selected.dataset.key : null;
@@ -2271,7 +1928,6 @@
           if (opt.dataset.key === q.correct) opt.classList.add('is-correct');
           if (opt.classList.contains('selected') && opt.dataset.key !== q.correct) opt.classList.add('is-wrong');
         });
-        
       } else {
         const inp = document.getElementById(`short-answer-${q.id}`);
         const studentAns = inp ? inp.value.trim().toLowerCase() : '';
@@ -2280,51 +1936,32 @@
 
         if (inp) {
           inp.disabled = true;
-          if (isCorrect) {
-            inp.style.borderColor = 'var(--correct)';
-            inp.style.backgroundColor = 'rgba(67, 160, 71, 0.1)';
-          } else {
-            inp.style.borderColor = 'var(--wrong)';
-            inp.style.backgroundColor = 'rgba(229, 57, 53, 0.08)';
-          }
+          inp.style.borderColor = isCorrect ? 'var(--correct)' : 'var(--wrong)';
+          inp.style.backgroundColor = isCorrect ? 'var(--correct-subtle)' : 'var(--wrong-subtle)';
         }
       }
 
-      // Icon kết quả
-      const icon = document.getElementById('icon-' + q.id);
-      if (icon) {
-        icon.style.display = 'inline-block';
-        icon.textContent = isCorrect ? '✅' : '❌';
-      }
+      setResultBadge(q.id, isCorrect);
+      if (card) card.classList.add(isCorrect ? 'correct-card' : 'wrong-card');
 
-      // Border card
-      if (card) {
-        card.classList.add(isCorrect ? 'correct-card' : 'wrong-card');
-      }
-
-      // Hiện lời giải
       const explainEl = document.getElementById('explain-' + q.id);
       if (explainEl) {
         explainEl.classList.add('visible');
-        
-        // Render KaTeX cho lời giải
         triggerKaTeX(explainEl);
       }
-      
+
       updateProgress();
       checkAllAnswered();
-      
-      // In review mode, hide skip button, record result, and auto-advance
+
       if (isReviewMode) {
         const actionsEl = document.getElementById('reviewActions-' + q.id);
         if (actionsEl) actionsEl.style.display = 'none';
-        
+
         if (isCorrect) rvCorrect++;
         else rvWrong++;
         rvResults.push({ qId: q.id, isCorrect: isCorrect, skipped: false });
         updateReviewBar();
-        
-        // Auto-advance after 1.5s delay to let student see the result
+
         setTimeout(() => {
           advanceReviewCard();
         }, 1500);
@@ -2337,16 +1974,14 @@
       if (!inp) return;
       const val = inp.value.trim();
       if (!val) {
-        showToast('Vui lòng nhập câu trả lời trước khi gửi!', 'error');
+        showToast('Vui lòng nhập câu trả lời trước khi gửi', 'error');
         return;
       }
       const btn = document.getElementById(`grade-btn-${qId}`);
       if (btn) btn.style.display = 'none';
-      
       gradeQuestion(qId);
     }
 
-    // ── Bắt đầu đếm ngược thời gian ──
     function startTimer() {
       if (quizFile && quizFile.startsWith('baitap_')) {
         const timerEl = document.getElementById('quizTimer');
@@ -2355,131 +1990,114 @@
       }
 
       if (timerInterval) clearInterval(timerInterval);
-      timeRemaining = 30 * 60; // 30 phút
+      timeRemaining = 30 * 60;
       const timerEl = document.getElementById('quizTimer');
       timerEl.style.display = 'flex';
       timerEl.classList.remove('urgent');
-      
+
       const updateDisplay = () => {
         if (timeRemaining <= 0) {
           clearInterval(timerInterval);
-          timerEl.textContent = "⏱ 00:00";
-          showToast('Đã hết thời gian làm bài!', 'error');
-          if (isReviewMode) endReview(true); // force submit
-          else submitQuiz(true); 
+          timerEl.innerHTML = `${SVG_CLOCK}<span>00:00</span>`;
+          showToast('Đã hết thời gian làm bài', 'error');
+          if (isReviewMode) endReview(true);
+          else submitQuiz(true);
           return;
         }
-        
+
         const m = Math.floor(timeRemaining / 60);
         const s = timeRemaining % 60;
-        timerEl.textContent = `⏱ ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        
-        if (timeRemaining <= 300) { // 5 phút cuối
+        timerEl.innerHTML = `${SVG_CLOCK}<span>${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}</span>`;
+
+        if (timeRemaining <= 300) {
           timerEl.classList.add('urgent');
         }
         timeRemaining--;
       };
-      
+
       updateDisplay();
       timerInterval = setInterval(updateDisplay, 1000);
     }
 
-    // ── Kết thúc ôn tập (Chấm điểm các câu đã làm) ──
     function endReview(force = false) {
       const answeredCount = rvCorrect + rvWrong;
-      const total = quizData.length;
-      
+
       if (answeredCount === 0) {
-        showToast('Em chưa hoàn thành câu hỏi nào!', 'error');
+        showToast('Em chưa hoàn thành câu hỏi nào', 'error');
         return;
       }
-      
+
       if (!force) {
         if (!confirm('Em có chắc chắn muốn kết thúc ôn tập? Hệ thống sẽ chấm điểm các câu đã làm.')) {
           return;
         }
       }
-      
+
       submitted = true;
       if (timerInterval) clearInterval(timerInterval);
-      
-      // Ẩn reviewBar
+
       const reviewBar = document.getElementById('reviewBar');
       if (reviewBar) reviewBar.style.display = 'none';
-      
-      // Lấy tên học sinh
+
       const nameInput = document.getElementById('studentName');
       const studentName = nameInput ? nameInput.value.trim() : 'Ẩn danh';
       if (nameInput) {
         nameInput.disabled = true;
         nameInput.style.opacity = '0.6';
       }
-      
-      // Tính điểm từ rvResults
+
       let earnedPoints = 0;
-      let possiblePoints = answeredCount; // chỉ tính câu đã làm
-      
+      let possiblePoints = answeredCount;
+
       rvResults.forEach(r => {
         if (r.skipped) return;
         const q = quizData.find(item => item.id === r.qId);
         if (!q) return;
-        
+
         if (q.type === 'cauhoi' || q.type === 'tln') {
           if (r.isCorrect) earnedPoints += 1.0;
         } else if (q.type === 'đs') {
-          // Partial credit đã được tính khi grade, nhưng ta cần lấy lại
-          if (r.isCorrect) {
-            earnedPoints += 1.0;
-          } else {
-            // Tính partial: đếm số ý đúng từ data đã grade
-            // Vì card không còn, ta dùng isCorrect=false => 0
-            earnedPoints += 0;
-          }
+          if (r.isCorrect) earnedPoints += 1.0;
         }
       });
-      
+
       const finalScore = parseFloat(((earnedPoints / possiblePoints) * 10).toFixed(2));
       const maxScore = 10;
       const pct = Math.round((earnedPoints / possiblePoints) * 100);
-      
-      // Hiển kết quả
+
       const container = document.getElementById('quizContainer');
       container.innerHTML = '';
-      
+
       const banner = document.getElementById('scoreBanner');
       document.getElementById('scoreValue').textContent = `${finalScore} / ${maxScore}`;
       document.getElementById('scoreValue').style.color =
-        pct >= 70 ? 'var(--correct)' : pct >= 40 ? '#f9a825' : 'var(--wrong)';
-      
+        pct >= 70 ? 'var(--correct)' : pct >= 40 ? 'var(--warning)' : 'var(--wrong)';
+
       let msg = `Hoàn thành ${answeredCount} câu (Đúng ${rvCorrect}, Sai ${rvWrong}, Bỏ qua ${rvSkipped}). `;
-      if (pct === 100) msg += '🎉 Tuyệt vời! Xuất sắc!';
-      else if (pct >= 70) msg += '👏 Giỏi lắm! Cần cố gắng thêm!';
-      else if (pct >= 40) msg += '💪 Khá! Hãy ôn thêm nhé!';
-      else msg += '📚 Cần luyện tập nhiều hơn!';
+      if (pct === 100) msg += 'Kết quả xuất sắc.';
+      else if (pct >= 70) msg += 'Kết quả tốt, tiếp tục duy trì.';
+      else if (pct >= 40) msg += 'Mức khá, cần ôn thêm các phần chưa chắc.';
+      else msg += 'Cần xem lại lý thuyết và luyện tập thêm.';
       document.getElementById('scoreMsg').textContent = msg;
-      
+
       banner.classList.add('visible');
       banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // Gom danh sách các câu làm sai
+
       let wrongAnswersList = [];
-      rvResults.forEach((r, i) => {
+      rvResults.forEach((r) => {
         if (r.skipped || r.isCorrect) return;
         const q = quizData.find(item => item.id === r.qId);
         if (!q) return;
         const idx = quizData.indexOf(q);
         wrongAnswersList.push(`Câu ${idx + 1}: Sai (Đáp án đúng: ${q.correct})`);
       });
-      
-      // Gửi kết quả về Telegram
+
       sendResultToTelegram(studentName + ' (Ôn tập)', finalScore, maxScore, wrongAnswersList);
-      
-      // Lưu tiến trình học tập vào Supabase
+
       if (currentSession && currentSession.gmail) {
         saveProgressToSupabase(currentSession.gmail, quizFile, 'quiz', finalScore);
       }
-      
-      // Hiện nút làm lại
+
       document.getElementById('retryBtn').classList.add('visible');
     }
 
@@ -2492,10 +2110,10 @@
           dates.sort((a, b) => new Date(b) - new Date(a));
           localStorage.setItem('zphysics_activity_dates', JSON.stringify(dates));
         }
-      } catch(e){}
+      } catch (e) {}
 
       if (!currentSession || !currentSession.premium || currentSession.gmail.startsWith('demo_')) return;
-      
+
       const uniqueType = type + '_' + Date.now();
       const payload = { email: email, lesson_id: lessonId, type: uniqueType, score: score };
       const authHeader = (currentSession && currentSession.access_token) ? `Bearer ${currentSession.access_token}` : `Bearer ${SUPABASE_ANON_KEY}`;
@@ -2511,11 +2129,9 @@
       }).catch(err => console.error('Lỗi lưu tiến trình:', err));
     }
 
-    // ── Nộp bài ──
     function submitQuiz() {
       if (submitted) return;
 
-      // Kiểm tra đã nhập tên chưa
       const nameInput = document.getElementById('studentName');
       const studentCard = document.getElementById('studentCard');
       const studentName = nameInput.value.trim();
@@ -2523,14 +2139,12 @@
       if (!studentName) {
         studentCard.classList.add('error');
         nameInput.focus();
-        // Xóa class error sau 2 giây để có thể rung lại lần sau
         setTimeout(() => studentCard.classList.remove('error'), 2000);
         return;
       }
       studentCard.classList.remove('error');
 
       submitted = true;
-      // Khóa ô nhập tên
       nameInput.disabled = true;
       nameInput.style.opacity = '0.6';
 
@@ -2549,61 +2163,55 @@
           let wrongStatements = [];
           const correctKey = q.correct ? q.correct.toString().toUpperCase().trim() : '';
           const correctArr = correctKey.replace(/D/g, 'Đ').split('');
-          
-          let studentAnsArr = [];
-          
+
           validAnswers.forEach((a, idx) => {
             const parent = document.getElementById(`tf-${q.id}-${a.key}`);
             const selected = parent.querySelector('.tf-btn.selected');
             const studentVal = selected ? selected.dataset.val : 'Không chọn';
-            studentAnsArr.push(studentVal);
-            
             const exactCorrectVal = correctArr[idx] || 'Đ';
-            
+
             parent.querySelectorAll('.tf-btn').forEach(btn => {
               btn.style.pointerEvents = 'none';
               btn.style.opacity = '0.5';
               if (btn.dataset.val === exactCorrectVal) {
                 btn.style.borderColor = 'var(--correct)';
-                btn.style.borderWidth = '2px';
                 btn.style.opacity = '1';
                 btn.style.color = 'var(--correct)';
               }
             });
-            
+
             if (studentVal === exactCorrectVal) {
               correctCount++;
               if (selected) {
                 selected.style.backgroundColor = 'var(--correct)';
-                selected.style.color = 'white';
+                selected.style.color = '#ffffff';
               }
             } else {
               wrongStatements.push(`Ý ${a.key} (Chọn: ${studentVal}, Đúng: ${exactCorrectVal})`);
               if (selected) {
                 selected.style.backgroundColor = 'var(--wrong)';
-                selected.style.color = 'white';
+                selected.style.color = '#ffffff';
                 selected.style.borderColor = 'var(--wrong)';
               }
             }
           });
-          
+
           let qScore = 0;
           if (correctCount === 1) qScore = 0.1;
           else if (correctCount === 2) qScore = 0.25;
           else if (correctCount === 3) qScore = 0.5;
           else if (correctCount === 4) qScore = 1.0;
-          
+
           if (!quizFile.startsWith('baitap_')) {
-            qScore = correctCount; // thang điểm cũ (1đ / ý)
+            qScore = correctCount;
           }
 
           score += qScore;
           isCorrect = (correctCount === validAnswers.length);
-          
+
           if (!isCorrect) {
             wrongAnswersList.push(`Câu ${index + 1}: Sai ${wrongStatements.length} ý. [${wrongStatements.join('; ')}]`);
           }
-
         } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
           const selected = answersEl.querySelector('.answer-option.selected');
           const selectedKey = selected ? selected.dataset.key : null;
@@ -2615,7 +2223,7 @@
             if (opt.dataset.key === q.correct) opt.classList.add('is-correct');
             if (opt.classList.contains('selected') && opt.dataset.key !== q.correct) opt.classList.add('is-wrong');
           });
-          
+
           if (isCorrect) {
             score += quizFile.startsWith('baitap_') ? 0.25 : 1;
           } else {
@@ -2631,15 +2239,10 @@
 
           if (inp) {
             inp.disabled = true;
-            if (isCorrect) {
-              inp.style.borderColor = 'var(--correct)';
-              inp.style.backgroundColor = 'rgba(67, 160, 71, 0.1)';
-            } else {
-              inp.style.borderColor = 'var(--wrong)';
-              inp.style.backgroundColor = 'rgba(229, 57, 53, 0.08)';
-            }
+            inp.style.borderColor = isCorrect ? 'var(--correct)' : 'var(--wrong)';
+            inp.style.backgroundColor = isCorrect ? 'var(--correct-subtle)' : 'var(--wrong-subtle)';
           }
-          
+
           if (isCorrect) {
             score += quizFile.startsWith('baitap_') ? 0.25 : 1;
           } else {
@@ -2647,27 +2250,19 @@
           }
         }
 
-        // Icon kết quả
-        const icon = document.getElementById('icon-' + q.id);
-        icon.style.display = 'inline-block';
-        icon.textContent = isCorrect ? '✅' : '❌';
-
-        // Border card
+        setResultBadge(q.id, isCorrect);
         card.classList.add(isCorrect ? 'correct-card' : 'wrong-card');
 
-        // Hiện lời giải
         const explainEl = document.getElementById('explain-' + q.id);
         explainEl.classList.add('visible');
       });
 
-      // Render KaTeX cho lời giải
       triggerKaTeX(document.getElementById('quizContainer'));
 
-      // Hiển thị điểm
       let finalScore = score;
       let maxScore = quizData.length;
       if (quizFile.startsWith('baitap_')) {
-        finalScore = score * 2; // Nhân 2 để ra thang điểm 10
+        finalScore = score * 2;
         maxScore = 10;
       }
       finalScore = parseFloat(finalScore.toFixed(2));
@@ -2677,22 +2272,20 @@
 
       document.getElementById('scoreValue').textContent = `${finalScore} / ${maxScore}`;
       document.getElementById('scoreValue').style.color =
-        pct >= 70 ? 'var(--correct)' : pct >= 40 ? '#f9a825' : 'var(--wrong)';
+        pct >= 70 ? 'var(--correct)' : pct >= 40 ? 'var(--warning)' : 'var(--wrong)';
 
       let msg = '';
-      if (pct === 100) msg = '🎉 Tuyệt vời! Xuất sắc!';
-      else if (pct >= 70) msg = '👏 Giỏi lắm! Cần cố gắng thêm!';
-      else if (pct >= 40) msg = '💪 Khá! Hãy ôn thêm nhé!';
-      else msg = '📚 Cần luyện tập nhiều hơn!';
+      if (pct === 100) msg = 'Kết quả xuất sắc, hoàn thành trọn vẹn bài tập.';
+      else if (pct >= 70) msg = 'Kết quả tốt, xem lại các câu sai để nắm chắc hơn.';
+      else if (pct >= 40) msg = 'Mức khá, nên xem kỹ phần lời giải bên dưới.';
+      else msg = 'Cần ôn tập lại lý thuyết trước khi làm lại.';
       document.getElementById('scoreMsg').textContent = msg;
 
       banner.classList.add('visible');
       banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-      // Gửi kết quả về Telegram
       sendResultToTelegram(studentName, finalScore, maxScore, wrongAnswersList);
 
-      // Lưu tiến trình học tập
       if (currentSession && currentSession.gmail) {
         let dbScore = finalScore;
         if (!quizFile.startsWith('baitap_') && maxScore > 0) {
@@ -2701,16 +2294,14 @@
         saveProgressToSupabase(currentSession.gmail, quizFile, 'quiz', parseFloat(dbScore.toFixed(2)));
       }
 
-      // Ẩn nút nộp, hiện nút làm lại
       document.getElementById('submitBtn').style.display = 'none';
       document.getElementById('retryBtn').classList.add('visible');
     }
 
-    // ── Làm lại ──
     function retryQuiz() {
       submitted = false;
       document.getElementById('scoreBanner').classList.remove('visible');
-      
+
       if (isReviewMode) {
         const reviewBar = document.getElementById('reviewBar');
         if (reviewBar) reviewBar.style.display = 'flex';
@@ -2723,10 +2314,9 @@
           submitBtn.disabled = true;
         }
       }
-      
+
       document.getElementById('retryBtn').classList.remove('visible');
       document.getElementById('progressFill').style.width = '0%';
-      // Chỉ mở khóa ô tên nếu không dùng session đăng nhập
       const nameInput = document.getElementById('studentName');
       if (!currentSession || !currentSession.ten) {
         nameInput.disabled = false;
@@ -2737,23 +2327,21 @@
     }
   </script>
 
-  <!-- BACKGROUND MUSIC CONTROLLER -->
   <audio id="bgMusic" loop preload="none"></audio>
 
   <script>
-    // ── GENTLE BACKGROUND MUSIC SYSTEM WITH TOGGLE ──
     function updateMusicButton(isPlaying) {
       const btn = document.getElementById('musicToggleBtn');
       const icon = document.getElementById('musicIcon');
       if (!btn || !icon) return;
 
       if (isPlaying) {
-        icon.textContent = '🎵';
+        icon.innerHTML = SVG_VOL_ON;
         btn.classList.add('playing');
         btn.classList.remove('muted');
         btn.title = 'Tắt tiếng (nhạc nền đang phát)';
       } else {
-        icon.textContent = '🔇';
+        icon.innerHTML = SVG_VOL_OFF;
         btn.classList.remove('playing');
         btn.classList.add('muted');
         btn.title = 'Bật tiếng (nhạc nền đang tắt)';
@@ -2786,21 +2374,14 @@
     function initMusicPlayer() {
       const audio = document.getElementById('bgMusic');
       if (!audio) return;
-      
+
       audio.volume = 0.35;
       const isMuted = localStorage.getItem('zphysics_music_muted') === 'true';
+      updateMusicButton(false);
+      if (isMuted) return;
 
-      if (isMuted) {
-        updateMusicButton(false);
-        return;
-      } else {
-        updateMusicButton(false);
-      }
-      
-      // Chỉ tải và phát nhạc nhẹ khi người dùng đã chủ động tương tác
       const events = ['click', 'touchstart', 'keydown'];
       const playOnFirstInteraction = (e) => {
-        // Nếu người dùng tương tác trực tiếp vào nút toggleMusic thì để toggleMusic tự xử lý
         if (e && e.target && e.target.closest && e.target.closest('#musicToggleBtn')) return;
 
         if (localStorage.getItem('zphysics_music_muted') === 'true') {
@@ -2822,10 +2403,10 @@
           events.forEach(evt => document.removeEventListener(evt, playOnFirstInteraction));
         }
       };
-      
+
       events.forEach(event => document.addEventListener(event, playOnFirstInteraction, { passive: true }));
     }
-    
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => setTimeout(initMusicPlayer, 500));
     } else {
