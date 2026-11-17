@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/auth.js?v=20261111_07"></script>
   <link rel="stylesheet" href="assets/css/pinui.css">
@@ -497,10 +497,18 @@
     }
 
     .section-label h3 {
-      font-size: 26px;
-      font-weight: 500;
-      letter-spacing: -0.02em;
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
+      font-size: 27px;
+      font-weight: 600;
+      letter-spacing: -0.025em;
       color: var(--text);
+    }
+
+    .section-label-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .section-summary {
@@ -508,6 +516,157 @@
       font-variant-numeric: tabular-nums;
       font-size: 12px;
       color: var(--muted);
+    }
+
+    /* ── QUICK SEARCH TRIGGER (SIDEBAR & HEADER) ── */
+    .cmd-trigger-btn {
+      width: 100%;
+      height: 38px;
+      padding: 0 10px 0 12px;
+      border-radius: 9px;
+      border: 1px solid var(--border-strong);
+      background: var(--card);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      transition: border-color 150ms var(--ease), color 150ms var(--ease), background-color 150ms var(--ease);
+    }
+
+    .cmd-trigger-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .cmd-trigger-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .cmd-trigger-left span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── BENTO GRADE OVERVIEW STRIP ── */
+    .grade-bento-strip {
+      display: grid;
+      grid-template-columns: 1.05fr 1.15fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .gb-card {
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 4px 16px rgba(31, 27, 22, 0.03);
+      transition: border-color 150ms var(--ease);
+    }
+
+    html[data-theme="dark"] .gb-card {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 20px rgba(0, 0, 0, 0.28);
+    }
+
+    .gb-card:hover {
+      border-color: var(--accent);
+    }
+
+    .gb-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .gb-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.01em;
+    }
+
+    .gb-title {
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
+      font-size: 15.5px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .gb-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .gb-ring-wrap {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gb-ring-label {
+      position: absolute;
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .gb-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 32px;
+      padding: 0 11px;
+      border-radius: 7px;
+      border: 1px solid var(--border-strong);
+      background: var(--raised);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+    }
+
+    .gb-action-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    html[data-theme="dark"] .gb-action-btn:hover {
+      color: #07080d;
+    }
+
+    .lesson-row.flash-highlight {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 3px var(--accent-subtle);
     }
 
     .grade-section {
@@ -1333,6 +1492,11 @@
         font-size: 20px;
       }
 
+      .grade-bento-strip {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
       .cards-list {
         grid-template-columns: 1fr;
       }
@@ -1416,6 +1580,16 @@
           </div>
         </div>
         <div class="sidebar-user-line" id="greetingText">Đang tải hồ sơ</div>
+      </div>
+
+      <div>
+        <button type="button" class="cmd-trigger-btn" onclick="openCmdPalette()" aria-label="Tìm bài học hoặc đề thi nhanh">
+          <span class="cmd-trigger-left">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Tìm bài học, đề thi...</span>
+          </span>
+          <span class="kbd-cap">Ctrl K</span>
+        </button>
       </div>
 
       <div>
@@ -1511,6 +1685,26 @@
       </div>
 
       <button class="close-dashboard" onclick="closeDashboard()">Đóng</button>
+    </div>
+  </div>
+
+  <!-- ── COMMAND PALETTE MODAL (⌘K / CTRL+K) ── -->
+  <div id="cmdPaletteBackdrop" class="cmd-backdrop" onclick="if(event.target===this) closeCmdPalette()">
+    <div class="cmd-modal" role="dialog" aria-label="Tìm nhanh bài học và đề thi">
+      <div class="cmd-input-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="cmdSearchInput" class="cmd-input" placeholder="Tìm bài học, chương, đề thi thử (vd: dao động, sóng dừng, đề 01)..." autocomplete="off" oninput="renderCmdResults(this.value)">
+        <button type="button" class="kbd-cap" onclick="closeCmdPalette()">Esc</button>
+      </div>
+      <div id="cmdResultsList" class="cmd-results"></div>
+      <div class="cmd-footer">
+        <div class="cmd-footer-hints">
+          <span><span class="kbd-cap">↑</span><span class="kbd-cap">↓</span> Di chuyển</span>
+          <span><span class="kbd-cap">↵</span> Mở bài</span>
+          <span><span class="kbd-cap">Esc</span> Đóng</span>
+        </div>
+        <span class="mono">Zphysics Quick Jump</span>
+      </div>
     </div>
   </div>
 
@@ -2012,12 +2206,19 @@
         labelDiv.className = 'section-label';
         labelDiv.innerHTML = `
           <h3>Danh mục bài học — ${gradeObj.grade}</h3>
-          <span class="section-summary">${gradeObj.chapters.length} chương · ${totalLessonsInGrade} bài học</span>
+          <div class="section-label-right">
+            <span class="section-summary">${gradeObj.chapters.length} chương · ${totalLessonsInGrade} bài học</span>
+          </div>
         `;
         section.appendChild(labelDiv);
 
+        const bentoStrip = document.createElement('div');
+        bentoStrip.className = 'grade-bento-strip';
+        section.appendChild(bentoStrip);
+
         const cardsList = document.createElement('div');
         cardsList.className = 'cards-list';
+        let completedInGradeCount = 0;
 
         const examsToRender = mockExams && mockExams.length > 0 ? mockExams : DEFAULT_MOCK_EXAMS;
         const matchingExams = examsToRender.filter(exam => {
@@ -2040,6 +2241,7 @@
 
           const card = document.createElement('div');
           card.className = 'ch-card' + (isLockedGrade ? ' locked' : '');
+          card.setAttribute('data-card-key', `g${gIdx}_exam`);
           if (isLockedGrade) {
             card.setAttribute('onclick', `showLockedGradeModal('${gradeObj.grade}')`);
           } else {
@@ -2112,7 +2314,7 @@
           cardsList.appendChild(wrapper);
         }
 
-        gradeObj.chapters.forEach(ch => {
+        gradeObj.chapters.forEach((ch, chIdx) => {
           const dotColor = ch.dotColor || 'var(--accent)';
           const chapterCode = extractChapterCode(ch.num);
 
@@ -2214,7 +2416,10 @@
             }
 
             const totalCompleted = homeworkCompleted + examCompleted;
-            if (totalCompleted > 0) completedCount++;
+            if (totalCompleted > 0) {
+              completedCount++;
+              completedInGradeCount++;
+            }
 
             let checkmarksHtml = '';
             if (homeworkCompleted > 0) {
@@ -2225,7 +2430,7 @@
             }
 
             return `
-              <div class="lesson-row ${totalCompleted > 0 ? 'completed' : ''}">
+              <div class="lesson-row ${totalCompleted > 0 ? 'completed' : ''}" data-lesson-key="g${gIdx}_c${chIdx}_l${lIdx}">
                 <div class="lesson-meta">
                   <div class="lesson-meta-left">
                     <span class="lesson-code">${l.num}</span>
@@ -2242,6 +2447,7 @@
 
           const card = document.createElement('div');
           card.className = 'ch-card' + (isLockedGrade ? ' locked' : '');
+          card.setAttribute('data-card-key', `g${gIdx}_c${chIdx}`);
           if (isLockedGrade) {
             card.setAttribute('onclick', `showLockedGradeModal('${gradeObj.grade}')`);
           } else {
@@ -2272,8 +2478,238 @@
           cardsList.appendChild(wrapper);
         });
 
+        // Populate Bento Grade Overview Strip
+        const pct = totalLessonsInGrade > 0 ? Math.round((completedInGradeCount / totalLessonsInGrade) * 100) : 0;
+        const r = 21;
+        const circ = (2 * Math.PI * r).toFixed(1);
+        const dashOffset = (circ * (1 - pct / 100)).toFixed(1);
+        const firstCh = gradeObj.chapters[0];
+        const firstChTitle = firstCh ? `${firstCh.num} · ${firstCh.title}` : gradeObj.grade;
+
+        bentoStrip.innerHTML = `
+          <div class="gb-card">
+            <div class="gb-info">
+              <span class="gb-eyebrow">TIẾN ĐỘ KHỐI ${gradeNum || ''}</span>
+              <div class="gb-title">${completedInGradeCount}/${totalLessonsInGrade} bài hoàn thành</div>
+              <div class="gb-meta">${gradeObj.chapters.length} chương chuyên đề chuẩn SGK</div>
+            </div>
+            <div class="gb-ring-wrap" aria-hidden="true">
+              <svg width="52" height="52" viewBox="0 0 52 52" style="transform: rotate(-90deg);">
+                <circle cx="26" cy="26" r="${r}" fill="none" stroke="var(--raised)" stroke-width="4.5" />
+                <circle cx="26" cy="26" r="${r}" fill="none" stroke="var(--accent)" stroke-width="4.5" stroke-dasharray="${circ}" stroke-dashoffset="${dashOffset}" stroke-linecap="round" />
+              </svg>
+              <span class="gb-ring-label">${pct}%</span>
+            </div>
+          </div>
+          <div class="gb-card">
+            <div class="gb-info">
+              <span class="gb-eyebrow">CHUYÊN ĐỀ MỞ ĐẦU</span>
+              <div class="gb-title" title="${firstChTitle}">${firstChTitle}</div>
+              <div class="gb-meta">${firstCh && firstCh.lessons ? firstCh.lessons.length : 0} bài giảng &amp; phiếu tự luyện</div>
+            </div>
+            <button type="button" class="gb-action-btn" onclick="openCardInGrade(${gIdx}, 'g${gIdx}_c0')">Mở chương →</button>
+          </div>
+          <div class="gb-card">
+            <div class="gb-info">
+              <span class="gb-eyebrow">PHÒNG ĐỀ &amp; TRA CỨU</span>
+              <div class="gb-title">${matchingExams.length} đề thi thử ${shortGradeLabel}</div>
+              <div class="gb-meta">Bấm Ctrl+K để tìm bài bất kỳ</div>
+            </div>
+            <button type="button" class="gb-action-btn" onclick="${matchingExams.length > 0 ? `openCardInGrade(${gIdx}, 'g${gIdx}_exam')` : 'openCmdPalette()'}">${matchingExams.length > 0 ? 'Mở đề →' : 'Tìm bài →'}</button>
+          </div>
+        `;
+
         section.appendChild(cardsList);
         contentEl.appendChild(section);
+      });
+    }
+
+    function openCardInGrade(gIdx, cardKey, lessonKey) {
+      if (activeGrade !== gIdx) {
+        switchGrade(gIdx);
+      }
+      setTimeout(() => {
+        const card = document.querySelector(`.ch-card[data-card-key="${cardKey}"]`);
+        if (!card) return;
+        if (card.classList.contains('locked')) {
+          card.click();
+          return;
+        }
+        if (!card.classList.contains('open')) {
+          toggleCard(card);
+        }
+        setTimeout(() => {
+          if (lessonKey) {
+            const row = card.querySelector(`.lesson-row[data-lesson-key="${lessonKey}"]`);
+            if (row) {
+              row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              row.classList.add('flash-highlight');
+              setTimeout(() => row.classList.remove('flash-highlight'), 1800);
+              return;
+            }
+          }
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 180);
+      }, 60);
+    }
+
+    /* ── COMMAND PALETTE (⌘K / CTRL+K) ── */
+    let cmdItemsCache = [];
+    let cmdActiveIdx = 0;
+
+    function buildCmdIndex() {
+      const items = [];
+      const exams = (mockExams && mockExams.length > 0) ? mockExams : DEFAULT_MOCK_EXAMS;
+
+      (globalLessonsData || []).forEach((gObj, gIdx) => {
+        const gNum = gObj.grade.match(/\d+/) ? gObj.grade.match(/\d+/)[0] : '';
+        const gShort = gNum ? `Lớp ${gNum}` : gObj.grade;
+        (gObj.chapters || []).forEach((ch, chIdx) => {
+          items.push({
+            type: 'chapter',
+            tag: `${gShort} · ${ch.num}`,
+            title: ch.title,
+            meta: `${(ch.lessons || []).length} bài`,
+            gIdx,
+            cardKey: `g${gIdx}_c${chIdx}`,
+            searchStr: normalizeText(`${gShort} ${ch.num} ${ch.title}`)
+          });
+          (ch.lessons || []).forEach((l, lIdx) => {
+            items.push({
+              type: 'lesson',
+              tag: `${gShort} · Bài ${l.num}`,
+              title: l.title,
+              meta: ch.num,
+              gIdx,
+              cardKey: `g${gIdx}_c${chIdx}`,
+              lessonKey: `g${gIdx}_c${chIdx}_l${lIdx}`,
+              searchStr: normalizeText(`${gShort} ${ch.num} bai ${l.num} ${l.title}`)
+            });
+          });
+        });
+      });
+
+      exams.forEach((ex) => {
+        const lop = ex.lop || '12';
+        items.push({
+          type: 'exam',
+          tag: `Đề VIP · Lớp ${lop}`,
+          title: ex.title,
+          meta: `${ex.duration || 50} phút`,
+          examId: ex.id,
+          searchStr: normalizeText(`de thi thu lop ${lop} ${ex.title} ${ex.desc || ''}`)
+        });
+      });
+
+      cmdItemsCache = items;
+    }
+
+    let currentFilteredCmdItems = [];
+
+    function renderCmdResults(query) {
+      const listEl = document.getElementById('cmdResultsList');
+      if (!listEl) return;
+      if (!cmdItemsCache.length) buildCmdIndex();
+
+      const q = normalizeText(query || '');
+      const matches = q
+        ? cmdItemsCache.filter(item => item.searchStr.includes(q)).slice(0, 18)
+        : cmdItemsCache.filter(item => item.type === 'chapter' || item.type === 'exam').slice(0, 14);
+
+      currentFilteredCmdItems = matches;
+      cmdActiveIdx = 0;
+
+      if (!matches.length) {
+        listEl.innerHTML = `<div class="cmd-empty">Không tìm thấy chuyên đề hoặc đề thi khớp với "${query}".</div>`;
+        return;
+      }
+
+      listEl.innerHTML = matches.map((item, idx) => `
+        <div class="cmd-item ${idx === 0 ? 'active' : ''}" data-cmd-idx="${idx}" onclick="executeCmdItem(${idx})">
+          <div class="cmd-item-left">
+            <span class="cmd-item-tag">${item.tag}</span>
+            <span class="cmd-item-title">${item.title}</span>
+          </div>
+          <span class="cmd-item-meta mono">${item.meta}</span>
+        </div>
+      `).join('');
+    }
+
+    function executeCmdItem(idx) {
+      const item = currentFilteredCmdItems[idx];
+      if (!item) return;
+      closeCmdPalette();
+      if (item.type === 'exam') {
+        const session = getSession();
+        if (session && session.premium) {
+          window.location.href = `l.html#${item.examId}`;
+        } else {
+          window.location.href = 'premium.html';
+        }
+        return;
+      }
+      openCardInGrade(item.gIdx, item.cardKey, item.lessonKey);
+    }
+
+    function openCmdPalette() {
+      buildCmdIndex();
+      const backdrop = document.getElementById('cmdPaletteBackdrop');
+      const input = document.getElementById('cmdSearchInput');
+      if (!backdrop) return;
+      backdrop.classList.add('open');
+      if (input) {
+        input.value = '';
+        renderCmdResults('');
+        setTimeout(() => input.focus(), 30);
+      }
+    }
+
+    function closeCmdPalette() {
+      const backdrop = document.getElementById('cmdPaletteBackdrop');
+      if (backdrop) backdrop.classList.remove('open');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const backdrop = document.getElementById('cmdPaletteBackdrop');
+        if (backdrop && backdrop.classList.contains('open')) {
+          closeCmdPalette();
+        } else {
+          openCmdPalette();
+        }
+        return;
+      }
+      const backdrop = document.getElementById('cmdPaletteBackdrop');
+      if (!backdrop || !backdrop.classList.contains('open')) return;
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeCmdPalette();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!currentFilteredCmdItems.length) return;
+        cmdActiveIdx = (cmdActiveIdx + 1) % currentFilteredCmdItems.length;
+        updateCmdActiveHighlight();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!currentFilteredCmdItems.length) return;
+        cmdActiveIdx = (cmdActiveIdx - 1 + currentFilteredCmdItems.length) % currentFilteredCmdItems.length;
+        updateCmdActiveHighlight();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        executeCmdItem(cmdActiveIdx);
+      }
+    });
+
+    function updateCmdActiveHighlight() {
+      const listEl = document.getElementById('cmdResultsList');
+      if (!listEl) return;
+      listEl.querySelectorAll('.cmd-item').forEach((el, i) => {
+        el.classList.toggle('active', i === cmdActiveIdx);
+        if (i === cmdActiveIdx) {
+          el.scrollIntoView({ block: 'nearest' });
+        }
       });
     }
 

@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/pinui.css">
   <script src="assets/js/pinui.js"></script>
   <script>PinUI.initTheme('dark');</script>
@@ -448,6 +448,7 @@
       border-radius: 6px;
       border: 1px solid var(--border-strong);
       background: var(--card);
+      border-bottom-width: 2px;
       color: var(--text-secondary);
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
@@ -457,7 +458,7 @@
       justify-content: center;
       cursor: pointer;
       user-select: none;
-      transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease);
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease), transform 90ms ease;
     }
 
     .mcq-btn:hover {
@@ -471,6 +472,10 @@
       color: var(--bg-deep);
       border-color: var(--accent);
       font-weight: 600;
+    }
+
+    html[data-theme="light"] .mcq-btn.selected {
+      color: #ffffff;
     }
 
     .mcq-btn.is-correct {
@@ -1624,7 +1629,30 @@
       const parent = btn.parentElement;
       parent.querySelectorAll('.mcq-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
+      if (window.PinUI && typeof window.PinUI.pressButton === 'function') {
+        window.PinUI.pressButton(btn, 0.12);
+      }
     }
+
+    let hoveredMcqRow = null;
+    document.addEventListener('mouseover', (e) => {
+      const row = e.target && e.target.closest ? e.target.closest('.mcq-row') : null;
+      if (row) hoveredMcqRow = row;
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (submitted || !hoveredMcqRow) return;
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || e.ctrlKey || e.metaKey || e.altKey) return;
+      const map = { 'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D', '1': 'A', '2': 'B', '3': 'C', '4': 'D' };
+      const opt = map[e.key.toLowerCase()];
+      if (!opt) return;
+      const btn = hoveredMcqRow.querySelector(`.mcq-btn[data-opt="${opt}"]`);
+      if (btn) {
+        e.preventDefault();
+        btn.click();
+      }
+    });
 
     function renderTFGrid() {
       const { tfCount, tfMaxScore } = getExamStructure(examData);
@@ -1672,6 +1700,9 @@
       const idx = val === 'Đ' ? '0' : '1';
       parent.setAttribute('data-selected', idx);
       parent.style.setProperty('--seg-index', idx);
+      if (window.PinUI && typeof window.PinUI.pressButton === 'function') {
+        window.PinUI.pressButton(btn, 0.10);
+      }
     }
 
     function renderSAGrid() {

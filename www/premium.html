@@ -9,7 +9,10 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/pinui.css">
+  <script src="assets/js/pinui.js"></script>
+  <script>PinUI.initTheme('dark');</script>
   <style>
     :root {
       --bg-deep: #07080d;
@@ -28,6 +31,22 @@
       --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
+    html[data-theme="light"] {
+      --bg-deep: #f2ede4;
+      --bg: #f7f4ee;
+      --card: #fdfbf7;
+      --raised: #efe9df;
+      --border: rgba(31, 27, 22, 0.08);
+      --border-strong: rgba(31, 27, 22, 0.14);
+      --text: #1f1b16;
+      --text-secondary: #5e554a;
+      --muted: #7b7266;
+      --accent: #0d9488;
+      --accent-subtle: rgba(13, 148, 136, 0.10);
+      --correct: #16a34a;
+      --wrong: #dc2626;
+    }
+
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -35,33 +54,202 @@
     }
 
     body {
-      font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Plus Jakarta Sans', 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       min-height: 100vh;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      flex-direction: column;
       line-height: 1.55;
       -webkit-font-smoothing: antialiased;
     }
 
+    .prem-nav {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 20px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .prem-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      transition: border-color 150ms var(--ease), color 150ms var(--ease);
+    }
+
+    .prem-back:hover {
+      border-color: var(--border-strong);
+      color: var(--text);
+    }
+
+    .prem-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 24px 48px;
+    }
+
+    .prem-shell {
+      width: 100%;
+      max-width: 932px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .prem-showcase {
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 12px 32px rgba(0, 0, 0, 0.16);
+    }
+
+    html[data-theme="light"] .prem-showcase,
+    html[data-theme="light"] .activation-card {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 10px 28px rgba(31, 27, 22, 0.06);
+    }
+
+    .prem-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .prem-headline {
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
+      font-size: clamp(24px, 2.8vw, 32px);
+      font-weight: 600;
+      line-height: 1.16;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .prem-headline .accent {
+      color: var(--accent);
+    }
+
+    .prem-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .prem-perks {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .prem-perk {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 11px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+    }
+
+    .prem-perk-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .prem-perk-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .prem-perk-desc {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .prem-specimen {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--raised);
+      border: 1px solid var(--border-strong);
+      font-size: 12px;
+    }
+
+    .prem-specimen-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+    }
+
+    .prem-specimen-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+    }
+
     .activation-card {
       width: 100%;
-      max-width: 420px;
       background: var(--card);
-      border-radius: 16px;
+      border-radius: 18px;
       border: 1px solid var(--border-strong);
       padding: 36px 28px;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 12px 32px rgba(0, 0, 0, 0.16);
     }
 
     .logo {
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
       font-size: 22px;
       font-weight: 600;
-      margin-bottom: 28px;
-      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
     }
 
     .logo span {
@@ -72,7 +260,7 @@
       position: relative;
       width: 64px;
       height: 64px;
-      margin: 0 auto 24px;
+      margin: 0 auto 20px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -127,7 +315,8 @@
     }
 
     .status-title {
-      font-size: 18px;
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
+      font-size: 19px;
       font-weight: 600;
       margin-bottom: 8px;
       color: var(--text);
@@ -138,11 +327,13 @@
       color: var(--text-secondary);
       line-height: 1.6;
       min-height: 44px;
+      max-width: 310px;
     }
 
     .error-box {
       display: none;
-      margin-top: 24px;
+      margin-top: 22px;
+      width: 100%;
     }
 
     .btn {
@@ -150,14 +341,14 @@
       align-items: center;
       justify-content: center;
       width: 100%;
-      height: 40px;
+      height: 42px;
       padding: 0 16px;
-      border-radius: 8px;
+      border-radius: 9px;
       border: none;
       cursor: pointer;
       font-family: inherit;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--bg-deep);
       background: var(--text);
       text-decoration: none;
@@ -182,28 +373,108 @@
     .btn-secondary:hover {
       border-color: var(--accent);
     }
+
+    @media (max-width: 780px) {
+      .prem-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .prem-showcase {
+        order: 2;
+        padding: 24px;
+      }
+
+      .activation-card {
+        order: 1;
+        padding: 28px 22px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div class="activation-card">
-    <div class="logo">Z<span>physics</span></div>
+  <header class="prem-nav">
+    <a href="landing.html" class="prem-back">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Về trang chủ Zphysics</span>
+    </a>
+    <button type="button" class="pts-toggle" onclick="PinUI.toggleTheme(this)" aria-label="Đổi giao diện sáng tối" aria-pressed="true">
+      <svg class="pts-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+      <svg class="pts-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+    </button>
+  </header>
 
-    <div class="loader-container">
-      <div class="spinner" id="spinner"></div>
-      <div class="success-icon" id="successIcon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <main class="prem-main">
+    <div class="prem-shell">
+      <section class="prem-showcase" aria-label="Quyền lợi tài khoản Zphysics Premium">
+        <div>
+          <div class="prem-eyebrow">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span>ZPHYSICS PREMIUM · LỚP 10 · 11 · 12</span>
+          </div>
+          <h1 class="prem-headline">Mở khóa toàn bộ chuyên đề &amp; <em class="serif-accent accent">Phòng luyện đề VIP</em></h1>
+          <p class="prem-sub">Quyền truy cập trọn đời vào kho bài giảng, phiếu bài tập 3 phần chuẩn GDPT 2018 và phòng luyện đề PDF bấm giờ.</p>
+        </div>
+
+        <div class="prem-perks">
+          <div class="prem-perk">
+            <span class="prem-perk-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            </span>
+            <div>
+              <div class="prem-perk-title">Toàn bộ chuyên đề Lớp 10, 11, 12</div>
+              <div class="prem-perk-desc">Hơn 200 bài giảng lý thuyết, video và bài tập tự luyện có lời giải KaTeX.</div>
+            </div>
+          </div>
+          <div class="prem-perk">
+            <span class="prem-perk-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/></svg>
+            </span>
+            <div>
+              <div class="prem-perk-title">Phòng luyện đề PDF chia đôi 50 phút</div>
+              <div class="prem-perk-desc">Làm đề thi thử chuẩn cấu trúc Bộ GD&amp;ĐT với phiếu tô đáp án 3 phần trực tiếp.</div>
+            </div>
+          </div>
+          <div class="prem-perk">
+            <span class="prem-perk-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            </span>
+            <div>
+              <div class="prem-perk-title">Đồng bộ lịch sử điểm &amp; chuỗi ngày học</div>
+              <div class="prem-perk-desc">Theo dõi sự tiến bộ qua từng đề thi trên cả trình duyệt Web và ứng dụng Android.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prem-specimen">
+          <div class="prem-specimen-left">
+            <span class="prem-specimen-badge">DEMO</span>
+            <span>Muốn xem trước giao diện phòng thi?</span>
+          </div>
+          <a href="l.html?demo=premium#de_thi_thu_01" style="color: var(--accent); font-weight: 600; text-decoration: none;">Mở đề mẫu →</a>
+        </div>
+      </section>
+
+      <div class="activation-card">
+        <div class="logo">Z<span>physics</span></div>
+
+        <div class="loader-container">
+          <div class="spinner" id="spinner"></div>
+          <div class="success-icon" id="successIcon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="state-icon" id="stateIcon"></div>
+        </div>
+
+        <div class="status-title" id="statusTitle">Đang xử lý kích hoạt</div>
+        <div class="status-desc" id="statusDesc">Đang kết nối hệ thống và kiểm tra tài khoản của em.</div>
+
+        <div class="error-box" id="errorBox">
+          <a href="landing.html#login" class="btn" id="errorBtn">Đi tới trang đăng nhập</a>
+        </div>
       </div>
-      <div class="state-icon" id="stateIcon"></div>
     </div>
-
-    <div class="status-title" id="statusTitle">Đang xử lý kích hoạt</div>
-    <div class="status-desc" id="statusDesc">Đang kết nối hệ thống và kiểm tra tài khoản của em.</div>
-
-    <div class="error-box" id="errorBox">
-      <a href="index.html" class="btn" id="errorBtn">Quay lại trang chủ</a>
-    </div>
-  </div>
+  </main>
 
   <script>
     const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';

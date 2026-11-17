@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,400;1,6..72,500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/auth.js?v=20261111_07"></script>
   <link rel="stylesheet" href="assets/css/pinui.css">
@@ -68,7 +68,7 @@
     }
 
     body {
-      font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Plus Jakarta Sans', 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       line-height: 1.6;
@@ -142,15 +142,16 @@
       gap: 10px;
       text-decoration: none;
       color: var(--text);
-      font-size: 17px;
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
+      font-size: 18px;
       font-weight: 600;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
     }
 
     .brand-mark {
       width: 28px;
       height: 28px;
-      border-radius: 6px;
+      border-radius: 7px;
       background: var(--text);
       color: var(--card);
       display: inline-flex;
@@ -204,15 +205,16 @@
       transform: scale(0.98);
     }
 
-    /* ── HERO (ASYMMETRIC SPLIT) ── */
+    /* ── HERO (ASYMMETRIC SPLIT + INTERACTIVE LAB) ── */
     .hero {
-      padding: 120px 0 80px;
+      padding: 116px 0 76px;
+      position: relative;
     }
 
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.04fr 0.96fr;
-      gap: 48px;
+      grid-template-columns: 1.02fr 0.98fr;
+      gap: 44px;
       align-items: center;
     }
 
@@ -221,27 +223,33 @@
       align-items: center;
       gap: 10px;
       margin-bottom: 20px;
-      font-size: 13px;
-      color: var(--muted);
+      padding: 5px 12px 5px 10px;
+      border-radius: 999px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      font-size: 12px;
+      color: var(--text-secondary);
+      box-shadow: 0 1px 2px rgba(31, 27, 22, 0.04);
     }
 
     .mono-tag {
       font-family: 'JetBrains Mono', monospace;
       font-variant-numeric: tabular-nums;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
-      padding: 2px 8px;
-      border-radius: 4px;
+      padding: 2px 7px;
+      border-radius: 5px;
       background: var(--raised);
       border: 1px solid var(--border-strong);
       color: var(--text-secondary);
     }
 
     .hero-title {
-      font-size: clamp(34px, 4.2vw, 52px);
-      font-weight: 500;
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
+      font-size: clamp(34px, 4.3vw, 54px);
+      font-weight: 600;
       line-height: 1.08;
-      letter-spacing: -0.025em;
+      letter-spacing: -0.03em;
       color: var(--text);
       margin-bottom: 20px;
     }
@@ -250,12 +258,19 @@
       color: var(--accent);
     }
 
+    .hero-title .serif-accent {
+      font-family: 'Newsreader', Georgia, serif;
+      font-style: italic;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
     .hero-subtitle {
-      font-size: 17px;
-      line-height: 1.65;
+      font-size: 16.5px;
+      line-height: 1.68;
       color: var(--text-secondary);
-      max-width: 500px;
-      margin-bottom: 32px;
+      max-width: 520px;
+      margin-bottom: 28px;
     }
 
     .hero-actions {
@@ -263,21 +278,23 @@
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
+      margin-bottom: 28px;
     }
 
     .btn-primary {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
       height: 44px;
       padding: 0 20px;
-      border-radius: 8px;
+      border-radius: 9px;
       border: none;
       background: var(--accent);
       color: #ffffff;
       font-family: inherit;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       text-decoration: none;
       cursor: pointer;
       transition: background-color 150ms var(--ease), transform 150ms var(--ease);
@@ -295,10 +312,11 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
       height: 44px;
-      padding: 0 20px;
-      border-radius: 8px;
-      background: var(--raised);
+      padding: 0 18px;
+      border-radius: 9px;
+      background: var(--card);
       border: 1px solid var(--border-strong);
       color: var(--text);
       font-family: inherit;
@@ -310,43 +328,101 @@
     }
 
     .btn-secondary:hover {
-      background: #e7dfd2;
+      background: var(--raised);
+      border-color: var(--accent);
     }
 
     .btn-secondary:active {
       transform: scale(0.98);
     }
 
-    /* ── HERO PRODUCT PREVIEW (THE MOMENT) ── */
+    .hero-trust-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    .hero-trust-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    /* ── HERO PRODUCT PREVIEW (INTERACTIVE WAVE LAB) ── */
     .preview-frame {
       background: var(--card);
       border: 1px solid var(--border-strong);
-      border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(31, 27, 22, 0.06);
+      border-radius: 16px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 14px 36px rgba(31, 27, 22, 0.08);
       overflow: hidden;
+    }
+
+    html[data-theme="dark"] .preview-frame {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 18px 42px rgba(0, 0, 0, 0.45);
     }
 
     .preview-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 16px;
+      gap: 10px;
+      padding: 11px 16px;
       background: var(--bg-deep);
       border-bottom: 1px solid var(--border);
       font-size: 12px;
       color: var(--text-secondary);
     }
 
+    .preview-bar-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .preview-bar-title {
-      font-weight: 500;
+      font-weight: 600;
       color: var(--text);
     }
 
+    .preview-bar-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lab-play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 24px;
+      padding: 0 9px;
+      border-radius: 5px;
+      border: 1px solid var(--border-strong);
+      background: var(--card);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+    }
+
+    .lab-play-btn:hover,
+    .lab-play-btn.playing {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-subtle);
+    }
+
     .preview-body {
-      padding: 20px;
+      padding: 18px 20px 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     .preview-lesson-head {
@@ -354,36 +430,85 @@
       align-items: baseline;
       justify-content: space-between;
       gap: 12px;
+      flex-wrap: wrap;
     }
 
     .preview-lesson-head h3 {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       color: var(--text);
     }
 
     .preview-eq {
       font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
       font-size: 12px;
+      font-weight: 500;
       color: var(--accent);
+      background: var(--accent-subtle);
+      padding: 2px 8px;
+      border-radius: 5px;
     }
 
     .graph-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      background-color: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
       padding: 12px 12px 8px;
+      position: relative;
     }
 
     .graph-caption {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
       margin-top: 8px;
       padding-top: 8px;
       border-top: 1px solid var(--border);
       font-size: 11px;
-      color: var(--muted);
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .graph-caption span {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 4px;
+    }
+
+    /* Interactive Sliders Strip */
+    .lab-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 9px;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+    }
+
+    .lab-control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .lab-control-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .lab-control-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--accent);
     }
 
     .preview-tf {
@@ -393,9 +518,19 @@
     }
 
     .preview-tf-label {
-      font-size: 13px;
-      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      font-weight: 600;
       color: var(--text);
+    }
+
+    .preview-tf-hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
     }
 
     .preview-tf-row {
@@ -403,12 +538,13 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 10px 12px;
+      padding: 9px 12px;
       border-radius: 8px;
       background: var(--bg);
       border: 1px solid var(--border);
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--text-secondary);
+      transition: border-color 150ms ease;
     }
 
     .preview-tf-btns {
@@ -429,10 +565,11 @@
     .preview-note {
       font-size: 12px;
       color: var(--text-secondary);
-      padding: 10px 12px;
+      padding: 9px 12px;
       border-radius: 8px;
       background: var(--raised);
-      border-left: 2px solid var(--accent);
+      border-left: 2.5px solid var(--accent);
+      line-height: 1.5;
     }
 
     /* ── STATS BAR ── */
@@ -450,6 +587,9 @@
     .stat-item {
       padding: 28px 24px;
       border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
     .stat-item:last-child {
@@ -457,13 +597,13 @@
     }
 
     .stat-number {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'Bricolage Grotesque', 'JetBrains Mono', monospace;
       font-variant-numeric: tabular-nums;
-      font-size: 30px;
-      font-weight: 500;
-      line-height: 1.1;
+      font-size: 34px;
+      font-weight: 600;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
       color: var(--text);
-      margin-bottom: 6px;
     }
 
     .stat-number span {
@@ -471,8 +611,16 @@
     }
 
     .stat-label {
-      font-size: 13px;
-      color: var(--text-secondary);
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text);
+      margin-top: 2px;
+    }
+
+    .stat-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
     }
 
     /* ── SECTIONS ── */
@@ -481,25 +629,28 @@
     }
 
     .section-head {
-      max-width: 620px;
-      margin-bottom: 48px;
+      max-width: 640px;
+      margin-bottom: 44px;
     }
 
     .section-index {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       font-family: 'JetBrains Mono', monospace;
       font-variant-numeric: tabular-nums;
       font-size: 12px;
       font-weight: 500;
       color: var(--accent);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .section-title {
-      font-size: clamp(26px, 3.2vw, 36px);
-      font-weight: 500;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
+      font-size: clamp(26px, 3.2vw, 38px);
+      font-weight: 600;
+      line-height: 1.14;
+      letter-spacing: -0.025em;
       color: var(--text);
       margin-bottom: 12px;
     }
@@ -507,46 +658,63 @@
     .section-desc {
       font-size: 16px;
       color: var(--text-secondary);
-      line-height: 1.6;
+      line-height: 1.65;
     }
 
-    /* ── FEATURES ── */
-    .features-grid {
+    /* ── ASYMMETRIC BENTO GRID (#features) ── */
+    .bento-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(12, 1fr);
       gap: 16px;
     }
 
-    .feat-card {
+    .bento-card {
       background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
       padding: 24px;
-      transition: border-color 150ms var(--ease), background-color 150ms var(--ease);
-    }
-
-    .feat-card:hover {
-      border-color: var(--border-strong);
-    }
-
-    .feat-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: var(--raised);
-      border: 1px solid var(--border);
-      color: var(--text-secondary);
       display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 4px 16px rgba(31, 27, 22, 0.03);
+      transition: border-color 180ms var(--ease), transform 180ms var(--ease);
+    }
+
+    html[data-theme="dark"] .bento-card {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .bento-card:hover {
+      border-color: var(--accent);
+    }
+
+    .bento-span-7 { grid-column: span 7; }
+    .bento-span-5 { grid-column: span 5; }
+    .bento-span-4 { grid-column: span 4; }
+
+    .bento-head {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bento-eyebrow {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent);
     }
 
     .feat-title {
-      font-size: 16px;
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
+      font-size: 18px;
       font-weight: 600;
+      letter-spacing: -0.015em;
       color: var(--text);
-      margin-bottom: 8px;
     }
 
     .feat-desc {
@@ -554,6 +722,204 @@
       color: var(--text-secondary);
       line-height: 1.6;
     }
+
+    /* Inline Specimens inside Bento Cards */
+    .bento-specimen {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .specimen-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      font-size: 12.5px;
+    }
+
+    .specimen-part-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .specimen-keycaps {
+      display: inline-flex;
+      gap: 5px;
+    }
+
+    .specimen-keycap {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid var(--border-strong);
+      border-bottom-width: 2px;
+      background: var(--bg);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 120ms ease;
+    }
+
+    .specimen-keycap.active,
+    .specimen-keycap:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    html[data-theme="dark"] .specimen-keycap.active,
+    html[data-theme="dark"] .specimen-keycap:hover {
+      color: #07080d;
+    }
+
+    .specimen-sa-box {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: var(--bg);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+
+    /* Mini Split Exam Mockup */
+    .bento-split-mock {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 12px;
+    }
+
+    .mock-pdf-pane,
+    .mock-ans-pane {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .mock-pane-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mock-line {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--raised);
+    }
+
+    .mock-line.w-80 { width: 80%; }
+    .mock-line.w-60 { width: 60%; }
+    .mock-line.accent { background: var(--accent-subtle); border: 1px solid rgba(13, 148, 136, 0.25); height: 22px; border-radius: 5px; }
+
+    .mock-bubbles {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+    }
+
+    .mock-bubble {
+      height: 16px;
+      border-radius: 4px;
+      background: var(--raised);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+    }
+
+    .mock-bubble.on {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    html[data-theme="dark"] .mock-bubble.on {
+      color: #07080d;
+    }
+
+    /* Formula & Chapter Mini Lists */
+    .formula-stack,
+    .mini-ch-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .formula-pill,
+    .mini-ch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 9px;
+      border-radius: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .formula-pill code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .streak-matrix {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      padding: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .streak-cell {
+      height: 18px;
+      border-radius: 4px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+    }
+
+    .streak-cell.l1 { background: rgba(13, 148, 136, 0.25); }
+    .streak-cell.l2 { background: rgba(13, 148, 136, 0.55); }
+    .streak-cell.l3 { background: var(--accent); }
 
     /* ── HOW IT WORKS ── */
     .how-section {
@@ -565,15 +931,23 @@
     .steps-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 20px;
       position: relative;
     }
 
     .step-card {
       background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
       padding: 24px;
+      position: relative;
+    }
+
+    .step-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
     }
 
     .step-num {
@@ -582,19 +956,25 @@
       justify-content: center;
       width: 32px;
       height: 32px;
-      border-radius: 6px;
-      background: var(--raised);
-      border: 1px solid var(--border-strong);
+      border-radius: 7px;
+      background: var(--accent-subtle);
+      border: 1px solid rgba(13, 148, 136, 0.28);
       font-family: 'JetBrains Mono', monospace;
       font-variant-numeric: tabular-nums;
       font-size: 13px;
       font-weight: 500;
       color: var(--accent);
-      margin-bottom: 16px;
+    }
+
+    .step-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
     }
 
     .step-title {
-      font-size: 16px;
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
+      font-size: 17px;
       font-weight: 600;
       color: var(--text);
       margin-bottom: 8px;
@@ -615,8 +995,8 @@
 
     .testi-card {
       background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
       padding: 24px;
       display: flex;
       flex-direction: column;
@@ -637,7 +1017,7 @@
       font-size: 12px;
       font-weight: 500;
       padding: 3px 8px;
-      border-radius: 4px;
+      border-radius: 5px;
       background: var(--accent-subtle);
       color: var(--accent);
     }
@@ -648,7 +1028,7 @@
     }
 
     .testi-quote {
-      font-size: 14px;
+      font-size: 14.5px;
       line-height: 1.65;
       color: var(--text);
     }
@@ -664,7 +1044,7 @@
     .testi-avatar {
       width: 32px;
       height: 32px;
-      border-radius: 6px;
+      border-radius: 7px;
       background: var(--raised);
       border: 1px solid var(--border-strong);
       display: flex;
@@ -679,7 +1059,7 @@
 
     .testi-name {
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--text);
     }
 
@@ -729,7 +1109,11 @@
       border: 1px solid var(--border-strong);
       border-radius: 16px;
       padding: 32px;
-      box-shadow: 0 8px 24px rgba(31, 27, 22, 0.05);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 12px 32px rgba(31, 27, 22, 0.06);
+    }
+
+    html[data-theme="dark"] .login-card {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 14px 36px rgba(0, 0, 0, 0.4);
     }
 
     .login-card-head {
@@ -737,7 +1121,8 @@
     }
 
     .login-card-title {
-      font-size: 20px;
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
+      font-size: 21px;
       font-weight: 600;
       color: var(--text);
       margin-bottom: 6px;
@@ -752,13 +1137,13 @@
       width: 100%;
       height: 44px;
       padding: 0 16px;
-      border-radius: 8px;
+      border-radius: 9px;
       border: 1px solid var(--border-strong);
       background: var(--bg);
       color: var(--text);
       font-family: inherit;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -769,7 +1154,7 @@
 
     .google-login-btn:hover {
       background: var(--raised);
-      border-color: rgba(31, 27, 22, 0.24);
+      border-color: var(--accent);
     }
 
     .google-login-btn:active {
@@ -831,6 +1216,7 @@
     }
 
     .footer-brand {
+      font-family: 'Bricolage Grotesque', 'Be Vietnam Pro', sans-serif;
       font-weight: 600;
       color: var(--text);
     }
@@ -888,7 +1274,12 @@
         border-bottom: 1px solid var(--border);
       }
 
-      .features-grid,
+      .bento-span-7,
+      .bento-span-5,
+      .bento-span-4 {
+        grid-column: span 6;
+      }
+
       .steps-grid,
       .testi-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -908,11 +1299,22 @@
         padding: 56px 0;
       }
 
-      .features-grid,
+      .bento-span-7,
+      .bento-span-5,
+      .bento-span-4 {
+        grid-column: span 12;
+      }
+
       .steps-grid,
       .testi-grid,
-      .stats-grid {
+      .stats-grid,
+      .lab-controls,
+      .bento-split-mock {
         grid-template-columns: 1fr;
+      }
+
+      .graph-caption {
+        grid-template-columns: repeat(2, 1fr);
       }
 
       .stat-item {
@@ -944,9 +1346,10 @@
         Z<span>physics</span>
       </a>
       <ul class="nav-links">
-        <li><a href="#features">Tính năng</a></li>
+        <li><a href="#features">Cấu trúc học</a></li>
         <li><a href="#how">Lộ trình</a></li>
         <li><a href="#reviews">Kết quả</a></li>
+        <li><a href="l.html?demo=premium#de_thi_thu_01">Phòng đề mẫu</a></li>
       </ul>
       <div class="nav-actions">
         <button type="button" class="pts-toggle" onclick="PinUI.toggleTheme(this)" aria-label="Đổi giao diện sáng tối" aria-pressed="false">
@@ -963,35 +1366,52 @@
       <div class="hero-grid">
         <div class="hero-copy">
           <div class="hero-meta">
+            <span class="status-dot" aria-hidden="true"></span>
             <span class="mono-tag">GDPT 2018</span>
             <span>Lớp 10 · Lớp 11 · Lớp 12</span>
           </div>
-          <h1 class="hero-title">Học và luyện đề <span class="accent">Vật lý THPT</span> với độ chính xác thực nghiệm</h1>
-          <p class="hero-subtitle">Hệ thống bài giảng, bài tập tự luyện 3 phần chuẩn cấu trúc Bộ GD&amp;ĐT và phòng luyện đề PDF giúp học sinh nắm chắc bản chất vật lý và theo dõi tiến độ theo từng chương.</p>
+          <h1 class="hero-title">Học và luyện đề <em class="serif-accent accent">Vật lý THPT</em> qua mô phỏng trực quan</h1>
+          <p class="hero-subtitle">Kết hợp bài giảng phân chương, thí nghiệm đồ thị tương tác và phòng luyện đề PDF 3 phần chuẩn cấu trúc Bộ GD&amp;ĐT — giúp học sinh nắm chắc bản chất vật lý và theo dõi tiến độ từng chương.</p>
           <div class="hero-actions">
-            <a href="#login" class="btn-primary">Bắt đầu học miễn phí</a>
-            <a href="#features" class="btn-secondary">Xem cấu trúc bài học</a>
+            <a href="#login" class="btn-primary">
+              <span>Bắt đầu học miễn phí</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="l.html?demo=premium#de_thi_thu_01" class="btn-secondary">
+              <span>Thử phòng luyện đề PDF</span>
+            </a>
+          </div>
+          <div class="hero-trust-strip">
+            <span class="hero-trust-item"><span class="kbd-cap">I · II · III</span> Trắc nghiệm · Đ/S · Trả lời ngắn</span>
+            <span class="hero-trust-item"><span class="kbd-cap">PDF</span> Phòng thi chia đôi 50 phút</span>
+            <span class="hero-trust-item"><span class="kbd-cap">f(x)</span> Đồ thị &amp; công thức KaTeX</span>
           </div>
         </div>
 
-        <div class="preview-frame" aria-label="Mô phỏng bài học Dao động điều hòa">
+        <div class="preview-frame" aria-label="Mô phỏng tương tác bài học Dao động điều hòa">
           <div class="preview-bar">
-            <span class="preview-bar-title">Chương I · Dao động cơ</span>
-            <span class="mono-tag">Bài 01</span>
+            <div class="preview-bar-left">
+              <span class="status-dot" aria-hidden="true"></span>
+              <span class="preview-bar-title">Thí nghiệm · Dao động điều hòa</span>
+            </div>
+            <div class="preview-bar-right">
+              <button type="button" class="lab-play-btn" id="wavePlayBtn" onclick="toggleWavePlay()">▶ Chạy pha ωt</button>
+              <span class="mono-tag">Bài 01</span>
+            </div>
           </div>
           <div class="preview-body">
             <div class="preview-lesson-head">
               <h3>Đồ thị li độ — thời gian</h3>
-              <span class="preview-eq">x(t) = 4cos(2πt - π/3)</span>
+              <span class="preview-eq" id="waveEquation">x(t) = 4.0 cos(2π·1.0t - π/3)</span>
             </div>
 
-            <div class="graph-box">
-              <svg viewBox="0 0 420 156" style="width: 100%; height: auto; display: block;" role="img" aria-label="Đồ thị dao động điều hòa hình sin">
-                <!-- Grid lines -->
-                <g stroke="var(--border-strong)" stroke-width="1" opacity="0.65">
-                  <line x1="36" y1="24" x2="404" y2="24" stroke-dasharray="3 3" />
+            <div class="graph-box lab-grid-bg">
+              <svg id="waveSvg" viewBox="0 0 420 156" style="width: 100%; height: auto; display: block;" role="img" aria-label="Đồ thị dao động điều hòa hình sin tương tác">
+                <!-- Grid & Envelope lines -->
+                <g stroke="var(--border-strong)" stroke-width="1" opacity="0.7">
+                  <line id="ampTopLine" x1="36" y1="24" x2="404" y2="24" stroke-dasharray="3 3" />
                   <line x1="36" y1="78" x2="404" y2="78" />
-                  <line x1="36" y1="132" x2="404" y2="132" stroke-dasharray="3 3" />
+                  <line id="ampBotLine" x1="36" y1="132" x2="404" y2="132" stroke-dasharray="3 3" />
                   <line x1="128" y1="14" x2="128" y2="142" stroke-dasharray="3 3" />
                   <line x1="220" y1="14" x2="220" y2="142" stroke-dasharray="3 3" />
                   <line x1="312" y1="14" x2="312" y2="142" stroke-dasharray="3 3" />
@@ -1002,48 +1422,72 @@
                 <line x1="36" y1="78" x2="408" y2="78" stroke="var(--muted)" stroke-width="1.2" />
                 <!-- Labels -->
                 <g fill="var(--muted)" font-family="'JetBrains Mono', monospace" font-size="10">
-                  <text x="8" y="28">+4</text>
+                  <text id="labelPosA" x="6" y="27">+4.0</text>
                   <text x="16" y="82">0</text>
-                  <text x="8" y="136">-4</text>
+                  <text id="labelNegA" x="6" y="135">-4.0</text>
                   <text x="118" y="152">0.5</text>
                   <text x="210" y="152">1.0</text>
                   <text x="302" y="152">1.5</text>
-                  <text x="392" y="152">t(s)</text>
+                  <text x="390" y="152">t(s)</text>
                 </g>
-                <!-- Sine curve for x(t) = 4 cos(2*pi*t - pi/3) over t in [0, 2]s -->
-                <path d="M 36,51 C 46,35 55,24 67,24 C 86,24 102,78 113,78 C 124,78 140,132 159,132 C 178,132 194,78 205,78 C 216,78 232,24 251,24 C 270,24 286,78 297,78 C 308,78 324,132 343,132 C 362,132 378,78 389,78 C 396,78 400,66 404,51"
-                      fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
-                <!-- Highlight point at t=0, x=+2cm and peak at t=1/6s -->
-                <circle cx="36" cy="51" r="3.5" fill="var(--card)" stroke="var(--accent)" stroke-width="2" />
-                <circle cx="251" cy="24" r="3.5" fill="var(--accent)" />
+                <!-- Reference baseline curve (A=4, f=1) -->
+                <path id="waveGhostPath" d="" fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="4 4" opacity="0.35" />
+                <!-- Dynamic Sine curve -->
+                <path id="waveCurvePath" d="" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" />
+                <!-- Displacement vector at t=0 -->
+                <line id="waveDispLine" x1="36" y1="78" x2="36" y2="51" stroke="var(--accent)" stroke-width="2" opacity="0.55" />
+                <!-- Highlight point at t=0 and first crest -->
+                <circle id="waveStartDot" cx="36" cy="51" r="4" fill="var(--card)" stroke="var(--accent)" stroke-width="2.2" />
+                <circle id="wavePeakDot" cx="67" cy="24" r="3.8" fill="var(--accent)" />
               </svg>
               <div class="graph-caption">
-                <span class="mono">A = 4 cm</span>
-                <span class="mono">T = 1.0 s</span>
-                <span class="mono">f = 1.0 Hz</span>
+                <span class="mono" id="readoutA">A = 4.0 cm</span>
+                <span class="mono" id="readoutT">T = 1.00 s</span>
+                <span class="mono" id="readoutF">f = 1.00 Hz</span>
+                <span class="mono" id="readoutVmax">v_max = 8π cm/s</span>
+              </div>
+            </div>
+
+            <div class="lab-controls" aria-label="Điều chỉnh thông số dao động">
+              <div class="lab-control-item">
+                <div class="lab-control-top">
+                  <label for="sliderA">Biên độ dao động (A)</label>
+                  <span class="lab-control-val" id="valSliderA">4.0 cm</span>
+                </div>
+                <input type="range" class="lab-slider" id="sliderA" min="2.0" max="5.5" step="0.5" value="4.0" oninput="updateWaveLab()">
+              </div>
+              <div class="lab-control-item">
+                <div class="lab-control-top">
+                  <label for="sliderF">Tần số góc / Tần số (f)</label>
+                  <span class="lab-control-val" id="valSliderF">1.00 Hz</span>
+                </div>
+                <input type="range" class="lab-slider" id="sliderF" min="0.5" max="2.0" step="0.25" value="1.0" oninput="updateWaveLab()">
               </div>
             </div>
 
             <div class="preview-tf">
-              <div class="preview-tf-label">Câu hỏi kiểm tra nhanh (Đúng / Sai)</div>
-              <div class="preview-tf-row">
-                <span><strong>a)</strong> Biên độ dao động của vật bằng 4 cm</span>
-                <div class="preview-tf-btns seg-control tf-seg" data-selected="0" style="--seg-index: 0;">
+              <div class="preview-tf-label">
+                <span>Kiểm tra nhanh theo đồ thị</span>
+                <span class="preview-tf-hint">Kéo thanh trượt để kiểm chứng</span>
+              </div>
+              <div class="preview-tf-row" id="tfRowA">
+                <span id="tfTextA"><strong>a)</strong> Biên độ dao động hiện tại của vật bằng 4,0 cm</span>
+                <div class="preview-tf-btns seg-control tf-seg" id="tfSegA" data-selected="0" style="--seg-index: 0;">
                   <span class="seg-thumb"></span>
-                  <button type="button" class="ptf-btn seg-btn tf-btn selected" data-val="Đ" onclick="togglePreviewBtn(this, 0)">Đúng</button>
-                  <button type="button" class="ptf-btn seg-btn tf-btn" data-val="S" onclick="togglePreviewBtn(this, 1)">Sai</button>
+                  <button type="button" class="ptf-btn seg-btn tf-btn selected" data-val="Đ" onclick="togglePreviewBtn(this, 0, 'a')">Đúng</button>
+                  <button type="button" class="ptf-btn seg-btn tf-btn" data-val="S" onclick="togglePreviewBtn(this, 1, 'a')">Sai</button>
                 </div>
               </div>
-              <div class="preview-tf-row">
-                <span><strong>b)</strong> Chu kỳ dao động của vật bằng 0,5 s</span>
-                <div class="preview-tf-btns seg-control tf-seg" data-selected="1" style="--seg-index: 1;">
+              <div class="preview-tf-row" id="tfRowB">
+                <span id="tfTextB"><strong>b)</strong> Chu kỳ dao động T = 1/f đang bằng 0,50 s</span>
+                <div class="preview-tf-btns seg-control tf-seg" id="tfSegB" data-selected="1" style="--seg-index: 1;">
                   <span class="seg-thumb"></span>
-                  <button type="button" class="ptf-btn seg-btn tf-btn" data-val="Đ" onclick="togglePreviewBtn(this, 0)">Đúng</button>
-                  <button type="button" class="ptf-btn seg-btn tf-btn selected" data-val="S" onclick="togglePreviewBtn(this, 1)">Sai</button>
+                  <button type="button" class="ptf-btn seg-btn tf-btn" data-val="Đ" onclick="togglePreviewBtn(this, 0, 'b')">Đúng</button>
+                  <button type="button" class="ptf-btn seg-btn tf-btn selected" data-val="S" onclick="togglePreviewBtn(this, 1, 'b')">Sai</button>
                 </div>
               </div>
               <div class="preview-note" id="previewNote">
-                Lời giải: Từ đồ thị, vật thực hiện một dao động toàn phần trong 1,0 s nên T = 1,0 s.
+                Chính xác (2/2 ý): Với A = 4,0 cm và f = 1,00 Hz thì chu kỳ T = 1/f = 1,00 s (nên ý b là Sai). Thử kéo f lên 2,00 Hz để thấy ý b đổi thành Đúng!
               </div>
             </div>
           </div>
@@ -1056,20 +1500,24 @@
     <div class="container">
       <div class="stats-grid reveal">
         <div class="stat-item">
-          <div class="stat-number">5,000<span>+</span></div>
+          <div class="stat-number" data-count-to="5000" data-count-comma="1" data-count-suffix="+">5,000<span>+</span></div>
           <div class="stat-label">Học sinh theo học trên hệ thống</div>
+          <div class="stat-sub">Đồng bộ Web &amp; Android</div>
         </div>
         <div class="stat-item">
-          <div class="stat-number">200<span>+</span></div>
-          <div class="stat-label">Bài học phân theo chương lớp 10–12</div>
+          <div class="stat-number" data-count-to="200" data-count-suffix="+">200<span>+</span></div>
+          <div class="stat-label">Bài học phân chương Lớp 10–12</div>
+          <div class="stat-sub">Bám sát SGK GDPT 2018</div>
         </div>
         <div class="stat-item">
-          <div class="stat-number">3,500<span>+</span></div>
+          <div class="stat-number" data-count-to="3500" data-count-comma="1" data-count-suffix="+">3,500<span>+</span></div>
           <div class="stat-label">Câu hỏi trắc nghiệm 3 phần</div>
+          <div class="stat-sub">Kèm lời giải chi tiết KaTeX</div>
         </div>
         <div class="stat-item">
-          <div class="stat-number">98<span>%</span></div>
+          <div class="stat-number" data-count-to="98" data-count-suffix="%">98<span>%</span></div>
           <div class="stat-label">Học sinh phản hồi hài lòng</div>
+          <div class="stat-sub">Tự luyện &amp; bấm giờ thi thử</div>
         </div>
       </div>
     </div>
@@ -1078,52 +1526,107 @@
   <section class="section" id="features">
     <div class="container">
       <div class="section-head reveal">
-        <span class="section-index">01 · Tính năng</span>
-        <h2 class="section-title">Cấu trúc học tập bám sát chương trình Vật lý phổ thông</h2>
-        <p class="section-desc">Mỗi bài học được tách rõ lý thuyết, bài tập tự luyện theo định dạng mới và đề thi thử tính giờ.</p>
+        <span class="section-index">01 · Không gian học tập</span>
+        <h2 class="section-title">Thiết kế chuyên biệt cho cấu trúc <em class="serif-accent">Vật lý phổ thông mới</em></h2>
+        <p class="section-desc">Mỗi công cụ trong Zphysics được tối ưu cho đúng một thao tác: đọc lý thuyết nhanh, bấm đáp án bằng phím tắt và đối chiếu đề PDF trực tiếp.</p>
       </div>
-      <div class="features-grid">
-        <div class="feat-card reveal">
-          <div class="feat-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+
+      <div class="bento-grid">
+        <!-- Bento 1: Span 7 -->
+        <div class="bento-card bento-span-7 reveal">
+          <div class="bento-head">
+            <span class="bento-eyebrow">PHẦN I · II · III CHUẨN BỘ GD&amp;ĐT</span>
+            <h3 class="feat-title">Phiếu làm bài 3 định dạng với phím tắt Keycap</h3>
+            <p class="feat-desc">Tách biệt rõ trắc nghiệm 4 lựa chọn, câu hỏi Đúng/Sai chấm điểm lũy tiến từng ý (0,1 → 1,0đ) và câu hỏi điền đáp số ngắn.</p>
           </div>
-          <h3 class="feat-title">Mục lục theo chương lớp 10–12</h3>
-          <p class="feat-desc">Tài liệu lý thuyết và video bài giảng được sắp xếp tuần tự theo từng chương của sách giáo khoa mới.</p>
+          <div class="bento-specimen" aria-label="Mẫu phiếu trả lời 3 phần">
+            <div class="specimen-row">
+              <span class="specimen-part-tag">Phần I · Chọn 1 đáp án</span>
+              <div class="specimen-keycaps">
+                <button type="button" class="specimen-keycap active" onclick="selectSpecimenKey(this)">A</button>
+                <button type="button" class="specimen-keycap" onclick="selectSpecimenKey(this)">B</button>
+                <button type="button" class="specimen-keycap" onclick="selectSpecimenKey(this)">C</button>
+                <button type="button" class="specimen-keycap" onclick="selectSpecimenKey(this)">D</button>
+              </div>
+            </div>
+            <div class="specimen-row">
+              <span class="specimen-part-tag">Phần II · Đúng/Sai 4 ý (a, b, c, d)</span>
+              <span class="mono-tag" style="color: var(--correct);">0.1 · 0.25 · 0.5 · 1.0đ</span>
+            </div>
+            <div class="specimen-row">
+              <span class="specimen-part-tag">Phần III · Trả lời ngắn (sai số ±10⁻⁶)</span>
+              <span class="specimen-sa-box">4,25 N/m</span>
+            </div>
+          </div>
         </div>
-        <div class="feat-card reveal">
-          <div class="feat-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+
+        <!-- Bento 2: Span 5 -->
+        <div class="bento-card bento-span-5 reveal">
+          <div class="bento-head">
+            <span class="bento-eyebrow">SPLIT-SCREEN EXAM ROOM</span>
+            <h3 class="feat-title">Phòng luyện đề PDF chia đôi 50 phút</h3>
+            <p class="feat-desc">Đọc đề gốc bên trái và tích phiếu trả lời bên phải, tự động thu gọn thành thanh chuyển tab mượt trên điện thoại.</p>
           </div>
-          <h3 class="feat-title">Định dạng đề thi 3 phần</h3>
-          <p class="feat-desc">Hỗ trợ đầy đủ trắc nghiệm nhiều lựa chọn, câu hỏi Đúng/Sai tính điểm từng ý và điền đáp số ngắn.</p>
+          <div class="bento-split-mock" aria-hidden="true">
+            <div class="mock-pdf-pane">
+              <div class="mock-pane-bar"><span>Đề PDF</span><span>Trang 1/4</span></div>
+              <div class="mock-line w-80"></div>
+              <div class="mock-line w-60"></div>
+              <div class="mock-line accent"></div>
+              <div class="mock-line w-80"></div>
+            </div>
+            <div class="mock-ans-pane">
+              <div class="mock-pane-bar"><span>Đáp án</span><span style="color:var(--accent);">49:58</span></div>
+              <div class="mock-bubbles">
+                <span class="mock-bubble on">A</span><span class="mock-bubble">B</span><span class="mock-bubble">C</span><span class="mock-bubble">D</span>
+                <span class="mock-bubble">A</span><span class="mock-bubble">B</span><span class="mock-bubble on">C</span><span class="mock-bubble">D</span>
+                <span class="mock-bubble">A</span><span class="mock-bubble on">B</span><span class="mock-bubble">C</span><span class="mock-bubble">D</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="feat-card reveal">
-          <div class="feat-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+
+        <!-- Bento 3: Span 4 -->
+        <div class="bento-card bento-span-4 reveal">
+          <div class="bento-head">
+            <span class="bento-eyebrow">KATEX ENGINE</span>
+            <h3 class="feat-title">Công thức &amp; Vectơ sắc nét</h3>
+            <p class="feat-desc">Toàn bộ phương trình, ký hiệu vi phân và lời giải từng bước hiển thị chuẩn bản in học thuật.</p>
           </div>
-          <h3 class="feat-title">Theo dõi tiến độ làm bài</h3>
-          <p class="feat-desc">Ghi nhận số lượt hoàn thành từng bài, tính điểm trung bình và lưu lại lịch sử các lần thi thử.</p>
+          <div class="formula-stack">
+            <div class="formula-pill"><span>Định luật Faraday</span><code>e = -dΦ / dt</code></div>
+            <div class="formula-pill"><span>Lực đàn hồi</span><code>F_đh = -k · Δl</code></div>
+            <div class="formula-pill"><span>Bước sóng cơ</span><code>λ = v / f = v · T</code></div>
+          </div>
         </div>
-        <div class="feat-card reveal">
-          <div class="feat-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7V4H6l6 8-6 8h12v-3"/></svg>
+
+        <!-- Bento 4: Span 4 -->
+        <div class="bento-card bento-span-4 reveal">
+          <div class="bento-head">
+            <span class="bento-eyebrow">LỘ TRÌNH 3 KHỐI + ⌘K</span>
+            <h3 class="feat-title">Mục lục chương &amp; Tìm nhanh</h3>
+            <p class="feat-desc">Tra cứu tức thì hơn 200 bài giảng, chuyên đề nâng cao và đề thi thử chỉ bằng tổ hợp phím Ctrl+K.</p>
           </div>
-          <h3 class="feat-title">Hiển thị công thức KaTeX</h3>
-          <p class="feat-desc">Ký hiệu vật lý, vectơ, phân số và lời giải chi tiết được kết xuất rõ ràng trên mọi kích thước màn hình.</p>
+          <div class="mini-ch-stack">
+            <div class="mini-ch-row"><span><strong>Ch.I</strong> · Dao động cơ</span><span class="mono-tag">Lớp 12</span></div>
+            <div class="mini-ch-row"><span><strong>Ch.II</strong> · Sóng &amp; Giao thoa</span><span class="mono-tag">Lớp 11</span></div>
+            <div class="mini-ch-row"><span><strong>Ch.III</strong> · Động lực học</span><span class="mono-tag">Lớp 10</span></div>
+          </div>
         </div>
-        <div class="feat-card reveal">
-          <div class="feat-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/></svg>
+
+        <!-- Bento 5: Span 4 -->
+        <div class="bento-card bento-span-4 reveal">
+          <div class="bento-head">
+            <span class="bento-eyebrow">PROGRESS &amp; STREAK</span>
+            <h3 class="feat-title">Theo dõi tiến độ &amp; Chuỗi ngày</h3>
+            <p class="feat-desc">Lưu lịch sử điểm từng lần làm bài lên đám mây, thống kê tỷ lệ hoàn thành theo khối và duy trì thói quen học.</p>
           </div>
-          <h3 class="feat-title">Phòng luyện đề PDF chia đôi</h3>
-          <p class="feat-desc">Đọc trực tiếp đề PDF bên trái và điền phiếu đáp án bên phải với đồng hồ đếm ngược 50 phút.</p>
-        </div>
-        <div class="feat-card reveal">
-          <div class="feat-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+          <div>
+            <div class="streak-matrix" aria-hidden="true">
+              <span class="streak-cell l1"></span><span class="streak-cell l2"></span><span class="streak-cell"></span><span class="streak-cell l2"></span><span class="streak-cell l3"></span><span class="streak-cell l3"></span><span class="streak-cell l2"></span>
+              <span class="streak-cell l2"></span><span class="streak-cell l3"></span><span class="streak-cell l1"></span><span class="streak-cell l3"></span><span class="streak-cell l2"></span><span class="streak-cell l3"></span><span class="streak-cell l3"></span>
+            </div>
           </div>
-          <h3 class="feat-title">Chế độ ôn tập từng câu</h3>
-          <p class="feat-desc">Trộn ngẫu nhiên câu hỏi trong bài, chấm đáp án ngay lập tức sau mỗi lần chọn để ghi nhớ nhanh.</p>
         </div>
       </div>
     </div>
@@ -1138,18 +1641,27 @@
       </div>
       <div class="steps-grid reveal">
         <div class="step-card">
-          <span class="step-num">01</span>
-          <h3 class="step-title">Đăng nhập bằng Google</h3>
-          <p class="step-desc">Sử dụng tài khoản Google để xác thực và đồng bộ lịch sử làm bài giữa máy tính và điện thoại.</p>
+          <div class="step-top">
+            <span class="step-num">01</span>
+            <span class="step-time">~10 giây</span>
+          </div>
+          <h3 class="step-title">Đăng nhập một chạm qua Google</h3>
+          <p class="step-desc">Sử dụng tài khoản Google để xác thực và đồng bộ lịch sử làm bài giữa máy tính và điện thoại Android.</p>
         </div>
         <div class="step-card">
-          <span class="step-num">02</span>
-          <h3 class="step-title">Chọn lớp và chuyên đề</h3>
-          <p class="step-desc">Mở chương tương ứng ở Lớp 10, 11 hoặc 12, xem video lý thuyết hoặc làm phiếu bài tập.</p>
+          <div class="step-top">
+            <span class="step-num">02</span>
+            <span class="step-time">Lớp 10 · 11 · 12</span>
+          </div>
+          <h3 class="step-title">Chọn khối lớp hoặc bấm Ctrl+K</h3>
+          <p class="step-desc">Mở chương tương ứng ở Lớp 10, 11 hoặc 12, xem video lý thuyết hoặc mở nhanh bất kỳ chuyên đề nào.</p>
         </div>
         <div class="step-card">
-          <span class="step-num">03</span>
-          <h3 class="step-title">Nộp bài và rà soát lỗi</h3>
+          <div class="step-top">
+            <span class="step-num">03</span>
+            <span class="step-time">Chấm tự động</span>
+          </div>
+          <h3 class="step-title">Nộp bài và rà soát từng ý</h3>
           <p class="step-desc">Hệ thống chấm điểm tự động theo thang điểm Bộ GD&amp;ĐT và mở lời giải chi tiết cho từng câu.</p>
         </div>
       </div>
@@ -1276,12 +1788,185 @@
   </footer>
 
   <script>
+    let waveAnimId = null;
+    let wavePhaseShift = 0;
+
+    function buildSineSvgPath(A, f, phaseOffset) {
+      const xStart = 36;
+      const xEnd = 404;
+      const yMid = 78;
+      const scaleY = 13.5; // px per cm (max 5.5cm -> ~74px)
+      const tMax = 2.0;
+      const steps = 110;
+      let d = '';
+      for (let i = 0; i <= steps; i++) {
+        const ratio = i / steps;
+        const t = ratio * tMax;
+        const x = xStart + ratio * (xEnd - xStart);
+        const angle = 2 * Math.PI * f * t - Math.PI / 3 + phaseOffset;
+        const y = yMid - A * scaleY * Math.cos(angle);
+        d += (i === 0 ? 'M ' : ' L ') + x.toFixed(1) + ',' + y.toFixed(1);
+      }
+      return d;
+    }
+
+    function evaluatePreviewTF() {
+      const sliderA = document.getElementById('sliderA');
+      const sliderF = document.getElementById('sliderF');
+      const segA = document.getElementById('tfSegA');
+      const segB = document.getElementById('tfSegB');
+      const note = document.getElementById('previewNote');
+      if (!sliderA || !sliderF || !segA || !segB || !note) return;
+
+      const A = parseFloat(sliderA.value);
+      const f = parseFloat(sliderF.value);
+      const T = 1 / f;
+
+      // Statement A: "Biên độ dao động hiện tại của vật bằng 4,0 cm"
+      const truthA = Math.abs(A - 4.0) < 0.01 ? '0' : '1'; // 0 = Đúng, 1 = Sai
+      // Statement B: "Chu kỳ dao động T = 1/f đang bằng 0,50 s"
+      const truthB = Math.abs(T - 0.50) < 0.01 ? '0' : '1';
+
+      const userA = segA.getAttribute('data-selected');
+      const userB = segB.getAttribute('data-selected');
+      const correctCount = (userA === truthA ? 1 : 0) + (userB === truthB ? 1 : 0);
+
+      const aStr = A.toFixed(1).replace('.', ',');
+      const fStr = f.toFixed(2).replace('.', ',');
+      const tStr = T.toFixed(2).replace('.', ',');
+
+      if (correctCount === 2) {
+        note.style.borderLeftColor = 'var(--correct)';
+        note.innerHTML = `<strong>Chính xác (2/2 ý):</strong> Đang đặt A = ${aStr} cm (ý a ${truthA === '0' ? 'Đúng' : 'Sai'}) và f = ${fStr} Hz ⇒ T = 1/f = ${tStr} s (ý b ${truthB === '0' ? 'Đúng' : 'Sai'}).`;
+      } else {
+        note.style.borderLeftColor = 'var(--accent)';
+        note.innerHTML = `<strong>Đang đúng ${correctCount}/2 ý:</strong> Với thông số hiện tại A = ${aStr} cm và T = 1/f = ${tStr} s, đáp án chuẩn là <strong>a) ${truthA === '0' ? 'Đúng' : 'Sai'}</strong> · <strong>b) ${truthB === '0' ? 'Đúng' : 'Sai'}</strong>.`;
+      }
+    }
+
+    function updateWaveLab() {
+      const sliderA = document.getElementById('sliderA');
+      const sliderF = document.getElementById('sliderF');
+      if (!sliderA || !sliderF) return;
+
+      const A = parseFloat(sliderA.value);
+      const f = parseFloat(sliderF.value);
+      const T = 1 / f;
+      const scaleY = 13.5;
+      const yMid = 78;
+
+      const valAEl = document.getElementById('valSliderA');
+      const valFEl = document.getElementById('valSliderF');
+      if (valAEl) valAEl.textContent = A.toFixed(1) + ' cm';
+      if (valFEl) valFEl.textContent = f.toFixed(2) + ' Hz';
+
+      const eqEl = document.getElementById('waveEquation');
+      if (eqEl) eqEl.textContent = `x(t) = ${A.toFixed(1)} cos(2π·${f.toFixed(2)}t - π/3)`;
+
+      const rA = document.getElementById('readoutA');
+      const rT = document.getElementById('readoutT');
+      const rF = document.getElementById('readoutF');
+      const rV = document.getElementById('readoutVmax');
+      if (rA) rA.textContent = `A = ${A.toFixed(1)} cm`;
+      if (rT) rT.textContent = `T = ${T.toFixed(2)} s`;
+      if (rF) rF.textContent = `f = ${f.toFixed(2)} Hz`;
+      if (rV) rV.textContent = `v_max = ${(2 * f * A).toFixed(1)}π cm/s`;
+
+      const yTop = (yMid - A * scaleY).toFixed(1);
+      const yBot = (yMid + A * scaleY).toFixed(1);
+      const topLine = document.getElementById('ampTopLine');
+      const botLine = document.getElementById('ampBotLine');
+      if (topLine) { topLine.setAttribute('y1', yTop); topLine.setAttribute('y2', yTop); }
+      if (botLine) { botLine.setAttribute('y1', yBot); botLine.setAttribute('y2', yBot); }
+
+      const lblPos = document.getElementById('labelPosA');
+      const lblNeg = document.getElementById('labelNegA');
+      if (lblPos) { lblPos.textContent = '+' + A.toFixed(1); lblPos.setAttribute('y', String(Math.max(16, parseFloat(yTop) + 3))); }
+      if (lblNeg) { lblNeg.textContent = '-' + A.toFixed(1); lblNeg.setAttribute('y', String(Math.min(144, parseFloat(yBot) + 3))); }
+
+      const ghost = document.getElementById('waveGhostPath');
+      if (ghost && !ghost.getAttribute('d')) {
+        ghost.setAttribute('d', buildSineSvgPath(4.0, 1.0, 0));
+      }
+
+      const curve = document.getElementById('waveCurvePath');
+      if (curve) {
+        curve.setAttribute('d', buildSineSvgPath(A, f, wavePhaseShift));
+      }
+
+      const y0 = yMid - A * scaleY * Math.cos(-Math.PI / 3 + wavePhaseShift);
+      const startDot = document.getElementById('waveStartDot');
+      const dispLine = document.getElementById('waveDispLine');
+      if (startDot) startDot.setAttribute('cy', y0.toFixed(1));
+      if (dispLine) dispLine.setAttribute('y2', y0.toFixed(1));
+
+      // First crest where 2*pi*f*t - pi/3 + wavePhaseShift = 0 (mod 2*pi)
+      let tPeak = (Math.PI / 3 - (wavePhaseShift % (2 * Math.PI))) / (2 * Math.PI * f);
+      while (tPeak < 0) tPeak += T;
+      while (tPeak > 2.0) tPeak -= T;
+      const xPeak = 36 + (tPeak / 2.0) * (404 - 36);
+      const peakDot = document.getElementById('wavePeakDot');
+      if (peakDot) {
+        peakDot.setAttribute('cx', xPeak.toFixed(1));
+        peakDot.setAttribute('cy', yTop);
+      }
+
+      evaluatePreviewTF();
+    }
+
+    function toggleWavePlay() {
+      const btn = document.getElementById('wavePlayBtn');
+      if (waveAnimId) {
+        cancelAnimationFrame(waveAnimId);
+        waveAnimId = null;
+        if (btn) {
+          btn.classList.remove('playing');
+          btn.textContent = '▶ Chạy pha ωt';
+        }
+        return;
+      }
+      if (btn) {
+        btn.classList.add('playing');
+        btn.textContent = '⏸ Dừng pha';
+      }
+      let last = performance.now();
+      const step = (now) => {
+        const dt = (now - last) / 1000;
+        last = now;
+        const sliderF = document.getElementById('sliderF');
+        const f = sliderF ? parseFloat(sliderF.value) : 1.0;
+        wavePhaseShift -= 2 * Math.PI * f * dt * 0.45;
+        updateWaveLab();
+        waveAnimId = requestAnimationFrame(step);
+      };
+      waveAnimId = requestAnimationFrame(step);
+    }
+
     function togglePreviewBtn(btn, idx) {
       const group = btn.parentElement;
       group.querySelectorAll('.ptf-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
       group.setAttribute('data-selected', String(idx));
       group.style.setProperty('--seg-index', String(idx));
+      if (window.PinUI && typeof window.PinUI.pressButton === 'function') {
+        window.PinUI.pressButton(btn, 0.08);
+      }
+      evaluatePreviewTF();
+    }
+
+    function selectSpecimenKey(btn) {
+      const wrap = btn.parentElement;
+      if (!wrap) return;
+      wrap.querySelectorAll('.specimen-keycap').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (window.PinUI && typeof window.PinUI.pressButton === 'function') {
+        window.PinUI.pressButton(btn, 0.1);
+      }
+    }
+
+    updateWaveLab();
+    if (window.PinUI && typeof window.PinUI.initNumberTicker === 'function') {
+      window.PinUI.initNumberTicker(document);
     }
 
     /* SCROLL REVEAL */

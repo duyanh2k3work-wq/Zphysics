@@ -1,5 +1,5 @@
 /**
- * PinUI Theme Switch Engine (Droplet + Radial Flood + Damped Recoil)
+ * PinUI Theme Switch Engine (Radial Flood + Damped Recoil)
  * Adapted for Zphysics Light (Warm Paper) & Dark (Technical Ink) themes.
  */
 (function () {
@@ -79,51 +79,6 @@
     }
   }
 
-  function createDropletSVG(isToDark) {
-    const uid = 'ptsDrop_' + Math.random().toString(36).slice(2, 7);
-    const cTop = isToDark ? '#5eead4' : '#2dd4bf';
-    const cBot = isToDark ? '#0f766e' : '#0d9488';
-    const ns = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('viewBox', '0 0 22 30');
-    svg.classList.add('pts-drop');
-
-    const defs = document.createElementNS(ns, 'defs');
-    const grad = document.createElementNS(ns, 'linearGradient');
-    grad.setAttribute('id', uid);
-    grad.setAttribute('x1', '0%');
-    grad.setAttribute('y1', '0%');
-    grad.setAttribute('x2', '100%');
-    grad.setAttribute('y2', '100%');
-
-    const s1 = document.createElementNS(ns, 'stop');
-    s1.setAttribute('offset', '0%');
-    s1.setAttribute('stop-color', cTop);
-    const s2 = document.createElementNS(ns, 'stop');
-    s2.setAttribute('offset', '100%');
-    s2.setAttribute('stop-color', cBot);
-    grad.appendChild(s1);
-    grad.appendChild(s2);
-    defs.appendChild(grad);
-    svg.appendChild(defs);
-
-    const path = document.createElementNS(ns, 'path');
-    path.setAttribute('d', 'M11 1.5C11 1.5 2 12.2 2 19a9 9 0 0 0 18 0C20 12.2 11 1.5 11 1.5Z');
-    path.setAttribute('fill', `url(#${uid})`);
-    svg.appendChild(path);
-
-    const hl = document.createElementNS(ns, 'ellipse');
-    hl.setAttribute('cx', '7.6');
-    hl.setAttribute('cy', '16.5');
-    hl.setAttribute('rx', '1.8');
-    hl.setAttribute('ry', '3.8');
-    hl.setAttribute('transform', 'rotate(-16 7.6 16.5)');
-    hl.setAttribute('fill', 'rgba(255,255,255,0.45)');
-    svg.appendChild(hl);
-
-    return svg;
-  }
-
   function spawnRipples(fxLayer, cx, cy, isToDark) {
     const color = isToDark ? '#2dd4bf' : '#0d9488';
     [0, 110].forEach((delay) => {
@@ -163,6 +118,7 @@
     }
 
     isSwitching = true;
+    const startAt = performance.now();
     const rect = btn.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
@@ -175,74 +131,45 @@
     fxLayer.className = 'pts-fx';
     document.body.appendChild(fxLayer);
 
-    // Phase 1: Falling water droplet from above button
-    const startY = Math.max(6, cy - 132);
-    const drop = createDropletSVG(isToDark);
-    drop.style.left = cx + 'px';
-    drop.style.top = '0px';
-    fxLayer.appendChild(drop);
-
-    const fallDuration = 185;
-    const fallAnim = drop.animate(
-      [
-        { transform: `translate(-50%, ${startY - 26}px) scale(0.86, 1.16)`, opacity: 0 },
-        { transform: `translate(-50%, ${startY}px) scale(0.88, 1.15)`, opacity: 1, offset: 0.18 },
-        { transform: `translate(-50%, ${cy - 4}px) scale(0.86, 1.18)`, opacity: 1 }
-      ],
-      {
-        duration: fallDuration,
-        easing: 'cubic-bezier(0.55, 0.05, 0.85, 0.25)',
-        fill: 'forwards'
-      }
-    );
-
     const cleanup = () => {
+      const remaining = Math.max(0, 760 - (performance.now() - startAt));
       setTimeout(() => {
         if (fxLayer.parentNode) fxLayer.remove();
         isSwitching = false;
-      }, 720);
+      }, remaining);
     };
 
-    fallAnim.finished.then(() => {
-      // Impact squash & fade
-      drop.animate(
-        [
-          { transform: `translate(-50%, ${cy - 4}px) scale(1.26, 0.72)`, opacity: 1 },
-          { transform: `translate(-50%, ${cy}px) scale(1.45, 0.45)`, opacity: 0 }
-        ],
-        { duration: 90, easing: 'ease-out', fill: 'forwards' }
-      );
+    // Immediate tactile button recoil & radial ripples
+    pressButton(btn, 0.10);
+    spawnRipples(fxLayer, cx, cy, isToDark);
 
-      // Tactile button recoil & ripples
-      pressButton(btn, 0.10);
-      spawnRipples(fxLayer, cx, cy, isToDark);
-
-      // Phase 2: Radial clip-path reveal across screen
-      if (typeof document.startViewTransition === 'function') {
-        try {
-          const vt = document.startViewTransition(() => {
-            applyTheme(next);
-          });
-          vt.ready.then(() => {
-            document.documentElement.animate(
-              {
-                clipPath: [
-                  `circle(0px at ${cx}px ${cy}px)`,
-                  `circle(${maxR}px at ${cx}px ${cy}px)`
-                ]
-              },
-              {
-                duration: 620,
-                easing: 'cubic-bezier(0.32, 0.72, 0, 1)',
-                pseudoElement: '::view-transition-new(root)'
-              }
-            );
-          }).catch(() => {});
-          vt.finished.finally(cleanup);
-          return;
-        } catch (e) {}
+    // Radial clip-path reveal across screen
+    if (typeof document.startViewTransition === 'function') {
+      try {
+        const vt = document.startViewTransition(() => {
+          applyTheme(next);
+        });
+        vt.ready.then(() => {
+          document.documentElement.animate(
+            {
+              clipPath: [
+                `circle(0px at ${cx}px ${cy}px)`,
+                `circle(${maxR}px at ${cx}px ${cy}px)`
+              ]
+            },
+            {
+              duration: 560,
+              easing: 'cubic-bezier(0.32, 0.72, 0, 1)',
+              pseudoElement: '::view-transition-new(root)'
+            }
+          );
+        }).catch(() => {});
+        vt.finished.finally(cleanup);
+      } catch (e) {
+        applyTheme(next);
+        cleanup();
       }
-
+    } else {
       // Fallback flood element
       const flood = document.createElement('div');
       flood.className = 'pts-flood';
@@ -268,10 +195,7 @@
         applyTheme(next);
         cleanup();
       });
-    }).catch(() => {
-      applyTheme(next);
-      cleanup();
-    });
+    }
 
     // Safety watchdog
     setTimeout(() => {
@@ -287,10 +211,66 @@
     applyTheme(initial);
   }
 
+  function initNumberTicker(root) {
+    const scope = root || document;
+    const els = scope.querySelectorAll('[data-count-to]');
+    if (!els.length) return;
+
+    const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const animateEl = (el) => {
+      if (el.dataset.counted === '1') return;
+      el.dataset.counted = '1';
+      const target = parseFloat(el.getAttribute('data-count-to') || '0');
+      const suffix = el.getAttribute('data-count-suffix') || '';
+      const useComma = el.getAttribute('data-count-comma') === '1';
+      const duration = 900;
+
+      const formatVal = (n) => {
+        const rounded = Math.round(n);
+        const str = useComma ? rounded.toLocaleString('en-US') : String(rounded);
+        return str + (suffix ? `<span>${suffix}</span>` : '');
+      };
+
+      if (reducedMotion || isNaN(target)) {
+        el.innerHTML = formatVal(target);
+        return;
+      }
+
+      const start = performance.now();
+      const tick = (now) => {
+        const p = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.innerHTML = formatVal(target * eased);
+        if (p < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          el.innerHTML = formatVal(target);
+        }
+      };
+      requestAnimationFrame(tick);
+    };
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            animateEl(entry.target);
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.25 });
+      els.forEach((el) => io.observe(el));
+    } else {
+      els.forEach(animateEl);
+    }
+  }
+
   window.PinUI = {
     initTheme: initPinTheme,
     applyTheme: applyTheme,
     toggleTheme: triggerPinThemeSwitch,
-    pressButton: pressButton
+    pressButton: pressButton,
+    initNumberTicker: initNumberTicker
   };
 })();

@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- KaTeX CSS & JS -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -508,6 +508,53 @@
       transform: scale(1);
     }
 
+    .opt-keycap {
+      min-width: 24px;
+      height: 24px;
+      margin-top: -1px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      transition: background-color 140ms var(--ease), border-color 140ms var(--ease), color 140ms var(--ease);
+    }
+
+    .answer-option.selected .opt-keycap {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    html[data-theme="dark"] .answer-option.selected .opt-keycap {
+      color: #07080d;
+    }
+
+    .answer-option.is-correct .opt-keycap {
+      background: var(--correct) !important;
+      border-color: var(--correct) !important;
+      color: #ffffff !important;
+    }
+
+    .answer-option.is-wrong .opt-keycap {
+      background: var(--wrong) !important;
+      border-color: var(--wrong) !important;
+      color: #ffffff !important;
+    }
+
+    .kbd-hint-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 600px) {
+      .kbd-hint-pill {
+        display: none;
+      }
+    }
+
     .answer-option.is-correct .radio-dot {
       border-color: var(--correct);
     }
@@ -935,6 +982,7 @@
       <div class="progress-bar">
         <div class="progress-fill" id="progressFill"></div>
       </div>
+      <span class="kbd-hint-pill" title="Bấm phím A, B, C, D để chọn đáp án nhanh"><span class="kbd-cap">A–D</span> Chọn nhanh</span>
       <div class="quiz-timer" id="quizTimer" style="display:none">30:00</div>
     </div>
 
@@ -1716,7 +1764,7 @@
         } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
           answersHTML = validAnswers.map(a => `
             <label class="answer-option" data-key="${a.key}" onclick="selectAnswer(this, ${q.id})">
-              <span class="radio-dot"></span>
+              <span class="opt-keycap kbd-cap">${a.key}</span>
               <span class="answer-text">${formatText(a.text)}</span>
             </label>
           `).join('');
@@ -1786,7 +1834,7 @@
       } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
         answersHTML = validAnswers.map(a => `
           <label class="answer-option" data-key="${a.key}" onclick="selectAnswer(this, ${q.id})">
-            <span class="radio-dot"></span>
+            <span class="opt-keycap kbd-cap">${a.key}</span>
             <span class="answer-text">${formatText(a.text)}</span>
           </label>
         `).join('');
@@ -1859,13 +1907,17 @@
       advanceReviewCard();
     }
 
-    function selectAnswer(el, qId) {
+      function selectAnswer(el, qId) {
       if (submitted) return;
       const answersEl = document.getElementById('answers-' + qId);
       if (isReviewMode && answersEl.querySelector('.answer-option.locked')) return;
 
       answersEl.querySelectorAll('.answer-option').forEach(opt => opt.classList.remove('selected'));
       el.classList.add('selected');
+      const cap = el.querySelector('.opt-keycap');
+      if (cap && window.PinUI && typeof window.PinUI.pressButton === 'function') {
+        window.PinUI.pressButton(cap, 0.12);
+      }
 
       if (isReviewMode) {
         gradeQuestion(qId);
@@ -1874,6 +1926,33 @@
         checkAllAnswered();
       }
     }
+
+    let hoveredQuestionCard = null;
+    document.addEventListener('mouseover', (e) => {
+      const card = e.target && e.target.closest ? e.target.closest('.question-card') : null;
+      if (card) hoveredQuestionCard = card;
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (submitted) return;
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || e.ctrlKey || e.metaKey || e.altKey) return;
+
+      const keyMap = { 'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D', '1': 'A', '2': 'B', '3': 'C', '4': 'D' };
+      const mapped = keyMap[e.key.toLowerCase()];
+      if (!mapped) return;
+
+      const targetCard = isReviewMode
+        ? document.querySelector('#quizContainer .question-card')
+        : (hoveredQuestionCard || document.querySelector('#quizContainer .question-card'));
+      if (!targetCard) return;
+
+      const opt = targetCard.querySelector(`.answer-option[data-key="${mapped}"]`);
+      if (opt && !opt.classList.contains('locked')) {
+        e.preventDefault();
+        opt.click();
+      }
+    });
 
     function selectTF(el, qId, key, val) {
       if (submitted) return;
