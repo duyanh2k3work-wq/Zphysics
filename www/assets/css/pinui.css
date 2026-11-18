@@ -878,7 +878,7 @@ body.study-mode-practice .q-practice-actions {
 }
 
 html[data-theme="dark"] .btn-check-single {
-  color: #07080d;
+  color: #ffffff;
 }
 
 .btn-check-single:hover {
@@ -1050,7 +1050,7 @@ html[data-theme="dark"] .btn-check-single {
 }
 
 html[data-theme="dark"] .zp-filter-chip.active {
-  color: #07080d;
+  color: #ffffff;
 }
 
 .zp-primary-btn {
@@ -1070,7 +1070,7 @@ html[data-theme="dark"] .zp-filter-chip.active {
 }
 
 html[data-theme="dark"] .zp-primary-btn {
-  color: #07080d;
+  color: #ffffff;
 }
 
 .zp-primary-btn:disabled {

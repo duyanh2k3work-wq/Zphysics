@@ -80,7 +80,7 @@
   }
 
   function spawnRipples(fxLayer, cx, cy, isToDark) {
-    const color = isToDark ? '#2dd4bf' : '#0d9488';
+    const color = '#9c27b0';
     [0, 110].forEach((delay) => {
       const ring = document.createElement('div');
       ring.className = 'pts-ripple';
