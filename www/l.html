@@ -1247,7 +1247,9 @@
 
     function getExamDraftKey() {
       const targetId = (examData && examData.id) || examId || 'default';
-      return 'zphysics_draft_exam_' + targetId;
+      const s = getSession();
+      const email = (s && s.gmail) ? String(s.gmail).trim().toLowerCase() : 'guest';
+      return 'zphysics_draft_exam_' + email + '_' + targetId;
     }
 
     function loadExamDraft() {

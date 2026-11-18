@@ -1146,6 +1146,7 @@
               localStorage.setItem(SESSION_KEY, JSON.stringify({
                 gmail: currentSession.gmail,
                 ten: student.full_name || currentSession.gmail,
+                lop: student.lop || currentSession.lop || '',
                 premium: isPremium,
                 premium_until: student.premium_until,
                 access_token: currentSession.access_token
@@ -1223,7 +1224,23 @@
     let flaggedQuestionIds = new Set();
     let checkedQuestionIds = new Set();
     let autosaveIntervalId = null;
-    const MISTAKE_STORAGE_KEY = 'zp_mistakes_v1';
+    try { localStorage.removeItem('zp_mistakes_v1'); } catch (e) {}
+
+    function getCurrentAccountEmail() {
+      const s = getSession();
+      return (s && s.gmail) ? String(s.gmail).trim().toLowerCase() : '';
+    }
+
+    function getCurrentAccountGrade() {
+      const s = getSession();
+      const m = (s && s.lop) ? String(s.lop).match(/\d+/) : null;
+      return m ? m[0] : '';
+    }
+
+    function getMistakeStorageKey() {
+      const email = getCurrentAccountEmail();
+      return email ? `zp_mistakes_v2_${email}` : 'zp_mistakes_v2_guest';
+    }
 
     function parseQuizCode(code) {
       if (!code) return null;
@@ -1469,9 +1486,17 @@
 
     function getMistakesList() {
       try {
-        const raw = localStorage.getItem(MISTAKE_STORAGE_KEY);
+        const raw = localStorage.getItem(getMistakeStorageKey());
         const parsed = raw ? JSON.parse(raw) : [];
-        return Array.isArray(parsed) ? parsed : [];
+        if (!Array.isArray(parsed)) return [];
+        const email = getCurrentAccountEmail();
+        const userGrade = getCurrentAccountGrade();
+        return parsed.filter((item) => {
+          if (!item || typeof item !== 'object') return false;
+          if (item.ownerEmail && email && String(item.ownerEmail).trim().toLowerCase() !== email) return false;
+          if (userGrade && item.grade && String(item.grade) !== String(userGrade)) return false;
+          return true;
+        });
       } catch (e) {
         return [];
       }
@@ -1479,7 +1504,7 @@
 
     function saveMistakesList(list) {
       try {
-        localStorage.setItem(MISTAKE_STORAGE_KEY, JSON.stringify(list));
+        localStorage.setItem(getMistakeStorageKey(), JSON.stringify(list));
       } catch (e) {}
     }
 
@@ -1498,6 +1523,7 @@
       if (!q || !q.question) return;
       const list = getMistakesList();
       const qKey = String(q.id);
+      const email = getCurrentAccountEmail();
       const originMade = q._originMade || (isMistakeQuiz ? q.made : quizFile) || quizFile;
       const grade = q._originGrade || inferQuestionGrade(q);
       const parsedMeta = parseQuizCode(originMade);
@@ -1509,11 +1535,13 @@
       if (existingIdx !== -1) {
         list[existingIdx].wrongCount = (list[existingIdx].wrongCount || 1) + 1;
         list[existingIdx].lastWrongAt = Date.now();
+        if (email) list[existingIdx].ownerEmail = email;
         if (!list[existingIdx].grade && grade) list[existingIdx].grade = grade;
         if (!list[existingIdx].lessonTitle && lessonLabel) list[existingIdx].lessonTitle = lessonLabel;
       } else {
         list.unshift({
           id: q.id,
+          ownerEmail: email,
           made: originMade,
           grade: grade,
           lessonTitle: lessonLabel,
@@ -1542,7 +1570,7 @@
     }
 
     function getDraftKey() {
-      return 'zphysics_draft_quiz_' + quizFile;
+      return 'zphysics_draft_quiz_' + (getCurrentAccountEmail() || 'guest') + '_' + quizFile;
     }
 
     function loadQuizDraft() {

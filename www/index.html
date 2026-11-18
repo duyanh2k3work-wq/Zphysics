@@ -3493,8 +3493,25 @@
     }
 
     /* ── FEATURE #5: MISTAKE NOTEBOOK (SỔ TAY CÂU SAI) ── */
-    const MISTAKE_STORAGE_KEY = 'zp_mistakes_v1';
+    const LEGACY_MISTAKE_STORAGE_KEY = 'zp_mistakes_v1';
+    try { localStorage.removeItem(LEGACY_MISTAKE_STORAGE_KEY); } catch (e) {}
     let activeMistakeGradeFilter = 'all';
+
+    function getCurrentAccountEmail() {
+      const s = (typeof getSession === 'function') ? getSession() : null;
+      return (s && s.gmail) ? String(s.gmail).trim().toLowerCase() : '';
+    }
+
+    function getCurrentAccountGrade() {
+      const s = (typeof getSession === 'function') ? getSession() : null;
+      const m = (s && s.lop) ? String(s.lop).match(/\d+/) : null;
+      return m ? m[0] : '';
+    }
+
+    function getMistakeStorageKey() {
+      const email = getCurrentAccountEmail();
+      return email ? `zp_mistakes_v2_${email}` : 'zp_mistakes_v2_guest';
+    }
 
     function triggerModalKaTeX(el) {
       if (!el) return;
@@ -3526,9 +3543,17 @@
 
     function getMistakeItems() {
       try {
-        const raw = localStorage.getItem(MISTAKE_STORAGE_KEY);
+        const raw = localStorage.getItem(getMistakeStorageKey());
         const parsed = raw ? JSON.parse(raw) : [];
-        return Array.isArray(parsed) ? parsed : [];
+        if (!Array.isArray(parsed)) return [];
+        const email = getCurrentAccountEmail();
+        const userGrade = getCurrentAccountGrade();
+        return parsed.filter((item) => {
+          if (!item || typeof item !== 'object') return false;
+          if (item.ownerEmail && email && String(item.ownerEmail).trim().toLowerCase() !== email) return false;
+          if (userGrade && item.grade && String(item.grade) !== String(userGrade)) return false;
+          return true;
+        });
       } catch (e) {
         return [];
       }
@@ -3536,7 +3561,7 @@
 
     function saveMistakeItems(items) {
       try {
-        localStorage.setItem(MISTAKE_STORAGE_KEY, JSON.stringify(items));
+        localStorage.setItem(getMistakeStorageKey(), JSON.stringify(items));
       } catch (e) {}
     }
 
@@ -3555,6 +3580,21 @@
     function openMistakeModal() {
       const modal = document.getElementById('mistakeModal');
       if (!modal) return;
+      const userGrade = getCurrentAccountGrade();
+      const chips = document.querySelectorAll('#mistakeGradeFilterGroup .zp-filter-chip');
+      if (userGrade === '10' || userGrade === '11' || userGrade === '12') {
+        activeMistakeGradeFilter = userGrade;
+        chips.forEach(btn => {
+          const matches = btn.getAttribute('data-grade') === userGrade;
+          btn.style.display = matches ? '' : 'none';
+          btn.classList.toggle('active', matches);
+        });
+      } else {
+        chips.forEach(btn => {
+          btn.style.display = '';
+          btn.classList.toggle('active', btn.getAttribute('data-grade') === activeMistakeGradeFilter);
+        });
+      }
       renderMistakeModalList();
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -3695,7 +3735,10 @@
     }
 
     /* ── FEATURE #6: FLASHCARD ENGINE (CÔNG THỨC & BẪY ĐÚNG/SAI) ── */
-    const FLASHCARD_MASTERED_KEY = 'zp_flashcards_mastered_v1';
+    function getFlashcardMasteredKey() {
+      const email = getCurrentAccountEmail();
+      return email ? `zp_flashcards_mastered_v2_${email}` : 'zp_flashcards_mastered_v2_guest';
+    }
 
     const ZPHYSICS_FLASHCARD_BANK = [
       // Lớp 12 - Chương I: Vật lí nhiệt
@@ -3756,7 +3799,7 @@
 
     function getMasteredFlashcards() {
       try {
-        const raw = localStorage.getItem(FLASHCARD_MASTERED_KEY);
+        const raw = localStorage.getItem(getFlashcardMasteredKey());
         const arr = raw ? JSON.parse(raw) : [];
         return Array.isArray(arr) ? arr : [];
       } catch (e) {
@@ -3766,7 +3809,7 @@
 
     function saveMasteredFlashcards(arr) {
       try {
-        localStorage.setItem(FLASHCARD_MASTERED_KEY, JSON.stringify(arr));
+        localStorage.setItem(getFlashcardMasteredKey(), JSON.stringify(arr));
       } catch (e) {}
     }
 
@@ -4030,7 +4073,7 @@
     document.addEventListener('DOMContentLoaded', updateMistakeBadges);
     window.addEventListener('pageshow', updateMistakeBadges);
     window.addEventListener('storage', (e) => {
-      if (!e || e.key === MISTAKE_STORAGE_KEY) updateMistakeBadges();
+      if (!e || !e.key || e.key.startsWith('zp_mistakes_') || e.key === SESSION_KEY) updateMistakeBadges();
     });
 
     var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
@@ -4198,6 +4241,7 @@
 
       const session = getSession();
       document.getElementById('popupEmail').textContent = session ? session.gmail : '';
+      updateMistakeBadges();
       const overlay = document.getElementById('loginOverlay');
       overlay.classList.add('hiding');
       setTimeout(() => { overlay.style.display = 'none'; }, 250);
