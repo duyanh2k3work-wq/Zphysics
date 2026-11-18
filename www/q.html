@@ -1642,6 +1642,7 @@
     }
 
     function clearQuizDraft(resetUI) {
+      if (resetUI && studyMode === 'practice') return;
       if (resetUI && !confirm('Xóa toàn bộ đáp án nháp đang lưu cho bài này?')) {
         return;
       }
@@ -1803,10 +1804,8 @@
       checkedQuestionIds.add(String(q.id));
 
       const checkBtn = document.getElementById(`check-btn-${q.id}`);
-      const resetBtn = document.getElementById(`reset-btn-${q.id}`);
       const tipEl = document.getElementById(`ptip-${q.id}`);
       if (checkBtn) checkBtn.style.display = 'none';
-      if (resetBtn) resetBtn.style.display = 'inline-flex';
       if (tipEl) tipEl.textContent = res.isCorrect ? 'Chính xác! Đọc lời giải để củng cố.' : 'Đã lưu vào Sổ tay câu sai để ôn lại.';
 
       const explainEl = document.getElementById('explain-' + q.id);
@@ -1826,72 +1825,6 @@
       checkAllAnswered();
       renderQuestionPalette();
       if (!opts.skipDraftSave) saveQuizDraft();
-    }
-
-    function resetSingleQuestion(qId) {
-      if (submitted) return;
-      const idx = quizData.findIndex(item => String(item.id) === String(qId));
-      if (idx === -1) return;
-      const q = quizData[idx];
-      checkedQuestionIds.delete(String(q.id));
-
-      const card = document.querySelector(`.question-card[data-id="${q.id}"]`);
-      if (card) card.classList.remove('correct-card', 'wrong-card');
-
-      const icon = document.getElementById('icon-' + q.id);
-      if (icon) {
-        icon.style.display = 'none';
-        icon.classList.remove('is-correct', 'is-wrong');
-        icon.innerHTML = '';
-      }
-
-      const explainEl = document.getElementById('explain-' + q.id);
-      if (explainEl) explainEl.classList.remove('visible');
-
-      const answersEl = document.getElementById('answers-' + q.id);
-      if (answersEl) {
-        if (q.type === 'đs') {
-          answersEl.querySelectorAll('.tf-statement').forEach(parent => {
-            parent.querySelectorAll('.tf-btn').forEach(btn => {
-              btn.style.pointerEvents = '';
-              btn.style.opacity = '';
-              btn.style.borderColor = '';
-              btn.style.backgroundColor = '';
-              btn.style.color = '';
-              btn.classList.remove('selected');
-            });
-            const seg = parent.querySelector('.tf-toggles');
-            if (seg) {
-              seg.setAttribute('data-selected', 'none');
-              seg.style.removeProperty('--seg-index');
-            }
-          });
-        } else if (q.type === 'cauhoi') {
-          answersEl.querySelectorAll('.answer-option').forEach(opt => {
-            opt.classList.remove('locked', 'selected', 'is-correct', 'is-wrong');
-          });
-        } else {
-          const inp = document.getElementById(`short-answer-${q.id}`);
-          if (inp) {
-            inp.disabled = false;
-            inp.value = '';
-            inp.style.borderColor = '';
-            inp.style.backgroundColor = '';
-          }
-        }
-      }
-
-      const checkBtn = document.getElementById(`check-btn-${q.id}`);
-      const resetBtn = document.getElementById(`reset-btn-${q.id}`);
-      const tipEl = document.getElementById(`ptip-${q.id}`);
-      if (checkBtn) checkBtn.style.display = '';
-      if (resetBtn) resetBtn.style.display = 'none';
-      if (tipEl) tipEl.textContent = 'Chọn đáp án rồi xem lời giải ngay';
-
-      updateProgress();
-      checkAllAnswered();
-      renderQuestionPalette();
-      saveQuizDraft();
     }
 
     function restoreQuizDraft(draft) {
@@ -2450,7 +2383,6 @@
           <div class="q-practice-actions" id="practiceActions-${q.id}">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
               <button type="button" class="btn-check-single" id="check-btn-${q.id}" onclick="checkSingleQuestion('${q.id}')">Kiểm tra &amp; Xem giải</button>
-              <button type="button" class="btn-reset-single" id="reset-btn-${q.id}" style="display:none;" onclick="resetSingleQuestion('${q.id}')">Làm lại câu này</button>
             </div>
             <span class="q-practice-tip" id="ptip-${q.id}">Chọn đáp án rồi xem lời giải ngay</span>
           </div>
@@ -3142,6 +3074,7 @@
         }
       });
 
+      document.querySelectorAll('.q-practice-actions').forEach(el => { el.style.display = 'none'; });
       try { localStorage.removeItem(getDraftKey()); } catch (e) {}
       updateAutosaveStatus('Đã nộp bài', true);
       renderQuestionPalette();

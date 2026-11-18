@@ -2288,6 +2288,7 @@
         if (!data || data.length === 0) {
           historyListEl.innerHTML = '<div class="history-empty">Chưa có lịch sử làm bài.</div>';
           document.getElementById('statAverageScore').textContent = '-';
+          document.getElementById('statCompleted').textContent = '0';
           return;
         }
 
@@ -2306,14 +2307,18 @@
 
         let totalScore = 0;
         let scoreCount = 0;
+        let passedCount = 0;
         for (const lid in bestScores) {
           totalScore += bestScores[lid];
           scoreCount++;
+          if (bestScores[lid] >= 8.0) {
+            passedCount++;
+          }
         }
 
         const avgScore = scoreCount > 0 ? (totalScore / scoreCount).toFixed(2) : '-';
         document.getElementById('statAverageScore').textContent = avgScore;
-        document.getElementById('statCompleted').textContent = scoreCount;
+        document.getElementById('statCompleted').textContent = passedCount;
 
         historyListEl.innerHTML = '';
         data.forEach(item => {
@@ -2366,9 +2371,7 @@
       document.getElementById('statAverageScore').textContent = '-';
 
       const completedCount = Object.keys(studentProgressMap).length;
-      if (completedCount > 0) {
-        document.getElementById('statCompleted').textContent = completedCount;
-      }
+      document.getElementById('statCompleted').textContent = completedCount;
 
       loadHistoryList();
 
@@ -4423,8 +4426,12 @@
           }
 
           if (progressData && progressData.length > 0) {
+            studentProgressMap = {};
             progressData.forEach(p => {
-              studentProgressMap[p.lesson_id] = (studentProgressMap[p.lesson_id] || 0) + 1;
+              const sVal = p.score !== null && p.score !== undefined ? parseFloat(p.score) : null;
+              if (sVal === null || (!isNaN(sVal) && sVal >= 8.0)) {
+                studentProgressMap[p.lesson_id] = (studentProgressMap[p.lesson_id] || 0) + 1;
+              }
             });
             needUpdate = true;
           }
