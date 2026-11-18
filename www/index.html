@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"></script>
-  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_feat1">
+  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_feat2">
   <script src="assets/js/pinui.js?v=20261118_arial"></script>
   <script>PinUI.initTheme('light');</script>
   <style>
@@ -560,6 +560,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 14px;
+      min-width: 0;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 4px 16px rgba(31, 27, 22, 0.03);
       transition: border-color 150ms var(--ease);
     }
@@ -680,6 +681,7 @@
 
     .ch-card-wrapper {
       width: 100%;
+      min-width: 0;
       display: flex;
     }
 
@@ -689,6 +691,7 @@
 
     .ch-card {
       width: 100%;
+      min-width: 0;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 18px;
@@ -759,6 +762,7 @@
       display: flex;
       align-items: baseline;
       gap: 8px;
+      min-width: 0;
       font-size: 12.5px;
       line-height: 1.45;
       color: var(--text-secondary);
@@ -773,6 +777,8 @@
     }
 
     .ch-preview-line .pl-title {
+      flex: 1;
+      min-width: 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1096,6 +1102,25 @@
       .ch-rt-btn {
         padding: 0 9px;
         font-size: 11.5px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .ch-rt-track {
+        display: none;
+      }
+
+      .ch-rt-progress {
+        padding: 0 4px;
+      }
+
+      .ch-rt-sep {
+        margin: 0 2px;
+      }
+
+      .ch-rt-btn {
+        padding: 0 8px;
+        font-size: 11px;
       }
     }
 
@@ -1801,12 +1826,14 @@
     /* ── RESPONSIVE MOBILE ── */
     @media (max-width: 899px) {
       .app-shell {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
 
       .sidebar {
         position: static;
         height: auto;
+        min-width: 0;
+        max-width: 100%;
         border-right: none;
         border-bottom: 1px solid var(--border);
         padding: 16px;
@@ -1822,13 +1849,39 @@
         font-size: 13px;
       }
 
-      .sidebar-tools-group,
+      .sidebar-tools-group .sidebar-group-label {
+        display: none;
+      }
+
+      .sidebar-nav-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .sidebar-nav-btn {
+        min-height: 36px;
+        height: auto;
+        padding: 6px 8px;
+        font-size: 12px;
+        line-height: 1.25;
+        background: var(--card);
+        border: 1px solid var(--border);
+        min-width: 0;
+      }
+
+      .sidebar-nav-btn svg {
+        flex-shrink: 0;
+      }
+
       .sidebar-footer {
         display: none;
       }
 
       .main-content {
         padding: 20px 16px 48px;
+        min-width: 0;
+        max-width: 100%;
       }
 
       .section-label h3 {

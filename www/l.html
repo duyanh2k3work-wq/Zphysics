@@ -10,7 +10,7 @@
   <title>Zphysics — Phòng luyện đề</title>
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
-  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_feat1">
+  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_feat2">
   <script src="assets/js/pinui.js?v=20261118_arial"></script>
   <script>PinUI.initTheme('dark');</script>
   <style>
@@ -912,18 +912,20 @@
     /* ── RESPONSIVE ── */
     @media (max-width: 767px) {
       .pdf-pane {
-        flex: 1;
+        flex: none;
         width: 100%;
         height: calc(100vh - 116px);
+        height: calc(100dvh - 116px);
         position: relative;
         top: 0;
         border-right: none;
       }
 
       .answers-pane {
-        flex: 1;
+        flex: none;
         width: 100%;
         height: calc(100vh - 116px);
+        height: calc(100dvh - 116px);
         padding: 16px;
       }
 

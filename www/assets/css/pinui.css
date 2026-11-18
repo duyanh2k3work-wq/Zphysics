@@ -1266,3 +1266,33 @@ html[data-theme="dark"] .zp-primary-btn {
   font-weight: 600;
 }
 
+@media (max-width: 600px) {
+  .zp-modal-backdrop {
+    padding: 8px;
+  }
+
+  .zp-modal-dialog {
+    max-height: 92vh;
+    max-height: 92dvh;
+    border-radius: 14px;
+  }
+
+  .zp-modal-head {
+    padding: 12px 14px;
+  }
+
+  .zp-modal-body {
+    padding: 12px 14px 18px;
+    gap: 10px;
+  }
+
+  .fc-scene,
+  .fc-card {
+    min-height: 270px;
+  }
+
+  .fc-face {
+    padding: 16px 14px;
+  }
+}
+

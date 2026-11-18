@@ -15,7 +15,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"
     onload="if(typeof triggerKaTeX==='function'){triggerKaTeX(document.body);}else if(typeof renderMathInElement==='function'){renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],throwOnError:false});}"></script>
-  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_feat1">
+  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_feat2">
   <script src="assets/js/pinui.js?v=20261118_arial"></script>
   <script>PinUI.initTheme('light');</script>
 
@@ -236,12 +236,68 @@
       display: block;
     }
 
+    /* ── STICKY TOP NAVIGATION CLUSTER ── */
+    .quiz-sticky-top {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      padding: 10px 4px 12px;
+      margin: 6px -4px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-bottom: 1px solid transparent;
+      transition: border-color 160ms var(--ease), box-shadow 160ms var(--ease);
+    }
+
+    .quiz-sticky-top.is-stuck {
+      border-bottom-color: var(--border-strong);
+      box-shadow: 0 10px 24px -12px var(--shadow);
+    }
+
+    .study-toolbar {
+      margin: 0 0 8px;
+    }
+
+    .quiz-sticky-top .progress-wrap,
+    .quiz-sticky-top .q-palette-card {
+      margin: 0;
+    }
+
+    .sticky-pal-toggle {
+      display: none;
+      height: 24px;
+      padding: 0 8px;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .quiz-sticky-top.is-stuck .sticky-pal-toggle {
+      display: inline-flex;
+    }
+
+    .quiz-sticky-top .q-palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+      gap: 6px;
+      max-height: 148px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .quiz-sticky-top .qp-chip {
+      min-width: 0;
+      width: 100%;
+    }
+
+    #questionPaletteCard.collapsed {
+      display: none !important;
+    }
+
     /* ── PROGRESS BAR ── */
     .progress-wrap {
-      position: sticky;
-      top: 12px;
-      z-index: 100;
-      margin: 16px 0 24px;
+      margin: 0;
       padding: 12px 16px;
       border-radius: 10px;
       background: var(--card);
@@ -365,6 +421,7 @@
       padding: 20px 24px 12px;
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 10px;
     }
 
@@ -389,6 +446,7 @@
     .q-badge {
       font-size: 13px;
       color: var(--muted);
+      min-width: 0;
     }
 
     .q-result-icon {
@@ -418,6 +476,11 @@
       font-weight: 400;
       line-height: 1.65;
       color: var(--text);
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .q-text img,
@@ -575,6 +638,9 @@
       color: var(--text);
       line-height: 1.55;
       flex: 1;
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
 
     /* ── TRUE / FALSE STATEMENTS ── */
@@ -591,6 +657,9 @@
 
     .tf-text {
       flex: 1;
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
       font-size: 14px;
       color: var(--text);
       line-height: 1.55;
@@ -638,6 +707,35 @@
       color: var(--text);
       line-height: 1.65;
       display: none;
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .q-text .katex-html,
+    .answer-text .katex-html,
+    .tf-text .katex-html,
+    .explanation .katex-html {
+      white-space: normal;
+    }
+
+    .q-text .katex-html > .base,
+    .answer-text .katex-html > .base,
+    .tf-text .katex-html > .base,
+    .explanation .katex-html > .base {
+      display: inline-block;
+      max-width: 100%;
+      margin: 1px 0;
+    }
+
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      max-width: 100%;
+      padding: 4px 0;
+      -webkit-overflow-scrolling: touch;
     }
 
     .explanation.visible {
@@ -912,6 +1010,114 @@
     }
 
     @media (max-width: 600px) {
+      .app {
+        padding: 0 10px 72px;
+      }
+
+      .header {
+        padding: 14px 0 12px;
+        gap: 8px;
+      }
+
+      .header-info h1 {
+        font-size: 16px;
+      }
+
+      .header-info p {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        line-height: 1.35;
+      }
+
+      .student-card {
+        margin: 12px 0;
+        padding: 12px 14px;
+      }
+
+      .quiz-sticky-top {
+        padding: 4px 4px 6px;
+        margin: 4px -4px 10px;
+        gap: 4px;
+      }
+
+      .progress-wrap {
+        padding: 6px 10px;
+        min-height: 38px;
+        gap: 8px;
+        border-radius: 8px;
+      }
+
+      .study-toolbar {
+        margin: 0 0 8px;
+        padding: 8px 10px;
+        gap: 8px;
+        border-radius: 8px;
+      }
+
+      .study-mode-seg .seg-btn {
+        height: 26px;
+        padding: 0 10px;
+        font-size: 11.5px;
+      }
+
+      .study-toolbar-right {
+        gap: 6px;
+      }
+
+      .autosave-pill,
+      .toolbar-mini-btn {
+        height: 26px;
+        padding: 0 8px;
+        font-size: 11.5px;
+      }
+
+      .sticky-pal-toggle {
+        height: 24px;
+        padding: 0 7px;
+        font-size: 11px;
+      }
+
+      .q-palette-card {
+        padding: 6px 8px;
+        border-radius: 9px;
+      }
+
+      .q-palette-head {
+        gap: 6px;
+      }
+
+      .q-palette-title {
+        font-size: 11.5px;
+      }
+
+      .q-palette-stats {
+        font-size: 11px;
+        gap: 6px;
+      }
+
+      .q-palette-legend {
+        margin-top: 5px;
+        gap: 6px;
+        font-size: 9.5px;
+      }
+
+      .quiz-sticky-top .q-palette-grid {
+        grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
+        gap: 4px;
+        margin-top: 5px;
+        max-height: 136px;
+      }
+
+      .quiz-sticky-top .qp-chip {
+        min-width: 0;
+        width: 100%;
+        height: 26px;
+        padding: 0 2px;
+        font-size: 11px;
+        border-radius: 5px;
+      }
+
       .q-header,
       .q-text {
         padding-left: 16px;
@@ -934,6 +1140,83 @@
       .tf-statement {
         flex-direction: column;
         align-items: flex-start;
+      }
+
+      .tf-text {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .tf-toggles {
+        align-self: flex-end;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .study-mode-seg {
+        width: 100%;
+      }
+
+      .study-toolbar-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .q-palette-title {
+        display: none;
+      }
+    }
+
+    @media (max-height: 540px) {
+      .quiz-sticky-top {
+        padding: 3px 4px 4px;
+        gap: 3px;
+      }
+
+      .progress-wrap {
+        padding: 4px 10px;
+        min-height: 34px;
+      }
+
+      .study-toolbar {
+        padding: 5px 8px;
+      }
+
+      .study-mode-seg .seg-btn,
+      .toolbar-mini-btn,
+      .autosave-pill {
+        height: 24px;
+        font-size: 11px;
+      }
+
+      .q-palette-card {
+        padding: 4px 8px;
+      }
+
+      .q-palette-stats {
+        font-size: 10.5px;
+      }
+
+      .q-palette-title,
+      .q-palette-legend {
+        display: none;
+      }
+
+      .quiz-sticky-top .q-palette-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        max-height: none;
+        margin-top: 4px;
+        padding-bottom: 2px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .quiz-sticky-top .qp-chip {
+        flex: 0 0 30px;
+        width: 30px;
+        height: 24px;
       }
     }
   </style>
@@ -974,15 +1257,6 @@
       <div class="student-error" id="studentError">Vui lòng nhập họ và tên trước khi nộp bài.</div>
     </div>
 
-    <div class="progress-wrap">
-      <span class="progress-text" id="progressText">0 / 0</span>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-      <span class="kbd-hint-pill" title="Bấm phím A, B, C, D để chọn đáp án nhanh"><span class="kbd-cap">A–D</span> Chọn nhanh</span>
-      <div class="quiz-timer" id="quizTimer" style="display:none">30:00</div>
-    </div>
-
     <div class="study-toolbar" id="studyToolbar">
       <div class="seg-control study-mode-seg" id="quizModeSeg" style="--seg-count: 2; --seg-index: 0;" role="tablist" aria-label="Chế độ làm bài">
         <span class="seg-thumb"></span>
@@ -999,24 +1273,36 @@
       </div>
     </div>
 
-    <div class="q-palette-card" id="questionPaletteCard">
-      <div class="q-palette-head">
-        <div class="q-palette-title">
-          <span>Bảng điều hướng câu hỏi</span>
+    <div class="quiz-sticky-top" id="quizStickyTop">
+      <div class="progress-wrap">
+        <span class="progress-text" id="progressText">0 / 0</span>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
         </div>
-        <div class="q-palette-stats" id="questionPaletteStats">
-          <span>Đã làm: <strong>0</strong></span>
-          <span>Chưa làm: <strong>0</strong></span>
-          <span>Phân vân: <strong style="color:var(--warning)">0</strong></span>
-        </div>
+        <span class="kbd-hint-pill" title="Bấm phím A, B, C, D để chọn đáp án nhanh"><span class="kbd-cap">A–D</span> Chọn nhanh</span>
+        <div class="quiz-timer" id="quizTimer" style="display:none">30:00</div>
+        <button type="button" class="toolbar-mini-btn sticky-pal-toggle" id="stickyTogglePaletteBtn" onclick="toggleQuestionPalette()">Ẩn bảng</button>
       </div>
-      <div class="q-palette-grid" id="questionPaletteGrid"></div>
-      <div class="q-palette-legend">
-        <span class="qp-leg-item"><span class="qp-leg-dot"></span>Chưa làm</span>
-        <span class="qp-leg-item"><span class="qp-leg-dot is-answered"></span>Đã làm</span>
-        <span class="qp-leg-item"><span class="qp-leg-dot is-flagged"></span>Phân vân</span>
-        <span class="qp-leg-item"><span class="qp-leg-dot is-correct"></span>Đúng</span>
-        <span class="qp-leg-item"><span class="qp-leg-dot is-wrong"></span>Sai</span>
+
+      <div class="q-palette-card" id="questionPaletteCard">
+        <div class="q-palette-head">
+          <div class="q-palette-title">
+            <span>Bảng điều hướng câu hỏi</span>
+          </div>
+          <div class="q-palette-stats" id="questionPaletteStats">
+            <span>Đã làm: <strong>0</strong></span>
+            <span>Chưa làm: <strong>0</strong></span>
+            <span>Phân vân: <strong style="color:var(--warning)">0</strong></span>
+          </div>
+        </div>
+        <div class="q-palette-grid" id="questionPaletteGrid"></div>
+        <div class="q-palette-legend">
+          <span class="qp-leg-item"><span class="qp-leg-dot"></span>Chưa làm</span>
+          <span class="qp-leg-item"><span class="qp-leg-dot is-answered"></span>Đã làm</span>
+          <span class="qp-leg-item"><span class="qp-leg-dot is-flagged"></span>Phân vân</span>
+          <span class="qp-leg-item"><span class="qp-leg-dot is-correct"></span>Đúng</span>
+          <span class="qp-leg-item"><span class="qp-leg-dot is-wrong"></span>Sai</span>
+        </div>
       </div>
     </div>
 
@@ -1686,9 +1972,12 @@
     function toggleQuestionPalette() {
       const card = document.getElementById('questionPaletteCard');
       const btn = document.getElementById('togglePaletteBtn');
-      if (!card || !btn) return;
+      const stickyBtn = document.getElementById('stickyTogglePaletteBtn');
+      if (!card) return;
       const isCollapsed = card.classList.toggle('collapsed');
-      btn.textContent = isCollapsed ? 'Hiện bảng câu hỏi' : 'Ẩn bảng câu hỏi';
+      if (btn) btn.textContent = isCollapsed ? 'Hiện bảng câu hỏi' : 'Ẩn bảng câu hỏi';
+      if (stickyBtn) stickyBtn.textContent = isCollapsed ? 'Hiện bảng' : 'Ẩn bảng';
+      updateStickyTopState();
     }
 
     function isQuestionAnswered(q) {
@@ -1708,13 +1997,16 @@
       const card = document.getElementById('questionPaletteCard');
       const grid = document.getElementById('questionPaletteGrid');
       const statsEl = document.getElementById('questionPaletteStats');
+      const stickyBtn = document.getElementById('stickyTogglePaletteBtn');
       if (!card || !grid) return;
 
       if (isReviewMode || !quizData || quizData.length === 0) {
         card.style.display = 'none';
+        if (stickyBtn) stickyBtn.style.display = 'none';
         return;
       }
       card.style.display = '';
+      if (stickyBtn) stickyBtn.style.display = '';
 
       let answeredCount = 0;
       let flaggedCount = 0;
@@ -1749,10 +2041,27 @@
       }
     }
 
+    function updateStickyTopState() {
+      const stickyEl = document.getElementById('quizStickyTop');
+      if (!stickyEl) return;
+      const isStuck = window.scrollY > 0 && stickyEl.getBoundingClientRect().top <= 1;
+      stickyEl.classList.toggle('is-stuck', isStuck);
+    }
+
+    window.addEventListener('scroll', updateStickyTopState, { passive: true });
+    window.addEventListener('resize', updateStickyTopState, { passive: true });
+    window.addEventListener('DOMContentLoaded', updateStickyTopState);
+
     function scrollToQuestion(qId) {
       const card = document.querySelector(`.question-card[data-id="${qId}"]`);
       if (!card) return;
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const stickyEl = document.getElementById('quizStickyTop');
+      const stickyOffset = stickyEl ? (stickyEl.getBoundingClientRect().height + 12) : 90;
+      const cardTop = card.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({
+        top: Math.max(0, cardTop - stickyOffset),
+        behavior: 'smooth'
+      });
       card.style.boxShadow = '0 0 0 2px var(--accent)';
       setTimeout(() => { card.style.boxShadow = ''; }, 1000);
     }
@@ -2104,9 +2413,11 @@
           const tb = document.getElementById('studyToolbar');
           const pal = document.getElementById('questionPaletteCard');
           const sb = document.getElementById('submitBtn');
+          const stickyBtn = document.getElementById('stickyTogglePaletteBtn');
           if (tb) tb.style.display = 'none';
           if (pal) pal.style.display = 'none';
           if (sb) sb.style.display = 'none';
+          if (stickyBtn) stickyBtn.style.display = 'none';
           return;
         }
 
@@ -2288,6 +2599,8 @@
       if (isReviewMode) {
         if (toolbarEl) toolbarEl.style.display = 'none';
         if (paletteEl) paletteEl.style.display = 'none';
+        const stickyBtn = document.getElementById('stickyTogglePaletteBtn');
+        if (stickyBtn) stickyBtn.style.display = 'none';
         const submitBtn = document.getElementById('submitBtn');
         if (submitBtn) submitBtn.style.display = 'none';
         const reviewBar = document.getElementById('reviewBar');
