@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zphysics — Chính sách bảo mật &amp; Điều khoản sử dụng</title>
+  <meta name="description" content="Chính sách bảo mật dữ liệu và Điều khoản sử dụng nền tảng học Vật lý THPT Zphysics.">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_arial">
+  <script src="assets/js/pinui.js?v=20261118_arial"></script>
+  <script>PinUI.initTheme('light');</script>
+  <style>
+    :root {
+      --bg-deep: #f2ede4;
+      --bg: #f7f4ee;
+      --card: #fdfbf7;
+      --raised: #efe9df;
+      --border: rgba(31, 27, 22, 0.08);
+      --border-strong: rgba(31, 27, 22, 0.14);
+      --text: #1f1b16;
+      --text-secondary: #5e554a;
+      --muted: #7b7266;
+      --accent: #9c27b0;
+      --accent-subtle: rgba(156, 39, 176, 0.10);
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    html[data-theme="dark"] {
+      --bg-deep: #07080d;
+      --bg: #0b0d14;
+      --card: #11141c;
+      --raised: #1a1e28;
+      --border: rgba(238, 240, 245, 0.08);
+      --border-strong: rgba(238, 240, 245, 0.14);
+      --text: #eef0f5;
+      --text-secondary: #a3a9b8;
+      --muted: #7a8296;
+      --accent-subtle: rgba(156, 39, 176, 0.16);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+    }
+
+    .topbar-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-link {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 7px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      transition: background-color 150ms var(--ease), color 150ms var(--ease);
+    }
+
+    .back-link:hover {
+      background: var(--raised);
+      color: var(--text);
+    }
+
+    main {
+      flex: 1;
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 36px 24px 56px;
+    }
+
+    .policy-card {
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 36px;
+    }
+
+    .policy-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-subtle);
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 26px;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+
+    .updated-at {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    section + section {
+      margin-top: 24px;
+    }
+
+    h2 {
+      font-size: 17px;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    p, li {
+      font-size: 14.5px;
+      color: var(--text-secondary);
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-top: 6px;
+    }
+
+    li + li {
+      margin-top: 4px;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg-deep);
+      padding: 20px 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 640px) {
+      .policy-card {
+        padding: 24px 20px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="landing.html" class="brand">Z<span>physics</span></a>
+      <div class="topbar-actions">
+        <button type="button" class="pts-toggle" onclick="PinUI.toggleTheme(this)" aria-label="Đổi giao diện sáng tối" aria-pressed="false">
+          <svg class="pts-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+          <svg class="pts-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+        <a href="landing.html" class="back-link">Quay lại trang chủ</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <article class="policy-card">
+      <span class="policy-badge">Zphysics · zphysics.io.vn</span>
+      <h1>Chính sách bảo mật &amp; Điều khoản sử dụng</h1>
+      <p class="updated-at">Cập nhật lần cuối: 24/11/2026</p>
+
+      <section>
+        <h2>1. Thông tin Zphysics thu thập khi đăng nhập Google</h2>
+        <p>Khi học sinh đăng nhập vào Zphysics bằng tài khoản Google, hệ thống chỉ yêu cầu các thông tin hồ sơ cơ bản (<code>openid</code>, <code>email</code>, <code>profile</code>), bao gồm:</p>
+        <ul>
+          <li>Địa chỉ email Google (dùng làm định danh tài khoản duy nhất).</li>
+          <li>Tên hiển thị tài khoản Google.</li>
+        </ul>
+        <p>Zphysics <strong>không</strong> truy cập mật khẩu, danh bạ, Google Drive, email cá nhân hay bất kỳ dữ liệu riêng tư nào khác trong tài khoản Google của bạn.</p>
+      </section>
+
+      <section>
+        <h2>2. Mục đích sử dụng dữ liệu</h2>
+        <ul>
+          <li>Xác thực tài khoản đăng nhập vào hệ thống học tập Zphysics trên Web (<code>https://zphysics.io.vn</code>) và ứng dụng di động.</li>
+          <li>Lưu trữ và đồng bộ tiến độ bài giảng, kết quả làm bài trắc nghiệm, luyện đề theo đúng khối lớp và gói học tập (Free/Premium).</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>3. Lưu trữ, bảo mật và chia sẻ dữ liệu</h2>
+        <ul>
+          <li>Dữ liệu phiên đăng nhập và kết quả học tập được lưu trữ an toàn trên hạ tầng Supabase với cơ chế phân quyền theo từng tài khoản (Row Level Security).</li>
+          <li>Zphysics <strong>không bán, cho thuê hoặc chia sẻ</strong> thông tin cá nhân của học sinh cho bên thứ ba phục vụ quảng cáo.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>4. Quyền của người dùng &amp; Yêu cầu xóa dữ liệu</h2>
+        <p>Học sinh có thể đăng xuất bất kỳ lúc nào trong ứng dụng hoặc thu hồi quyền truy cập của Zphysics trong phần quản lý bảo mật của tài khoản Google. Nếu muốn xóa toàn bộ tài khoản và lịch sử học tập khỏi hệ thống, vui lòng liên hệ trực tiếp giáo viên phụ trách Zphysics để được hỗ trợ xử lý.</p>
+      </section>
+
+      <section>
+        <h2>5. Điều khoản sử dụng</h2>
+        <p>Tài liệu bài giảng, câu hỏi trắc nghiệm và đề thi trên Zphysics chỉ phục vụ mục đích học tập cá nhân của học sinh theo chương trình GDPT 2018. Không sao chép, phân phối lại nội dung vì mục đích thương mại khi chưa có sự đồng ý của Zphysics.</p>
+      </section>
+    </article>
+  </main>
+
+  <footer>
+    © 2026 Zphysics (zphysics.io.vn) — Hệ thống học và luyện đề Vật lý THPT.
+  </footer>
+</body>
+
+</html>

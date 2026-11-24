@@ -7,6 +7,7 @@
 
 var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
 var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
+var GOOGLE_WEB_CLIENT_ID = window.GOOGLE_WEB_CLIENT_ID || '1020898687836-e8os4pese1acht2ra3kegt275h1p0d4h.apps.googleusercontent.com';
 var SESSION_KEY = window.SESSION_KEY || 'zphysics_session';
 var NATIVE_AUTH_REDIRECT_URL = 'com.zanh.zphysics://auth/callback';
 var HANDLED_AUTH_URL_KEY = 'zphysics_handled_auth_url';
@@ -26,6 +27,10 @@ if (window.supabase) {
 var nativeAuthListenerAttached = false;
 var nativeAuthProcessingPromise = null;
 var activeNativeAuthUrl = null;
+var currentGoogleRawNonce = null;
+var currentGoogleHashedNonce = null;
+var googleWebObserverAttached = false;
+var googleWebInitStarted = false;
 
 function isNativeCapacitorApp() {
   try {
@@ -239,6 +244,163 @@ async function loginWithGoogle() {
     console.error('Lỗi khởi tạo Google OAuth:', err);
     alert('Không thể kết nối với dịch vụ Google: ' + (err.message || 'Lỗi mạng'));
   }
+}
+
+async function generateGoogleNoncePair() {
+  if (!window.crypto || !window.crypto.subtle || typeof window.crypto.getRandomValues !== 'function') {
+    return null;
+  }
+  const bytes = new Uint8Array(16);
+  window.crypto.getRandomValues(bytes);
+  const rawNonce = btoa(String.fromCharCode.apply(null, bytes));
+  const encoded = new TextEncoder().encode(rawNonce);
+  const hashBuffer = await window.crypto.subtle.digest('SHA-256', encoded);
+  const hashedNonce = Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  return { rawNonce, hashedNonce };
+}
+
+function renderGoogleWebButton() {
+  const container = document.getElementById('googleBtnContainer');
+  const nativeBtn = document.getElementById('nativeGoogleBtn');
+  if (!container || !window.google || !window.google.accounts || !window.google.accounts.id) {
+    return false;
+  }
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const parentWidth = container.parentElement ? container.parentElement.clientWidth : 340;
+  const btnWidth = Math.min(Math.max(Math.round(container.clientWidth || parentWidth || 320), 220), 400);
+
+  container.innerHTML = '';
+  container.style.display = 'flex';
+  container.style.justifyContent = 'center';
+
+  window.google.accounts.id.renderButton(container, {
+    theme: isDark ? 'filled_black' : 'outline',
+    size: 'large',
+    text: 'continue_with',
+    shape: 'rectangular',
+    width: btnWidth,
+    locale: 'vi'
+  });
+
+  if (nativeBtn) nativeBtn.style.display = 'none';
+  return true;
+}
+
+async function setupGoogleWebClient(forceNewNonce) {
+  if (!window.google || !window.google.accounts || !window.google.accounts.id || !sbClient) {
+    return false;
+  }
+
+  if (forceNewNonce || !currentGoogleRawNonce || !currentGoogleHashedNonce) {
+    const pair = await generateGoogleNoncePair();
+    if (!pair) return false;
+    currentGoogleRawNonce = pair.rawNonce;
+    currentGoogleHashedNonce = pair.hashedNonce;
+  }
+
+  window.google.accounts.id.initialize({
+    client_id: GOOGLE_WEB_CLIENT_ID,
+    callback: handleGoogleCredentialResponse,
+    nonce: currentGoogleHashedNonce,
+    use_fedcm_for_prompt: true
+  });
+
+  return renderGoogleWebButton();
+}
+
+async function handleGoogleCredentialResponse(response) {
+  const sub = document.getElementById('loginSubtitle');
+  const errEl = document.getElementById('loginError');
+  if (errEl) {
+    errEl.textContent = '';
+    errEl.classList.remove('visible');
+  }
+  if (!sbClient || !response || !response.credential) return;
+  if (sub) sub.textContent = 'Đang xác thực tài khoản Google...';
+
+  try {
+    const { data, error } = await sbClient.auth.signInWithIdToken({
+      provider: 'google',
+      token: response.credential,
+      nonce: currentGoogleRawNonce
+    });
+    if (error) throw error;
+
+    if (data && data.session) {
+      const synced = await syncAndGetAuthSession();
+      if (synced && synced.gmail) {
+        navigateToAppHomeAfterLogin();
+        return;
+      }
+    }
+    throw new Error('Không khởi tạo được phiên đăng nhập Zphysics.');
+  } catch (err) {
+    console.error('Lỗi xác thực Google ID Token:', err);
+    const msg = 'Đăng nhập Google thất bại: ' + (err.message || 'Lỗi xác thực');
+    if (errEl) {
+      errEl.textContent = msg;
+      errEl.classList.add('visible');
+    } else {
+      alert(msg);
+    }
+    if (sub) sub.textContent = 'Đăng nhập không thành công. Vui lòng bấm thử lại!';
+    setupGoogleWebClient(true).catch(() => {});
+  }
+}
+
+function attachGoogleThemeObserver() {
+  if (googleWebObserverAttached || typeof MutationObserver === 'undefined') return;
+  googleWebObserverAttached = true;
+  const observer = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.attributeName === 'data-theme') {
+        renderGoogleWebButton();
+        break;
+      }
+    }
+  });
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+}
+
+function initGoogleWebSignIn() {
+  if (googleWebInitStarted) return;
+  const container = document.getElementById('googleBtnContainer');
+  const nativeBtn = document.getElementById('nativeGoogleBtn');
+  if (!container) return;
+
+  if (isNativeCapacitorApp() || !GOOGLE_WEB_CLIENT_ID) {
+    if (nativeBtn) nativeBtn.style.display = 'flex';
+    return;
+  }
+
+  googleWebInitStarted = true;
+  let attempts = 0;
+  const tryInit = async () => {
+    attempts += 1;
+    if (window.google && window.google.accounts && window.google.accounts.id && sbClient) {
+      const ok = await setupGoogleWebClient(false);
+      if (ok) {
+        attachGoogleThemeObserver();
+        return;
+      }
+    }
+    if (attempts < 50) {
+      setTimeout(tryInit, 100);
+    } else if (nativeBtn) {
+      nativeBtn.style.display = 'flex';
+    }
+  };
+
+  tryInit();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initGoogleWebSignIn);
+} else {
+  initGoogleWebSignIn();
 }
 
 /**
