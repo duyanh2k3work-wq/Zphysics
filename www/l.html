@@ -10,6 +10,8 @@
   <title>Zphysics — Phòng luyện đề</title>
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/auth.js?v=20261124_sec"></script>
   <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_feat2">
   <script src="assets/js/pinui.js?v=20261118_arial"></script>
   <script>PinUI.initTheme('dark');</script>
@@ -1163,7 +1165,26 @@
     var SESSION_KEY = window.SESSION_KEY || 'zphysics_session';
     var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
     var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
-    const SHEETS_API_URL = localStorage.getItem('ZPHYSICS_API_URL') || 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
+    const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
+
+    function escapeExamHtml(str) {
+      return String(str === undefined || str === null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function sanitizeExamHttpUrl(rawUrl) {
+      if (typeof window.sanitizeHttpUrl === 'function') {
+        return window.sanitizeHttpUrl(rawUrl, false);
+      }
+      if (typeof rawUrl !== 'string') return '';
+      const trimmed = rawUrl.trim();
+      if (!trimmed || trimmed === '#' || /[\u0000-\u001F\u007F]/.test(trimmed)) return '';
+      return /^https?:\/\/[^\s"'<>]+$/i.test(trimmed) ? trimmed : '';
+    }
 
     function getSession() {
       try {
@@ -1183,7 +1204,7 @@
       }
     }
 
-    const currentSession = getSession();
+    let currentSession = null;
     function parseUrlExamParams() {
       const searchParams = new URLSearchParams(window.location.search);
       let dMode = searchParams.get('demo');
@@ -1213,6 +1234,11 @@
     }
 
     let { examId, demoMode } = parseUrlExamParams();
+    const isDemoMode = (demoMode === 'premium');
+    if (isDemoMode) {
+      // Chế độ demo chỉ được phép mở duy nhất đề mẫu de_thi_thu_01
+      examId = 'de_thi_thu_01';
+    }
 
     function findExamById(list, targetId) {
       if (!Array.isArray(list) || list.length === 0) return null;
@@ -1228,24 +1254,18 @@
       }
     }
 
-    if (!currentSession && demoMode !== 'premium') {
-      window.location.href = './';
-    } else {
-      if (currentSession && !currentSession.premium && demoMode !== 'premium') {
-        window.location.href = 'premium.html';
-      }
-    }
-
     let examData = null;
     let timeRemaining = 3000;
     let timerInterval = null;
     let submitted = false;
+    let isSubmittingExam = false;
     let currentMobileView = 'pdf';
     let countdownTimerId = null;
     let isExamUnlocked = false;
     let flaggedExamItems = new Set();
     let examResultsMap = {};
     let examAutosaveIntervalId = null;
+    let reloadUnlockedExamFn = null;
 
     function getExamDraftKey() {
       const targetId = (examData && examData.id) || examId || 'default';
@@ -1532,9 +1552,9 @@
       examData = data;
       const openDate = parseExamOpenTime(data);
 
-      if (openDate && openDate.getTime() > Date.now()) {
+      if (data.locked || (openDate && openDate.getTime() > Date.now())) {
         if (!isExamUnlocked) {
-          showExamLockScreen(data, openDate);
+          showExamLockScreen(data, openDate || new Date(Date.now() + 60000));
           return;
         }
       }
@@ -1592,6 +1612,13 @@
     }
 
     function unlockAndStartExam(data) {
+      if ((!data || !data.pdfUrl) && typeof reloadUnlockedExamFn === 'function') {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.style.display = 'flex';
+        isExamUnlocked = false;
+        reloadUnlockedExamFn();
+        return;
+      }
       isExamUnlocked = true;
       if (countdownTimerId) {
         clearInterval(countdownTimerId);
@@ -1626,13 +1653,26 @@
     }
 
     async function initExamPage() {
-      const nameInput = document.getElementById('studentName');
-      if (currentSession && currentSession.ten) {
-        nameInput.value = currentSession.ten;
-        if (!currentSession.gmail.startsWith('demo_')) {
-          nameInput.disabled = true;
-          nameInput.style.opacity = '0.7';
+      if (!isDemoMode) {
+        const verifiedSession = await syncAndGetAuthSession();
+        if (!verifiedSession || !verifiedSession.gmail) {
+          window.location.href = 'landing.html';
+          return;
         }
+        if (!verifiedSession.premium) {
+          window.location.href = 'premium.html';
+          return;
+        }
+        currentSession = verifiedSession;
+      } else {
+        currentSession = await syncAndGetAuthSession();
+      }
+
+      const nameInput = document.getElementById('studentName');
+      if (currentSession && currentSession.ten && nameInput) {
+        nameInput.value = currentSession.ten;
+        nameInput.disabled = true;
+        nameInput.style.opacity = '0.7';
       }
 
       const backBtn = document.querySelector('.back-btn');
@@ -1652,92 +1692,122 @@
         }
       });
 
-      let list = [];
-      try {
-        const cached = localStorage.getItem('zphysics_exams_cache');
-        if (cached) {
-          list = JSON.parse(cached);
-          if (Array.isArray(list) && list.length > 0) {
-            const found = findExamById(list, examId);
-            if (found) checkAndLoadExam(found);
-          }
-        }
-      } catch (e) {}
-
       const fetchExamData = async () => {
+        const targetId = isDemoMode ? 'de_thi_thu_01' : (examId || 'de_thi_thu_01');
+        const authToken = (currentSession && currentSession.access_token) ? currentSession.access_token : SUPABASE_ANON_KEY;
+
         try {
-          const response = await fetch(`${SUPABASE_URL}/rest/v1/exams?select=*`, {
+          let freshExam = null;
+          const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_unlocked_exam`, {
+            method: 'POST',
             cache: 'no-store',
             headers: {
+              'Content-Type': 'application/json',
               'apikey': SUPABASE_ANON_KEY,
-              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-            }
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ p_exam_id: targetId })
           });
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          const data = await response.json();
-          const freshList = data.map(item => ({
-            ...item,
-            desc: item.description,
-            lop: item.grade,
-            pdfUrl: item.pdf_url,
-            videoUrl: item.video_url,
-            mcAnswers: item.mc_answers,
-            tfAnswers: item.tf_answers,
-            saAnswers: item.sa_answers,
-            openAt: item.open_at || ''
-          }));
 
-          if (freshList && freshList.length > 0) {
-            try {
-              localStorage.setItem('zphysics_exams_cache', JSON.stringify(freshList));
-            } catch (e) {}
-            const freshExam = findExamById(freshList, examId) || (!examId ? freshList[0] : null);
-            if (freshExam) {
-              const isDifferent = !examData ||
-                examData.id !== freshExam.id ||
-                examData.title !== freshExam.title ||
-                examData.pdfUrl !== freshExam.pdfUrl ||
-                examData.mcAnswers !== freshExam.mcAnswers ||
-                examData.tfAnswers !== freshExam.tfAnswers ||
-                examData.saAnswers !== freshExam.saAnswers ||
-                examData.openAt !== freshExam.openAt;
-              if (!isExamUnlocked || (isDifferent && !submitted)) {
-                isExamUnlocked = false;
-                checkAndLoadExam(freshExam);
+          if (rpcRes.status === 401 || rpcRes.status === 403) {
+            if (!isDemoMode) {
+              window.location.href = 'premium.html';
+              return;
+            }
+            throw new Error('Không có quyền truy cập đề thi.');
+          }
+
+          if (rpcRes.status === 404) {
+            // Fallback tương thích khi chưa chạy supabase/security_rls.sql
+            const legacyRes = await fetch(`${SUPABASE_URL}/rest/v1/exams?id=eq.${encodeURIComponent(targetId)}&select=*`, {
+              cache: 'no-store',
+              headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${authToken}`
               }
+            });
+            if (!legacyRes.ok) throw new Error('HTTP ' + legacyRes.status);
+            const rows = await legacyRes.json();
+            const item = Array.isArray(rows) ? rows[0] : rows;
+            if (item) {
+              freshExam = {
+                ...item,
+                desc: item.description,
+                lop: item.grade,
+                pdfUrl: item.pdf_url,
+                videoUrl: item.video_url,
+                mcAnswers: item.mc_answers,
+                tfAnswers: item.tf_answers,
+                saAnswers: item.sa_answers,
+                openAt: item.open_at || ''
+              };
+            }
+          } else {
+            if (!rpcRes.ok) throw new Error('HTTP ' + rpcRes.status);
+            const rows = await rpcRes.json();
+            const row = Array.isArray(rows) ? rows[0] : rows;
+            if (row) {
+              freshExam = {
+                id: row.id,
+                title: row.title,
+                desc: row.description,
+                description: row.description,
+                duration: row.duration,
+                lop: row.grade,
+                pdfUrl: row.pdf_url || '',
+                videoUrl: row.video_url || '',
+                mcCount: typeof row.mc_count === 'number' ? row.mc_count : undefined,
+                tfCount: typeof row.tf_count === 'number' ? row.tf_count : undefined,
+                saCount: typeof row.sa_count === 'number' ? row.sa_count : undefined,
+                locked: !!row.locked,
+                openAt: row.open_at || ''
+              };
             }
           }
-        } catch (err) {
-          console.warn('Supabase chậm hoặc lỗi, dùng dữ liệu offline:', err);
-          if (!isExamUnlocked && !examData) {
-            try {
-              const res = await fetch('luyende.json?v=' + Date.now());
-              if (res.ok) {
-                const offlineList = await res.json();
-                try {
-                  localStorage.setItem('zphysics_exams_cache', JSON.stringify(offlineList));
-                } catch (e) {}
-                const offExam = findExamById(offlineList, examId) || (!examId ? offlineList[0] : null);
-                if (offExam) {
-                  checkAndLoadExam(offExam);
-                } else {
-                  showError('Không tìm thấy thông tin đề thi.');
-                }
-              } else {
-                showError('Không thể tải dữ liệu đề thi.');
-              }
-            } catch (e) {
-              console.error('Không thể tải luyende.json:', e);
-              showError('Không thể tải dữ liệu đề thi.');
+
+          if (freshExam) {
+            const isDifferent = !examData ||
+              examData.id !== freshExam.id ||
+              examData.title !== freshExam.title ||
+              examData.pdfUrl !== freshExam.pdfUrl ||
+              examData.locked !== freshExam.locked ||
+              examData.openAt !== freshExam.openAt;
+            if (!isExamUnlocked || (isDifferent && !submitted)) {
+              isExamUnlocked = false;
+              checkAndLoadExam(freshExam);
             }
+          } else if (targetId.toLowerCase() === 'de_thi_thu_01') {
+            throw new Error('FALLBACK_DEMO');
+          } else {
+            showError('Không tìm thấy thông tin đề thi.');
+          }
+        } catch (err) {
+          console.warn('Lỗi tải đề từ Supabase:', err);
+          if (!isExamUnlocked && !examData) {
+            if (targetId.toLowerCase() === 'de_thi_thu_01') {
+              try {
+                const res = await fetch('luyende.json?v=' + Date.now());
+                if (res.ok) {
+                  const offlineList = await res.json();
+                  const offExam = findExamById(offlineList, 'de_thi_thu_01') || offlineList[0];
+                  if (offExam) {
+                    checkAndLoadExam(offExam);
+                    return;
+                  }
+                }
+              } catch (e) {}
+            }
+            showError('Không thể tải dữ liệu đề thi. Vui lòng kiểm tra kết nối mạng và thử lại.');
           }
         }
       };
 
+      reloadUnlockedExamFn = fetchExamData;
       fetchExamData();
 
       window.addEventListener('hashchange', () => {
         const parsed = parseUrlExamParams();
+        if (isDemoMode) return;
         if (parsed.examId && parsed.examId !== examId) {
           examId = parsed.examId;
           submitted = false;
@@ -1757,7 +1827,7 @@
     function showError(msg) {
       document.getElementById('loadingOverlay').innerHTML =
         `<div style="color:var(--wrong); font-weight:500; font-size:15px; text-align:center; padding:24px;">
-          Lỗi: ${msg}<br><br>
+          Lỗi: ${escapeExamHtml(msg)}<br><br>
           <a href="./" style="color:var(--accent); text-decoration:none; font-size:14px;">Quay lại trang chủ</a>
          </div>`;
     }
@@ -1775,26 +1845,30 @@
       isExamUnlocked = true;
       document.getElementById('examTitle').textContent = data.title;
 
-      const fileId = extractDriveFileId(data.pdfUrl);
+      const safePdfUrl = sanitizeExamHttpUrl(data.pdfUrl || '');
+      const fileId = extractDriveFileId(safePdfUrl);
       const pdfOpenBtn = document.getElementById('btnPdfOpen');
       const popoutBtn = document.getElementById('btnPdfPopout');
       const iframe = document.getElementById('pdfViewer');
 
-      if (pdfOpenBtn) pdfOpenBtn.href = data.pdfUrl;
+      if (pdfOpenBtn) pdfOpenBtn.href = safePdfUrl || '#';
 
       if (popoutBtn) {
         popoutBtn.onclick = (e) => {
           e.preventDefault();
+          if (!safePdfUrl) return;
           const w = Math.min(Math.floor(window.screen.availWidth * 0.55), 960);
           const h = Math.floor(window.screen.availHeight * 0.92);
-          window.open(data.pdfUrl, 'zphysics_pdf_window', `width=${w},height=${h},top=40,left=30,resizable=yes,scrollbars=yes`);
+          window.open(safePdfUrl, 'zphysics_pdf_window', `width=${w},height=${h},top=40,left=30,resizable=yes,scrollbars=yes`);
         };
       }
 
       if (fileId) {
-        iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
+        iframe.src = `https://drive.google.com/file/d/${encodeURIComponent(fileId)}/preview`;
+      } else if (safePdfUrl) {
+        iframe.src = safePdfUrl;
       } else {
-        iframe.src = data.pdfUrl;
+        iframe.removeAttribute('src');
       }
 
       const durationMin = data.duration || 50;
@@ -1873,11 +1947,27 @@
       const mcKeys = parseMCKeys(data);
       const tfKeys = parseTFKeys(data);
       const saKeys = parseSAKeys(data);
+      const hasCounts = data && (
+        typeof data.mcCount === 'number' ||
+        typeof data.tfCount === 'number' ||
+        typeof data.saCount === 'number'
+      );
+      const isZeroCounts = hasCounts && (
+        Number(data.mcCount || 0) === 0 &&
+        Number(data.tfCount || 0) === 0 &&
+        Number(data.saCount || 0) === 0
+      );
       const isEmptyAll = mcKeys.length === 0 && tfKeys.length === 0 && saKeys.length === 0;
 
-      const mcCount = isEmptyAll ? 18 : mcKeys.length;
-      const tfCount = isEmptyAll ? 4 : tfKeys.length;
-      const saCount = isEmptyAll ? 6 : saKeys.length;
+      const mcCount = mcKeys.length > 0
+        ? mcKeys.length
+        : (hasCounts ? (isZeroCounts ? 18 : Number(data.mcCount || 0)) : (isEmptyAll ? 18 : 0));
+      const tfCount = tfKeys.length > 0
+        ? tfKeys.length
+        : (hasCounts ? (isZeroCounts ? 4 : Number(data.tfCount || 0)) : (isEmptyAll ? 4 : 0));
+      const saCount = saKeys.length > 0
+        ? saKeys.length
+        : (hasCounts ? (isZeroCounts ? 6 : Number(data.saCount || 0)) : (isEmptyAll ? 6 : 0));
 
       const mcMaxScore = Math.round(mcCount * 0.25 * 100) / 100;
       const tfMaxScore = Math.round(tfCount * 1.0 * 100) / 100;
@@ -2178,8 +2268,79 @@
       return false;
     }
 
-    function submitExam(isTimeout = false) {
-      if (submitted) return;
+    async function ensureExamAnswerKeysLoaded() {
+      if (!examData) return false;
+      const hasAnyKey = !!(
+        examData.mcAnswers || examData.mc_answers ||
+        examData.tfAnswers || examData.tf_answers ||
+        examData.saAnswers || examData.sa_answers
+      );
+      if (hasAnyKey) return true;
+
+      const targetId = examData.id || examId || 'de_thi_thu_01';
+      const authToken = (currentSession && currentSession.access_token) ? currentSession.access_token : SUPABASE_ANON_KEY;
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_exam_answer_key`, {
+          method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({ p_exam_id: targetId })
+        });
+
+        let row = null;
+        if (res.status === 404) {
+          const legacyRes = await fetch(`${SUPABASE_URL}/rest/v1/exams?id=eq.${encodeURIComponent(targetId)}&select=mc_answers,tf_answers,sa_answers`, {
+            cache: 'no-store',
+            headers: {
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
+          if (legacyRes.ok) {
+            const legacyRows = await legacyRes.json();
+            row = Array.isArray(legacyRows) ? legacyRows[0] : legacyRows;
+          }
+        } else if (res.ok) {
+          const rows = await res.json();
+          row = Array.isArray(rows) ? rows[0] : rows;
+        }
+
+        if (row) {
+          examData.mcAnswers = row.mc_answers || '';
+          examData.tfAnswers = row.tf_answers || '';
+          examData.saAnswers = row.sa_answers || '';
+          return true;
+        }
+      } catch (err) {
+        console.error('Lỗi lấy đáp án chấm bài:', err);
+      }
+
+      if (String(targetId).toLowerCase() === 'de_thi_thu_01') {
+        try {
+          const resJson = await fetch('luyende.json?v=' + Date.now());
+          if (resJson.ok) {
+            const offlineList = await resJson.json();
+            const offExam = findExamById(offlineList, 'de_thi_thu_01');
+            if (offExam) {
+              examData.mcAnswers = offExam.mcAnswers || '';
+              examData.tfAnswers = offExam.tfAnswers || '';
+              examData.saAnswers = offExam.saAnswers || '';
+              return true;
+            }
+          }
+        } catch (e) {}
+      }
+
+      return false;
+    }
+
+    async function submitExam(isTimeout = false) {
+      if (submitted || isSubmittingExam) return;
 
       const nameInput = document.getElementById('studentName');
       let studentName = nameInput.value.trim();
@@ -2221,7 +2382,30 @@
         }
       }
 
+      isSubmittingExam = true;
+      const submitBtnEl = document.getElementById('submitBtn');
+      const mobileSubmitBtnEl = document.getElementById('btnMobileSubmit');
+      const prevSubmitText = submitBtnEl ? submitBtnEl.textContent : 'Xác nhận nộp bài';
+      if (submitBtnEl) {
+        submitBtnEl.disabled = true;
+        submitBtnEl.textContent = 'Đang chấm điểm...';
+      }
+      if (mobileSubmitBtnEl) mobileSubmitBtnEl.disabled = true;
+
+      const keysLoaded = await ensureExamAnswerKeysLoaded();
+      if (!keysLoaded) {
+        isSubmittingExam = false;
+        if (submitBtnEl) {
+          submitBtnEl.disabled = false;
+          submitBtnEl.textContent = prevSubmitText;
+        }
+        if (mobileSubmitBtnEl) mobileSubmitBtnEl.disabled = false;
+        alert('Không thể kết nối máy chủ chấm điểm. Đáp án của em vẫn được giữ nguyên, vui lòng kiểm tra mạng và bấm Nộp bài lại!');
+        return;
+      }
+
       submitted = true;
+      isSubmittingExam = false;
       clearInterval(timerInterval);
       try { localStorage.removeItem(getExamDraftKey()); } catch (e) {}
       updateExamAutosaveStatus('Đã nộp bài', true);
@@ -2231,10 +2415,8 @@
       document.querySelectorAll('.tf-btn').forEach(btn => btn.classList.add('locked'));
       document.querySelectorAll('.sa-input').forEach(inp => inp.disabled = true);
       document.querySelectorAll('.exam-flag-btn').forEach(btn => btn.disabled = true);
-      document.getElementById('submitBtn').disabled = true;
-
-      const mobileSubmitBtn = document.getElementById('btnMobileSubmit');
-      if (mobileSubmitBtn) mobileSubmitBtn.disabled = true;
+      if (submitBtnEl) submitBtnEl.disabled = true;
+      if (mobileSubmitBtnEl) mobileSubmitBtnEl.disabled = true;
 
       const { mcKeys, tfKeys: tfQuestionKeys, saKeys, mcCount, tfCount, saCount, saPointEach } = getExamStructure(examData);
       let scorePart1 = 0;
@@ -2359,7 +2541,7 @@
       sendToTelegram(studentName, totalScore, wrongList);
 
       if (currentSession && currentSession.gmail) {
-        saveProgressToSupabase(currentSession.gmail, examId, 'exam', totalScore);
+        saveProgressToSupabase(currentSession.gmail, examData.id || examId, 'exam', totalScore);
       }
     }
 
@@ -2379,7 +2561,12 @@
       try {
         await fetch(SHEETS_API_URL, {
           method: 'POST',
-          body: JSON.stringify({ action: 'sendReport', message: message })
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'sendReport',
+            message: message,
+            accessToken: (currentSession && currentSession.access_token) ? currentSession.access_token : ''
+          })
         });
       } catch (err) {
         console.warn('Lỗi gửi báo cáo thi về Telegram:', err);

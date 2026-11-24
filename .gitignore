@@ -26,3 +26,11 @@ dev_server.js
 .clasprc.json
 **/.clasprc.json
 **/.clasp.json
+
+# Environment, signing keys, and local private IDs
+.env
+.env.*
+*.keystore
+*.jks
+keystore.properties
+.agents/*.local.json

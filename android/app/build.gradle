@@ -16,9 +16,33 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    def keystorePropsFile = rootProject.file('keystore.properties')
+    if (!keystorePropsFile.exists()) {
+        keystorePropsFile = file('../../keystore.properties')
+    }
+    def keystoreProps = new Properties()
+    def hasReleaseKeystore = false
+    if (keystorePropsFile.exists()) {
+        keystorePropsFile.withInputStream { keystoreProps.load(it) }
+        if (keystoreProps['storeFile'] && file(keystoreProps['storeFile']).exists()) {
+            hasReleaseKeystore = true
+        }
+    }
+
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            release {
+                storeFile file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            signingConfig hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

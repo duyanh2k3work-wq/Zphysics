@@ -33,6 +33,8 @@ var SUPABASE_ANON_KEY = (scriptProperties.getProperty('SUPABASE_ANON_KEY') || "s
 // CÁC KHÓA BẢO MẬT CAO: Đọc trực tiếp từ môi trường bảo mật của Google, KHÔNG ghi đè thô vào code
 var SUPABASE_KEY = (scriptProperties.getProperty('SUPABASE_KEY') || "").trim(); 
 var TELEGRAM_BOT_TOKEN = (scriptProperties.getProperty('TELEGRAM_BOT_TOKEN') || "").trim();
+var ADMIN_API_SECRET = (scriptProperties.getProperty('ADMIN_API_SECRET') || "").trim();
+var TELEGRAM_WEBHOOK_SECRET = (scriptProperties.getProperty('TELEGRAM_WEBHOOK_SECRET') || "").trim();
 
 var WEB_APP_URL = (scriptProperties.getProperty('WEB_APP_URL') || "https://zphysics.io.vn").trim();
 // =========================================================================

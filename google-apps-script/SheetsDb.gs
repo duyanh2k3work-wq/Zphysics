@@ -464,8 +464,9 @@ function registerStudent(gmail, name, lop) {
 }
 
 // Nâng cấp tài khoản Premium cho học sinh
-function upgradePremium(gmail) {
+function upgradePremium(gmail, fallbackName) {
   if (!gmail) return { success: false, message: 'Gmail không được để trống' };
+  gmail = String(gmail).trim().toLowerCase();
   
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = null;
@@ -491,21 +492,37 @@ function upgradePremium(gmail) {
     }
   }
   
+  var displayName = fallbackName ? String(fallbackName).trim() : gmail.split('@')[0];
+  
   if (foundRow === -1) {
-    return { success: false, message: 'Không tìm thấy tài khoản học sinh' };
+    // Học sinh đăng nhập Google OAuth lần đầu chưa có dòng trên Sheet -> tự thêm mới với gói premium
+    sheet.appendRow([gmail, displayName, '', 'premium', '', '']);
+  } else {
+    // Cập nhật cột D (Loại tài khoản) thành 'premium'
+    // Cột E (Hạn dùng) thành trống (trọn đời)
+    sheet.getRange(foundRow, 4).setValue('premium');
+    sheet.getRange(foundRow, 5).setValue('');
   }
   
-  // Cập nhật cột D (Loại tài khoản) thành 'premium'
-  // Cột E (Hạn dùng) thành trống (trọn đời)
-  sheet.getRange(foundRow, 4).setValue('premium');
-  sheet.getRange(foundRow, 5).setValue('');
-  
-  // Đồng bộ sang Supabase
+  // Đồng bộ sang Supabase (dùng PATCH nếu đã có dòng để giữ nguyên cột lớp/tên hiện có)
   try {
-    supabaseRequest('students?email=eq.' + encodeURIComponent(gmail), 'PATCH', {
-      role: 'premium',
-      premium_until: null
-    });
+    var existing = supabaseRequest('students?email=eq.' + encodeURIComponent(gmail) + '&select=email', 'GET');
+    if (existing && existing.length > 0) {
+      supabaseRequest('students?email=eq.' + encodeURIComponent(gmail), 'PATCH', {
+        role: 'premium',
+        premium_until: null
+      });
+    } else {
+      supabaseRequest('students?on_conflict=email', 'POST', [{
+        email: gmail,
+        full_name: displayName,
+        lop: '',
+        role: 'premium',
+        premium_until: null
+      }], {
+        'Prefer': 'resolution=merge-duplicates'
+      });
+    }
   } catch (err) {
     console.warn("Lỗi đồng bộ Supabase khi nâng cấp Premium: " + err.message);
   }

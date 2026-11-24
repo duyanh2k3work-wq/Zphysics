@@ -793,8 +793,8 @@ function handleCauHoi(chatId) {
                        "<b>C.</b> " + q.c + "\n" +
                        "<b>D.</b> " + q.d;
     
-    // Callback data: q|ChosenAnswer|CorrectAnswer|Made|QuestionID
-    var cbBase = q.correct + "|" + q.made + "|" + q.qid;
+    // Callback data: q|ChosenAnswer|Made|QuestionID (KHÔNG nhúng đáp án đúng vào callback_data)
+    var cbBase = q.made + "|" + q.qid;
     var keyboard = [[
       { text: "🅰️ A", callback_data: "q|A|" + cbBase },
       { text: "🅱️ B", callback_data: "q|B|" + cbBase },
@@ -824,8 +824,9 @@ function handleCauHoi(chatId) {
 function handleCallbackQuery(callbackQuery) {
   var chatId = callbackQuery.message.chat.id;
   var messageId = callbackQuery.message.message_id;
-  var data = callbackQuery.data;
+  var data = callbackQuery.data || '';
   var callbackId = callbackQuery.id;
+  var cache = CacheService.getScriptCache();
   
   // Xóa trạng thái loading trên nút
   UrlFetchApp.fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/answerCallbackQuery', {
@@ -835,46 +836,33 @@ function handleCallbackQuery(callbackQuery) {
     'muteHttpExceptions': true
   });
   
-  // Xử lý nút "Câu tiếp theo"
+  // Xử lý nút "Câu tiếp theo" (chống bấm đúp liên tiếp trong 5 giây)
   if (data === 'next_q') {
+    var nextLockKey = 'tg_next_' + chatId + '_' + messageId;
+    if (cache.get(nextLockKey)) return;
+    cache.put(nextLockKey, '1', 5);
     handleCauHoi(chatId);
     return;
   }
   
-  // Parse: q|Chosen|Correct|Made|QuestionID
+  // Parse định dạng mới: q|Chosen|Made|QuestionID (hỗ trợ cả định dạng cũ 5 phần nhưng luôn lấy đáp án từ DB)
   var parts = data.split('|');
-  if (parts[0] !== 'q' || parts.length < 5) return;
+  if (parts[0] !== 'q' || (parts.length !== 4 && parts.length < 5)) return;
   
-  var chosen = parts[1];
-  var correct = parts[2];
-  var made = parts[3];
-  var questionId = parts[4];
-  var isCorrect = (chosen === correct);
+  var chosen = String(parts[1] || '').trim().toUpperCase();
+  if (chosen !== 'A' && chosen !== 'B' && chosen !== 'C' && chosen !== 'D') return;
   
-  // Tìm lời giải thích từ Supabase để tối ưu tốc độ phản hồi (tránh đọc Google Sheets quá chậm)
-  var explanation = "";
-  try {
-    var qData = supabaseRequest('questions?made=eq.' + encodeURIComponent(made) + '&question_id=eq.' + questionId + '&select=explanation', 'GET');
-    if (qData && qData.length > 0) {
-      explanation = trimCell(qData[0].explanation);
-    }
-  } catch (e) {
-    Logger.log("Lỗi tra explanation từ Supabase: " + e.message);
+  var made = parts.length === 4 ? trimCell(parts[2]) : trimCell(parts[3]);
+  var rawQid = parts.length === 4 ? parts[3] : parts[4];
+  var questionId = parseInt(rawQid, 10);
+  if (!made || isNaN(questionId)) return;
+  
+  // Chống replay cùng một câu hỏi (mỗi messageId chỉ được chấm 1 lần)
+  var cbLockKey = 'tg_cb_' + chatId + '_' + messageId;
+  if (cache.get(cbLockKey)) {
+    return;
   }
-  
-  // Cập nhật điểm gamification
-  var student = findStudentByChatId(chatId);
-  var pointsEarned = 0;
-  var totalPoints = 0;
-  var currentStreak = 0;
-  
-  if (student) {
-    if (isCorrect) {
-      pointsEarned = 10;
-      totalPoints = updateGamePoints(student.email, pointsEarned);
-    }
-    currentStreak = updateStreak(student.email);
-  }
+  cache.put(cbLockKey, '1', 21600);
   
   // Xóa keyboard khỏi tin nhắn cũ
   UrlFetchApp.fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/editMessageReplyMarkup', {
@@ -888,12 +876,64 @@ function handleCallbackQuery(callbackQuery) {
     'muteHttpExceptions': true
   });
   
+  // Tìm đáp án đúng và lời giải thích trực tiếp từ Supabase (không tin vào dữ liệu client gửi lên)
+  var correct = "";
+  var explanation = "";
+  try {
+    var qData = supabaseRequest(
+      'questions?made=eq.' + encodeURIComponent(made) +
+      '&question_id=eq.' + encodeURIComponent(String(questionId)) +
+      '&select=correct,explanation',
+      'GET'
+    );
+    if (qData && qData.length > 0) {
+      correct = trimCell(qData[0].correct).toUpperCase();
+      explanation = trimCell(qData[0].explanation);
+    }
+  } catch (e) {
+    Logger.log("Lỗi tra đáp án/explanation từ Supabase: " + e.message);
+  }
+  
+  if (!correct) {
+    sendTelegramMessage(chatId, "⚠️ Không thể xác minh đáp án của câu hỏi này lúc này. Vui lòng thử lại sau.");
+    return;
+  }
+  
+  var isCorrect = (chosen === correct);
+  
+  // Cập nhật điểm gamification (chỉ cộng nếu student tồn tại và chưa vượt quá 3 lượt nhận điểm/ngày)
+  var student = findStudentByChatId(chatId);
+  var pointsEarned = 0;
+  var totalPoints = 0;
+  var currentStreak = 0;
+  var dailyCapReached = false;
+  
+  if (student) {
+    var todayStr = Utilities.formatDate(new Date(), "GMT+7", "yyyy-MM-dd");
+    var dailyAnsKey = 'tg_ans_' + student.email.replace(/[^a-zA-Z0-9_.-]/g, '_').slice(0, 120) + '_' + todayStr;
+    var ansToday = parseInt(cache.get(dailyAnsKey) || '0', 10);
+    if (isNaN(ansToday)) ansToday = 0;
+    
+    if (ansToday < 3) {
+      cache.put(dailyAnsKey, String(ansToday + 1), 86400);
+      if (isCorrect) {
+        pointsEarned = 10;
+        totalPoints = updateGamePoints(student.email, pointsEarned);
+      }
+      currentStreak = updateStreak(student.email);
+    } else {
+      dailyCapReached = true;
+    }
+  }
+  
   // Gửi kết quả
   var resultMsg = "";
   if (isCorrect) {
     resultMsg = "✅ <b>CHÍNH XÁC!</b> Đáp án <b>" + correct + "</b> 🎉\n\n";
     if (pointsEarned > 0) {
       resultMsg += "+" + pointsEarned + " điểm ⭐ (Tổng: <b>" + totalPoints + "</b> điểm)\n";
+    } else if (dailyCapReached) {
+      resultMsg += "<i>(Đã đạt giới hạn cộng điểm tối đa 3 câu hôm nay)</i>\n";
     }
   } else {
     resultMsg = "❌ <b>SAI RỒI!</b>\nBạn chọn <b>" + chosen + "</b>, đáp án đúng là <b>" + correct + "</b>\n\n";
@@ -1013,9 +1053,17 @@ function checkBadgeMilestone(email, streak) {
   }
 }
 
-// THIẾT LẬP WEBHOOK — Chạy 1 lần duy nhất để kết nối Bot ↔ Apps Script
+// THIẾT LẬP WEBHOOK — Chạy 1 lần duy nhất để kết nối Bot ↔ Apps Script (kèm tg_secret xác thực)
 function setTelegramWebhook() {
-  var webAppUrl = "https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec";
+  var baseAppUrl = trimCell(scriptProperties.getProperty('APPS_SCRIPT_WEBAPP_URL') || "https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec");
+  var secret = trimCell(scriptProperties.getProperty('TELEGRAM_WEBHOOK_SECRET') || '');
+  if (!secret) {
+    secret = Utilities.getUuid().replace(/-/g, '');
+    scriptProperties.setProperty('TELEGRAM_WEBHOOK_SECRET', secret);
+    TELEGRAM_WEBHOOK_SECRET = secret;
+  }
+  var sep = baseAppUrl.indexOf('?') === -1 ? '?' : '&';
+  var webAppUrl = baseAppUrl + sep + 'tg_secret=' + encodeURIComponent(secret);
   
   var url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/setWebhook?url=" + encodeURIComponent(webAppUrl) + "&drop_pending_updates=true";
   var res = UrlFetchApp.fetch(url);
@@ -1112,6 +1160,24 @@ function handleToggleNotification(chatId, isSubscribe) {
   }
 }
 
+// Chỉ giữ lại các thẻ HTML an toàn cho báo cáo Telegram (chặn <a href=...>, <script>, v.v.)
+function sanitizeTelegramReportHtml(text) {
+  if (!text) return '';
+  var s = String(text);
+  var placeholders = [];
+  s = s.replace(/<(\/?(?:b|i|code|pre))>/gi, function(_, tag) {
+    var idx = placeholders.length;
+    placeholders.push('<' + tag.toLowerCase() + '>');
+    return '___TGSAFE_' + idx + '___';
+  });
+  s = s.replace(/&(?!lt;|gt;|amp;|quot;|#\d+;)/gi, '&amp;');
+  s = s.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  s = s.replace(/___TGSAFE_(\d+)___/g, function(_, idx) {
+    return placeholders[parseInt(idx, 10)] || '';
+  });
+  return s;
+}
+
 // ── GỬI BÁO CÁO KẾT QUẢ THI / LUYỆN TẬP VỀ TELEGRAM CHO GIÁO VIÊN ──
 function sendReportToTelegram(message) {
   var adminBotToken = PropertiesService.getScriptProperties().getProperty('TELEGRAM_BOT_TOKEN_2');
@@ -1127,7 +1193,7 @@ function sendReportToTelegram(message) {
   }
   
   try {
-    var text = cleanLatexForTelegram(message);
+    var text = sanitizeTelegramReportHtml(cleanLatexForTelegram(message));
     var payload = {
       'chat_id': adminChatId,
       'text': text,

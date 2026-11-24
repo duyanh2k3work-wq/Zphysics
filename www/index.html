@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="logo.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="assets/js/auth.js?v=20261124_gis"></script>
+  <script src="assets/js/auth.js?v=20261124_sec"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"></script>
@@ -2401,15 +2401,15 @@
           const html = `
             <div class="history-item">
               <div class="history-info">
-                <div class="history-title" title="${title}">${title}</div>
+                <div class="history-title" title="${escapeHtmlAttr(title)}">${escapeHtmlAttr(title)}</div>
                 <div class="history-meta">
                   ${typeBadge}
-                  <span class="history-date mono">${dateStr}</span>
+                  <span class="history-date mono">${escapeHtmlAttr(dateStr)}</span>
                 </div>
               </div>
               <div class="history-score-wrap">
-                <div class="history-score ${scoreClass}">${score}</div>
-                <button class="history-action" onclick="retryAttempt('${item.lesson_id}', '${isExam ? 'exam' : 'quiz'}')">Làm lại</button>
+                <div class="history-score ${scoreClass}">${escapeHtmlAttr(score)}</div>
+                <button class="history-action" data-lesson-id="${escapeHtmlAttr(item.lesson_id)}" data-lesson-type="${isExam ? 'exam' : 'quiz'}" onclick="retryAttempt(this.getAttribute('data-lesson-id'), this.getAttribute('data-lesson-type'))">Làm lại</button>
               </div>
             </div>
           `;
@@ -2617,11 +2617,86 @@
     }
 
     function escapeHtmlAttr(str) {
-      return String(str || '')
+      return String(str === undefined || str === null ? '' : str)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function safeUrl(rawUrl, allowRelative) {
+      if (typeof window.sanitizeHttpUrl === 'function') {
+        return window.sanitizeHttpUrl(rawUrl, allowRelative);
+      }
+      if (typeof rawUrl !== 'string') return '';
+      const trimmed = rawUrl.trim();
+      if (!trimmed || trimmed === '#' || /[\u0000-\u001F\u007F]/.test(trimmed) || trimmed.startsWith('//')) return '';
+      try {
+        const parsed = new URL(trimmed, 'https://zphysics.local');
+        if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return '';
+        if (!allowRelative && !/^https?:\/\//i.test(trimmed)) return '';
+        return trimmed;
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function safeCssColor(color, fallback = 'var(--accent)') {
+      const s = String(color || '').trim();
+      if (/^#[0-9a-fA-F]{3,8}$/.test(s) || /^var\(--[a-zA-Z0-9-]+\)$/.test(s)) {
+        return s;
+      }
+      return fallback;
+    }
+
+    function openExamRoom(examId) {
+      const session = getSession();
+      if (session && session.premium) {
+        window.location.href = `l.html#${encodeURIComponent(String(examId || ''))}`;
+      } else {
+        window.location.href = 'premium.html';
+      }
+    }
+
+    async function openExamVideoById(examId) {
+      const session = getSession();
+      if (!session || !session.premium) {
+        window.location.href = 'premium.html';
+        return;
+      }
+      const existing = (mockExams || []).find(ex => ex && ex.id === examId);
+      if (existing && existing.videoUrl && existing.videoUrl !== '#') {
+        openVideoModal(existing.videoUrl);
+        return;
+      }
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_unlocked_exam`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${session.access_token || SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({ p_exam_id: examId })
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const rows = await res.json();
+        const row = Array.isArray(rows) ? rows[0] : rows;
+        if (!row || row.locked) {
+          alert('Đề thi chưa mở nên video chữa bài chưa khả dụng.');
+          return;
+        }
+        const vUrl = safeUrl(row.video_url || '', false);
+        if (!vUrl) {
+          alert('Video chữa bài đang được cập nhật.');
+          return;
+        }
+        if (existing) existing.videoUrl = vUrl;
+        openVideoModal(vUrl);
+      } catch (err) {
+        alert('Không thể tải link video chữa bài lúc này.');
+      }
     }
 
     function cancelElementAnimations(el) {
@@ -2919,11 +2994,11 @@
         const labelDiv = document.createElement('div');
         labelDiv.className = 'section-label';
         labelDiv.innerHTML = `
-          <h3>Danh mục bài học — ${gradeObj.grade}</h3>
+          <h3>Danh mục bài học — ${escapeHtmlAttr(gradeObj.grade)}</h3>
           <div class="section-label-right" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <span class="section-summary">${gradeObj.chapters.length} chương · ${totalLessonsInGrade} bài học</span>
             <button type="button" class="zp-filter-chip" onclick="openMistakeModal()" title="Xem và ôn lại các câu làm sai">Sổ tay câu sai (<span class="mistake-inline-count">0</span>)</button>
-            <button type="button" class="zp-filter-chip" onclick="openFlashcardModal('${gradeNum}')" title="Ôn nhanh Flashcard công thức và bẫy Đúng/Sai">Flashcard</button>
+            <button type="button" class="zp-filter-chip" onclick="openFlashcardModal('${escapeHtmlAttr(gradeNum)}')" title="Ôn nhanh Flashcard công thức và bẫy Đúng/Sai">Flashcard</button>
           </div>
         `;
         section.appendChild(labelDiv);
@@ -2960,22 +3035,27 @@
           card.className = 'ch-card' + (isLockedGrade ? ' locked' : '');
           card.setAttribute('data-card-key', `g${gIdx}_exam`);
           if (isLockedGrade) {
-            card.setAttribute('onclick', `showLockedGradeModal('${gradeObj.grade}')`);
+            card.setAttribute('data-grade-name', gradeObj.grade);
+            card.setAttribute('onclick', 'showLockedGradeModal(this.getAttribute("data-grade-name"))');
           } else {
             card.setAttribute('onclick', 'toggleCard(this)');
           }
 
           let completedMockCount = 0;
           const lessonsHTML = matchingExams.map((exam, exIdx) => {
-            const clickAction = `event.stopPropagation(); const session = getSession(); if (session && session.premium) { window.location.href='l.html#${exam.id}'; } else { window.location.href='premium.html'; }`;
-            const hasVideo = exam.videoUrl &&
-              exam.videoUrl !== '#' &&
-              exam.videoUrl.trim() !== '' &&
-              exam.videoUrl.trim() !== 'null' &&
-              exam.videoUrl.trim() !== 'undefined';
+            const safeExamIdAttr = escapeHtmlAttr(exam.id);
+            const safeVideoUrl = safeUrl(exam.videoUrl || '', false);
+            const hasVideo = !!(
+              safeVideoUrl ||
+              exam.hasVideo ||
+              exam.has_video ||
+              (exam.videoUrl && exam.videoUrl !== '#' && exam.videoUrl.trim() !== '' && exam.videoUrl.trim() !== 'null' && exam.videoUrl.trim() !== 'undefined')
+            );
 
             const videoBtnHTML = hasVideo
-              ? `<a href="javascript:void(0)" class="lnk lnk-video" onclick="event.stopPropagation(); openVideoModal('${exam.videoUrl}')">${ICONS.video} Video chữa</a>`
+              ? (safeVideoUrl
+                  ? `<a href="javascript:void(0)" class="lnk lnk-video" data-video-url="${escapeHtmlAttr(safeVideoUrl)}" onclick="event.stopPropagation(); openVideoModal(this.getAttribute('data-video-url'))">${ICONS.video} Video chữa</a>`
+                  : `<a href="javascript:void(0)" class="lnk lnk-video" data-exam-id="${safeExamIdAttr}" onclick="event.stopPropagation(); openExamVideoById(this.getAttribute('data-exam-id'))">${ICONS.video} Video chữa</a>`)
               : '';
 
             let lockBadge = '';
@@ -2983,10 +3063,10 @@
             if (openDate && openDate.getTime() > Date.now()) {
               const pad = n => String(n).padStart(2, '0');
               const timeStr = `${pad(openDate.getHours())}:${pad(openDate.getMinutes())} ${pad(openDate.getDate())}/${pad(openDate.getMonth() + 1)}`;
-              lockBadge = `<span class="exam-scheduled-badge" title="Đề thi sẽ mở vào lúc ${timeStr}">${ICONS.lock} Mở ${timeStr}</span>`;
+              lockBadge = `<span class="exam-scheduled-badge" title="Đề thi sẽ mở vào lúc ${escapeHtmlAttr(timeStr)}">${ICONS.lock} Mở ${escapeHtmlAttr(timeStr)}</span>`;
             }
 
-            const lamBaiBtnHTML = `<a href="javascript:void(0)" class="lnk lnk-tracNghiem" onclick="${clickAction}">${ICONS.edit} Làm bài (${exam.duration || 50} phút)</a>`;
+            const lamBaiBtnHTML = `<a href="javascript:void(0)" class="lnk lnk-tracNghiem" data-exam-id="${safeExamIdAttr}" onclick="event.stopPropagation(); openExamRoom(this.getAttribute('data-exam-id'))">${ICONS.edit} Làm bài (${parseInt(exam.duration, 10) || 50} phút)</a>`;
 
             const isCompleted = studentProgressMap[exam.id] || 0;
             if (isCompleted > 0) completedMockCount++;
@@ -2997,7 +3077,7 @@
                 <div class="lesson-meta">
                   <div class="lesson-meta-left">
                     <span class="lesson-code">${numCode}</span>
-                    <span class="lesson-title">${exam.title}${isCompleted > 0 ? `<span class="lesson-done-tag is-exam">Đã làm${isCompleted > 1 ? ` · ${isCompleted}` : ''}</span>` : ''}${lockBadge}</span>
+                    <span class="lesson-title">${escapeHtmlAttr(exam.title)}${isCompleted > 0 ? `<span class="lesson-done-tag is-exam">Đã làm${isCompleted > 1 ? ` · ${isCompleted}` : ''}</span>` : ''}${lockBadge}</span>
                   </div>
                   <span class="lesson-num is-vip">VIP</span>
                 </div>
@@ -3037,7 +3117,7 @@
                 <div class="ch-title">Đề ôn thi thử ${isLockedGrade ? ICONS.lock : ''}</div>
                 <div class="tags">${examTagsHTML}</div>
                 ${isLockedGrade ? `
-                <div class="chapter-progress-text" style="color:var(--wrong);">Dành riêng cho lớp ${studentLop || ''}</div>
+                <div class="chapter-progress-text" style="color:var(--wrong);">Dành riêng cho lớp ${escapeHtmlAttr(studentLop || '')}</div>
                 ` : `
                 <div class="chapter-progress-wrap">
                   <div class="chapter-progress-bar" style="width: ${Math.round((completedMockCount / matchingExams.length) * 100)}%"></div>
@@ -3054,11 +3134,11 @@
         }
 
         gradeObj.chapters.forEach((ch, chIdx) => {
-          const dotColor = ch.dotColor || 'var(--accent)';
+          const dotColor = safeCssColor(ch.dotColor || 'var(--accent)');
           const chapterCode = extractChapterCode(ch.num);
 
           const tagsHTML = (ch.tags || []).map(t =>
-            `<span class="tag"><span class="tag-dot" style="background:${t.color || dotColor}"></span>${t.label}</span>`
+            `<span class="tag"><span class="tag-dot" style="background:${safeCssColor(t.color || dotColor)}"></span>${escapeHtmlAttr(t.label)}</span>`
           ).join('');
 
           let completedCount = 0;
@@ -3084,7 +3164,7 @@
                   const suffix = matchedExams.length > 1 ? ` ${idx + 1}` : '';
                   const key = `luyenDe_${exam.id}`;
                   LINK_CONFIG[key] = { label: `Bài tập${suffix}`, cls: 'lnk-luyenDe', icon: ICONS.edit };
-                  autoLinks[key] = `l.html#${exam.id}`;
+                  autoLinks[key] = `l.html#${encodeURIComponent(exam.id)}`;
                 });
               }
             }
@@ -3103,7 +3183,7 @@
               .map(([key, url]) => {
                 const cfg = LINK_CONFIG[key];
                 if (!cfg || url === '#') {
-                  return `<span class="lnk ${cfg ? cfg.cls : ''} lnk-disabled">${cfg ? cfg.icon + ' ' + cfg.label : key}</span>`;
+                  return `<span class="lnk ${cfg ? cfg.cls : ''} lnk-disabled">${cfg ? cfg.icon + ' ' + cfg.label : escapeHtmlAttr(key)}</span>`;
                 }
 
                 let normalizedUrl = url;
@@ -3134,9 +3214,17 @@
                 }
 
                 if (key === 'video') {
-                  return `<a href="javascript:void(0)" class="lnk ${cfg.cls}" onclick="event.stopPropagation(); openVideoModal('${normalizedUrl}')">${cfg.icon} ${cfg.label}</a>`;
+                  const safeVideoUrl = safeUrl(normalizedUrl, false);
+                  if (!safeVideoUrl) {
+                    return `<span class="lnk ${cfg.cls} lnk-disabled">${cfg.icon} ${cfg.label}</span>`;
+                  }
+                  return `<a href="javascript:void(0)" class="lnk ${cfg.cls}" data-video-url="${escapeHtmlAttr(safeVideoUrl)}" onclick="event.stopPropagation(); openVideoModal(this.getAttribute('data-video-url'))">${cfg.icon} ${cfg.label}</a>`;
                 }
-                return `<a href="${normalizedUrl}" class="lnk ${cfg.cls}" target="_blank" onclick="event.stopPropagation()">${cfg.icon} ${cfg.label}</a>`;
+                const safeHref = safeUrl(normalizedUrl, true);
+                if (!safeHref) {
+                  return `<span class="lnk ${cfg.cls} lnk-disabled">${cfg.icon} ${cfg.label}</span>`;
+                }
+                return `<a href="${escapeHtmlAttr(safeHref)}" class="lnk ${cfg.cls}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${cfg.icon} ${cfg.label}</a>`;
               }).join('');
 
             const isFree = isLessonFree(gradeNumCur, cNum, lIdx);
@@ -3172,8 +3260,8 @@
               <div class="lesson-row ${totalCompleted > 0 ? 'completed' : ''}" data-lesson-key="g${gIdx}_c${chIdx}_l${lIdx}">
                 <div class="lesson-meta">
                   <div class="lesson-meta-left">
-                    <span class="lesson-code">${l.num}</span>
-                    <span class="lesson-title">${l.title}${checkmarksHtml}</span>
+                    <span class="lesson-code">${escapeHtmlAttr(l.num)}</span>
+                    <span class="lesson-title">${escapeHtmlAttr(l.title)}${checkmarksHtml}</span>
                   </div>
                   ${numDisplay}
                 </div>
@@ -3188,7 +3276,8 @@
           card.className = 'ch-card' + (isLockedGrade ? ' locked' : '');
           card.setAttribute('data-card-key', `g${gIdx}_c${chIdx}`);
           if (isLockedGrade) {
-            card.setAttribute('onclick', `showLockedGradeModal('${gradeObj.grade}')`);
+            card.setAttribute('data-grade-name', gradeObj.grade);
+            card.setAttribute('onclick', 'showLockedGradeModal(this.getAttribute("data-grade-name"))');
           } else {
             card.setAttribute('onclick', 'toggleCard(this)');
           }
@@ -3218,13 +3307,13 @@
 
           card.innerHTML = `
             <div class="ch-header">
-              <div class="ch-badge">${chapterCode}</div>
+              <div class="ch-badge">${escapeHtmlAttr(chapterCode)}</div>
               <div class="ch-info">
-                <div class="ch-num">${ch.num}</div>
-                <div class="ch-title">${ch.title} ${isLockedGrade ? ICONS.lock : ''}</div>
+                <div class="ch-num">${escapeHtmlAttr(ch.num)}</div>
+                <div class="ch-title">${escapeHtmlAttr(ch.title)} ${isLockedGrade ? ICONS.lock : ''}</div>
                 <div class="tags">${tagsHTML}</div>
                 ${isLockedGrade ? `
-                <div class="chapter-progress-text" style="color:var(--wrong);">Dành riêng cho lớp ${studentLop || ''}</div>
+                <div class="chapter-progress-text" style="color:var(--wrong);">Dành riêng cho lớp ${escapeHtmlAttr(studentLop || '')}</div>
                 ` : (totalLessons > 0 ? `
                 <div class="chapter-progress-wrap">
                   <div class="chapter-progress-bar" style="width: ${Math.round((completedCount / totalLessons) * 100)}%"></div>
@@ -3251,7 +3340,7 @@
         bentoStrip.innerHTML = `
           <div class="gb-card">
             <div class="gb-info">
-              <span class="gb-eyebrow">TIẾN ĐỘ KHỐI ${gradeNum || ''}</span>
+              <span class="gb-eyebrow">TIẾN ĐỘ KHỐI ${escapeHtmlAttr(gradeNum || '')}</span>
               <div class="gb-title">${completedInGradeCount}/${totalLessonsInGrade} bài hoàn thành</div>
               <div class="gb-meta">${gradeObj.chapters.length} chương chuyên đề chuẩn SGK</div>
             </div>
@@ -3266,7 +3355,7 @@
           <div class="gb-card">
             <div class="gb-info">
               <span class="gb-eyebrow">CHUYÊN ĐỀ MỞ ĐẦU</span>
-              <div class="gb-title" title="${firstChTitle}">${firstChTitle}</div>
+              <div class="gb-title" title="${escapeHtmlAttr(firstChTitle)}">${escapeHtmlAttr(firstChTitle)}</div>
               <div class="gb-meta">${firstCh && firstCh.lessons ? firstCh.lessons.length : 0} bài giảng &amp; phiếu tự luyện</div>
             </div>
             <button type="button" class="gb-action-btn" onclick="openCardInGrade(${gIdx}, 'g${gIdx}_c0')">Open →</button>
@@ -3274,7 +3363,7 @@
           <div class="gb-card">
             <div class="gb-info">
               <span class="gb-eyebrow">PHÒNG ĐỀ &amp; TRA CỨU</span>
-              <div class="gb-title">${matchingExams.length} đề thi thử ${shortGradeLabel}</div>
+              <div class="gb-title">${matchingExams.length} đề thi thử ${escapeHtmlAttr(shortGradeLabel)}</div>
               <div class="gb-meta">Bấm Ctrl+K để tìm bài bất kỳ</div>
             </div>
             <button type="button" class="gb-action-btn" onclick="${matchingExams.length > 0 ? `openCardInGrade(${gIdx}, 'g${gIdx}_exam')` : 'openCmdPalette()'}">${matchingExams.length > 0 ? 'Open →' : 'Tìm bài →'}</button>
@@ -3393,17 +3482,17 @@
       cmdActiveIdx = 0;
 
       if (!matches.length) {
-        listEl.innerHTML = `<div class="cmd-empty">Không tìm thấy chuyên đề hoặc đề thi khớp với "${query}".</div>`;
+        listEl.innerHTML = `<div class="cmd-empty">Không tìm thấy chuyên đề hoặc đề thi khớp với "${escapeHtmlAttr(query)}".</div>`;
         return;
       }
 
       listEl.innerHTML = matches.map((item, idx) => `
         <div class="cmd-item ${idx === 0 ? 'active' : ''}" data-cmd-idx="${idx}" onclick="executeCmdItem(${idx})">
           <div class="cmd-item-left">
-            <span class="cmd-item-tag">${item.tag}</span>
-            <span class="cmd-item-title">${item.title}</span>
+            <span class="cmd-item-tag">${escapeHtmlAttr(item.tag)}</span>
+            <span class="cmd-item-title">${escapeHtmlAttr(item.title)}</span>
           </div>
-          <span class="cmd-item-meta mono">${item.meta}</span>
+          <span class="cmd-item-meta mono">${escapeHtmlAttr(item.meta)}</span>
         </div>
       `).join('');
     }
@@ -3597,13 +3686,22 @@
 
     function formatModalSafeText(text) {
       if (!text) return '';
-      const escaped = String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      return escaped
-        .replace(/\[img\](.*?)\[\/img\]/gi, '<div style="margin:6px 0;"><img src="$1" style="max-width:100%; border-radius:8px; border:1px solid var(--border);" onerror="this.style.display=\'none\'"></div>')
-        .replace(/\n/g, '<br>');
+      const safeImages = [];
+      let work = String(text).replace(/\[img\](.*?)\[\/img\]/gi, (_, rawUrl) => {
+        const cleaned = safeUrl(String(rawUrl || ''), false);
+        if (!cleaned || /[\s"'<>]/.test(cleaned)) {
+          return '';
+        }
+        const token = `\u0000ZPMIMG_${safeImages.length}\u0000`;
+        safeImages.push(cleaned);
+        return token;
+      });
+      const escaped = escapeHtmlAttr(work).replace(/\n/g, '<br>');
+      return escaped.replace(/\u0000ZPMIMG_(\d+)\u0000/g, (_, idx) => {
+        const u = safeImages[parseInt(idx, 10)];
+        if (!u) return '';
+        return `<div style="margin:6px 0;"><img src="${escapeHtmlAttr(u)}" style="max-width:100%; border-radius:8px; border:1px solid var(--border);" onerror="this.style.display='none'"></div>`;
+      });
     }
 
     function getMistakeItems() {
@@ -3761,8 +3859,8 @@
                 ${wrongCountTag}
               </div>
               <div style="display:flex; align-items:center; gap:6px;">
-                <button type="button" class="toolbar-mini-btn" onclick="toggleMistakeExplain('${idStr}')">Xem giải</button>
-                <button type="button" class="toolbar-mini-btn is-danger" onclick="removeMistakeById('${idStr}')">Đã nhớ · Xóa</button>
+                <button type="button" class="toolbar-mini-btn" data-mistake-id="${idStr}" onclick="toggleMistakeExplain(this.getAttribute('data-mistake-id'))">Xem giải</button>
+                <button type="button" class="toolbar-mini-btn is-danger" data-mistake-id="${idStr}" onclick="removeMistakeById(this.getAttribute('data-mistake-id'))">Đã nhớ · Xóa</button>
               </div>
             </div>
             <div class="mistake-q-text">${formatModalSafeText(item.question)}</div>
@@ -4143,36 +4241,38 @@
 
     var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
     var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
-    var SHEETS_API_URL = window.SHEETS_API_URL || 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
     var SESSION_KEY = window.SESSION_KEY || 'zphysics_session';
 
     function getYouTubeEmbedUrl(url) {
-      if (!url) return '';
+      const checked = safeUrl(url, false);
+      if (!checked) return '';
       let videoId = '';
       const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      const match = url.match(regExp);
+      const match = checked.match(regExp);
 
       if (match && match[2].length === 11) {
         videoId = match[2];
       } else {
         try {
-          const urlObj = new URL(url);
+          const urlObj = new URL(checked);
           if (urlObj.hostname.includes('youtube.com')) {
             videoId = urlObj.searchParams.get('v');
           }
         } catch (e) {}
       }
 
-      if (videoId) {
+      if (videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
         return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
       }
-      return url;
+      return checked;
     }
 
     function openVideoModal(url) {
+      const embedUrl = getYouTubeEmbedUrl(url);
+      if (!embedUrl) return;
       const modal = document.getElementById('videoModal');
       const iframe = document.getElementById('videoPlayer');
-      iframe.src = getYouTubeEmbedUrl(url);
+      iframe.src = embedUrl;
       modal.classList.add('visible');
       document.body.style.overflow = 'hidden';
     }
@@ -4256,8 +4356,9 @@
         PinUI.applyTheme(resolved);
 
         document.getElementById('themeToggleWrap').style.display = 'block';
-        document.getElementById('greetingText').innerHTML = `<span>${ten}</span> <span class="plan-tag">Premium</span>`;
-        document.getElementById('popupName').innerHTML = `${ten} <span class="plan-tag">Premium</span>`;
+        const safeTen = escapeHtmlAttr(ten);
+        document.getElementById('greetingText').innerHTML = `<span>${safeTen}</span> <span class="plan-tag">Premium</span>`;
+        document.getElementById('popupName').innerHTML = `${safeTen} <span class="plan-tag">Premium</span>`;
 
         const session = getSession();
         const lopStr = session && session.lop ? ` · Lớp ${session.lop}` : '';
@@ -4333,9 +4434,6 @@
       });
     }
 
-    function cancelRegistration() {}
-    async function doLogin() {}
-
     function doLogout() {
       logoutStudent();
     }
@@ -4406,30 +4504,50 @@
         globalLessonsData = baihocData;
         renderAll(baihocData);
 
+        const session = getSession();
+        const authTokenHeader = (session && session.access_token) ? `Bearer ${session.access_token}` : `Bearer ${SUPABASE_ANON_KEY}`;
+
         const abortCtrl = new AbortController();
         const timeoutId = setTimeout(() => abortCtrl.abort(), 4000);
 
-        const luyendePromise = fetch(`${SUPABASE_URL}/rest/v1/exams?select=*`, {
+        const mapExamCatalogList = (data) => (Array.isArray(data) ? data : []).map(item => ({
+          id: item.id,
+          title: item.title,
+          desc: item.description,
+          description: item.description,
+          duration: item.duration,
+          lop: item.grade,
+          grade: item.grade,
+          hasVideo: !!(item.has_video || (item.video_url && item.video_url !== '#' && String(item.video_url).trim() !== '')),
+          videoUrl: item.video_url || '',
+          openAt: item.open_at || ''
+        }));
+
+        const luyendePromise = fetch(`${SUPABASE_URL}/rest/v1/rpc/get_exam_catalog`, {
+          method: 'POST',
           signal: abortCtrl.signal,
           headers: {
+            'Content-Type': 'application/json',
             'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-          }
+            'Authorization': authTokenHeader
+          },
+          body: '{}'
         })
           .then(async res => {
+            if (res.status === 404) {
+              // Tương thích nếu chưa chạy supabase/security_rls.sql (chỉ lấy metadata, không lấy đáp án)
+              const legacyRes = await fetch(`${SUPABASE_URL}/rest/v1/exams?select=id,title,description,duration,grade,video_url`, {
+                signal: abortCtrl.signal,
+                headers: {
+                  'apikey': SUPABASE_ANON_KEY,
+                  'Authorization': authTokenHeader
+                }
+              });
+              if (!legacyRes.ok) throw new Error('Không thể tải đề từ Supabase');
+              return mapExamCatalogList(await legacyRes.json());
+            }
             if (!res.ok) throw new Error('Không thể tải đề từ Supabase');
-            const data = await res.json();
-            return data.map(item => ({
-              ...item,
-              desc: item.description,
-              lop: item.grade,
-              pdfUrl: item.pdf_url,
-              videoUrl: item.video_url,
-              mcAnswers: item.mc_answers,
-              tfAnswers: item.tf_answers,
-              saAnswers: item.sa_answers,
-              openAt: item.open_at || ''
-            }));
+            return mapExamCatalogList(await res.json());
           })
           .catch(() => {
             try {
@@ -4448,7 +4566,7 @@
           signal: abortCtrl.signal,
           headers: {
             'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            'Authorization': authTokenHeader
           }
         })
           .then(async res => {
@@ -4463,14 +4581,13 @@
           })
           .catch(() => []);
 
-        const session = getSession();
         let progressPromise = Promise.resolve([]);
-        if (session && session.premium && session.gmail && !session.gmail.startsWith('demo_')) {
+        if (session && session.premium && session.gmail) {
           progressPromise = fetch(`${SUPABASE_URL}/rest/v1/student_progress?email=eq.${encodeURIComponent(session.gmail)}&select=*`, {
             signal: abortCtrl.signal,
             headers: {
               'apikey': SUPABASE_ANON_KEY,
-              'Authorization': (session && session.access_token) ? `Bearer ${session.access_token}` : `Bearer ${SUPABASE_ANON_KEY}`
+              'Authorization': authTokenHeader
             }
           }).then(res => res.ok ? res.json() : []).catch(() => []);
         }
@@ -4538,7 +4655,7 @@
       } catch (err) {
         console.error(err);
         document.getElementById('gradeContent').innerHTML =
-          `<p style="color:var(--wrong);text-align:center;padding:40px 24px;font-weight:500">Không tải được dữ liệu bài học.<br><small style="opacity:.7">${err.message || 'Lỗi kết nối'}</small></p>`;
+          `<p style="color:var(--wrong);text-align:center;padding:40px 24px;font-weight:500">Không tải được dữ liệu bài học.<br><small style="opacity:.7">${escapeHtmlAttr(err.message || 'Lỗi kết nối')}</small></p>`;
       }
     }
   </script>

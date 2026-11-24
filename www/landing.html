@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="logo.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="assets/js/auth.js?v=20261124_gis"></script>
+  <script src="assets/js/auth.js?v=20261124_sec"></script>
   <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_arial">
   <script src="assets/js/pinui.js?v=20261118_arial"></script>
   <script>PinUI.initTheme('light');</script>
@@ -1961,178 +1961,6 @@
     }, { threshold: 0.08 });
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-    /* ── CONFIG ── */
-    var SUPABASE_URL = window.SUPABASE_URL || 'https://uztfmglzpfrwvamuggwx.supabase.co';
-    var SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_XdBJ6z0Yj_nQyvn7FSemew_B8ewlDOM';
-    var SHEETS_API_URL = window.SHEETS_API_URL || 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
-    var SESSION_KEY = window.SESSION_KEY || 'zphysics_session';
-
-    function saveSession(gmail, ten, premium, premiumUntil = null, lop = null) {
-      localStorage.setItem(SESSION_KEY, JSON.stringify({
-        gmail,
-        ten,
-        premium,
-        premium_until: premiumUntil,
-        lop: lop
-      }));
-    }
-
-    function loadSession() {
-      try {
-        const raw = localStorage.getItem(SESSION_KEY);
-        if (!raw) return null;
-        const s = JSON.parse(raw);
-        if (s.premium_until && new Date(s.premium_until) < new Date()) {
-          s.premium = false;
-          s.premium_until = null;
-          localStorage.setItem(SESSION_KEY, JSON.stringify(s));
-        }
-        return s;
-      } catch {
-        return null;
-      }
-    }
-
-    let isRegistering = false;
-    let selectedGrade = '10';
-
-    function selectGrade(grade) {
-      selectedGrade = String(grade);
-      const buttons = document.querySelectorAll('#loginGradeButtons .grade-btn');
-      buttons.forEach(btn => {
-        if (btn.getAttribute('data-grade') === selectedGrade) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-    }
-
-    function showError(msg) {
-      const el = document.getElementById('loginError');
-      if (el) {
-        el.textContent = msg;
-        el.classList.add('visible');
-      }
-      const emailEl = document.getElementById('loginEmail');
-      if (emailEl) emailEl.classList.add('error');
-    }
-
-    function clearError() {
-      const el = document.getElementById('loginError');
-      if (el) el.classList.remove('visible');
-      const emailEl = document.getElementById('loginEmail');
-      if (emailEl) emailEl.classList.remove('error');
-      const nameEl = document.getElementById('loginName');
-      if (nameEl) nameEl.classList.remove('error');
-    }
-
-    function cancelRegistration() {
-      isRegistering = false;
-      const nameWrap = document.getElementById('loginNameWrap');
-      const subEl = document.getElementById('loginSubtitle');
-      const emailEl = document.getElementById('loginEmail');
-      const nameEl = document.getElementById('loginName');
-      const btnEl = document.getElementById('loginBtn');
-      if (nameWrap) nameWrap.style.display = 'none';
-      if (subEl) subEl.textContent = 'Đăng nhập bằng tài khoản Google để tiếp tục';
-      if (emailEl) { emailEl.value = ''; emailEl.disabled = false; }
-      if (nameEl) nameEl.value = '';
-      if (btnEl) btnEl.textContent = 'Đăng nhập';
-      selectGrade(10);
-      clearError();
-    }
-
-    async function doLogin() {
-      const emailInput = document.getElementById('loginEmail');
-      const nameInput = document.getElementById('loginName');
-      const nameWrap = document.getElementById('loginNameWrap');
-      const subtitleEl = document.getElementById('loginSubtitle');
-      const errorEl = document.getElementById('loginError');
-      const btn = document.getElementById('loginBtn');
-      if (!emailInput || !btn) return;
-      const gmail = emailInput.value.trim().toLowerCase();
-
-      clearError();
-      if (!gmail) {
-        showError('Vui lòng nhập Gmail.');
-        return;
-      }
-
-      if (isRegistering && nameInput) {
-        const fullName = nameInput.value.trim();
-        if (!fullName) {
-          showError('Vui lòng nhập Họ và Tên để kích hoạt.');
-          nameInput.classList.add('error');
-          nameInput.focus();
-          return;
-        }
-        btn.disabled = true;
-        btn.textContent = 'Đang kích hoạt...';
-        try {
-          const regUrl = `${SHEETS_API_URL}?action=registerStudent&gmail=${encodeURIComponent(gmail)}&name=${encodeURIComponent(fullName)}&lop=${encodeURIComponent(selectedGrade)}`;
-          const response = await fetch(regUrl);
-          if (!response.ok) throw new Error('Không thể kết nối Web App để kích hoạt');
-          const result = await response.json();
-          if (result && result.success) {
-            saveSession(gmail, result.ten || fullName, false, null, result.lop || selectedGrade);
-            window.location.href = 'index.html';
-          } else {
-            throw new Error(result.error || result.message || 'Lỗi xử lý kích hoạt.');
-          }
-        } catch (err) {
-          console.error(err);
-          if (errorEl) {
-            errorEl.textContent = 'Lỗi kích hoạt: ' + (err.message || 'Lỗi mạng, hãy thử lại.');
-            errorEl.classList.add('visible');
-          }
-        } finally {
-          btn.disabled = false;
-          if (isRegistering) btn.textContent = 'Kích hoạt tài khoản Free';
-        }
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = 'Đang kiểm tra...';
-      try {
-        const url = `${SUPABASE_URL}/rest/v1/students?email=eq.${encodeURIComponent(gmail)}&select=*`;
-        const res = await fetch(url, {
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-          }
-        });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const students = await res.json();
-        if (students && students.length > 0) {
-          const student = students[0];
-          const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
-          saveSession(gmail, student.full_name || gmail, isPremium, student.premium_until, student.lop);
-          window.location.href = 'index.html';
-        } else {
-          isRegistering = true;
-          emailInput.disabled = true;
-          if (nameWrap) nameWrap.style.display = 'block';
-          if (subtitleEl) subtitleEl.textContent = 'Tài khoản mới: Nhập Họ & Tên để kích hoạt gói miễn phí';
-          btn.textContent = 'Kích hoạt tài khoản Free';
-          btn.disabled = false;
-          if (nameInput) nameInput.focus();
-        }
-      } catch (err) {
-        console.error(err);
-        if (errorEl) {
-          errorEl.textContent = 'Lỗi kết nối. Vui lòng thử lại.';
-          errorEl.classList.add('visible');
-        }
-      } finally {
-        if (!isRegistering) {
-          btn.disabled = false;
-          btn.textContent = 'Đăng nhập';
-        }
-      }
-    }
-
     window.addEventListener('DOMContentLoaded', async () => {
       const hasAuthHash = window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error'));
       if (hasAuthHash) {
@@ -2140,7 +1968,7 @@
         if (sub) sub.textContent = 'Đang xác thực tài khoản Google...';
       }
       const s = await syncAndGetAuthSession();
-      if (s && s.gmail && !s.gmail.startsWith('demo_')) {
+      if (s && s.gmail) {
         window.location.href = 'index.html';
       }
     });

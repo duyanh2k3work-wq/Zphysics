@@ -78,18 +78,28 @@ create table exams (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- 5. PHÂN QUYỀN ĐỌC CÔNG KHAI (SELECT) CHO HỌC SINH QUA KEY "ANON"
+-- 5. PHÂN QUYỀN BẢO MẬT (ROW LEVEL SECURITY)
+-- Lưu ý: Không dùng `using (true)` cho `anon` trên students/exams/student_progress.
+-- Để cài đặt đầy đủ các chính sách RLS mới nhất cùng các hàm RPC bảo vệ đề thi
+-- và đáp án, hãy mở file `supabase/security_rls.sql` trong dự án và chạy toàn bộ
+-- trong SQL Editor của Supabase.
+
 alter table questions enable row level security;
-create policy "Allow public read questions" on questions for select using (true);
+create policy "questions_select_authenticated" on questions
+  for select to authenticated using (true);
 
 alter table students enable row level security;
-create policy "Allow public read students" on students for select using (true);
+create policy "students_select_own" on students
+  for select to authenticated
+  using (lower(email) = lower(coalesce(auth.jwt() ->> 'email', '')));
 
 alter table lessons enable row level security;
-create policy "Allow public read lessons" on lessons for select using (true);
+create policy "lessons_select_authenticated" on lessons
+  for select to authenticated using (true);
 
+-- Bảng exams được bảo vệ thông qua các RPC get_exam_catalog / get_unlocked_exam / get_exam_answer_key
+-- trong file `supabase/security_rls.sql` để không lộ đáp án và link PDF đề hẹn giờ.
 alter table exams enable row level security;
-create policy "Allow public read exams" on exams for select using (true);
 
 -- 6. BẢNG TIẾN TRÌNH HỌC TẬP (STUDENT PROGRESS)
 create table student_progress (
@@ -103,15 +113,29 @@ create table student_progress (
 );
 
 alter table student_progress enable row level security;
-create policy "Allow student to read own progress" on student_progress for select using (auth.role() = 'anon' or true);
-create policy "Allow student to insert own progress" on student_progress for insert with check (true);
-create policy "Allow student to update own progress" on student_progress for update using (true);
+create policy "student_progress_select_own" on student_progress
+  for select to authenticated
+  using (lower(email) = lower(coalesce(auth.jwt() ->> 'email', '')));
+create policy "student_progress_insert_own" on student_progress
+  for insert to authenticated
+  with check (
+    lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+    and (score is null or (score >= 0 and score <= 10))
+  );
+create policy "student_progress_update_own" on student_progress
+  for update to authenticated
+  using (lower(email) = lower(coalesce(auth.jwt() ->> 'email', '')))
+  with check (
+    lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+    and (score is null or (score >= 0 and score <= 10))
+  );
 
 create index idx_progress_email on student_progress(email);
 create index idx_progress_email_lesson on student_progress(email, lesson_id);
 ```
 
 4. Bấm nút **Run** (phía dưới bên phải màn hình). Xác nhận kết quả hiển thị thông báo chạy thành công (`Success. No rows returned` hoặc tương tự).
+5. **Bắt buộc đối với dự án đang chạy:** Chạy toàn bộ nội dung file [`supabase/security_rls.sql`](supabase/security_rls.sql) trong SQL Editor để áp dụng Trigger tạo hồ sơ học sinh mới và các hàm RPC bảo vệ đề thi/đáp án (`get_exam_catalog`, `get_unlocked_exam`, `get_exam_answer_key`).
 
 ---
 

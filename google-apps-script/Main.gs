@@ -7,48 +7,21 @@
 function doGet(e) {
   try {
     var action = (e && e.parameter && e.parameter.action) ? String(e.parameter.action) : '';
-    
-    // Thống kê số câu hỏi của mỗi Mã đề
+    var adminSecret = (e && e.parameter && e.parameter.admin_secret) ? String(e.parameter.admin_secret).trim() : '';
+
+    // Chỉ cho phép truy vấn thống kê khi có ADMIN_API_SECRET hợp lệ (>= 16 ký tự)
     if (action === 'getStats') {
-      return jsonResponse(getStats());
-    }
-    
-    // Kiểm tra đăng nhập học sinh bằng Gmail
-    if (action === 'checkStudent') {
-      var gmail = (e && e.parameter && e.parameter.gmail) ? String(e.parameter.gmail).trim().toLowerCase() : '';
-      return jsonResponse(checkStudent(gmail));
+      if (ADMIN_API_SECRET.length >= 16 && constantTimeEquals(adminSecret, ADMIN_API_SECRET)) {
+        return jsonResponse(getStats());
+      }
+      return jsonResponse({ error: 'Unauthorized' });
     }
 
-    // Tự động đăng ký học sinh mới với tài khoản Free
-    if (action === 'registerStudent') {
-      var gmail = (e && e.parameter && e.parameter.gmail) ? String(e.parameter.gmail).trim().toLowerCase() : '';
-      var name = (e && e.parameter && e.parameter.name) ? String(e.parameter.name).trim() : '';
-      var lop = (e && e.parameter && e.parameter.lop) ? String(e.parameter.lop).trim() : '';
-      return jsonResponse(registerStudent(gmail, name, lop));
-    }
-    
-    // Nâng cấp Premium trực tiếp
-    if (action === 'upgradePremium') {
-      var gmail = (e && e.parameter && e.parameter.gmail) ? String(e.parameter.gmail).trim().toLowerCase() : '';
-      return jsonResponse(upgradePremium(gmail));
-    }
-    
-    // Lấy link bài học động từ Google Sheet
-    if (action === 'getLinks') {
-      return jsonResponse(getLinks());
-    }
-    
-    // Lấy danh sách đề luyện VIP từ tab "LuyenDe"
-    if (action === 'getExams') {
-      return jsonResponse(getExams());
-    }
-    
-    // Lấy đề thi (mặc định)
-    var quiz = (e && e.parameter && e.parameter.quiz)
-      ? String(e.parameter.quiz)
-      : 'cauhoi';
-    var data = getQuizData(quiz);
-    return jsonResponse(data);
+    // Đóng toàn bộ các endpoint đọc/ghi không xác thực (checkStudent, registerStudent, upgradePremium, getLinks, getExams, quiz)
+    return jsonResponse({
+      status: 'ok',
+      message: 'Zphysics API is active (Protected)'
+    });
   } catch (err) {
     return jsonResponse({ error: String(err.message || err) });
   }
@@ -62,45 +35,89 @@ function doPost(e) {
     } else {
       throw new Error("Không tìm thấy dữ liệu POST");
     }
-    
+
     // ═══ TELEGRAM WEBHOOK ═══
-    // Nếu là tin nhắn từ Telegram Bot (học sinh nhắn lệnh)
-    if (postData.message && postData.message.chat) {
-      try {
-        handleTelegramMessage(postData);
-      } catch (teleErr) {
-        Logger.log("Lỗi xử lý Telegram message: " + teleErr.message);
+    if ((postData.message && postData.message.chat) || postData.callback_query) {
+      var tgSecret = (e && e.parameter && e.parameter.tg_secret) ? String(e.parameter.tg_secret).trim() : '';
+      if (TELEGRAM_WEBHOOK_SECRET.length > 0 && !constantTimeEquals(tgSecret, TELEGRAM_WEBHOOK_SECRET)) {
+        Logger.log("Từ chối Telegram Webhook không hợp lệ.");
+        return HtmlService.createHtmlOutput("Unauthorized");
       }
-      return HtmlService.createHtmlOutput("OK");
-    }
-    // Nếu là callback query (học sinh bấm nút A/B/C/D trong /cauhoi)
-    if (postData.callback_query) {
-      try {
-        handleCallbackQuery(postData.callback_query);
-      } catch (cbErr) {
-        Logger.log("Lỗi xử lý Telegram callback: " + cbErr.message);
+
+      if (postData.message && postData.message.chat) {
+        try {
+          handleTelegramMessage(postData);
+        } catch (teleErr) {
+          Logger.log("Lỗi xử lý Telegram message: " + teleErr.message);
+        }
+        return HtmlService.createHtmlOutput("OK");
       }
-      return HtmlService.createHtmlOutput("OK");
+
+      if (postData.callback_query) {
+        try {
+          handleCallbackQuery(postData.callback_query);
+        } catch (cbErr) {
+          Logger.log("Lỗi xử lý Telegram callback: " + cbErr.message);
+        }
+        return HtmlService.createHtmlOutput("OK");
+      }
     }
-    
-    // ═══ ADMIN & UTILITY ACTIONS (từ admin.html & client) ═══
+
     var action = postData.action;
-    var result;
-    
-    if (action === 'addQuestion') {
-      result = addQuestion(postData.questionData);
-    } else if (action === 'editQuestion') {
-      result = editQuestion(postData.id, postData.maDe, postData.questionData);
-    } else if (action === 'deleteQuestion') {
-      result = deleteQuestion(postData.id, postData.maDe);
-    } else if (action === 'sendReport') {
-      var success = sendReportToTelegram(postData.message);
-      return jsonResponse({ success: success });
-    } else {
-      throw new Error("Hành động không hợp lệ: " + action);
+
+    // ═══ HỌC SINH TỰ NÂNG CẤP PREMIUM MIỄN PHÍ (BẮT BUỘC XÁC THỰC JWT GOOGLE/SUPABASE) ═══
+    if (action === 'upgradePremium') {
+      var verifiedUser = verifySupabaseAccessToken(postData.accessToken);
+      if (!verifiedUser) {
+        return jsonResponse({
+          success: false,
+          message: 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.'
+        });
+      }
+      if (!checkRateLimit('upg_' + verifiedUser.email, 5, 60)) {
+        return jsonResponse({
+          success: false,
+          message: 'Thao tác quá nhanh, vui lòng thử lại sau ít phút.'
+        });
+      }
+      return jsonResponse(upgradePremium(verifiedUser.email, verifiedUser.name));
     }
-    
-    return jsonResponse({ success: true, data: result });
+
+    // ═══ GỬI BÁO CÁO KẾT QUẢ THI (BẮT BUỘC XÁC THỰC JWT) ═══
+    if (action === 'sendReport') {
+      var verifiedReporter = verifySupabaseAccessToken(postData.accessToken);
+      if (!verifiedReporter) {
+        return jsonResponse({ success: false, error: 'Unauthorized' });
+      }
+      if (!checkRateLimit('rep_' + verifiedReporter.email, 8, 60)) {
+        return jsonResponse({ success: false, error: 'Rate limit exceeded' });
+      }
+      var rawMsg = String(postData.message || '').slice(0, 4000);
+      if (!rawMsg.trim()) {
+        return jsonResponse({ success: false, error: 'Empty report' });
+      }
+      var success = sendReportToTelegram(rawMsg);
+      return jsonResponse({ success: success });
+    }
+
+    // ═══ ADMIN ACTIONS (BẮT BUỘC ADMIN_API_SECRET) ═══
+    if (action === 'addQuestion' || action === 'editQuestion' || action === 'deleteQuestion') {
+      var providedSecret = String(postData.adminSecret || '').trim();
+      if (ADMIN_API_SECRET.length < 16 || !constantTimeEquals(providedSecret, ADMIN_API_SECRET)) {
+        throw new Error("Unauthorized admin action");
+      }
+      var result;
+      if (action === 'addQuestion') {
+        result = addQuestion(postData.questionData);
+      } else if (action === 'editQuestion') {
+        result = editQuestion(postData.id, postData.maDe, postData.questionData);
+      } else {
+        result = deleteQuestion(postData.id, postData.maDe);
+      }
+      return jsonResponse({ success: true, data: result });
+    }
+
+    throw new Error("Hành động không hợp lệ: " + action);
   } catch (err) {
     Logger.log("Lỗi doPost: " + err.message);
     return HtmlService.createHtmlOutput("ERROR: " + err.message);

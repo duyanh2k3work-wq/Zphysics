@@ -73,3 +73,71 @@ function formatScheduleTime(val) {
   return trimCell(val);
 }
 
+// So sánh chuỗi theo thời gian hằng số để tránh timing attack
+function constantTimeEquals(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (a.length === 0 || a.length !== b.length) return false;
+  var diff = 0;
+  for (var i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
+// Xác thực Supabase JWT Access Token thông qua /auth/v1/user
+function verifySupabaseAccessToken(accessToken) {
+  if (typeof accessToken !== 'string') return null;
+  var token = accessToken.trim();
+  if (token.length < 20) return null;
+
+  var baseUrl = trimCell(SUPABASE_URL).replace(/\/+$/, '');
+  var anonKey = trimCell(SUPABASE_ANON_KEY);
+  if (!baseUrl || !anonKey) return null;
+
+  try {
+    var res = UrlFetchApp.fetch(baseUrl + '/auth/v1/user', {
+      'method': 'get',
+      'headers': {
+        'apikey': anonKey,
+        'Authorization': 'Bearer ' + token
+      },
+      'muteHttpExceptions': true
+    });
+    if (res.getResponseCode() !== 200) return null;
+
+    var user = JSON.parse(res.getContentText() || '{}');
+    if (!user || !user.email) return null;
+
+    var metaName = '';
+    if (user.user_metadata) {
+      metaName = user.user_metadata.full_name || user.user_metadata.name || '';
+    }
+
+    return {
+      id: user.id || '',
+      email: String(user.email).trim().toLowerCase(),
+      name: String(metaName).trim()
+    };
+  } catch (err) {
+    Logger.log('Lỗi verifySupabaseAccessToken: ' + err.message);
+    return null;
+  }
+}
+
+// Giới hạn tần suất gọi API theo bucket trong CacheService
+function checkRateLimit(bucketKey, maxHits, windowSeconds) {
+  try {
+    var cache = CacheService.getScriptCache();
+    var safeKey = 'rl_' + String(bucketKey || 'default').replace(/[^a-zA-Z0-9_.-]/g, '_').slice(0, 180);
+    var cur = parseInt(cache.get(safeKey) || '0', 10);
+    if (isNaN(cur)) cur = 0;
+    if (cur >= maxHits) {
+      return false;
+    }
+    cache.put(safeKey, String(cur + 1), windowSeconds || 60);
+    return true;
+  } catch (err) {
+    return true;
+  }
+}
+

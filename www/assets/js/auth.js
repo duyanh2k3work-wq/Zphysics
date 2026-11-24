@@ -525,30 +525,54 @@ async function resolveSupabaseSession() {
   return null;
 }
 
+function escapeHtml(str) {
+  return String(str === undefined || str === null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function sanitizeHttpUrl(rawUrl, allowRelative) {
+  if (typeof rawUrl !== 'string') return '';
+  const trimmed = rawUrl.trim();
+  if (!trimmed || trimmed === '#') return '';
+  if (/[\u0000-\u001F\u007F]/.test(trimmed)) return '';
+  if (trimmed.startsWith('//')) return '';
+  try {
+    const parsed = new URL(trimmed, 'https://zphysics.local');
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+      return '';
+    }
+    const isAbsoluteHttp = /^https?:\/\//i.test(trimmed);
+    if (!allowRelative && !isAbsoluteHttp) {
+      return '';
+    }
+    return trimmed;
+  } catch (e) {
+    return '';
+  }
+}
+
+window.escapeHtml = escapeHtml;
+window.sanitizeHttpUrl = sanitizeHttpUrl;
+
 /**
  * Lấy phiên đăng nhập hiện tại và đồng bộ với bảng students
  */
 async function syncAndGetAuthSession() {
   if (!sbClient) {
-    try {
-      const raw = localStorage.getItem(SESSION_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch { return null; }
+    try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+    return null;
   }
 
   try {
-    // 2. Chờ lấy session từ Supabase Auth
+    // 2. Chờ lấy session từ Supabase Auth (tuyệt đối không fallback đọc localStorage giả mạo)
     const session = await resolveSupabaseSession();
 
     if (!session || !session.user) {
-      // Nếu không có session Supabase, thử dùng cache cục bộ cũ nếu có
-      try {
-        const cached = localStorage.getItem(SESSION_KEY);
-        if (cached) {
-          const c = JSON.parse(cached);
-          if (c && c.gmail && !c.gmail.startsWith('demo_')) return c;
-        }
-      } catch (e) {}
+      try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
       return null;
     }
 
@@ -614,12 +638,8 @@ async function syncAndGetAuthSession() {
     return sessionObj;
   } catch (err) {
     console.warn('Lỗi đồng bộ Auth session:', err);
-    try {
-      const cached = localStorage.getItem(SESSION_KEY);
-      return cached ? JSON.parse(cached) : null;
-    } catch {
-      return null;
-    }
+    try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+    return null;
   }
 }
 

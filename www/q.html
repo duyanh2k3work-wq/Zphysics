@@ -7,6 +7,8 @@
   <title>Zphysics — Trắc nghiệm Vật lí</title>
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/auth.js?v=20261124_sec"></script>
 
   <!-- KaTeX CSS & JS -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -1800,11 +1802,10 @@
       }
     }
 
-    const currentSession = getSession();
-    if (!currentSession || !currentSession.gmail) {
-      window.location.href = './';
-    } else {
-      if (currentSession.premium) {
+    let currentSession = null;
+
+    function applySessionTheme(session) {
+      if (session && session.premium) {
         document.body.classList.add('premium-theme');
         const explicitTheme = localStorage.getItem('zphysics_theme');
         const resolved = (explicitTheme === 'light' || explicitTheme === 'dark')
@@ -1812,83 +1813,13 @@
           : (localStorage.getItem('zphysics_premium_mode') === 'light' ? 'light' : 'dark');
         PinUI.applyTheme(resolved);
       } else {
+        document.body.classList.remove('premium-theme');
         const explicitTheme = localStorage.getItem('zphysics_theme');
         PinUI.applyTheme(explicitTheme === 'dark' ? 'dark' : 'light');
       }
-
-      if (currentSession.gmail.startsWith('demo_')) {
-        window.addEventListener('DOMContentLoaded', () => {
-          const nameInput = document.getElementById('studentName');
-          if (nameInput) {
-            nameInput.value = currentSession.ten || 'Demo Student';
-            nameInput.disabled = true;
-            nameInput.style.opacity = '0.7';
-          }
-        });
-      } else {
-        const authHeader = currentSession.access_token ? `Bearer ${currentSession.access_token}` : `Bearer ${SUPABASE_ANON_KEY}`;
-        const checkUrl = `${SUPABASE_URL}/rest/v1/students?email=eq.${encodeURIComponent(currentSession.gmail)}&select=*`;
-        fetch(checkUrl, {
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': authHeader
-          }
-        })
-          .then(res => {
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            return res.json();
-          })
-          .then(students => {
-            if (!students || students.length === 0) {
-              localStorage.removeItem(SESSION_KEY);
-              window.location.href = './';
-            } else {
-              const student = students[0];
-              const isPremium = student.role === 'premium' && (!student.premium_until || new Date(student.premium_until) > new Date());
-              localStorage.setItem(SESSION_KEY, JSON.stringify({
-                gmail: currentSession.gmail,
-                ten: student.full_name || currentSession.gmail,
-                lop: student.lop || currentSession.lop || '',
-                premium: isPremium,
-                premium_until: student.premium_until,
-                access_token: currentSession.access_token
-              }));
-
-              if (isPremium) {
-                document.body.classList.add('premium-theme');
-                const explicitTheme = localStorage.getItem('zphysics_theme');
-                const resolved = (explicitTheme === 'light' || explicitTheme === 'dark')
-                  ? explicitTheme
-                  : (localStorage.getItem('zphysics_premium_mode') === 'light' ? 'light' : 'dark');
-                PinUI.applyTheme(resolved);
-              } else {
-                document.body.classList.remove('premium-theme');
-                const explicitTheme = localStorage.getItem('zphysics_theme');
-                PinUI.applyTheme(explicitTheme === 'dark' ? 'dark' : 'light');
-              }
-
-              const nameInput = document.getElementById('studentName');
-              if (nameInput) {
-                nameInput.value = student.full_name || currentSession.gmail;
-              }
-            }
-          })
-          .catch(err => {
-            console.warn('Lỗi xác thực trực tuyến trang trắc nghiệm, dùng phiên offline:', err);
-          });
-      }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      if (currentSession && currentSession.ten && !currentSession.gmail.startsWith('demo_')) {
-        const nameInput = document.getElementById('studentName');
-        if (nameInput) {
-          nameInput.value = currentSession.ten;
-          nameInput.disabled = true;
-          nameInput.style.opacity = '0.7';
-        }
-      }
-
+    function setupQuizNavigationGuards() {
       const backBtn = document.querySelector('.back-btn');
       if (backBtn) {
         backBtn.addEventListener('click', (e) => {
@@ -1905,9 +1836,15 @@
           e.returnValue = 'Bạn có chắc chắn muốn thoát? Kết quả làm bài sẽ không được lưu.';
         }
       });
-    });
+    }
 
-    const SHEETS_API_URL = localStorage.getItem('ZPHYSICS_API_URL') || 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupQuizNavigationGuards);
+    } else {
+      setupQuizNavigationGuards();
+    }
+
+    const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
 
     let quizData = [];
     let rawQuizPool = [];
@@ -2122,7 +2059,12 @@
           try {
             const res = await fetch(SHEETS_API_URL, {
               method: 'POST',
-              body: JSON.stringify({ action: 'sendReport', message: msg })
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({
+                action: 'sendReport',
+                message: msg,
+                accessToken: (currentSession && currentSession.access_token) ? currentSession.access_token : ''
+              })
             });
             if (!res.ok) allOk = false;
           } catch (err) {
@@ -2470,7 +2412,7 @@
         else if (isAnswered) classes.push('is-answered');
         if (isFlagged) classes.push('is-flagged');
 
-        return `<button type="button" class="${classes.join(' ')}" onclick="scrollToQuestion('${escapeTelegramHtml(qKey)}')" title="Câu ${idx + 1}${isFlagged ? ' (Đang phân vân)' : ''}">${String(idx + 1).padStart(2, '0')}</button>`;
+        return `<button type="button" class="${classes.join(' ')}" data-qid="${escapeTelegramHtml(qKey)}" onclick="scrollToQuestion(this.dataset.qid)" title="Câu ${idx + 1}${isFlagged ? ' (Đang phân vân)' : ''}">${String(idx + 1).padStart(2, '0')}</button>`;
       }).join('');
 
       const unansweredCount = Math.max(0, quizData.length - answeredCount);
@@ -2949,10 +2891,11 @@
         url = `${SUPABASE_URL}/rest/v1/questions?made=in.(${encodeURIComponent(inVals)})&select=*`;
       }
 
+      const authToken = (currentSession && currentSession.access_token) ? currentSession.access_token : SUPABASE_ANON_KEY;
       fetch(url, {
         headers: {
           'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          'Authorization': `Bearer ${authToken}`
         }
       })
         .then(res => {
@@ -2980,13 +2923,37 @@
           if (!hasRendered) {
             document.getElementById('quizContainer').innerHTML =
               '<div class="loading"><p style="color:var(--wrong);font-weight:500;font-size:14px">Không tải được đề từ Database Supabase.<br><small style="opacity:.7">'
-              + (err.message || 'Hãy kiểm tra lại kết nối mạng và mã đề thi.')
+              + escapeQuizHtml(err.message || 'Hãy kiểm tra lại kết nối mạng và mã đề thi.')
               + '</small></p></div>';
           }
         });
     }
 
-    loadQuizFromSupabase();
+    (async function initQuizPageWithAuth() {
+      const verifiedSession = await syncAndGetAuthSession();
+      if (!verifiedSession || !verifiedSession.gmail) {
+        window.location.href = 'landing.html';
+        return;
+      }
+      currentSession = verifiedSession;
+      applySessionTheme(verifiedSession);
+
+      const applyStudentName = () => {
+        const nameInput = document.getElementById('studentName');
+        if (nameInput && verifiedSession.ten) {
+          nameInput.value = verifiedSession.ten;
+          nameInput.disabled = true;
+          nameInput.style.opacity = '0.7';
+        }
+      };
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyStudentName);
+      } else {
+        applyStudentName();
+      }
+
+      loadQuizFromSupabase();
+    })();
 
     function preprocessMath(text) {
       if (!text) return '';
@@ -3069,26 +3036,54 @@
       }
     }
 
+    function escapeQuizHtml(str) {
+      return String(str === undefined || str === null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function normalizeSafeImageUrl(rawUrl) {
+      if (typeof rawUrl !== 'string') return '';
+      let cleaned = rawUrl.trim();
+      const driveMatch = cleaned.match(/^https?:\/\/drive\.google\.com\/file\/d\/([^/\s"'<>]+)\/view/i);
+      if (driveMatch && driveMatch[1]) {
+        cleaned = `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`;
+      }
+      if (/[\s"'<>]/.test(cleaned)) return '';
+      if (typeof window.sanitizeHttpUrl === 'function') {
+        return window.sanitizeHttpUrl(cleaned, false);
+      }
+      return /^https?:\/\/[^\s"'<>]+$/i.test(cleaned) ? cleaned : '';
+    }
+
     function formatText(text) {
       if (!text) return '';
-      text = preprocessMath(text);
+      const processed = preprocessMath(String(text));
+      const safeImages = [];
 
-      let html = text.replace(/\[img\](.*?)\[\/img\]/gi, '\n__IMG__$1__ENDIMG__\n');
+      const stashImage = (rawUrl) => {
+        const safeUrl = normalizeSafeImageUrl(rawUrl);
+        if (!safeUrl) return '';
+        const idx = safeImages.length;
+        safeImages.push(safeUrl);
+        return `\n\u0000ZPIMG_${idx}\u0000\n`;
+      };
+
+      let work = processed.replace(/\[img\](.*?)\[\/img\]/gi, (_, url) => stashImage(url));
       const imgUrlRegex = /(https?:\/\/[^\s<>"]+?(?:\.(?:jpg|jpeg|png|gif|webp|svg|bmp)(?:[?#][^\s<>"]*)?|(?:drive\.google\.com\/(?:file\/d\/[^/\s]+\/view|uc\?[^\s<>"]*export=download[^\s<>"]*|uc\?[^\s<>"]*id=[^\s<>"]+)|i\.imgur\.com\/[^\s<>"]+|ibb\.co\/[^\s<>"]+|postimg\.cc\/[^\s<>"]+|i\.postimg\.cc\/[^\s<>"]+)))/gi;
-      html = html.replace(imgUrlRegex, '\n__IMG__$1__ENDIMG__\n');
+      work = work.replace(imgUrlRegex, (url) => stashImage(url));
 
-      html = html.replace(/__IMG__(https?:\/\/drive\.google\.com\/file\/d\/([^/\s]+)\/view[^\s]*)__ENDIMG__/gi,
-        function (match, url, fileId) {
-          return `__IMG__https://drive.google.com/uc?export=view&id=${fileId}__ENDIMG__`;
-        }
-      );
-
-      html = html.replace(/__IMG__(.*?)__ENDIMG__/gi,
-        '<br><img src="$1" onerror="this.style.display=\'none\'" loading="lazy"><br>'
-      );
-
+      let html = escapeQuizHtml(work);
       html = html.replace(/\n/g, '<br>');
       html = html.replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>');
+      html = html.replace(/\u0000ZPIMG_(\d+)\u0000/g, (_, idx) => {
+        const u = safeImages[parseInt(idx, 10)];
+        if (!u) return '';
+        return `<br><img src="${escapeQuizHtml(u)}" onerror="this.style.display='none'" loading="lazy"><br>`;
+      });
       return html;
     }
 
@@ -3307,30 +3302,37 @@
       let answersHTML = '';
       let helperNote = '';
 
+      const qIdSafe = escapeQuizHtml(q.id);
       if (q.type === 'đs' && validAnswers.length > 0) {
-        answersHTML = validAnswers.map(a => `
-          <div class="tf-statement" id="tf-${q.id}-${a.key}">
-            <div class="tf-text"><strong>${a.key}.</strong> ${formatText(a.text)}</div>
+        answersHTML = validAnswers.map(a => {
+          const aKeySafe = escapeQuizHtml(a.key);
+          return `
+          <div class="tf-statement" id="tf-${qIdSafe}-${aKeySafe}">
+            <div class="tf-text"><strong>${aKeySafe}.</strong> ${formatText(a.text)}</div>
             <div class="tf-toggles seg-control tf-seg" data-selected="none">
               <span class="seg-thumb"></span>
-              <div class="tf-btn seg-btn" data-val="Đ" onclick="selectTF(this, '${q.id}', '${a.key}', 'Đ')">Đúng</div>
-              <div class="tf-btn seg-btn" data-val="S" onclick="selectTF(this, '${q.id}', '${a.key}', 'S')">Sai</div>
+              <div class="tf-btn seg-btn" data-val="Đ" data-qid="${qIdSafe}" data-akey="${aKeySafe}" onclick="selectTF(this, this.dataset.qid, this.dataset.akey, 'Đ')">Đúng</div>
+              <div class="tf-btn seg-btn" data-val="S" data-qid="${qIdSafe}" data-akey="${aKeySafe}" onclick="selectTF(this, this.dataset.qid, this.dataset.akey, 'S')">Sai</div>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
         helperNote = `Chọn đủ Đúng/Sai cho cả ${validAnswers.length} ý. Phải đúng cả ${validAnswers.length}/${validAnswers.length} ý mới giữ mạng.`;
       } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
-        answersHTML = validAnswers.map(a => `
-          <label class="answer-option" data-key="${a.key}" onclick="selectAnswer(this, '${q.id}')">
-            <span class="opt-keycap kbd-cap">${a.key}</span>
+        answersHTML = validAnswers.map(a => {
+          const aKeySafe = escapeQuizHtml(a.key);
+          return `
+          <label class="answer-option" data-key="${aKeySafe}" data-qid="${qIdSafe}" onclick="selectAnswer(this, this.dataset.qid)">
+            <span class="opt-keycap kbd-cap">${aKeySafe}</span>
             <span class="answer-text">${formatText(a.text)}</span>
           </label>
-        `).join('');
+        `;
+        }).join('');
         helperNote = 'Chọn 1 đáp án rồi bấm Kiểm tra đáp án (hoặc phím A–D và Enter).';
       } else {
         answersHTML = `
           <div>
-            <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời" oninput="onHomeworkInputChange()" onkeydown="if(event.key==='Enter'){ event.preventDefault(); checkHomeworkCurrentQuestion(); }">
+            <input type="text" class="student-input" id="short-answer-${qIdSafe}" placeholder="Nhập câu trả lời" oninput="onHomeworkInputChange()" onkeydown="if(event.key==='Enter'){ event.preventDefault(); checkHomeworkCurrentQuestion(); }">
           </div>
         `;
         helperNote = 'Nhập đáp án rồi bấm Kiểm tra đáp án (hoặc nhấn Enter).';
@@ -3340,16 +3342,16 @@
         <div class="q-header">
           <div class="q-num">${String(hwIndex + 1).padStart(2, '0')}</div>
           <span class="q-badge">Câu ${hwIndex + 1}/${quizData.length} · ${meta.shortLabel}</span>
-          <span class="q-result-icon" id="icon-${q.id}"></span>
+          <span class="q-result-icon" id="icon-${qIdSafe}"></span>
         </div>
         <div class="q-text">${formatText(q.question)}</div>
-        <div class="answers-list" id="answers-${q.id}">
+        <div class="answers-list" id="answers-${qIdSafe}">
           ${answersHTML}
         </div>
-        <div class="explanation" id="explain-${q.id}">
+        <div class="explanation" id="explain-${qIdSafe}">
           <strong>Lời giải:</strong> ${formatText(q.explanation)}
         </div>
-        <div class="hw-card-actions" id="hwActions-${q.id}">
+        <div class="hw-card-actions" id="hwActions-${qIdSafe}">
           <span class="hw-action-note" id="hwActionNote">${helperNote}</span>
           <div class="hw-btn-row" id="hwBtnRow">
             <button type="button" class="hw-primary-btn" id="hwCheckBtn" disabled onclick="checkHomeworkCurrentQuestion()">Kiểm tra đáp án</button>
@@ -3685,30 +3687,37 @@
         card.className = 'question-card';
         card.dataset.id = q.id;
 
+        const qIdSafe = escapeQuizHtml(q.id);
         const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
         let answersHTML = '';
         if (q.type === 'đs' && validAnswers.length > 0) {
-          answersHTML = validAnswers.map(a => `
-            <div class="tf-statement" id="tf-${q.id}-${a.key}">
-              <div class="tf-text"><strong>${a.key}.</strong> ${formatText(a.text)}</div>
+          answersHTML = validAnswers.map(a => {
+            const aKeySafe = escapeQuizHtml(a.key);
+            return `
+            <div class="tf-statement" id="tf-${qIdSafe}-${aKeySafe}">
+              <div class="tf-text"><strong>${aKeySafe}.</strong> ${formatText(a.text)}</div>
               <div class="tf-toggles seg-control tf-seg" data-selected="none">
                 <span class="seg-thumb"></span>
                 <div class="tf-btn seg-btn" data-val="Đ">Đúng</div>
                 <div class="tf-btn seg-btn" data-val="S">Sai</div>
               </div>
             </div>
-          `).join('');
+          `;
+          }).join('');
         } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
-          answersHTML = validAnswers.map(a => `
-            <label class="answer-option" data-key="${a.key}">
-              <span class="opt-keycap kbd-cap">${a.key}</span>
+          answersHTML = validAnswers.map(a => {
+            const aKeySafe = escapeQuizHtml(a.key);
+            return `
+            <label class="answer-option" data-key="${aKeySafe}">
+              <span class="opt-keycap kbd-cap">${aKeySafe}</span>
               <span class="answer-text">${formatText(a.text)}</span>
             </label>
-          `).join('');
+          `;
+          }).join('');
         } else {
           answersHTML = `
             <div>
-              <input type="text" class="student-input" id="short-answer-${q.id}" disabled>
+              <input type="text" class="student-input" id="short-answer-${qIdSafe}" disabled>
             </div>
           `;
         }
@@ -3717,13 +3726,13 @@
           <div class="q-header">
             <div class="q-num">${String(idx + 1).padStart(2, '0')}</div>
             <span class="q-badge">Câu ${idx + 1}</span>
-            <span class="q-result-icon" id="icon-${q.id}"></span>
+            <span class="q-result-icon" id="icon-${qIdSafe}"></span>
           </div>
           <div class="q-text">${formatText(q.question)}</div>
-          <div class="answers-list" id="answers-${q.id}">
+          <div class="answers-list" id="answers-${qIdSafe}">
             ${answersHTML}
           </div>
-          <div class="explanation" id="explain-${q.id}">
+          <div class="explanation" id="explain-${qIdSafe}">
             <strong>Lời giải:</strong> ${formatText(q.explanation)}
           </div>
         `;
@@ -3840,37 +3849,44 @@
         card.className = 'question-card' + (isFlagged ? ' flagged-card' : '');
         card.dataset.id = q.id;
 
+        const qIdSafe = escapeQuizHtml(q.id);
         const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
         let answersHTML = '';
 
         if (q.type === 'đs' && validAnswers.length > 0) {
-          answersHTML = validAnswers.map(a => `
-            <div class="tf-statement" id="tf-${q.id}-${a.key}">
-              <div class="tf-text"><strong>${a.key}.</strong> ${formatText(a.text)}</div>
+          answersHTML = validAnswers.map(a => {
+            const aKeySafe = escapeQuizHtml(a.key);
+            return `
+            <div class="tf-statement" id="tf-${qIdSafe}-${aKeySafe}">
+              <div class="tf-text"><strong>${aKeySafe}.</strong> ${formatText(a.text)}</div>
               <div class="tf-toggles seg-control tf-seg" data-selected="none">
                 <span class="seg-thumb"></span>
-                <div class="tf-btn seg-btn" data-val="Đ" onclick="selectTF(this, '${q.id}', '${a.key}', 'Đ')">Đúng</div>
-                <div class="tf-btn seg-btn" data-val="S" onclick="selectTF(this, '${q.id}', '${a.key}', 'S')">Sai</div>
+                <div class="tf-btn seg-btn" data-val="Đ" data-qid="${qIdSafe}" data-akey="${aKeySafe}" onclick="selectTF(this, this.dataset.qid, this.dataset.akey, 'Đ')">Đúng</div>
+                <div class="tf-btn seg-btn" data-val="S" data-qid="${qIdSafe}" data-akey="${aKeySafe}" onclick="selectTF(this, this.dataset.qid, this.dataset.akey, 'S')">Sai</div>
               </div>
             </div>
-          `).join('');
+          `;
+          }).join('');
         } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
-          answersHTML = validAnswers.map(a => `
-            <label class="answer-option" data-key="${a.key}" onclick="selectAnswer(this, '${q.id}')">
-              <span class="opt-keycap kbd-cap">${a.key}</span>
+          answersHTML = validAnswers.map(a => {
+            const aKeySafe = escapeQuizHtml(a.key);
+            return `
+            <label class="answer-option" data-key="${aKeySafe}" data-qid="${qIdSafe}" onclick="selectAnswer(this, this.dataset.qid)">
+              <span class="opt-keycap kbd-cap">${aKeySafe}</span>
               <span class="answer-text">${formatText(a.text)}</span>
             </label>
-          `).join('');
+          `;
+          }).join('');
         } else {
           answersHTML = `
             <div>
-              <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời" oninput="inputShortAnswer()" onkeydown="if(event.key==='Enter' && studyMode==='practice'){ event.preventDefault(); checkSingleQuestion('${q.id}'); }">
+              <input type="text" class="student-input" id="short-answer-${qIdSafe}" data-qid="${qIdSafe}" placeholder="Nhập câu trả lời" oninput="inputShortAnswer()" onkeydown="if(event.key==='Enter' && studyMode==='practice'){ event.preventDefault(); checkSingleQuestion(this.dataset.qid); }">
             </div>
           `;
         }
 
         const sourceBadge = (isMistakeQuiz && q._originLesson)
-          ? ` · ${escapeTelegramHtml(q._originLesson)}`
+          ? ` · ${escapeQuizHtml(q._originLesson)}`
           : '';
 
         card.innerHTML = `
@@ -3878,23 +3894,23 @@
             <div class="q-num">${String(idx + 1).padStart(2, '0')}</div>
             <span class="q-badge">Câu ${idx + 1}${sourceBadge}</span>
             <div class="q-header-right">
-              <button type="button" class="q-flag-btn${isFlagged ? ' flagged' : ''}" id="flag-btn-${q.id}" onclick="toggleQuestionFlag('${q.id}')" title="Đánh dấu câu phân vân để xem lại sau">
+              <button type="button" class="q-flag-btn${isFlagged ? ' flagged' : ''}" id="flag-btn-${qIdSafe}" data-qid="${qIdSafe}" onclick="toggleQuestionFlag(this.dataset.qid)" title="Đánh dấu câu phân vân để xem lại sau">
                 ${SVG_FLAG}<span>${isFlagged ? 'Phân vân' : 'Xem lại'}</span>
               </button>
-              <span class="q-result-icon" id="icon-${q.id}"></span>
+              <span class="q-result-icon" id="icon-${qIdSafe}"></span>
             </div>
           </div>
           <div class="q-text">${formatText(q.question)}</div>
-          <div class="answers-list" id="answers-${q.id}">
+          <div class="answers-list" id="answers-${qIdSafe}">
             ${answersHTML}
           </div>
-          <div class="q-practice-actions" id="practiceActions-${q.id}">
+          <div class="q-practice-actions" id="practiceActions-${qIdSafe}">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <button type="button" class="btn-check-single" id="check-btn-${q.id}" onclick="checkSingleQuestion('${q.id}')">Kiểm tra &amp; Xem giải</button>
+              <button type="button" class="btn-check-single" id="check-btn-${qIdSafe}" data-qid="${qIdSafe}" onclick="checkSingleQuestion(this.dataset.qid)">Kiểm tra &amp; Xem giải</button>
             </div>
-            <span class="q-practice-tip" id="ptip-${q.id}">Chọn đáp án rồi xem lời giải ngay</span>
+            <span class="q-practice-tip" id="ptip-${qIdSafe}">Chọn đáp án rồi xem lời giải ngay</span>
           </div>
-          <div class="explanation" id="explain-${q.id}">
+          <div class="explanation" id="explain-${qIdSafe}">
             <strong>Lời giải:</strong> ${formatText(q.explanation)}
           </div>
         `;
@@ -3926,33 +3942,40 @@
       card.className = 'question-card review-card-enter';
       card.dataset.id = q.id;
 
+      const qIdSafe = escapeQuizHtml(q.id);
       const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
       let answersHTML = '';
       const typeLabel = q.type === 'đs' ? 'Đúng / Sai' : (q.type === 'cauhoi' ? 'Trắc nghiệm' : 'Trả lời ngắn');
 
       if (q.type === 'đs' && validAnswers.length > 0) {
-        answersHTML = validAnswers.map(a => `
-          <div class="tf-statement" id="tf-${q.id}-${a.key}">
-            <div class="tf-text"><strong>${a.key}.</strong> ${formatText(a.text)}</div>
+        answersHTML = validAnswers.map(a => {
+          const aKeySafe = escapeQuizHtml(a.key);
+          return `
+          <div class="tf-statement" id="tf-${qIdSafe}-${aKeySafe}">
+            <div class="tf-text"><strong>${aKeySafe}.</strong> ${formatText(a.text)}</div>
             <div class="tf-toggles seg-control tf-seg" data-selected="none">
               <span class="seg-thumb"></span>
-              <div class="tf-btn seg-btn" data-val="Đ" onclick="selectTF(this, ${q.id}, '${a.key}', 'Đ')">Đúng</div>
-              <div class="tf-btn seg-btn" data-val="S" onclick="selectTF(this, ${q.id}, '${a.key}', 'S')">Sai</div>
+              <div class="tf-btn seg-btn" data-val="Đ" data-qid="${qIdSafe}" data-akey="${aKeySafe}" onclick="selectTF(this, this.dataset.qid, this.dataset.akey, 'Đ')">Đúng</div>
+              <div class="tf-btn seg-btn" data-val="S" data-qid="${qIdSafe}" data-akey="${aKeySafe}" onclick="selectTF(this, this.dataset.qid, this.dataset.akey, 'S')">Sai</div>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
       } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
-        answersHTML = validAnswers.map(a => `
-          <label class="answer-option" data-key="${a.key}" onclick="selectAnswer(this, ${q.id})">
-            <span class="opt-keycap kbd-cap">${a.key}</span>
+        answersHTML = validAnswers.map(a => {
+          const aKeySafe = escapeQuizHtml(a.key);
+          return `
+          <label class="answer-option" data-key="${aKeySafe}" data-qid="${qIdSafe}" onclick="selectAnswer(this, this.dataset.qid)">
+            <span class="opt-keycap kbd-cap">${aKeySafe}</span>
             <span class="answer-text">${formatText(a.text)}</span>
           </label>
-        `).join('');
+        `;
+        }).join('');
       } else {
         answersHTML = `
           <div style="display: flex; gap: 10px;">
-            <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời" style="flex: 1;" onkeydown="if(event.key === 'Enter') gradeShortAnswer(${q.id})">
-            <button type="button" class="grade-btn" id="grade-btn-${q.id}" onclick="gradeShortAnswer(${q.id})">Gửi</button>
+            <input type="text" class="student-input" id="short-answer-${qIdSafe}" data-qid="${qIdSafe}" placeholder="Nhập câu trả lời" style="flex: 1;" onkeydown="if(event.key === 'Enter') gradeShortAnswer(this.dataset.qid)">
+            <button type="button" class="grade-btn" id="grade-btn-${qIdSafe}" data-qid="${qIdSafe}" onclick="gradeShortAnswer(this.dataset.qid)">Gửi</button>
           </div>
         `;
       }
@@ -3961,16 +3984,16 @@
         <div class="q-header">
           <div class="q-num">${String(rvIndex + 1).padStart(2, '0')}</div>
           <span class="q-badge">Câu ${rvIndex + 1} · ${typeLabel}</span>
-          <span class="q-result-icon" id="icon-${q.id}"></span>
+          <span class="q-result-icon" id="icon-${qIdSafe}"></span>
         </div>
         <div class="q-text">${formatText(q.question)}</div>
-        <div class="answers-list" id="answers-${q.id}">
+        <div class="answers-list" id="answers-${qIdSafe}">
           ${answersHTML}
         </div>
-        <div class="explanation" id="explain-${q.id}">
+        <div class="explanation" id="explain-${qIdSafe}">
           <strong>Lời giải:</strong> ${formatText(q.explanation)}
         </div>
-        <div class="review-actions" id="reviewActions-${q.id}">
+        <div class="review-actions" id="reviewActions-${qIdSafe}">
           <button class="skip-btn" onclick="skipReviewQuestion()">Bỏ qua câu này</button>
         </div>
       `;

@@ -10,13 +10,13 @@ Skill chuyên trách tạo và triển khai đề thi thử / đề luyện tậ
 
 ---
 
-## 1. Thông Tin & ID Cố Định Của Hệ Thống
+## 1. Thông Tin & ID Hệ Thống (Đọc Từ Cấu Hình Cục Bộ)
 
-Không cần tìm kiếm hay hỏi lại người dùng về các thông tin này:
-- **Thư mục Google Drive Đề thi (PDF):** `1Qd75nHk5Da8V7GVUCDNO2TzhDGk_AolN`
-  - Đảm bảo quyền kế thừa xem công khai (`anyoneWithLink`).
+Đọc `driveFolderId` và `spreadsheetId` từ tệp cục bộ `.agents/zphysics-config.local.json` (tệp này bị Git ignore để tránh lộ ID nội bộ lên kho mã nguồn công khai). Không tự bịa ID nếu chưa đọc tệp cấu hình:
+- **Thư mục Google Drive Đề thi (PDF):** `<driveFolderId>` trong `.agents/zphysics-config.local.json`
+  - Đảm bảo quyền xem công khai (`anyoneWithLink`) cho file PDF nhúng.
   - URL nhúng preview chuẩn: `https://drive.google.com/file/d/<FILE_ID>/view?usp=sharing` (hoặc `https://drive.google.com/uc?export=view&id=<FILE_ID>`).
-- **Google Sheet Ngân hàng đề:** `1-RbwBWS_d7tWkLJvtkZg7s5yF9qVLaGe_N_Owgxe2r4`
+- **Google Sheet Ngân hàng đề:** `<spreadsheetId>` trong `.agents/zphysics-config.local.json`
   - Tab mục tiêu: `LuyenDe`
 - **Mẫu HTML A4 in ấn:** `assets/exam_template.html` (trong thư mục gốc dự án Zphysics).
 
@@ -67,11 +67,11 @@ chrome.exe --headless --disable-gpu --print-to-pdf="assets/temp_exam.pdf" --no-p
 *(Nếu dùng Edge: `msedge.exe --headless ...`)*
 
 ### Bước 3: Đẩy file PDF lên Google Drive
-- Upload file PDF vào thư mục Drive ID: `1Qd75nHk5Da8V7GVUCDNO2TzhDGk_AolN`.
+- Upload file PDF vào `<driveFolderId>` (đọc tự động bởi `node assets/upload_drive.js <pdf-path>`).
 - Lấy `fileId` sau khi upload và tạo link view: `https://drive.google.com/file/d/<fileId>/view?usp=sharing`.
 
 ### Bước 4: Đồng bộ vào Google Sheet `LuyenDe`
-1. Đọc sheet `LuyenDe` từ Spreadsheet ID `1-RbwBWS_d7twKLJvtkZg7s5yF9qVLaGe_N_Owgxe2r4`.
+1. Đọc sheet `LuyenDe` từ `<spreadsheetId>` trong `.agents/zphysics-config.local.json`.
 2. Kiểm tra mã đề cuối cùng ở Cột A (`id`) để tự động tăng mã (ví dụ: `de_thi_thu_04` -> `de_thi_thu_05`).
 3. Ghi dòng mới gồm đúng 10 cột (A -> J):
    - **A (id):** `de_thi_thu_XX`
