@@ -719,14 +719,18 @@
     .q-text .katex-html,
     .answer-text .katex-html,
     .tf-text .katex-html,
-    .explanation .katex-html {
+    .explanation .katex-html,
+    .qf-answer-body .katex-html,
+    .qf-explain-box .katex-html {
       white-space: normal;
     }
 
     .q-text .katex-html > .base,
     .answer-text .katex-html > .base,
     .tf-text .katex-html > .base,
-    .explanation .katex-html > .base {
+    .explanation .katex-html > .base,
+    .qf-answer-body .katex-html > .base,
+    .qf-explain-box .katex-html > .base {
       display: inline-block;
       max-width: 100%;
       margin: 1px 0;
@@ -1074,8 +1078,7 @@
     .hw-lives-wrap {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 4px 10px;
+      padding: 5px 10px;
       border-radius: 8px;
       background: var(--raised);
       border: 1px solid var(--border);
@@ -1130,18 +1133,6 @@
       20% { transform: scale(1.15) translateX(-3px); }
       45% { transform: scale(1.05) translateX(3px); }
       70% { transform: scale(0.9) translateX(-2px); }
-    }
-
-    .hw-lives-label {
-      font-size: 12px;
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
-      color: var(--text);
-      white-space: nowrap;
-    }
-
-    .hw-lives-wrap.is-danger .hw-lives-label {
-      color: var(--wrong);
     }
 
     .hw-step-track {
@@ -1291,6 +1282,379 @@
     .hw-secondary-btn:hover {
       background: var(--raised);
       border-color: var(--accent);
+    }
+
+    /* ── QUESTION FEEDBACK PANEL (DUOLINGO-STYLE INTEGRATED DRAWER) ── */
+    .qf-panel {
+      display: none;
+      padding: 18px 20px 20px;
+      border-top: 1px solid transparent;
+      animation: qfSlideUp 220ms var(--ease) both;
+    }
+
+    .qf-panel.visible {
+      display: block;
+    }
+
+    .qf-panel.is-compact {
+      padding: 14px 20px 16px;
+    }
+
+    .qf-panel.is-correct {
+      background: #edf9f1;
+      border-top-color: rgba(22, 163, 74, 0.22);
+    }
+
+    .qf-panel.is-wrong {
+      background: #fef2f2;
+      border-top-color: rgba(220, 38, 38, 0.22);
+    }
+
+    html[data-theme="dark"] .qf-panel.is-correct {
+      background: #13261b;
+      border-top-color: rgba(76, 195, 138, 0.26);
+    }
+
+    html[data-theme="dark"] .qf-panel.is-wrong {
+      background: #221519;
+      border-top-color: rgba(229, 72, 77, 0.28);
+    }
+
+    @keyframes qfSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .qf-panel {
+        animation: none;
+      }
+    }
+
+    .qf-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .qf-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .qf-icon-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .qf-panel.is-correct .qf-icon-badge {
+      background: #16a34a;
+      color: #ffffff;
+    }
+
+    .qf-panel.is-wrong .qf-icon-badge {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    html[data-theme="dark"] .qf-panel.is-correct .qf-icon-badge {
+      background: #4cc38a;
+      color: #08170f;
+    }
+
+    html[data-theme="dark"] .qf-panel.is-wrong .qf-icon-badge {
+      background: #e5484d;
+      color: #1a0b0c;
+    }
+
+    .qf-title {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+    }
+
+    .qf-panel.is-correct .qf-title {
+      color: #15803d;
+    }
+
+    .qf-panel.is-wrong .qf-title {
+      color: #b91c1c;
+    }
+
+    html[data-theme="dark"] .qf-panel.is-correct .qf-title {
+      color: #5fd69e;
+    }
+
+    html[data-theme="dark"] .qf-panel.is-wrong .qf-title {
+      color: #ff6b70;
+    }
+
+    .qf-meta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .qf-meta-badge svg {
+      width: 13px;
+      height: 13px;
+      fill: currentColor;
+      stroke: currentColor;
+      flex-shrink: 0;
+    }
+
+    .qf-panel.is-correct .qf-meta-badge {
+      background: rgba(22, 163, 74, 0.12);
+      color: #15803d;
+      border: 1px solid rgba(22, 163, 74, 0.24);
+    }
+
+    .qf-panel.is-wrong .qf-meta-badge {
+      background: rgba(220, 38, 38, 0.10);
+      color: #b91c1c;
+      border: 1px solid rgba(220, 38, 38, 0.24);
+    }
+
+    html[data-theme="dark"] .qf-panel.is-correct .qf-meta-badge {
+      background: rgba(76, 195, 138, 0.15);
+      color: #7ee3b3;
+      border-color: rgba(76, 195, 138, 0.28);
+    }
+
+    html[data-theme="dark"] .qf-panel.is-wrong .qf-meta-badge {
+      background: rgba(229, 72, 77, 0.16);
+      color: #ff8a8e;
+      border-color: rgba(229, 72, 77, 0.30);
+    }
+
+    .qf-section {
+      margin-top: 12px;
+    }
+
+    .qf-label {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: #b91c1c;
+    }
+
+    html[data-theme="dark"] .qf-label {
+      color: #ff6b70;
+    }
+
+    .qf-answer-body {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text);
+      overflow-x: auto;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .qf-ans-option {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .qf-ans-key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 7px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 700;
+      background: rgba(220, 38, 38, 0.12);
+      color: #b91c1c;
+      border: 1px solid rgba(220, 38, 38, 0.25);
+      flex-shrink: 0;
+    }
+
+    html[data-theme="dark"] .qf-ans-key {
+      background: rgba(229, 72, 77, 0.18);
+      color: #ff8a8e;
+      border-color: rgba(229, 72, 77, 0.32);
+    }
+
+    .qf-ans-val {
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .qf-short-ans {
+      display: inline-block;
+      padding: 4px 11px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.85);
+      color: #b91c1c;
+      border: 1px solid rgba(220, 38, 38, 0.22);
+    }
+
+    html[data-theme="dark"] .qf-short-ans {
+      background: rgba(11, 13, 20, 0.55);
+      color: #ff8a8e;
+      border-color: rgba(229, 72, 77, 0.28);
+    }
+
+    .qf-tf-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .qf-tf-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(220, 38, 38, 0.20);
+      color: var(--text);
+    }
+
+    html[data-theme="dark"] .qf-tf-chip {
+      background: rgba(11, 13, 20, 0.52);
+      border-color: rgba(229, 72, 77, 0.24);
+    }
+
+    .qf-tf-chip strong {
+      color: var(--text-secondary);
+      font-weight: 700;
+    }
+
+    .qf-tf-chip .is-true {
+      color: var(--correct);
+      font-weight: 700;
+    }
+
+    .qf-tf-chip .is-false {
+      color: var(--wrong);
+      font-weight: 700;
+    }
+
+    .qf-explain-box {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.80);
+      border: 1px solid rgba(220, 38, 38, 0.16);
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: var(--text);
+      overflow-wrap: break-word;
+      word-break: break-word;
+      overflow-x: auto;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    html[data-theme="dark"] .qf-explain-box {
+      background: rgba(11, 13, 20, 0.52);
+      border-color: rgba(229, 72, 77, 0.22);
+      color: #eef0f5;
+    }
+
+    .qf-explain-box img {
+      max-width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin: 8px 0;
+    }
+
+    .qf-cta-wrap {
+      margin-top: 16px;
+    }
+
+    .qf-cta-btn {
+      width: 100%;
+      height: 46px;
+      padding: 0 20px;
+      border-radius: 12px;
+      border: none;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 110ms var(--ease), box-shadow 110ms var(--ease), filter 140ms var(--ease);
+    }
+
+    .qf-cta-btn.is-correct {
+      background: #16a34a;
+      color: #ffffff;
+      box-shadow: 0 3px 0 #15803d;
+    }
+
+    .qf-cta-btn.is-wrong {
+      background: #dc2626;
+      color: #ffffff;
+      box-shadow: 0 3px 0 #b91c1c;
+    }
+
+    html[data-theme="dark"] .qf-cta-btn.is-correct {
+      background: #4cc38a;
+      color: #08170f;
+      box-shadow: 0 3px 0 #2d9664;
+    }
+
+    html[data-theme="dark"] .qf-cta-btn.is-wrong {
+      background: #e5484d;
+      color: #ffffff;
+      box-shadow: 0 3px 0 #b3262b;
+    }
+
+    .qf-cta-btn:hover {
+      filter: brightness(1.04);
+    }
+
+    .qf-cta-btn:active {
+      transform: translateY(2px);
+    }
+
+    .qf-cta-btn.is-correct:active {
+      box-shadow: 0 1px 0 #15803d;
+    }
+
+    .qf-cta-btn.is-wrong:active {
+      box-shadow: 0 1px 0 #b91c1c;
+    }
+
+    html[data-theme="dark"] .qf-cta-btn.is-correct:active {
+      box-shadow: 0 1px 0 #2d9664;
+    }
+
+    html[data-theme="dark"] .qf-cta-btn.is-wrong:active {
+      box-shadow: 0 1px 0 #b3262b;
     }
 
     .score-banner.is-failed {
@@ -1522,12 +1886,7 @@
       }
 
       .hw-lives-wrap {
-        padding: 3px 8px;
-        gap: 6px;
-      }
-
-      .hw-lives-label {
-        font-size: 11.5px;
+        padding: 4px 8px;
       }
 
       .hw-step-track {
@@ -1552,6 +1911,23 @@
       .hw-btn-row .hw-primary-btn,
       .hw-btn-row .hw-secondary-btn {
         flex: 1;
+      }
+
+      .qf-panel {
+        padding: 14px 16px 16px;
+      }
+
+      .qf-panel.is-compact {
+        padding: 12px 16px 14px;
+      }
+
+      .qf-title {
+        font-size: 16.5px;
+      }
+
+      .qf-cta-btn {
+        height: 44px;
+        font-size: 14px;
       }
     }
 
@@ -1690,9 +2066,8 @@
       <div class="hw-hud" id="homeworkHud">
         <div class="hw-hud-top">
           <div class="hw-part-pills" id="hwPartPills"></div>
-          <div class="hw-lives-wrap" id="hwLivesWrap" title="Tối đa 2 lần sai; sai đến câu thứ 3 sẽ bị trượt và phải làm lại bài">
+          <div class="hw-lives-wrap" id="hwLivesWrap" aria-label="Còn 3 trên 3 mạng" title="Tối đa 2 lần sai; sai đến câu thứ 3 sẽ bị trượt và phải làm lại bài">
             <div class="hw-lives-hearts" id="hwLivesHearts"></div>
-            <span class="hw-lives-label" id="hwLivesLabel">3/3 mạng</span>
           </div>
         </div>
         <div class="hw-step-track" id="hwStepTrack"></div>
@@ -1859,6 +2234,7 @@
     let rvWrong = 0;
     let rvSkipped = 0;
     let rvResults = [];
+    let rvAnsweredCurrent = false;
 
     const HW_MAX_LIVES = 3;
     let hwIndex = 0;
@@ -2496,13 +2872,14 @@
       const res = evaluateQuestion(q, idx);
       checkedQuestionIds.add(String(q.id));
 
-      const checkBtn = document.getElementById(`check-btn-${q.id}`);
-      const tipEl = document.getElementById(`ptip-${q.id}`);
-      if (checkBtn) checkBtn.style.display = 'none';
-      if (tipEl) tipEl.textContent = res.isCorrect ? 'Chính xác! Đọc lời giải để củng cố.' : 'Đã lưu vào Sổ tay câu sai để ôn lại.';
+      const practiceActionsEl = document.getElementById(`practiceActions-${q.id}`);
+      if (practiceActionsEl) practiceActionsEl.style.display = 'none';
 
-      const explainEl = document.getElementById('explain-' + q.id);
-      if (explainEl) triggerKaTeX(explainEl);
+      renderQuestionFeedbackPanel(q, {
+        isCorrect: res.isCorrect,
+        compact: true,
+        metaText: res.isCorrect ? (isMistakeQuiz ? 'Đã xóa khỏi Sổ tay' : '') : 'Đã lưu Sổ tay câu sai'
+      });
 
       if (!opts.skipMistakeUpdate) {
         if (!res.isCorrect) {
@@ -2955,10 +3332,23 @@
       loadQuizFromSupabase();
     })();
 
+    function normalizeEscapedLatex(str) {
+      if (!str || !str.includes('\\\\')) return str;
+      const hasDoubleEscapedLatex = /(^|[^\\])\\\\(?:frac|dfrac|tfrac|cdot|times|div|pm|mp|pi|Delta|delta|alpha|beta|gamma|lambda|mu|omega|Omega|phi|varphi|theta|rho|sigma|tau|epsilon|varepsilon|eta|Rightarrow|rightarrow|Leftarrow|leftarrow|leftrightarrow|to|text|mathrm|mathbf|mathit|sqrt|vec|bar|overline|hat|dot|ddot|left|right|approx|equiv|sim|le|leq|ge|geq|ne|neq|infty|circ|sin|cos|tan|cot|log|ln|sum|int|quad|qquad|boxed|begin|end)\b|(^|[^\\])\\\\\([\s\S]*\\\\\)|(^|[^\\])\\\\\[[\s\S]*\\\\\]/.test(str);
+      if (!hasDoubleEscapedLatex) return str;
+      let out = str.replace(/\\\\\\\\/g, '\u0000ZPLINEBRK\u0000');
+      out = out.replace(/(\\+)([a-zA-Z]{2,}|[,;!%{}()\[\]])/g, (m, slashes, cmd) => {
+        if (slashes.length === 2) return '\\' + cmd;
+        return m;
+      });
+      out = out.replace(/\u0000ZPLINEBRK\u0000/g, '\\\\');
+      return out;
+    }
+
     function preprocessMath(text) {
       if (!text) return '';
 
-      let res = text
+      let res = normalizeEscapedLatex(String(text))
         .replace(/\\bar\{Ed1\}/g, '\\overline{E_{d1}}')
         .replace(/\\bar\{Ed2\}/g, '\\overline{E_{d2}}')
         .replace(/\\bar\{Ed\}/g, '\\overline{E_d}')
@@ -3076,8 +3466,13 @@
       const imgUrlRegex = /(https?:\/\/[^\s<>"]+?(?:\.(?:jpg|jpeg|png|gif|webp|svg|bmp)(?:[?#][^\s<>"]*)?|(?:drive\.google\.com\/(?:file\/d\/[^/\s]+\/view|uc\?[^\s<>"]*export=download[^\s<>"]*|uc\?[^\s<>"]*id=[^\s<>"]+)|i\.imgur\.com\/[^\s<>"]+|ibb\.co\/[^\s<>"]+|postimg\.cc\/[^\s<>"]+|i\.postimg\.cc\/[^\s<>"]+)))/gi;
       work = work.replace(imgUrlRegex, (url) => stashImage(url));
 
-      let html = escapeQuizHtml(work);
-      html = html.replace(/\n/g, '<br>');
+      const mathProtectRegex = /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$[^\$\n]+?\$)/g;
+      const segs = work.split(mathProtectRegex);
+      let html = segs.map((seg, i) => {
+        if (!seg) return '';
+        const escapedSeg = escapeQuizHtml(seg);
+        return (i % 2 === 1) ? escapedSeg : escapedSeg.replace(/\n/g, '<br>');
+      }).join('');
       html = html.replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>');
       html = html.replace(/\u0000ZPIMG_(\d+)\u0000/g, (_, idx) => {
         const u = safeImages[parseInt(idx, 10)];
@@ -3085,6 +3480,102 @@
         return `<br><img src="${escapeQuizHtml(u)}" onerror="this.style.display='none'" loading="lazy"><br>`;
       });
       return html;
+    }
+
+    function buildCorrectAnswerHtml(q) {
+      const validAnswers = (q && Array.isArray(q.answers))
+        ? q.answers.filter(a => a.text && a.text.trim() !== '')
+        : [];
+
+      if (q && q.type === 'cauhoi' && validAnswers.length > 0) {
+        const correctKeyNorm = String(q.correct || '').trim().toUpperCase();
+        const opt = validAnswers.find(a => a.key === q.correct)
+          || validAnswers.find(a => String(a.key).trim().toUpperCase() === correctKeyNorm);
+        if (opt) {
+          return `<div class="qf-ans-option"><span class="qf-ans-key">${escapeQuizHtml(opt.key)}</span><span class="qf-ans-val">${formatText(opt.text)}</span></div>`;
+        }
+        return `<span class="qf-short-ans">${formatText(String(q.correct || ''))}</span>`;
+      }
+
+      if (q && q.type === 'đs' && validAnswers.length > 0) {
+        const correctArr = String(q.correct || '').toUpperCase().trim().replace(/D/g, 'Đ').split('');
+        return `<div class="qf-tf-chips">${validAnswers.map((a, idx) => {
+          const v = correctArr[idx] || 'Đ';
+          const isTrue = v === 'Đ';
+          return `<span class="qf-tf-chip"><strong>${escapeQuizHtml(a.key)})</strong> <span class="${isTrue ? 'is-true' : 'is-false'}">${isTrue ? 'Đúng' : 'Sai'}</span></span>`;
+        }).join('')}</div>`;
+      }
+
+      const rawCorrect = String((q && q.correct) || '').trim();
+      const parts = rawCorrect.includes('|')
+        ? rawCorrect.split('|').map(s => s.trim()).filter(Boolean)
+        : [rawCorrect];
+      const formatted = parts.filter(Boolean).map(p => formatText(p)).join(' hoặc ') || '—';
+      return `<span class="qf-short-ans">${formatted}</span>`;
+    }
+
+    function renderQuestionFeedbackPanel(q, opts = {}) {
+      if (!q) return null;
+      const panel = document.getElementById('qfPanel-' + q.id);
+      if (!panel) return null;
+
+      const isCorrect = !!opts.isCorrect;
+      const isCompact = !!opts.compact;
+      panel.className = 'qf-panel visible ' + (isCorrect ? 'is-correct' : 'is-wrong') + (isCompact ? ' is-compact' : '');
+
+      const iconSvg = isCorrect
+        ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+
+      let metaHtml = '';
+      if (opts.metaText) {
+        const iconPrefix = opts.metaIcon === 'heart' ? SVG_HEART : '';
+        metaHtml = `<span class="qf-meta-badge">${iconPrefix}<span>${escapeQuizHtml(opts.metaText)}</span></span>`;
+      }
+
+      let ctaHtml = '';
+      if (opts.ctaText && opts.ctaOnClick) {
+        const idAttr = opts.ctaId ? ` id="${escapeQuizHtml(opts.ctaId)}"` : '';
+        const btnCls = isCorrect ? 'is-correct' : 'is-wrong';
+        ctaHtml = `<div class="qf-cta-wrap"><button type="button" class="qf-cta-btn ${btnCls}"${idAttr} onclick="${escapeQuizHtml(opts.ctaOnClick)}">${escapeQuizHtml(opts.ctaText)}</button></div>`;
+      }
+
+      if (isCorrect) {
+        panel.innerHTML = `
+          <div class="qf-head">
+            <div class="qf-title-group">
+              <span class="qf-icon-badge" aria-hidden="true">${iconSvg}</span>
+              <span class="qf-title">Tuyệt vời!</span>
+            </div>
+            ${metaHtml}
+          </div>
+          ${ctaHtml}
+        `;
+      } else {
+        const hasExplanation = !!(q.explanation && String(q.explanation).trim() !== '');
+        const explainHtml = hasExplanation
+          ? `<div class="qf-section"><div class="qf-label">Lời giải:</div><div class="qf-explain-box">${formatText(q.explanation)}</div></div>`
+          : '';
+
+        panel.innerHTML = `
+          <div class="qf-head">
+            <div class="qf-title-group">
+              <span class="qf-icon-badge" aria-hidden="true">${iconSvg}</span>
+              <span class="qf-title">Không chính xác</span>
+            </div>
+            ${metaHtml}
+          </div>
+          <div class="qf-section">
+            <div class="qf-label">Đáp án đúng:</div>
+            <div class="qf-answer-body">${buildCorrectAnswerHtml(q)}</div>
+          </div>
+          ${explainHtml}
+          ${ctaHtml}
+        `;
+      }
+
+      triggerKaTeX(panel);
+      return panel;
     }
 
     function resetScoreBannerUI() {
@@ -3189,12 +3680,12 @@
       }
 
       const livesWrap = document.getElementById('hwLivesWrap');
-      const livesLabel = document.getElementById('hwLivesLabel');
-      if (livesWrap) livesWrap.classList.toggle('is-danger', livesLeft <= 1);
-      if (livesLabel) {
-        if (livesLeft <= 0) livesLabel.textContent = '0/3 mạng · Trượt';
-        else if (livesLeft === 1) livesLabel.textContent = 'Còn 1 mạng!';
-        else livesLabel.textContent = `${livesLeft}/${HW_MAX_LIVES} mạng`;
+      if (livesWrap) {
+        livesWrap.classList.toggle('is-danger', livesLeft <= 1);
+        livesWrap.setAttribute(
+          'aria-label',
+          livesLeft <= 0 ? 'Đã hết mạng, bài làm trượt' : `Còn ${livesLeft} trên ${HW_MAX_LIVES} mạng`
+        );
       }
 
       const trackEl = document.getElementById('hwStepTrack');
@@ -3348,15 +3839,13 @@
         <div class="answers-list" id="answers-${qIdSafe}">
           ${answersHTML}
         </div>
-        <div class="explanation" id="explain-${qIdSafe}">
-          <strong>Lời giải:</strong> ${formatText(q.explanation)}
-        </div>
         <div class="hw-card-actions" id="hwActions-${qIdSafe}">
           <span class="hw-action-note" id="hwActionNote">${helperNote}</span>
           <div class="hw-btn-row" id="hwBtnRow">
             <button type="button" class="hw-primary-btn" id="hwCheckBtn" disabled onclick="checkHomeworkCurrentQuestion()">Kiểm tra đáp án</button>
           </div>
         </div>
+        <div class="qf-panel" id="qfPanel-${qIdSafe}"></div>
       `;
 
       container.appendChild(card);
@@ -3392,9 +3881,6 @@
       const res = evaluateQuestion(q, hwIndex);
       hwAnsweredCurrent = true;
 
-      const explainEl = document.getElementById('explain-' + q.id);
-      if (explainEl) triggerKaTeX(explainEl);
-
       hwResults.push({
         qId: q.id,
         type: q.type,
@@ -3404,23 +3890,21 @@
         studentAnswer: studentAnswerSnapshot
       });
 
-      const noteEl = document.getElementById('hwActionNote');
-      const btnRow = document.getElementById('hwBtnRow');
+      const actionsEl = document.getElementById('hwActions-' + q.id);
+      if (actionsEl) actionsEl.style.display = 'none';
       const isLastQuestion = (hwIndex >= quizData.length - 1);
 
       if (res.isCorrect) {
         hwCorrectCount++;
-        const livesLeft = Math.max(0, HW_MAX_LIVES - hwWrongCount);
         renderHomeworkHud(-1);
         saveQuizDraft();
 
-        if (noteEl) {
-          noteEl.className = 'hw-action-note is-correct';
-          noteEl.textContent = `Chính xác! Giữ nguyên ${livesLeft}/${HW_MAX_LIVES} mạng.`;
-        }
-        if (btnRow) {
-          btnRow.innerHTML = `<button type="button" class="hw-primary-btn" id="hwNextBtn" onclick="nextHomeworkQuestion()">${isLastQuestion ? 'Hoàn thành & Nộp bài' : 'Câu tiếp theo →'}</button>`;
-        }
+        renderQuestionFeedbackPanel(q, {
+          isCorrect: true,
+          ctaText: isLastQuestion ? 'HOÀN THÀNH & NỘP BÀI' : 'TIẾP TỤC',
+          ctaId: 'hwNextBtn',
+          ctaOnClick: 'nextHomeworkQuestion()'
+        });
         return;
       }
 
@@ -3435,21 +3919,16 @@
       }
 
       saveQuizDraft();
-      if (noteEl) {
-        noteEl.className = 'hw-action-note is-wrong';
-        noteEl.textContent = livesLeft === 1
-          ? `Sai rồi! Chỉ còn 1/${HW_MAX_LIVES} mạng — sai thêm 1 câu nữa sẽ bị trượt.`
-          : `Sai rồi! Còn ${livesLeft}/${HW_MAX_LIVES} mạng. Hãy đọc kỹ lời giải bên trên.`;
+      const panel = renderQuestionFeedbackPanel(q, {
+        isCorrect: false,
+        ctaText: isLastQuestion ? 'ĐÃ HIỂU · HOÀN THÀNH' : 'ĐÃ HIỂU',
+        ctaId: 'hwNextBtn',
+        ctaOnClick: 'nextHomeworkQuestion()'
+      });
+      if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (livesLeft === 1) {
+        showToast('Cảnh báo: Chỉ còn 1 mạng duy nhất!', 'error');
       }
-      if (btnRow) {
-        btnRow.innerHTML = `<button type="button" class="hw-primary-btn" id="hwNextBtn" onclick="nextHomeworkQuestion()">${isLastQuestion ? 'Hoàn thành & Nộp bài' : 'Câu tiếp theo →'}</button>`;
-      }
-      showToast(
-        livesLeft === 1
-          ? 'Cảnh báo: Chỉ còn 1 lượt sai duy nhất!'
-          : `Sai rồi! Còn ${livesLeft} mạng.`,
-        'error'
-      );
     }
 
     function nextHomeworkQuestion() {
@@ -3485,14 +3964,14 @@
       submitted = true;
       try { localStorage.removeItem(getDraftKey()); } catch (e) {}
 
-      const noteEl = document.getElementById('hwActionNote');
-      const btnRow = document.getElementById('hwBtnRow');
-      if (noteEl) {
-        noteEl.className = 'hw-action-note is-wrong';
-        noteEl.textContent = `Đã sai đủ ${HW_MAX_LIVES}/${HW_MAX_LIVES} câu — Chưa đạt yêu cầu. Xem lời giải rồi làm lại bộ đề mới.`;
-      }
-      if (btnRow) {
-        btnRow.innerHTML = `<button type="button" class="hw-primary-btn is-danger" onclick="retryQuiz()">Làm lại bài (${quizData.length} câu mới)</button>`;
+      if (lastQuestion) {
+        const actionsEl = document.getElementById('hwActions-' + lastQuestion.id);
+        if (actionsEl) actionsEl.style.display = 'none';
+        renderQuestionFeedbackPanel(lastQuestion, {
+          isCorrect: false,
+          ctaText: `LÀM LẠI BÀI (${quizData.length} CÂU MỚI)`,
+          ctaOnClick: 'retryQuiz()'
+        });
       }
 
       const mcDone = hwResults.filter(r => r.type === 'cauhoi').length;
@@ -3732,9 +4211,7 @@
           <div class="answers-list" id="answers-${qIdSafe}">
             ${answersHTML}
           </div>
-          <div class="explanation" id="explain-${qIdSafe}">
-            <strong>Lời giải:</strong> ${formatText(q.explanation)}
-          </div>
+          <div class="qf-panel" id="qfPanel-${qIdSafe}"></div>
         `;
         container.appendChild(card);
 
@@ -3763,7 +4240,8 @@
           if (inp) inp.value = savedAns;
         }
 
-        evaluateQuestion(q, idx);
+        const evalRes = evaluateQuestion(q, idx);
+        renderQuestionFeedbackPanel(q, { isCorrect: evalRes.isCorrect, compact: true });
       });
 
       triggerKaTeX(container);
@@ -3906,13 +4384,11 @@
           </div>
           <div class="q-practice-actions" id="practiceActions-${qIdSafe}">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <button type="button" class="btn-check-single" id="check-btn-${qIdSafe}" data-qid="${qIdSafe}" onclick="checkSingleQuestion(this.dataset.qid)">Kiểm tra &amp; Xem giải</button>
+              <button type="button" class="btn-check-single" id="check-btn-${qIdSafe}" data-qid="${qIdSafe}" onclick="checkSingleQuestion(this.dataset.qid)">Kiểm tra đáp án</button>
             </div>
-            <span class="q-practice-tip" id="ptip-${qIdSafe}">Chọn đáp án rồi xem lời giải ngay</span>
+            <span class="q-practice-tip" id="ptip-${qIdSafe}">Chọn đáp án rồi bấm kiểm tra</span>
           </div>
-          <div class="explanation" id="explain-${qIdSafe}">
-            <strong>Lời giải:</strong> ${formatText(q.explanation)}
-          </div>
+          <div class="qf-panel" id="qfPanel-${qIdSafe}"></div>
         `;
 
         container.appendChild(card);
@@ -3937,6 +4413,7 @@
         return;
       }
 
+      rvAnsweredCurrent = false;
       const q = quizData[rvIndex];
       const card = document.createElement('div');
       card.className = 'question-card review-card-enter';
@@ -3990,12 +4467,10 @@
         <div class="answers-list" id="answers-${qIdSafe}">
           ${answersHTML}
         </div>
-        <div class="explanation" id="explain-${qIdSafe}">
-          <strong>Lời giải:</strong> ${formatText(q.explanation)}
-        </div>
         <div class="review-actions" id="reviewActions-${qIdSafe}">
           <button class="skip-btn" onclick="skipReviewQuestion()">Bỏ qua câu này</button>
         </div>
+        <div class="qf-panel" id="qfPanel-${qIdSafe}"></div>
       `;
 
       container.appendChild(card);
@@ -4043,6 +4518,7 @@
       function selectAnswer(el, qId) {
       if (submitted) return;
       if (isHomeworkMode && hwAnsweredCurrent) return;
+      if (isReviewMode && rvAnsweredCurrent) return;
       const answersEl = document.getElementById('answers-' + qId);
       if (answersEl && answersEl.querySelector('.answer-option.locked')) return;
 
@@ -4093,6 +4569,14 @@
         return;
       }
 
+      if (isReviewMode && e.key === 'Enter' && rvAnsweredCurrent) {
+        const activeBtn = document.activeElement && document.activeElement.tagName === 'BUTTON';
+        if (activeBtn) return;
+        e.preventDefault();
+        advanceReviewCard();
+        return;
+      }
+
       const keyMap = { 'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D', '1': 'A', '2': 'B', '3': 'C', '4': 'D' };
       const mapped = keyMap[e.key.toLowerCase()];
       if (!mapped) return;
@@ -4112,6 +4596,7 @@
     function selectTF(el, qId, key, val) {
       if (submitted) return;
       if (isHomeworkMode && hwAnsweredCurrent) return;
+      if (isReviewMode && rvAnsweredCurrent) return;
       const answersEl = document.getElementById('answers-' + qId);
 
       const parent = document.getElementById(`tf-${qId}-${key}`);
@@ -4366,9 +4851,6 @@
       setResultBadge(q.id, isCorrect);
       if (card) card.classList.add(isCorrect ? 'correct-card' : 'wrong-card');
 
-      const explainEl = document.getElementById('explain-' + q.id);
-      if (explainEl) explainEl.classList.add('visible');
-
       return { isCorrect, score, wrongDetail };
     }
 
@@ -4382,14 +4864,12 @@
         recordMistake(q);
       }
 
-      const explainEl = document.getElementById('explain-' + q.id);
-      if (explainEl) triggerKaTeX(explainEl);
-
       updateProgress();
       checkAllAnswered();
       renderQuestionPalette();
 
       if (isReviewMode) {
+        rvAnsweredCurrent = true;
         const actionsEl = document.getElementById('reviewActions-' + q.id);
         if (actionsEl) actionsEl.style.display = 'none';
 
@@ -4398,9 +4878,15 @@
         rvResults.push({ qId: q.id, isCorrect: isCorrect, skipped: false, wrongDetail: wrongDetail });
         updateReviewBar();
 
-        setTimeout(() => {
-          advanceReviewCard();
-        }, 1500);
+        const panel = renderQuestionFeedbackPanel(q, {
+          isCorrect,
+          ctaText: isCorrect ? 'TIẾP TỤC' : 'ĐÃ HIỂU',
+          ctaId: 'rvNextBtn',
+          ctaOnClick: 'advanceReviewCard()'
+        });
+        if (!isCorrect && panel) {
+          panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       }
     }
 
@@ -4616,6 +5102,10 @@
       quizData.forEach((q, index) => {
         const res = evaluateQuestion(q, index);
         score += res.score;
+        renderQuestionFeedbackPanel(q, {
+          isCorrect: res.isCorrect,
+          compact: true
+        });
         if (!res.isCorrect) {
           recordMistake(q);
           if (res.wrongDetail) wrongAnswersList.push(res.wrongDetail);

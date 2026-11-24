@@ -3684,10 +3684,23 @@
       }
     }
 
+    function normalizeEscapedLatex(str) {
+      if (!str || !str.includes('\\\\')) return str;
+      const hasDoubleEscapedLatex = /(^|[^\\])\\\\(?:frac|dfrac|tfrac|cdot|times|div|pm|mp|pi|Delta|delta|alpha|beta|gamma|lambda|mu|omega|Omega|phi|varphi|theta|rho|sigma|tau|epsilon|varepsilon|eta|Rightarrow|rightarrow|Leftarrow|leftarrow|leftrightarrow|to|text|mathrm|mathbf|mathit|sqrt|vec|bar|overline|hat|dot|ddot|left|right|approx|equiv|sim|le|leq|ge|geq|ne|neq|infty|circ|sin|cos|tan|cot|log|ln|sum|int|quad|qquad|boxed|begin|end)\b|(^|[^\\])\\\\\([\s\S]*\\\\\)|(^|[^\\])\\\\\[[\s\S]*\\\\\]/.test(str);
+      if (!hasDoubleEscapedLatex) return str;
+      let out = str.replace(/\\\\\\\\/g, '\u0000ZPLINEBRK\u0000');
+      out = out.replace(/(\\+)([a-zA-Z]{2,}|[,;!%{}()\[\]])/g, (m, slashes, cmd) => {
+        if (slashes.length === 2) return '\\' + cmd;
+        return m;
+      });
+      out = out.replace(/\u0000ZPLINEBRK\u0000/g, '\\\\');
+      return out;
+    }
+
     function formatModalSafeText(text) {
       if (!text) return '';
       const safeImages = [];
-      let work = String(text).replace(/\[img\](.*?)\[\/img\]/gi, (_, rawUrl) => {
+      let work = normalizeEscapedLatex(String(text)).replace(/\[img\](.*?)\[\/img\]/gi, (_, rawUrl) => {
         const cleaned = safeUrl(String(rawUrl || ''), false);
         if (!cleaned || /[\s"'<>]/.test(cleaned)) {
           return '';
@@ -3696,7 +3709,12 @@
         safeImages.push(cleaned);
         return token;
       });
-      const escaped = escapeHtmlAttr(work).replace(/\n/g, '<br>');
+      const mathProtectRegex = /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$[^\$\n]+?\$)/g;
+      const escaped = work.split(mathProtectRegex).map((seg, i) => {
+        if (!seg) return '';
+        const esc = escapeHtmlAttr(seg);
+        return (i % 2 === 1) ? esc : esc.replace(/\n/g, '<br>');
+      }).join('');
       return escaped.replace(/\u0000ZPMIMG_(\d+)\u0000/g, (_, idx) => {
         const u = safeImages[parseInt(idx, 10)];
         if (!u) return '';
