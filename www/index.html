@@ -548,14 +548,14 @@
     /* ── BENTO GRADE OVERVIEW STRIP ── */
     .grade-bento-strip {
       display: grid;
-      grid-template-columns: 1.05fr 1.15fr 1fr;
+      grid-template-columns: 1fr;
       gap: 14px;
-      margin-bottom: 24px;
+      margin-bottom: 18px;
     }
 
     .gb-card {
       background: var(--card);
-      border: 1px solid var(--border-strong);
+      border: 1.5px solid rgba(31, 27, 22, 0.20);
       border-radius: 14px;
       padding: 18px 20px;
       display: flex;
@@ -563,12 +563,13 @@
       justify-content: space-between;
       gap: 14px;
       min-width: 0;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 4px 16px rgba(31, 27, 22, 0.03);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 10px rgba(31, 27, 22, 0.05);
       transition: border-color 150ms var(--ease);
     }
 
     html[data-theme="dark"] .gb-card {
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 20px rgba(0, 0, 0, 0.28);
+      border-color: rgba(238, 240, 245, 0.18);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 6px 18px rgba(0, 0, 0, 0.34);
     }
 
     .gb-card:hover {
@@ -625,35 +626,6 @@
       color: var(--text);
     }
 
-    .gb-action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      height: 32px;
-      padding: 0 11px;
-      border-radius: 7px;
-      border: 1px solid var(--border-strong);
-      background: var(--raised);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
-      transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
-    }
-
-    .gb-action-btn:hover {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #ffffff;
-    }
-
-    html[data-theme="dark"] .gb-action-btn:hover {
-      color: #ffffff;
-    }
-
     .lesson-row.flash-highlight {
       border-color: var(--accent) !important;
       box-shadow: 0 0 0 3px var(--accent-subtle);
@@ -695,25 +667,31 @@
       width: 100%;
       min-width: 0;
       background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
+      border: 1.5px solid rgba(31, 27, 22, 0.20);
+      border-radius: 16px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       position: relative;
       cursor: pointer;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 4px 14px rgba(31, 27, 22, 0.03);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 10px rgba(31, 27, 22, 0.05);
       transition: border-color 180ms var(--ease), transform 180ms var(--ease), box-shadow 180ms var(--ease);
     }
 
     html[data-theme="dark"] .ch-card {
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 8px 20px rgba(0, 0, 0, 0.28);
+      border-color: rgba(238, 240, 245, 0.18);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 6px 18px rgba(0, 0, 0, 0.34);
     }
 
     .ch-card:hover {
-      border-color: var(--border-strong);
+      border-color: rgba(156, 39, 176, 0.50);
+      box-shadow: 0 6px 18px rgba(31, 27, 22, 0.09);
       transform: translateY(-2px);
+    }
+
+    html[data-theme="dark"] .ch-card:hover {
+      border-color: rgba(171, 71, 188, 0.60);
     }
 
     .ch-card.open {
@@ -734,99 +712,11 @@
     }
 
     .ch-header {
-      padding: 20px 20px 14px;
+      padding: 18px 20px 20px;
       display: flex;
       align-items: flex-start;
       gap: 14px;
       user-select: none;
-    }
-
-    /* Excerpt preview inside collapsed card + floating glass Open pill */
-    .ch-excerpt-preview {
-      position: relative;
-      background: var(--bg);
-      border-top: 1px solid var(--border);
-      padding: 12px 18px 46px;
-      min-height: 112px;
-      overflow: hidden;
-    }
-
-    .ch-preview-lines {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
-      mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
-      pointer-events: none;
-    }
-
-    .ch-preview-line {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      min-width: 0;
-      font-size: 12.5px;
-      line-height: 1.45;
-      color: var(--text-secondary);
-    }
-
-    .ch-preview-line .pl-num {
-      font-family: Arial, Helvetica, sans-serif;
-      font-variant-numeric: tabular-nums;
-      font-size: 11px;
-      color: var(--muted);
-      flex-shrink: 0;
-    }
-
-    .ch-preview-line .pl-title {
-      flex: 1;
-      min-width: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .ch-open-pill {
-      position: absolute;
-      left: 50%;
-      bottom: 11px;
-      transform: translateX(-50%);
-      height: 30px;
-      padding: 0 14px;
-      border-radius: 999px;
-      background: rgba(253, 251, 247, 0.92);
-      backdrop-filter: blur(14px) saturate(1.4);
-      -webkit-backdrop-filter: blur(14px) saturate(1.4);
-      border: 1px solid var(--border-strong);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 4px 12px rgba(31, 27, 22, 0.08);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: border-color 150ms var(--ease), color 150ms var(--ease), background-color 150ms var(--ease);
-    }
-
-    html[data-theme="dark"] .ch-open-pill {
-      background: rgba(26, 30, 40, 0.88);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 6px 16px rgba(0, 0, 0, 0.42);
-    }
-
-    .ch-card:hover .ch-open-pill {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .ch-open-pill svg {
-      width: 12px;
-      height: 12px;
-      stroke: currentColor;
-      stroke-width: 2;
-      fill: none;
     }
 
     /* ── OPENED CHAPTER READER DIALOG ── */
@@ -1131,7 +1021,7 @@
       height: 40px;
       border-radius: 8px;
       background: var(--raised);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(31, 27, 22, 0.16);
       font-family: Arial, Helvetica, sans-serif;
       font-variant-numeric: tabular-nums;
       font-size: 13px;
@@ -1141,6 +1031,10 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+    }
+
+    html[data-theme="dark"] .ch-badge {
+      border-color: rgba(238, 240, 245, 0.16);
     }
 
     .ch-badge.is-exam {
@@ -1187,8 +1081,12 @@
       font-size: 11px;
       font-weight: 500;
       background: var(--raised);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(31, 27, 22, 0.15);
       color: var(--text-secondary);
+    }
+
+    html[data-theme="dark"] .tag {
+      border-color: rgba(238, 240, 245, 0.14);
     }
 
     .tag-dot {
@@ -1226,6 +1124,12 @@
       flex-shrink: 0;
       color: var(--muted);
       margin-top: 2px;
+      transition: transform 160ms var(--ease), color 160ms var(--ease);
+    }
+
+    .ch-card:not(.locked):hover .ch-arrow {
+      color: var(--accent);
+      transform: translateX(2px);
     }
 
     .ch-arrow svg {
@@ -1239,10 +1143,14 @@
     /* ── LESSON LIST ── */
     .lesson-row {
       background: var(--card);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(31, 27, 22, 0.16);
       border-radius: 10px;
       padding: 13px 14px;
       transition: border-color 150ms var(--ease), background-color 150ms var(--ease);
+    }
+
+    html[data-theme="dark"] .lesson-row {
+      border-color: rgba(238, 240, 245, 0.15);
     }
 
     .ch-reader-lessons .lesson-row {
@@ -2914,27 +2822,7 @@
       return cleaned || 'CH';
     }
 
-    const SVG_EXPAND_ICON = '<svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
-
-    function buildCardPreviewHTML(items, isExam, isLocked, studentLop) {
-      const lines = (items || []).slice(0, 3).map((item) => `
-        <div class="ch-preview-line">
-          <span class="pl-num">${escapeHtmlAttr(item.num)}</span>
-          <span class="pl-title">${escapeHtmlAttr(item.title)}</span>
-        </div>
-      `).join('');
-
-      const pillLabel = isLocked
-        ? `${ICONS.lock} <span>Lớp ${escapeHtmlAttr(studentLop || '')}</span>`
-        : `<span>Open</span>${SVG_EXPAND_ICON}`;
-
-      return `
-        <div class="ch-excerpt-preview">
-          <div class="ch-preview-lines">${lines}</div>
-          <button type="button" class="ch-open-pill">${pillLabel}</button>
-        </div>
-      `;
-    }
+    const SVG_CHEVRON_RIGHT = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
 
     function renderAll(data) {
       const tabsEl = document.getElementById('gradeTabs');
@@ -3086,10 +2974,6 @@
           }).join('');
 
           const examCardKey = `g${gIdx}_exam`;
-          const examPreviewItems = matchingExams.slice(0, 3).map((ex, i) => ({
-            num: String(i + 1).padStart(2, '0'),
-            title: ex.title
-          }));
           const examTagsHTML = `<span class="tag"><span class="tag-dot" style="background:var(--accent)"></span>Cấu trúc THPT Quốc gia</span>`;
 
           if (!isLockedGrade) {
@@ -3125,9 +3009,8 @@
                 <div class="chapter-progress-text">${completedMockCount}/${matchingExams.length} đề hoàn thành</div>
                 `}
               </div>
-              ${isLockedGrade ? `<div class="ch-arrow">${ICONS.lock}</div>` : ''}
-            </div>
-            ${buildCardPreviewHTML(examPreviewItems, true, isLockedGrade, studentLop)}`;
+              <div class="ch-arrow">${isLockedGrade ? ICONS.lock : SVG_CHEVRON_RIGHT}</div>
+            </div>`;
 
           wrapper.appendChild(card);
           cardsList.appendChild(wrapper);
@@ -3283,10 +3166,6 @@
           }
 
           const chCardKey = `g${gIdx}_c${chIdx}`;
-          const chPreviewItems = (ch.lessons || []).slice(0, 3).map((l) => ({
-            num: l.num,
-            title: l.title
-          }));
 
           if (!isLockedGrade) {
             chapterReaderRegistry[chCardKey] = {
@@ -3321,21 +3200,18 @@
                 <div class="chapter-progress-text">${completedCount}/${totalLessons} bài hoàn thành</div>
                 ` : '')}
               </div>
-              ${isLockedGrade ? `<div class="ch-arrow">${ICONS.lock}</div>` : ''}
-            </div>
-            ${buildCardPreviewHTML(chPreviewItems, false, isLockedGrade, studentLop)}`;
+              <div class="ch-arrow">${isLockedGrade ? ICONS.lock : SVG_CHEVRON_RIGHT}</div>
+            </div>`;
 
           wrapper.appendChild(card);
           cardsList.appendChild(wrapper);
         });
 
-        // Populate Bento Grade Overview Strip
+        // Populate Bento Grade Overview Strip (Progress Card)
         const pct = totalLessonsInGrade > 0 ? Math.round((completedInGradeCount / totalLessonsInGrade) * 100) : 0;
         const r = 21;
         const circ = (2 * Math.PI * r).toFixed(1);
         const dashOffset = (circ * (1 - pct / 100)).toFixed(1);
-        const firstCh = gradeObj.chapters[0];
-        const firstChTitle = firstCh ? `${firstCh.num} · ${firstCh.title}` : gradeObj.grade;
 
         bentoStrip.innerHTML = `
           <div class="gb-card">
@@ -3351,22 +3227,6 @@
               </svg>
               <span class="gb-ring-label">${pct}%</span>
             </div>
-          </div>
-          <div class="gb-card">
-            <div class="gb-info">
-              <span class="gb-eyebrow">CHUYÊN ĐỀ MỞ ĐẦU</span>
-              <div class="gb-title" title="${escapeHtmlAttr(firstChTitle)}">${escapeHtmlAttr(firstChTitle)}</div>
-              <div class="gb-meta">${firstCh && firstCh.lessons ? firstCh.lessons.length : 0} bài giảng &amp; phiếu tự luyện</div>
-            </div>
-            <button type="button" class="gb-action-btn" onclick="openCardInGrade(${gIdx}, 'g${gIdx}_c0')">Open →</button>
-          </div>
-          <div class="gb-card">
-            <div class="gb-info">
-              <span class="gb-eyebrow">PHÒNG ĐỀ &amp; TRA CỨU</span>
-              <div class="gb-title">${matchingExams.length} đề thi thử ${escapeHtmlAttr(shortGradeLabel)}</div>
-              <div class="gb-meta">Bấm Ctrl+K để tìm bài bất kỳ</div>
-            </div>
-            <button type="button" class="gb-action-btn" onclick="${matchingExams.length > 0 ? `openCardInGrade(${gIdx}, 'g${gIdx}_exam')` : 'openCmdPalette()'}">${matchingExams.length > 0 ? 'Open →' : 'Tìm bài →'}</button>
           </div>
         `;
 
