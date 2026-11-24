@@ -1009,6 +1009,363 @@
       transition: opacity 200ms var(--ease);
     }
 
+    /* ── HOMEWORK ONE-BY-ONE 3-LIVES MODE ── */
+    .hw-hud {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 4px 14px var(--shadow);
+    }
+
+    .hw-hud.visible {
+      display: flex;
+    }
+
+    .hw-hud-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hw-part-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .hw-part-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      height: 24px;
+      padding: 0 9px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      background: var(--raised);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      transition: background-color 160ms var(--ease), border-color 160ms var(--ease), color 160ms var(--ease);
+    }
+
+    .hw-part-pill.is-active {
+      background: var(--accent-subtle);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .hw-part-pill.is-done {
+      background: var(--correct-subtle);
+      border-color: var(--correct);
+      color: var(--correct);
+    }
+
+    .hw-lives-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      transition: background-color 180ms var(--ease), border-color 180ms var(--ease);
+    }
+
+    .hw-lives-wrap.is-danger {
+      background: var(--wrong-subtle);
+      border-color: var(--wrong);
+    }
+
+    .hw-lives-hearts {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .hw-heart {
+      width: 17px;
+      height: 17px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--wrong);
+      transition: transform 240ms var(--ease), opacity 240ms var(--ease), color 240ms var(--ease);
+    }
+
+    .hw-heart svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      stroke: currentColor;
+      stroke-width: 1.5;
+    }
+
+    .hw-heart.is-lost {
+      color: var(--muted);
+      opacity: 0.32;
+      transform: scale(0.84);
+    }
+
+    .hw-heart.is-lost svg {
+      fill: none;
+    }
+
+    .hw-heart.just-lost {
+      animation: heartShake 420ms var(--ease);
+    }
+
+    @keyframes heartShake {
+      0%, 100% { transform: scale(0.84) translateX(0); }
+      20% { transform: scale(1.15) translateX(-3px); }
+      45% { transform: scale(1.05) translateX(3px); }
+      70% { transform: scale(0.9) translateX(-2px); }
+    }
+
+    .hw-lives-label {
+      font-size: 12px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .hw-lives-wrap.is-danger .hw-lives-label {
+      color: var(--wrong);
+    }
+
+    .hw-step-track {
+      display: grid;
+      grid-template-columns: repeat(14, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .hw-step-dot {
+      height: 7px;
+      border-radius: 999px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      transition: background-color 180ms var(--ease), border-color 180ms var(--ease), transform 180ms var(--ease);
+    }
+
+    .hw-step-dot.is-current {
+      background: var(--accent);
+      border-color: var(--accent);
+      transform: scaleY(1.25);
+    }
+
+    .hw-step-dot.is-correct {
+      background: var(--correct);
+      border-color: var(--correct);
+    }
+
+    .hw-step-dot.is-wrong {
+      background: var(--wrong);
+      border-color: var(--wrong);
+    }
+
+    .hw-part-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 4px 0 12px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .hw-part-banner strong {
+      color: var(--accent);
+    }
+
+    .hw-card-actions {
+      padding: 14px 20px 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hw-action-note {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .hw-action-note.is-correct {
+      color: var(--correct);
+      font-weight: 600;
+    }
+
+    .hw-action-note.is-wrong {
+      color: var(--wrong);
+      font-weight: 600;
+    }
+
+    .hw-btn-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .hw-primary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 20px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 150ms var(--ease), transform 150ms var(--ease), opacity 150ms var(--ease);
+    }
+
+    .hw-primary-btn:hover:not(:disabled) {
+      background: var(--accent-hover);
+    }
+
+    .hw-primary-btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .hw-primary-btn:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+    }
+
+    .hw-primary-btn.is-danger {
+      background: var(--wrong);
+    }
+
+    .hw-primary-btn.is-danger:hover:not(:disabled) {
+      filter: brightness(0.92);
+      background: var(--wrong);
+    }
+
+    .hw-secondary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--card);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 150ms var(--ease), border-color 150ms var(--ease);
+    }
+
+    .hw-secondary-btn:hover {
+      background: var(--raised);
+      border-color: var(--accent);
+    }
+
+    .score-banner.is-failed {
+      border-color: var(--wrong);
+      background: var(--card);
+    }
+
+    .score-banner.is-passed {
+      border-color: var(--correct);
+      background: var(--card);
+    }
+
+    .hw-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .hw-status-badge.is-failed {
+      background: var(--wrong-subtle);
+      color: var(--wrong);
+      border: 1px solid rgba(220, 38, 38, 0.25);
+    }
+
+    .hw-status-badge.is-passed {
+      background: var(--correct-subtle);
+      color: var(--correct);
+      border: 1px solid rgba(22, 163, 74, 0.25);
+    }
+
+    .hw-banner-stats {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hw-stat-chip {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hw-stat-chip strong {
+      color: var(--text);
+    }
+
+    .hw-banner-actions {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hw-review-heading {
+      margin: 22px 0 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
     @media (max-width: 600px) {
       .app {
         padding: 0 10px 72px;
@@ -1150,6 +1507,50 @@
       .tf-toggles {
         align-self: flex-end;
       }
+
+      .hw-hud {
+        padding: 8px 10px;
+        gap: 7px;
+      }
+
+      .hw-part-pill {
+        height: 22px;
+        padding: 0 7px;
+        font-size: 11px;
+      }
+
+      .hw-lives-wrap {
+        padding: 3px 8px;
+        gap: 6px;
+      }
+
+      .hw-lives-label {
+        font-size: 11.5px;
+      }
+
+      .hw-step-track {
+        gap: 3px;
+      }
+
+      .hw-card-actions {
+        padding: 12px 16px 16px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hw-action-note {
+        min-width: 0;
+      }
+
+      .hw-btn-row {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .hw-btn-row .hw-primary-btn,
+      .hw-btn-row .hw-secondary-btn {
+        flex: 1;
+      }
     }
 
     @media (max-width: 480px) {
@@ -1284,6 +1685,17 @@
         <button type="button" class="toolbar-mini-btn sticky-pal-toggle" id="stickyTogglePaletteBtn" onclick="toggleQuestionPalette()">Ẩn bảng</button>
       </div>
 
+      <div class="hw-hud" id="homeworkHud">
+        <div class="hw-hud-top">
+          <div class="hw-part-pills" id="hwPartPills"></div>
+          <div class="hw-lives-wrap" id="hwLivesWrap" title="Tối đa 2 lần sai; sai đến câu thứ 3 sẽ bị trượt và phải làm lại bài">
+            <div class="hw-lives-hearts" id="hwLivesHearts"></div>
+            <span class="hw-lives-label" id="hwLivesLabel">3/3 mạng</span>
+          </div>
+        </div>
+        <div class="hw-step-track" id="hwStepTrack"></div>
+      </div>
+
       <div class="q-palette-card" id="questionPaletteCard">
         <div class="q-palette-head">
           <div class="q-palette-title">
@@ -1307,9 +1719,12 @@
     </div>
 
     <div class="score-banner" id="scoreBanner">
+      <div id="hwStatusBadge" class="hw-status-badge" style="display:none"></div>
       <div class="score-value" id="scoreValue"></div>
-      <div class="score-label">Tổng điểm</div>
+      <div class="score-label" id="scoreLabel">Tổng điểm</div>
       <div class="score-msg" id="scoreMsg"></div>
+      <div class="hw-banner-stats" id="hwBannerStats" style="display:none"></div>
+      <div class="hw-banner-actions" id="hwBannerActions" style="display:none"></div>
     </div>
 
     <div id="quizContainer">
@@ -1350,6 +1765,7 @@
     const SVG_FLAG = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>';
     const SVG_VOL_ON = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
     const SVG_VOL_OFF = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>';
+    const SVG_HEART = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>';
 
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
       const path = window.location.pathname;
@@ -1494,6 +1910,7 @@
     const SHEETS_API_URL = localStorage.getItem('ZPHYSICS_API_URL') || 'https://script.google.com/macros/s/AKfycbzxnkAXTX9lMgdq854Nm8CAWiaULzHD7MAo4Er7XBVnmfxhubWP4KWSF5_yNfVaCKXMdQ/exec';
 
     let quizData = [];
+    let rawQuizPool = [];
     let submitted = false;
     let lessonInfo = null;
 
@@ -1505,6 +1922,15 @@
     let rvWrong = 0;
     let rvSkipped = 0;
     let rvResults = [];
+
+    const HW_MAX_LIVES = 3;
+    let hwIndex = 0;
+    let hwWrongCount = 0;
+    let hwCorrectCount = 0;
+    let hwResults = [];
+    let hwFailed = false;
+    let hwAnsweredCurrent = false;
+    let hwShowingReviewList = false;
 
     let studyMode = 'exam';
     let flaggedQuestionIds = new Set();
@@ -1750,6 +2176,7 @@
 
     const isMistakeQuiz = quizFile.startsWith('mistakes');
     const isReviewMode = quizFile.startsWith('ontap_');
+    const isHomeworkMode = quizFile.startsWith('baitap_');
 
     if (isMistakeQuiz) {
       studyMode = 'practice';
@@ -1909,6 +2336,21 @@
     function saveQuizDraft() {
       if (submitted || isReviewMode || !Array.isArray(quizData) || quizData.length === 0) return;
       try {
+        if (isHomeworkMode) {
+          if (hwFailed) return;
+          const hwDraft = {
+            isHomework: true,
+            quizFile: quizFile,
+            questionIds: quizData.map(q => q.id),
+            hwIndex: hwResults.length,
+            hwWrongCount: hwWrongCount,
+            hwCorrectCount: hwCorrectCount,
+            hwResults: hwResults,
+            updatedAt: Date.now()
+          };
+          localStorage.setItem(getDraftKey(), JSON.stringify(hwDraft));
+          return;
+        }
         const draft = {
           quizFile: quizFile,
           questionIds: quizData.map(q => q.id),
@@ -2000,7 +2442,7 @@
       const stickyBtn = document.getElementById('stickyTogglePaletteBtn');
       if (!card || !grid) return;
 
-      if (isReviewMode || !quizData || quizData.length === 0) {
+      if (isReviewMode || isHomeworkMode || !quizData || quizData.length === 0) {
         card.style.display = 'none';
         if (stickyBtn) stickyBtn.style.display = 'none';
         return;
@@ -2265,16 +2707,13 @@
     }
     loadLessonInfo();
 
-    function processQuizData(data) {
-      if (!data || !Array.isArray(data) || data.length === 0) return false;
-
-      const draft = isReviewMode ? null : loadQuizDraft();
+    function normalizeRawQuestions(data) {
       let part1 = [];
       let part2 = [];
       let part3 = [];
       const itemById = new Map();
 
-      data.forEach((item, rawIdx) => {
+      (data || []).forEach((item, rawIdx) => {
         let type = 'cauhoi';
         if (item.type) {
           type = item.type;
@@ -2308,53 +2747,116 @@
         else part3.push(q);
       });
 
-      const shuffle = (arr) => {
-        for (let i = arr.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-        return arr;
-      };
+      return { part1, part2, part3, itemById };
+    }
+
+    function shuffleArray(arr) {
+      const copy = arr.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function buildHomeworkQuestionSet(rawData) {
+      const { part1, part2, part3 } = normalizeRawQuestions(rawData);
+      return [
+        ...shuffleArray(part1).slice(0, 9),
+        ...shuffleArray(part2).slice(0, 2),
+        ...shuffleArray(part3).slice(0, 3)
+      ];
+    }
+
+    function processQuizData(data) {
+      if (!data || !Array.isArray(data) || data.length === 0) return false;
+
+      rawQuizPool = data.slice();
+      const draft = isReviewMode ? null : loadQuizDraft();
+      const { part1: rawPart1, part2: rawPart2, part3: rawPart3, itemById } = normalizeRawQuestions(data);
+      let part1 = rawPart1.slice();
+      let part2 = rawPart2.slice();
+      let part3 = rawPart3.slice();
 
       let mappedData = null;
+      let validHomeworkDraft = null;
 
-      if (draft && Array.isArray(draft.questionIds) && draft.questionIds.length > 0) {
-        const restoredList = draft.questionIds.map(id => itemById.get(String(id))).filter(Boolean);
-        if (restoredList.length > 0) {
-          mappedData = restoredList;
+      if (isHomeworkMode) {
+        if (
+          draft &&
+          draft.isHomework &&
+          Array.isArray(draft.questionIds) &&
+          draft.questionIds.length > 0 &&
+          typeof draft.hwWrongCount === 'number' &&
+          draft.hwWrongCount < HW_MAX_LIVES
+        ) {
+          const restoredList = draft.questionIds.map(id => itemById.get(String(id))).filter(Boolean);
+          if (restoredList.length === draft.questionIds.length) {
+            mappedData = restoredList;
+            validHomeworkDraft = draft;
+          }
         }
-      }
+        if (!mappedData) {
+          mappedData = buildHomeworkQuestionSet(data);
+        }
+      } else {
+        if (draft && !draft.isHomework && Array.isArray(draft.questionIds) && draft.questionIds.length > 0) {
+          const restoredList = draft.questionIds.map(id => itemById.get(String(id))).filter(Boolean);
+          if (restoredList.length > 0) {
+            mappedData = restoredList;
+          }
+        }
 
-      if (!mappedData) {
-        part1 = shuffle(part1);
-        part2 = shuffle(part2);
-        part3 = shuffle(part3);
+        if (!mappedData) {
+          part1 = shuffleArray(part1);
+          part2 = shuffleArray(part2);
+          part3 = shuffleArray(part3);
 
-        if (isMistakeQuiz) {
-          mappedData = [...part1, ...part2, ...part3];
-        } else if (quizFile.startsWith('baitap_')) {
-          part1 = part1.slice(0, 9);
-          part2 = part2.slice(0, 2);
-          part3 = part3.slice(0, 3);
-          mappedData = [...part1, ...part2, ...part3];
-        } else if (quizFile.startsWith('ontap_')) {
-          mappedData = shuffle([...part1, ...part2, ...part3]);
-        } else if (quizFile.startsWith('cauhoi')) {
-          mappedData = part1.slice(0, 18);
-        } else if (quizFile.startsWith('đs')) {
-          mappedData = part2.slice(0, 4);
-        } else if (quizFile.startsWith('tln')) {
-          mappedData = part3.slice(0, 6);
-        } else {
-          mappedData = [...part1, ...part2, ...part3];
+          if (isMistakeQuiz) {
+            mappedData = [...part1, ...part2, ...part3];
+          } else if (quizFile.startsWith('ontap_')) {
+            mappedData = shuffleArray([...part1, ...part2, ...part3]);
+          } else if (quizFile.startsWith('cauhoi')) {
+            mappedData = part1.slice(0, 18);
+          } else if (quizFile.startsWith('đs')) {
+            mappedData = part2.slice(0, 4);
+          } else if (quizFile.startsWith('tln')) {
+            mappedData = part3.slice(0, 6);
+          } else {
+            mappedData = [...part1, ...part2, ...part3];
+          }
         }
       }
 
       quizData = mappedData;
+
+      if (isHomeworkMode) {
+        hwFailed = false;
+        hwAnsweredCurrent = false;
+        hwShowingReviewList = false;
+        if (validHomeworkDraft) {
+          hwResults = Array.isArray(validHomeworkDraft.hwResults) ? validHomeworkDraft.hwResults.slice(0, quizData.length) : [];
+          hwWrongCount = hwResults.filter(r => !r.isCorrect).length;
+          hwCorrectCount = hwResults.filter(r => r.isCorrect).length;
+          hwIndex = hwResults.length;
+        } else {
+          hwIndex = 0;
+          hwWrongCount = 0;
+          hwCorrectCount = 0;
+          hwResults = [];
+        }
+        renderQuiz(mappedData);
+        if (validHomeworkDraft && hwResults.length > 0) {
+          showToast(`Đã khôi phục tiến trình làm bài (Câu ${Math.min(hwIndex + 1, quizData.length)}/${quizData.length}, còn ${HW_MAX_LIVES - hwWrongCount} mạng)`, 'success');
+        }
+        startTimer(null);
+        return true;
+      }
+
       renderQuiz(mappedData);
 
       let initialTimerSec = null;
-      if (draft && !isReviewMode) {
+      if (draft && !isReviewMode && !draft.isHomework) {
         const didRestore = restoreQuizDraft(draft);
         renderQuestionPalette();
         updateProgress();
@@ -2466,6 +2968,8 @@
           try {
             localStorage.setItem(cacheKey, JSON.stringify(data));
           } catch (e) {}
+
+          rawQuizPool = data.slice();
 
           if (!hasRendered) {
             processQuizData(data);
@@ -2588,6 +3092,675 @@
       return html;
     }
 
+    function resetScoreBannerUI() {
+      const banner = document.getElementById('scoreBanner');
+      if (banner) banner.classList.remove('visible', 'is-failed', 'is-passed');
+      const badge = document.getElementById('hwStatusBadge');
+      if (badge) {
+        badge.style.display = 'none';
+        badge.className = 'hw-status-badge';
+        badge.textContent = '';
+      }
+      const label = document.getElementById('scoreLabel');
+      if (label) label.textContent = 'Tổng điểm';
+      const stats = document.getElementById('hwBannerStats');
+      if (stats) {
+        stats.style.display = 'none';
+        stats.innerHTML = '';
+      }
+      const actions = document.getElementById('hwBannerActions');
+      if (actions) {
+        actions.style.display = 'none';
+        actions.innerHTML = '';
+      }
+    }
+
+    function getHomeworkPartMeta(q, idx) {
+      const sameType = quizData.filter(item => item.type === q.type);
+      const posInPart = sameType.findIndex(item => String(item.id) === String(q.id)) + 1;
+      const totalInPart = sameType.length;
+      if (q.type === 'cauhoi') {
+        return {
+          partNum: 'Phần I',
+          shortLabel: 'Trắc nghiệm',
+          fullTitle: 'Phần I · Trắc nghiệm nhiều phương án lựa chọn',
+          posInPart,
+          totalInPart
+        };
+      }
+      if (q.type === 'đs') {
+        return {
+          partNum: 'Phần II',
+          shortLabel: 'Đúng / Sai',
+          fullTitle: 'Phần II · Câu trắc nghiệm đúng sai',
+          posInPart,
+          totalInPart
+        };
+      }
+      return {
+        partNum: 'Phần III',
+        shortLabel: 'Trả lời ngắn',
+        fullTitle: 'Phần III · Câu trắc nghiệm trả lời ngắn',
+        posInPart,
+        totalInPart
+      };
+    }
+
+    function renderHomeworkHud(justLostLifeIndex = -1) {
+      const hud = document.getElementById('homeworkHud');
+      if (!hud) return;
+      if (!isHomeworkMode || !quizData || quizData.length === 0) {
+        hud.classList.remove('visible');
+        return;
+      }
+      hud.classList.add('visible');
+
+      const mcTotal = quizData.filter(q => q.type === 'cauhoi').length;
+      const tfTotal = quizData.filter(q => q.type === 'đs').length;
+      const saTotal = quizData.filter(q => q.type !== 'cauhoi' && q.type !== 'đs').length;
+
+      const mcDone = hwResults.filter(r => r.type === 'cauhoi').length;
+      const tfDone = hwResults.filter(r => r.type === 'đs').length;
+      const saDone = hwResults.filter(r => r.type !== 'cauhoi' && r.type !== 'đs').length;
+
+      const currentQ = (!submitted && hwIndex < quizData.length) ? quizData[hwIndex] : null;
+      const currentType = currentQ ? currentQ.type : '';
+
+      const partPillsEl = document.getElementById('hwPartPills');
+      if (partPillsEl) {
+        const pills = [
+          { label: 'TN', done: mcDone, total: mcTotal, active: currentType === 'cauhoi' },
+          { label: 'Đ/S', done: tfDone, total: tfTotal, active: currentType === 'đs' },
+          { label: 'TLN', done: saDone, total: saTotal, active: currentType !== '' && currentType !== 'cauhoi' && currentType !== 'đs' }
+        ].filter(p => p.total > 0);
+
+        partPillsEl.innerHTML = pills.map(p => {
+          const isDone = p.done >= p.total;
+          const cls = ['hw-part-pill', isDone ? 'is-done' : (p.active ? 'is-active' : '')].filter(Boolean).join(' ');
+          return `<span class="${cls}">${p.label}: ${p.done}/${p.total}</span>`;
+        }).join('');
+      }
+
+      const livesLeft = Math.max(0, HW_MAX_LIVES - hwWrongCount);
+      const heartsEl = document.getElementById('hwLivesHearts');
+      if (heartsEl) {
+        let heartsHtml = '';
+        for (let i = 0; i < HW_MAX_LIVES; i++) {
+          const isLost = i >= livesLeft;
+          const isJustLost = (i === justLostLifeIndex);
+          heartsHtml += `<span class="hw-heart${isLost ? ' is-lost' : ''}${isJustLost ? ' just-lost' : ''}" aria-hidden="true">${SVG_HEART}</span>`;
+        }
+        heartsEl.innerHTML = heartsHtml;
+      }
+
+      const livesWrap = document.getElementById('hwLivesWrap');
+      const livesLabel = document.getElementById('hwLivesLabel');
+      if (livesWrap) livesWrap.classList.toggle('is-danger', livesLeft <= 1);
+      if (livesLabel) {
+        if (livesLeft <= 0) livesLabel.textContent = '0/3 mạng · Trượt';
+        else if (livesLeft === 1) livesLabel.textContent = 'Còn 1 mạng!';
+        else livesLabel.textContent = `${livesLeft}/${HW_MAX_LIVES} mạng`;
+      }
+
+      const trackEl = document.getElementById('hwStepTrack');
+      if (trackEl) {
+        trackEl.style.gridTemplateColumns = `repeat(${Math.max(1, quizData.length)}, minmax(0, 1fr))`;
+        trackEl.innerHTML = quizData.map((q, idx) => {
+          const r = hwResults[idx];
+          let cls = 'hw-step-dot';
+          let title = `Câu ${idx + 1}`;
+          if (r) {
+            cls += r.isCorrect ? ' is-correct' : ' is-wrong';
+            title += r.isCorrect ? ' · Đúng' : ' · Sai';
+          } else if (idx === hwIndex && !submitted && !hwFailed) {
+            cls += ' is-current';
+            title += ' · Đang làm';
+          }
+          return `<span class="${cls}" title="${title}"></span>`;
+        }).join('');
+      }
+
+      const progressTextEl = document.getElementById('progressText');
+      const progressBarEl = document.querySelector('.progress-bar');
+      const progressFillEl = document.getElementById('progressFill');
+      if (progressBarEl) progressBarEl.style.display = 'block';
+      if (progressTextEl) {
+        if (submitted && !hwFailed) {
+          progressTextEl.textContent = `Hoàn thành ${quizData.length} / ${quizData.length}`;
+        } else if (hwFailed) {
+          progressTextEl.textContent = `Dừng ở câu ${Math.min(hwIndex + 1, quizData.length)} / ${quizData.length}`;
+        } else {
+          progressTextEl.textContent = `Câu ${Math.min(hwIndex + 1, quizData.length)} / ${quizData.length}`;
+        }
+      }
+      if (progressFillEl) {
+        const pct = (hwResults.length / Math.max(1, quizData.length)) * 100;
+        progressFillEl.style.width = `${pct}%`;
+      }
+    }
+
+    function updateHomeworkCheckButton() {
+      if (!isHomeworkMode || submitted || hwAnsweredCurrent) return;
+      const btn = document.getElementById('hwCheckBtn');
+      const q = quizData[hwIndex];
+      if (!btn || !q) return;
+      btn.disabled = !isQuestionAnswered(q);
+    }
+
+    function onHomeworkInputChange() {
+      if (submitted || hwAnsweredCurrent) return;
+      updateHomeworkCheckButton();
+    }
+
+    function captureSingleQuestionAnswer(q) {
+      const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
+      if (q.type === 'đs' && validAnswers.length > 0) {
+        const tfObj = {};
+        validAnswers.forEach(a => {
+          const parent = document.getElementById(`tf-${q.id}-${a.key}`);
+          const sel = parent ? parent.querySelector('.tf-btn.selected') : null;
+          if (sel && sel.dataset && sel.dataset.val) tfObj[a.key] = sel.dataset.val;
+        });
+        return tfObj;
+      }
+      if (q.type === 'cauhoi' && validAnswers.length > 0) {
+        const sel = document.querySelector(`#answers-${q.id} .answer-option.selected`);
+        return sel ? sel.dataset.key : null;
+      }
+      const inp = document.getElementById(`short-answer-${q.id}`);
+      return inp ? inp.value : '';
+    }
+
+    function showHomeworkCard() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+
+      if (hwIndex >= quizData.length) {
+        renderHomeworkHud(-1);
+        container.innerHTML = `
+          <div class="review-done-msg">
+            <h2>Đã hoàn thành ${quizData.length}/${quizData.length} câu hỏi</h2>
+            <p style="margin-bottom:18px;">Em đã vượt qua bài tập với <strong>${hwCorrectCount}/${quizData.length} câu đúng</strong> và chỉ sai <strong>${hwWrongCount}/${HW_MAX_LIVES} lần</strong>.</p>
+            <button type="button" class="hw-primary-btn" onclick="finishHomeworkPass()">Xem kết quả &amp; Nộp bài</button>
+          </div>
+        `;
+        return;
+      }
+
+      hwAnsweredCurrent = false;
+      const q = quizData[hwIndex];
+      const meta = getHomeworkPartMeta(q, hwIndex);
+      const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
+
+      const partBanner = document.createElement('div');
+      partBanner.className = 'hw-part-banner';
+      partBanner.innerHTML = `
+        <span>${meta.fullTitle}</span>
+        <strong>${meta.shortLabel} ${meta.posInPart}/${meta.totalInPart}</strong>
+      `;
+      container.appendChild(partBanner);
+
+      const card = document.createElement('div');
+      card.className = 'question-card review-card-enter';
+      card.dataset.id = q.id;
+
+      let answersHTML = '';
+      let helperNote = '';
+
+      if (q.type === 'đs' && validAnswers.length > 0) {
+        answersHTML = validAnswers.map(a => `
+          <div class="tf-statement" id="tf-${q.id}-${a.key}">
+            <div class="tf-text"><strong>${a.key}.</strong> ${formatText(a.text)}</div>
+            <div class="tf-toggles seg-control tf-seg" data-selected="none">
+              <span class="seg-thumb"></span>
+              <div class="tf-btn seg-btn" data-val="Đ" onclick="selectTF(this, '${q.id}', '${a.key}', 'Đ')">Đúng</div>
+              <div class="tf-btn seg-btn" data-val="S" onclick="selectTF(this, '${q.id}', '${a.key}', 'S')">Sai</div>
+            </div>
+          </div>
+        `).join('');
+        helperNote = `Chọn đủ Đúng/Sai cho cả ${validAnswers.length} ý. Phải đúng cả ${validAnswers.length}/${validAnswers.length} ý mới giữ mạng.`;
+      } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
+        answersHTML = validAnswers.map(a => `
+          <label class="answer-option" data-key="${a.key}" onclick="selectAnswer(this, '${q.id}')">
+            <span class="opt-keycap kbd-cap">${a.key}</span>
+            <span class="answer-text">${formatText(a.text)}</span>
+          </label>
+        `).join('');
+        helperNote = 'Chọn 1 đáp án rồi bấm Kiểm tra đáp án (hoặc phím A–D và Enter).';
+      } else {
+        answersHTML = `
+          <div>
+            <input type="text" class="student-input" id="short-answer-${q.id}" placeholder="Nhập câu trả lời" oninput="onHomeworkInputChange()" onkeydown="if(event.key==='Enter'){ event.preventDefault(); checkHomeworkCurrentQuestion(); }">
+          </div>
+        `;
+        helperNote = 'Nhập đáp án rồi bấm Kiểm tra đáp án (hoặc nhấn Enter).';
+      }
+
+      card.innerHTML = `
+        <div class="q-header">
+          <div class="q-num">${String(hwIndex + 1).padStart(2, '0')}</div>
+          <span class="q-badge">Câu ${hwIndex + 1}/${quizData.length} · ${meta.shortLabel}</span>
+          <span class="q-result-icon" id="icon-${q.id}"></span>
+        </div>
+        <div class="q-text">${formatText(q.question)}</div>
+        <div class="answers-list" id="answers-${q.id}">
+          ${answersHTML}
+        </div>
+        <div class="explanation" id="explain-${q.id}">
+          <strong>Lời giải:</strong> ${formatText(q.explanation)}
+        </div>
+        <div class="hw-card-actions" id="hwActions-${q.id}">
+          <span class="hw-action-note" id="hwActionNote">${helperNote}</span>
+          <div class="hw-btn-row" id="hwBtnRow">
+            <button type="button" class="hw-primary-btn" id="hwCheckBtn" disabled onclick="checkHomeworkCurrentQuestion()">Kiểm tra đáp án</button>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+      triggerKaTeX(card);
+      renderHomeworkHud(-1);
+
+      if (q.type !== 'cauhoi' && q.type !== 'đs' && window.innerWidth > 600) {
+        const inp = document.getElementById(`short-answer-${q.id}`);
+        if (inp) setTimeout(() => inp.focus(), 60);
+      }
+    }
+
+    function checkHomeworkCurrentQuestion() {
+      if (!isHomeworkMode || submitted || hwFailed || hwAnsweredCurrent) return;
+      if (hwIndex >= quizData.length) return;
+
+      const q = quizData[hwIndex];
+      const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
+      if (!isQuestionAnswered(q)) {
+        if (q.type === 'đs' && validAnswers.length > 0) {
+          showToast(`Vui lòng chọn đủ Đúng/Sai cho cả ${validAnswers.length} ý`, 'error');
+        } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
+          showToast('Vui lòng chọn một phương án trước khi kiểm tra', 'error');
+        } else {
+          showToast('Vui lòng nhập đáp án trước khi kiểm tra', 'error');
+          const inp = document.getElementById(`short-answer-${q.id}`);
+          if (inp) inp.focus();
+        }
+        return;
+      }
+
+      const studentAnswerSnapshot = captureSingleQuestionAnswer(q);
+      const res = evaluateQuestion(q, hwIndex);
+      hwAnsweredCurrent = true;
+
+      const explainEl = document.getElementById('explain-' + q.id);
+      if (explainEl) triggerKaTeX(explainEl);
+
+      hwResults.push({
+        qId: q.id,
+        type: q.type,
+        isCorrect: res.isCorrect,
+        score: res.score,
+        wrongDetail: res.wrongDetail,
+        studentAnswer: studentAnswerSnapshot
+      });
+
+      const noteEl = document.getElementById('hwActionNote');
+      const btnRow = document.getElementById('hwBtnRow');
+      const isLastQuestion = (hwIndex >= quizData.length - 1);
+
+      if (res.isCorrect) {
+        hwCorrectCount++;
+        const livesLeft = Math.max(0, HW_MAX_LIVES - hwWrongCount);
+        renderHomeworkHud(-1);
+        saveQuizDraft();
+
+        if (noteEl) {
+          noteEl.className = 'hw-action-note is-correct';
+          noteEl.textContent = `Chính xác! Giữ nguyên ${livesLeft}/${HW_MAX_LIVES} mạng.`;
+        }
+        if (btnRow) {
+          btnRow.innerHTML = `<button type="button" class="hw-primary-btn" id="hwNextBtn" onclick="nextHomeworkQuestion()">${isLastQuestion ? 'Hoàn thành & Nộp bài' : 'Câu tiếp theo →'}</button>`;
+        }
+        return;
+      }
+
+      hwWrongCount++;
+      recordMistake(q);
+      const livesLeft = Math.max(0, HW_MAX_LIVES - hwWrongCount);
+      renderHomeworkHud(livesLeft);
+
+      if (hwWrongCount >= HW_MAX_LIVES) {
+        handleHomeworkFail(q);
+        return;
+      }
+
+      saveQuizDraft();
+      if (noteEl) {
+        noteEl.className = 'hw-action-note is-wrong';
+        noteEl.textContent = livesLeft === 1
+          ? `Sai rồi! Chỉ còn 1/${HW_MAX_LIVES} mạng — sai thêm 1 câu nữa sẽ bị trượt.`
+          : `Sai rồi! Còn ${livesLeft}/${HW_MAX_LIVES} mạng. Hãy đọc kỹ lời giải bên trên.`;
+      }
+      if (btnRow) {
+        btnRow.innerHTML = `<button type="button" class="hw-primary-btn" id="hwNextBtn" onclick="nextHomeworkQuestion()">${isLastQuestion ? 'Hoàn thành & Nộp bài' : 'Câu tiếp theo →'}</button>`;
+      }
+      showToast(
+        livesLeft === 1
+          ? 'Cảnh báo: Chỉ còn 1 lượt sai duy nhất!'
+          : `Sai rồi! Còn ${livesLeft} mạng.`,
+        'error'
+      );
+    }
+
+    function nextHomeworkQuestion() {
+      if (!isHomeworkMode || submitted || hwFailed || !hwAnsweredCurrent) return;
+      if (hwIndex >= quizData.length - 1) {
+        finishHomeworkPass();
+        return;
+      }
+
+      const container = document.getElementById('quizContainer');
+      const currentCard = container ? container.querySelector('.question-card') : null;
+      const advance = () => {
+        hwIndex++;
+        showHomeworkCard();
+        const stickyEl = document.getElementById('quizStickyTop');
+        const targetTop = stickyEl ? Math.max(0, stickyEl.offsetTop - 8) : 0;
+        if (window.scrollY > targetTop + 60) {
+          window.scrollTo({ top: targetTop, behavior: 'smooth' });
+        }
+      };
+
+      if (currentCard) {
+        currentCard.classList.remove('review-card-enter');
+        currentCard.classList.add('review-card-exit');
+        setTimeout(advance, 190);
+      } else {
+        advance();
+      }
+    }
+
+    function handleHomeworkFail(lastQuestion) {
+      hwFailed = true;
+      submitted = true;
+      try { localStorage.removeItem(getDraftKey()); } catch (e) {}
+
+      const noteEl = document.getElementById('hwActionNote');
+      const btnRow = document.getElementById('hwBtnRow');
+      if (noteEl) {
+        noteEl.className = 'hw-action-note is-wrong';
+        noteEl.textContent = `Đã sai đủ ${HW_MAX_LIVES}/${HW_MAX_LIVES} câu — Chưa đạt yêu cầu. Xem lời giải rồi làm lại bộ đề mới.`;
+      }
+      if (btnRow) {
+        btnRow.innerHTML = `<button type="button" class="hw-primary-btn is-danger" onclick="retryQuiz()">Làm lại bài (${quizData.length} câu mới)</button>`;
+      }
+
+      const mcDone = hwResults.filter(r => r.type === 'cauhoi').length;
+      const tfDone = hwResults.filter(r => r.type === 'đs').length;
+      const saDone = hwResults.filter(r => r.type !== 'cauhoi' && r.type !== 'đs').length;
+      const mcTotal = quizData.filter(q => q.type === 'cauhoi').length;
+      const tfTotal = quizData.filter(q => q.type === 'đs').length;
+      const saTotal = quizData.filter(q => q.type !== 'cauhoi' && q.type !== 'đs').length;
+
+      const banner = document.getElementById('scoreBanner');
+      const badge = document.getElementById('hwStatusBadge');
+      const scoreValueEl = document.getElementById('scoreValue');
+      const scoreLabelEl = document.getElementById('scoreLabel');
+      const scoreMsgEl = document.getElementById('scoreMsg');
+      const statsEl = document.getElementById('hwBannerStats');
+      const actionsEl = document.getElementById('hwBannerActions');
+
+      if (banner) {
+        banner.classList.remove('is-passed');
+        banner.classList.add('is-failed', 'visible');
+      }
+      if (badge) {
+        badge.className = 'hw-status-badge is-failed';
+        badge.style.display = 'inline-flex';
+        badge.innerHTML = `${SVG_X} Chưa đạt · Trượt bài tập`;
+      }
+      if (scoreValueEl) {
+        scoreValueEl.textContent = `Sai ${hwWrongCount} / ${HW_MAX_LIVES}`;
+        scoreValueEl.style.color = 'var(--wrong)';
+      }
+      if (scoreLabelEl) {
+        scoreLabelEl.textContent = `Dừng ở câu ${Math.min(hwIndex + 1, quizData.length)} / ${quizData.length} · Kết quả chưa được ghi nhận`;
+      }
+      if (scoreMsgEl) {
+        scoreMsgEl.textContent = `Em đã dùng hết ${HW_MAX_LIVES} lượt sai trước khi hoàn thành trọn vẹn bài tập. Các câu sai đã được lưu vào Sổ tay câu sai — hãy xem lời giải câu vừa làm bên dưới rồi bấm Làm lại với bộ ${quizData.length} câu mới nhé.`;
+      }
+      if (statsEl) {
+        statsEl.style.display = 'flex';
+        statsEl.innerHTML = `
+          <span class="hw-stat-chip">Đúng: <strong style="color:var(--correct)">${hwCorrectCount}</strong></span>
+          <span class="hw-stat-chip">Sai: <strong style="color:var(--wrong)">${hwWrongCount}/${HW_MAX_LIVES}</strong></span>
+          <span class="hw-stat-chip">TN: <strong>${mcDone}/${mcTotal}</strong></span>
+          <span class="hw-stat-chip">Đ/S: <strong>${tfDone}/${tfTotal}</strong></span>
+          <span class="hw-stat-chip">TLN: <strong>${saDone}/${saTotal}</strong></span>
+        `;
+      }
+      if (actionsEl) {
+        actionsEl.style.display = 'flex';
+        actionsEl.innerHTML = `
+          <button type="button" class="hw-primary-btn is-danger" onclick="retryQuiz()">Làm lại bài (${quizData.length} câu mới)</button>
+        `;
+      }
+
+      const retryBtn = document.getElementById('retryBtn');
+      if (retryBtn) retryBtn.classList.remove('visible');
+
+      renderHomeworkHud(-1);
+      showToast('Đã sai 3 câu! Bài làm bị trượt, em hãy làm lại nhé.', 'error');
+      if (banner) banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function finishHomeworkPass() {
+      if (!isHomeworkMode || submitted || hwFailed) return;
+
+      const nameInput = document.getElementById('studentName');
+      const studentCard = document.getElementById('studentCard');
+      const studentName = nameInput ? nameInput.value.trim() : '';
+
+      if (!studentName) {
+        if (studentCard) studentCard.classList.add('error');
+        if (nameInput) nameInput.focus();
+        showToast('Vui lòng nhập họ và tên trước khi nộp bài', 'error');
+        setTimeout(() => { if (studentCard) studentCard.classList.remove('error'); }, 2200);
+        return;
+      }
+      if (studentCard) studentCard.classList.remove('error');
+
+      submitted = true;
+      hwFailed = false;
+      try { localStorage.removeItem(getDraftKey()); } catch (e) {}
+
+      if (nameInput) {
+        nameInput.disabled = true;
+        nameInput.style.opacity = '0.6';
+      }
+
+      const totalRawScore = hwResults.reduce((sum, r) => sum + (Number(r.score) || 0), 0);
+      const maxRawScore = quizData.reduce((sum, q) => sum + (q.type === 'đs' ? 1.0 : 0.25), 0);
+      const finalScore = maxRawScore > 0 ? parseFloat(((totalRawScore / maxRawScore) * 10).toFixed(2)) : 0;
+      const maxScore = 10;
+      const livesLeft = Math.max(0, HW_MAX_LIVES - hwWrongCount);
+
+      const wrongAnswersList = hwResults
+        .filter(r => !r.isCorrect && r.wrongDetail)
+        .map(r => r.wrongDetail);
+
+      const banner = document.getElementById('scoreBanner');
+      const badge = document.getElementById('hwStatusBadge');
+      const scoreValueEl = document.getElementById('scoreValue');
+      const scoreLabelEl = document.getElementById('scoreLabel');
+      const scoreMsgEl = document.getElementById('scoreMsg');
+      const statsEl = document.getElementById('hwBannerStats');
+      const actionsEl = document.getElementById('hwBannerActions');
+
+      if (banner) {
+        banner.classList.remove('is-failed');
+        banner.classList.add('is-passed', 'visible');
+      }
+      if (badge) {
+        badge.className = 'hw-status-badge is-passed';
+        badge.style.display = 'inline-flex';
+        badge.innerHTML = `${SVG_CHECK} Đạt yêu cầu · Hoàn thành ${quizData.length}/${quizData.length} câu`;
+      }
+      if (scoreValueEl) {
+        scoreValueEl.textContent = `${finalScore} / ${maxScore}`;
+        scoreValueEl.style.color = 'var(--correct)';
+      }
+      if (scoreLabelEl) {
+        scoreLabelEl.textContent = 'Tổng điểm bài tập về nhà';
+      }
+      if (scoreMsgEl) {
+        if (hwWrongCount === 0) {
+          scoreMsgEl.textContent = `Xuất sắc tuyệt đối! Em hoàn thành trọn vẹn ${quizData.length}/${quizData.length} câu mà không sai câu nào.`;
+        } else if (hwWrongCount === 1) {
+          scoreMsgEl.textContent = 'Rất tốt! Em đã vượt qua bài tập về nhà chỉ với 1 lần sai.';
+        } else {
+          scoreMsgEl.textContent = 'Chúc mừng em đã hoàn thành bài tập về nhà! Hãy xem lại 2 câu sai để nắm chắc kiến thức hơn.';
+        }
+      }
+      if (statsEl) {
+        statsEl.style.display = 'flex';
+        statsEl.innerHTML = `
+          <span class="hw-stat-chip">Đúng: <strong style="color:var(--correct)">${hwCorrectCount}/${quizData.length}</strong></span>
+          <span class="hw-stat-chip">Sai: <strong style="color:${hwWrongCount > 0 ? 'var(--wrong)' : 'var(--correct)'}">${hwWrongCount}/${HW_MAX_LIVES}</strong></span>
+          <span class="hw-stat-chip">Còn lại: <strong>${livesLeft}/${HW_MAX_LIVES} mạng</strong></span>
+        `;
+      }
+      if (actionsEl) {
+        actionsEl.style.display = 'flex';
+        actionsEl.innerHTML = `
+          <button type="button" class="hw-secondary-btn" id="hwToggleReviewBtn" onclick="toggleHomeworkReviewList()">Xem lại ${quizData.length} câu &amp; lời giải</button>
+          <button type="button" class="hw-primary-btn" onclick="retryQuiz()">Làm lại (${quizData.length} câu mới)</button>
+        `;
+      }
+
+      const container = document.getElementById('quizContainer');
+      if (container) container.innerHTML = '';
+      hwShowingReviewList = false;
+
+      const retryBtn = document.getElementById('retryBtn');
+      if (retryBtn) retryBtn.classList.remove('visible');
+
+      renderHomeworkHud(-1);
+      if (banner) banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      sendResultToTelegram(studentName, finalScore, maxScore, wrongAnswersList);
+      if (currentSession && currentSession.gmail) {
+        saveProgressToSupabase(currentSession.gmail, quizFile, 'quiz', finalScore);
+      }
+    }
+
+    function toggleHomeworkReviewList() {
+      const container = document.getElementById('quizContainer');
+      const btn = document.getElementById('hwToggleReviewBtn');
+      if (!container) return;
+
+      if (hwShowingReviewList) {
+        container.innerHTML = '';
+        hwShowingReviewList = false;
+        if (btn) btn.textContent = `Xem lại ${quizData.length} câu & lời giải`;
+        return;
+      }
+
+      hwShowingReviewList = true;
+      if (btn) btn.textContent = `Ẩn chi tiết ${quizData.length} câu`;
+      container.innerHTML = `<div class="hw-review-heading"><span>Chi tiết ${quizData.length} câu đã hoàn thành</span></div>`;
+
+      let lastPartRendered = '';
+      quizData.forEach((q, idx) => {
+        const partKey = q.type === 'cauhoi' ? 'I' : (q.type === 'đs' ? 'II' : 'III');
+        if (partKey !== lastPartRendered) {
+          lastPartRendered = partKey;
+          const partTitles = {
+            'I': 'Phần I. Câu trắc nghiệm nhiều phương án lựa chọn',
+            'II': 'Phần II. Câu trắc nghiệm đúng sai',
+            'III': 'Phần III. Câu trắc nghiệm trả lời ngắn'
+          };
+          container.insertAdjacentHTML('beforeend', `<div class="part-header">${partTitles[partKey]}</div>`);
+        }
+
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.dataset.id = q.id;
+
+        const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
+        let answersHTML = '';
+        if (q.type === 'đs' && validAnswers.length > 0) {
+          answersHTML = validAnswers.map(a => `
+            <div class="tf-statement" id="tf-${q.id}-${a.key}">
+              <div class="tf-text"><strong>${a.key}.</strong> ${formatText(a.text)}</div>
+              <div class="tf-toggles seg-control tf-seg" data-selected="none">
+                <span class="seg-thumb"></span>
+                <div class="tf-btn seg-btn" data-val="Đ">Đúng</div>
+                <div class="tf-btn seg-btn" data-val="S">Sai</div>
+              </div>
+            </div>
+          `).join('');
+        } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
+          answersHTML = validAnswers.map(a => `
+            <label class="answer-option" data-key="${a.key}">
+              <span class="opt-keycap kbd-cap">${a.key}</span>
+              <span class="answer-text">${formatText(a.text)}</span>
+            </label>
+          `).join('');
+        } else {
+          answersHTML = `
+            <div>
+              <input type="text" class="student-input" id="short-answer-${q.id}" disabled>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="q-header">
+            <div class="q-num">${String(idx + 1).padStart(2, '0')}</div>
+            <span class="q-badge">Câu ${idx + 1}</span>
+            <span class="q-result-icon" id="icon-${q.id}"></span>
+          </div>
+          <div class="q-text">${formatText(q.question)}</div>
+          <div class="answers-list" id="answers-${q.id}">
+            ${answersHTML}
+          </div>
+          <div class="explanation" id="explain-${q.id}">
+            <strong>Lời giải:</strong> ${formatText(q.explanation)}
+          </div>
+        `;
+        container.appendChild(card);
+
+        const rec = hwResults[idx];
+        const savedAns = rec ? rec.studentAnswer : null;
+        if (q.type === 'đs' && savedAns && typeof savedAns === 'object') {
+          Object.entries(savedAns).forEach(([k, v]) => {
+            const parent = document.getElementById(`tf-${q.id}-${k}`);
+            if (!parent) return;
+            const targetBtn = parent.querySelector(`.tf-btn[data-val="${v}"]`);
+            if (targetBtn) {
+              targetBtn.classList.add('selected');
+              const seg = targetBtn.closest('.tf-toggles');
+              if (seg) {
+                const segIdx = v === 'Đ' ? '0' : '1';
+                seg.setAttribute('data-selected', segIdx);
+                seg.style.setProperty('--seg-index', segIdx);
+              }
+            }
+          });
+        } else if (q.type === 'cauhoi' && savedAns) {
+          const opt = document.querySelector(`#answers-${q.id} .answer-option[data-key="${savedAns}"]`);
+          if (opt) opt.classList.add('selected');
+        } else if (typeof savedAns === 'string') {
+          const inp = document.getElementById(`short-answer-${q.id}`);
+          if (inp) inp.value = savedAns;
+        }
+
+        evaluateQuestion(q, idx);
+      });
+
+      triggerKaTeX(container);
+      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     function renderQuiz(data) {
       const container = document.getElementById('quizContainer');
       container.innerHTML = '';
@@ -2595,6 +3768,28 @@
 
       const toolbarEl = document.getElementById('studyToolbar');
       const paletteEl = document.getElementById('questionPaletteCard');
+      const hwHudEl = document.getElementById('homeworkHud');
+      const kbdHintEl = document.querySelector('.kbd-hint-pill');
+
+      if (isHomeworkMode) {
+        if (toolbarEl) toolbarEl.style.display = 'none';
+        if (paletteEl) paletteEl.style.display = 'none';
+        const stickyBtn = document.getElementById('stickyTogglePaletteBtn');
+        if (stickyBtn) stickyBtn.style.display = 'none';
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) submitBtn.style.display = 'none';
+        const reviewBar = document.getElementById('reviewBar');
+        if (reviewBar) reviewBar.style.display = 'none';
+        if (kbdHintEl) {
+          kbdHintEl.innerHTML = '<span class="kbd-cap">A–D</span> Chọn · <span class="kbd-cap">Enter</span> Gửi';
+          kbdHintEl.title = 'Phím A–D để chọn, Enter để kiểm tra hoặc sang câu tiếp theo';
+        }
+        resetScoreBannerUI();
+        showHomeworkCard();
+        return;
+      }
+
+      if (hwHudEl) hwHudEl.classList.remove('visible');
 
       if (isReviewMode) {
         if (toolbarEl) toolbarEl.style.display = 'none';
@@ -2824,6 +4019,7 @@
 
       function selectAnswer(el, qId) {
       if (submitted) return;
+      if (isHomeworkMode && hwAnsweredCurrent) return;
       const answersEl = document.getElementById('answers-' + qId);
       if (answersEl && answersEl.querySelector('.answer-option.locked')) return;
 
@@ -2834,7 +4030,9 @@
         window.PinUI.pressButton(cap, 0.12);
       }
 
-      if (isReviewMode) {
+      if (isHomeworkMode) {
+        updateHomeworkCheckButton();
+      } else if (isReviewMode) {
         gradeQuestion(qId);
       } else {
         updateProgress();
@@ -2859,11 +4057,24 @@
       const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
       if (tag === 'input' || tag === 'textarea' || e.ctrlKey || e.metaKey || e.altKey) return;
 
+      if (isHomeworkMode && e.key === 'Enter') {
+        if (hwFailed) return;
+        const activeBtn = document.activeElement && document.activeElement.tagName === 'BUTTON';
+        if (activeBtn) return;
+        e.preventDefault();
+        if (hwAnsweredCurrent) {
+          nextHomeworkQuestion();
+        } else if (hwIndex < quizData.length && isQuestionAnswered(quizData[hwIndex])) {
+          checkHomeworkCurrentQuestion();
+        }
+        return;
+      }
+
       const keyMap = { 'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D', '1': 'A', '2': 'B', '3': 'C', '4': 'D' };
       const mapped = keyMap[e.key.toLowerCase()];
       if (!mapped) return;
 
-      const targetCard = isReviewMode
+      const targetCard = (isReviewMode || isHomeworkMode)
         ? document.querySelector('#quizContainer .question-card')
         : (hoveredQuestionCard || document.querySelector('#quizContainer .question-card'));
       if (!targetCard) return;
@@ -2877,6 +4088,7 @@
 
     function selectTF(el, qId, key, val) {
       if (submitted) return;
+      if (isHomeworkMode && hwAnsweredCurrent) return;
       const answersEl = document.getElementById('answers-' + qId);
 
       const parent = document.getElementById(`tf-${qId}-${key}`);
@@ -2893,7 +4105,9 @@
         seg.style.setProperty('--seg-index', idx);
       }
 
-      if (isReviewMode) {
+      if (isHomeworkMode) {
+        updateHomeworkCheckButton();
+      } else if (isReviewMode) {
         const q = quizData.find(item => String(item.id) === String(qId));
         const validAnswers = q.answers.filter(a => a.text && a.text.trim() !== '');
         const selectedTf = answersEl.querySelectorAll('.tf-btn.selected');
@@ -3445,7 +4659,35 @@
       flaggedQuestionIds.clear();
       checkedQuestionIds.clear();
       try { localStorage.removeItem(getDraftKey()); } catch (e) {}
-      document.getElementById('scoreBanner').classList.remove('visible');
+      resetScoreBannerUI();
+
+      if (isHomeworkMode) {
+        hwIndex = 0;
+        hwWrongCount = 0;
+        hwCorrectCount = 0;
+        hwResults = [];
+        hwFailed = false;
+        hwAnsweredCurrent = false;
+        hwShowingReviewList = false;
+
+        if (Array.isArray(rawQuizPool) && rawQuizPool.length > 0) {
+          quizData = buildHomeworkQuestionSet(rawQuizPool);
+        } else {
+          quizData = buildHomeworkQuestionSet(quizData);
+        }
+
+        document.getElementById('retryBtn').classList.remove('visible');
+        document.getElementById('progressFill').style.width = '0%';
+        const nameInput = document.getElementById('studentName');
+        if (nameInput && (!currentSession || !currentSession.ten)) {
+          nameInput.disabled = false;
+          nameInput.style.opacity = '1';
+        }
+        renderQuiz(quizData);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast(`Đã tạo bộ ${quizData.length} câu mới. Chúc em làm bài tốt!`, 'success');
+        return;
+      }
 
       if (isMistakeQuiz) {
         const gradeMatch = quizFile.match(/^mistakes_(\d{2})$/);
