@@ -269,12 +269,13 @@ function renderGoogleWebButton() {
   }
 
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const parentWidth = container.parentElement ? container.parentElement.clientWidth : 340;
-  const btnWidth = Math.min(Math.max(Math.round(container.clientWidth || parentWidth || 320), 220), 400);
-
   container.innerHTML = '';
   container.style.display = 'flex';
+  container.style.width = '100%';
   container.style.justifyContent = 'center';
+
+  const measuredWidth = Math.round(container.clientWidth || 320);
+  const btnWidth = Math.min(Math.max(measuredWidth, 220), 400);
 
   window.google.accounts.id.renderButton(container, {
     theme: isDark ? 'filled_black' : 'outline',
