@@ -103,7 +103,7 @@
     }
 
     .back-btn,
-    .music-btn {
+    .sfx-btn {
       width: 36px;
       height: 36px;
       border-radius: 8px;
@@ -120,14 +120,14 @@
     }
 
     .back-btn:hover,
-    .music-btn:hover {
+    .sfx-btn:hover {
       background: var(--raised);
       color: var(--text);
       border-color: var(--accent);
     }
 
     .back-btn svg,
-    .music-btn svg {
+    .sfx-btn svg {
       width: 16px;
       height: 16px;
       stroke: currentColor;
@@ -135,13 +135,13 @@
       fill: none;
     }
 
-    .music-btn.playing {
+    .sfx-btn.playing {
       background: var(--accent-subtle);
       border-color: var(--accent);
       color: var(--accent);
     }
 
-    .music-btn.muted {
+    .sfx-btn.muted {
       opacity: 0.65;
     }
 
@@ -2018,9 +2018,9 @@
         <svg class="pts-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
         <svg class="pts-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
       </button>
-      <button class="music-btn" id="musicToggleBtn" onclick="toggleMusic()" title="Bật/Tắt nhạc nền tập trung">
-        <span id="musicIcon">
-          <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>
+      <button type="button" class="sfx-btn playing" id="sfxToggleBtn" onclick="toggleSfx()" title="Tắt âm thanh hiệu ứng (đang bật)" aria-label="Bật hoặc tắt âm thanh hiệu ứng">
+        <span id="sfxIcon">
+          <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
         </span>
       </button>
     </div>
@@ -2870,6 +2870,9 @@
       }
 
       const res = evaluateQuestion(q, idx);
+      if (!opts.skipMistakeUpdate && !opts.silent) {
+        playAnswerFeedbackSound(res.isCorrect);
+      }
       checkedQuestionIds.add(String(q.id));
 
       const practiceActionsEl = document.getElementById(`practiceActions-${q.id}`);
@@ -3879,6 +3882,7 @@
 
       const studentAnswerSnapshot = captureSingleQuestionAnswer(q);
       const res = evaluateQuestion(q, hwIndex);
+      playAnswerFeedbackSound(res.isCorrect);
       hwAnsweredCurrent = true;
 
       hwResults.push({
@@ -4860,6 +4864,7 @@
       const q = quizData[idx];
 
       const { isCorrect, wrongDetail } = evaluateQuestion(q, idx);
+      playAnswerFeedbackSound(isCorrect);
       if (!isCorrect) {
         recordMistake(q);
       }
@@ -5133,6 +5138,7 @@
 
       const banner = document.getElementById('scoreBanner');
       const pct = Math.round((finalScore / maxScore) * 100);
+      playAnswerFeedbackSound(pct >= 50);
 
       document.getElementById('scoreValue').textContent = `${finalScore} / ${maxScore}`;
       document.getElementById('scoreValue').style.color =
@@ -5239,90 +5245,219 @@
     }
   </script>
 
-  <audio id="bgMusic" loop preload="none"></audio>
-
   <script>
-    function updateMusicButton(isPlaying) {
-      const btn = document.getElementById('musicToggleBtn');
-      const icon = document.getElementById('musicIcon');
+    const SFX_STORAGE_KEY = 'zphysics_sfx_muted';
+    let sfxAudioCtx = null;
+
+    function isSfxMuted() {
+      try {
+        return localStorage.getItem(SFX_STORAGE_KEY) === 'true';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function updateSfxButton(isEnabled) {
+      const btn = document.getElementById('sfxToggleBtn');
+      const icon = document.getElementById('sfxIcon');
       if (!btn || !icon) return;
 
-      if (isPlaying) {
+      if (isEnabled) {
         icon.innerHTML = SVG_VOL_ON;
         btn.classList.add('playing');
         btn.classList.remove('muted');
-        btn.title = 'Tắt tiếng (nhạc nền đang phát)';
+        btn.title = 'Tắt âm thanh hiệu ứng (đang bật)';
       } else {
         icon.innerHTML = SVG_VOL_OFF;
         btn.classList.remove('playing');
         btn.classList.add('muted');
-        btn.title = 'Bật tiếng (nhạc nền đang tắt)';
+        btn.title = 'Bật âm thanh hiệu ứng (đang tắt)';
       }
     }
 
-    function toggleMusic() {
-      const audio = document.getElementById('bgMusic');
-      if (!audio) return;
-
-      if (!audio.src || !audio.src.includes('alla-turca.mp3')) {
-        audio.src = 'assets/alla-turca.mp3';
+    function getSfxAudioContext() {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      if (!sfxAudioCtx) {
+        sfxAudioCtx = new AudioCtx();
       }
-
-      if (audio.paused) {
-        audio.volume = 0.35;
-        audio.play().then(() => {
-          localStorage.setItem('zphysics_music_muted', 'false');
-          updateMusicButton(true);
-        }).catch(err => {
-          console.warn('Không thể phát nhạc nền:', err);
-        });
-      } else {
-        audio.pause();
-        localStorage.setItem('zphysics_music_muted', 'true');
-        updateMusicButton(false);
-      }
+      return sfxAudioCtx;
     }
 
-    function initMusicPlayer() {
-      const audio = document.getElementById('bgMusic');
-      if (!audio) return;
-
-      audio.volume = 0.35;
-      const isMuted = localStorage.getItem('zphysics_music_muted') === 'true';
-      updateMusicButton(false);
-      if (isMuted) return;
-
-      const events = ['click', 'touchstart', 'keydown'];
-      const playOnFirstInteraction = (e) => {
-        if (e && e.target && e.target.closest && e.target.closest('#musicToggleBtn')) return;
-
-        if (localStorage.getItem('zphysics_music_muted') === 'true') {
-          events.forEach(evt => document.removeEventListener(evt, playOnFirstInteraction));
-          return;
-        }
-
-        if (!audio.src || !audio.src.includes('alla-turca.mp3')) {
-          audio.src = 'assets/alla-turca.mp3';
-        }
-
-        if (audio.paused) {
-          audio.play().then(() => {
-            updateMusicButton(true);
-            events.forEach(evt => document.removeEventListener(evt, playOnFirstInteraction));
-          }).catch(() => {});
+    function withSfxContext(renderFn) {
+      try {
+        const ctx = getSfxAudioContext();
+        if (!ctx) return;
+        if (ctx.state === 'suspended') {
+          ctx.resume().then(() => renderFn(ctx)).catch(() => {});
         } else {
-          updateMusicButton(true);
-          events.forEach(evt => document.removeEventListener(evt, playOnFirstInteraction));
+          renderFn(ctx);
         }
-      };
+      } catch (e) {}
+    }
 
-      events.forEach(event => document.addEventListener(event, playOnFirstInteraction, { passive: true }));
+    /**
+     * Schedules one synthesized oscillator voice with an exponential decay envelope.
+     */
+    function scheduleSfxVoice(ctx, destination, opts) {
+      const start = opts.startTime;
+      const dur = opts.duration;
+      const attack = opts.attack || 0.006;
+
+      const osc = ctx.createOscillator();
+      osc.type = opts.type || 'sine';
+      osc.frequency.setValueAtTime(opts.freqStart, start);
+      if (opts.freqEnd && opts.freqEnd !== opts.freqStart) {
+        osc.frequency.exponentialRampToValueAtTime(opts.freqEnd, start + dur);
+      }
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.linearRampToValueAtTime(opts.peakGain, start + attack);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+
+      osc.connect(gain);
+      gain.connect(destination);
+
+      osc.start(start);
+      osc.stop(start + dur + 0.02);
+    }
+
+    /**
+     * Simulates Duolingo "Correct" chime: ascending Major Third (F# -> A#)
+     * with layered marimba/celesta harmonics and percussive exponential decay.
+     */
+    function playDuolingoCorrectSound() {
+      withSfxContext((ctx) => {
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(3800, ctx.currentTime);
+        filter.Q.setValueAtTime(0.7, ctx.currentTime);
+        filter.connect(ctx.destination);
+
+        const t0 = ctx.currentTime + 0.005;
+        const notes = [
+          { start: t0,        dur: 0.14, peak: 0.22, f5: 739.99, f4: 369.99, f6: 1479.98, shimmerDur: 0.055, shimmerScale: 0.18 },
+          { start: t0 + 0.09, dur: 0.32, peak: 0.30, f5: 932.33, f4: 466.16, f6: 1864.66, shimmerDur: 0.085, shimmerScale: 0.16 }
+        ];
+
+        notes.forEach((n) => {
+          scheduleSfxVoice(ctx, filter, {
+            type: 'sine',
+            freqStart: n.f5,
+            startTime: n.start,
+            duration: n.dur,
+            attack: 0.006,
+            peakGain: n.peak
+          });
+          scheduleSfxVoice(ctx, filter, {
+            type: 'triangle',
+            freqStart: n.f4,
+            startTime: n.start,
+            duration: n.dur * 0.9,
+            attack: 0.006,
+            peakGain: n.peak * 0.45
+          });
+          scheduleSfxVoice(ctx, filter, {
+            type: 'sine',
+            freqStart: n.f6,
+            startTime: n.start,
+            duration: n.shimmerDur,
+            attack: 0.004,
+            peakGain: n.peak * n.shimmerScale
+          });
+        });
+      });
+    }
+
+    /**
+     * Simulates Duolingo "Incorrect" cue: low-pass filtered descending tritone
+     * / minor-second buzz-thud (F#3 -> C3) with mild downward pitch droop.
+     */
+    function playDuolingoWrongSound() {
+      withSfxContext((ctx) => {
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(720, ctx.currentTime);
+        filter.Q.setValueAtTime(1.1, ctx.currentTime);
+        filter.connect(ctx.destination);
+
+        const t0 = ctx.currentTime + 0.005;
+        const steps = [
+          {
+            start: t0,
+            dur: 0.11,
+            peak: 0.24,
+            voices: [
+              { type: 'sawtooth', freqStart: 185.00, freqEnd: 175.00, weight: 0.62 },
+              { type: 'triangle', freqStart: 196.00, freqEnd: 185.00, weight: 0.48 }
+            ]
+          },
+          {
+            start: t0 + 0.095,
+            dur: 0.24,
+            peak: 0.28,
+            voices: [
+              { type: 'sawtooth', freqStart: 138.59, freqEnd: 126.00, weight: 0.62 },
+              { type: 'triangle', freqStart: 130.81, freqEnd: 121.00, weight: 0.48 }
+            ]
+          }
+        ];
+
+        steps.forEach((step) => {
+          step.voices.forEach((v) => {
+            scheduleSfxVoice(ctx, filter, {
+              type: v.type,
+              freqStart: v.freqStart,
+              freqEnd: v.freqEnd,
+              startTime: step.start,
+              duration: step.dur,
+              attack: 0.008,
+              peakGain: step.peak * v.weight
+            });
+          });
+        });
+      });
+    }
+
+    function playAnswerFeedbackSound(isCorrect) {
+      if (isSfxMuted()) return;
+      if (isCorrect) {
+        playDuolingoCorrectSound();
+      } else {
+        playDuolingoWrongSound();
+      }
+    }
+
+    function toggleSfx() {
+      const nextMuted = !isSfxMuted();
+      try {
+        localStorage.setItem(SFX_STORAGE_KEY, nextMuted ? 'true' : 'false');
+      } catch (e) {}
+      updateSfxButton(!nextMuted);
+      if (!nextMuted) {
+        playDuolingoCorrectSound();
+      }
+    }
+
+    function initSfxControls() {
+      updateSfxButton(!isSfxMuted());
+
+      const unlockEvents = ['pointerdown', 'keydown'];
+      const unlockAudio = () => {
+        const ctx = getSfxAudioContext();
+        if (ctx && ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+        unlockEvents.forEach(evt => document.removeEventListener(evt, unlockAudio));
+      };
+      unlockEvents.forEach(evt => document.addEventListener(evt, unlockAudio, { passive: true, once: true }));
     }
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => setTimeout(initMusicPlayer, 500));
+      document.addEventListener('DOMContentLoaded', initSfxControls);
     } else {
-      setTimeout(initMusicPlayer, 500);
+      initSfxControls();
     }
   </script>
 </body>

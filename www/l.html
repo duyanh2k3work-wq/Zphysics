@@ -103,8 +103,7 @@
       z-index: 100;
     }
 
-    .back-btn,
-    .music-btn {
+    .back-btn {
       width: 34px;
       height: 34px;
       border-radius: 8px;
@@ -120,30 +119,18 @@
       transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease);
     }
 
-    .back-btn:hover,
-    .music-btn:hover {
+    .back-btn:hover {
       background: var(--raised);
       color: var(--text);
       border-color: var(--accent);
     }
 
-    .back-btn svg,
-    .music-btn svg {
+    .back-btn svg {
       width: 16px;
       height: 16px;
       stroke: currentColor;
       stroke-width: 1.5;
       fill: none;
-    }
-
-    .music-btn.playing {
-      background: var(--accent-subtle);
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .music-btn.muted {
-      opacity: 0.65;
     }
 
     .header-info {
@@ -989,11 +976,6 @@
         <svg class="pts-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
         <svg class="pts-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
       </button>
-      <button class="music-btn" id="musicToggleBtn" onclick="toggleMusic()" title="Bật/Tắt nhạc nền tập trung">
-        <span id="musicIcon">
-          <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>
-        </span>
-      </button>
       <div class="header-timer-wrap">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span class="timer-text" id="headerTimer">50:00</span>
@@ -1148,8 +1130,6 @@
 
   <script>
     const SVG_FLAG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>';
-    const SVG_VOL_ON = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
-    const SVG_VOL_OFF = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>';
 
     if (window.location.protocol.startsWith('http') && !window.Capacitor) {
       const path = window.location.pathname;
@@ -2571,93 +2551,6 @@
       } catch (err) {
         console.warn('Lỗi gửi báo cáo thi về Telegram:', err);
       }
-    }
-  </script>
-
-  <audio id="bgMusic" loop preload="none"></audio>
-
-  <script>
-    function updateMusicButton(isPlaying) {
-      const btn = document.getElementById('musicToggleBtn');
-      const icon = document.getElementById('musicIcon');
-      if (!btn || !icon) return;
-
-      if (isPlaying) {
-        icon.innerHTML = SVG_VOL_ON;
-        btn.classList.add('playing');
-        btn.classList.remove('muted');
-        btn.title = 'Tắt nhạc nền (đang phát)';
-      } else {
-        icon.innerHTML = SVG_VOL_OFF;
-        btn.classList.remove('playing');
-        btn.classList.add('muted');
-        btn.title = 'Bật nhạc nền (đang tắt)';
-      }
-    }
-
-    function toggleMusic() {
-      const audio = document.getElementById('bgMusic');
-      if (!audio) return;
-
-      if (!audio.src || !audio.src.includes('alla-turca.mp3')) {
-        audio.src = 'assets/alla-turca.mp3';
-      }
-
-      if (audio.paused) {
-        audio.volume = 0.35;
-        audio.play().then(() => {
-          localStorage.setItem('zphysics_music_muted', 'false');
-          updateMusicButton(true);
-        }).catch(err => {
-          console.warn('Không thể phát nhạc nền:', err);
-        });
-      } else {
-        audio.pause();
-        localStorage.setItem('zphysics_music_muted', 'true');
-        updateMusicButton(false);
-      }
-    }
-
-    function initMusicPlayer() {
-      const audio = document.getElementById('bgMusic');
-      if (!audio) return;
-
-      audio.volume = 0.35;
-      const isMuted = localStorage.getItem('zphysics_music_muted') === 'true';
-      updateMusicButton(false);
-      if (isMuted) return;
-
-      const events = ['click', 'touchstart', 'keydown'];
-      const playOnFirstInteraction = (e) => {
-        if (e && e.target && e.target.closest && e.target.closest('#musicToggleBtn')) return;
-
-        if (localStorage.getItem('zphysics_music_muted') === 'true') {
-          events.forEach(evt => document.removeEventListener(evt, playOnFirstInteraction));
-          return;
-        }
-
-        if (!audio.src || !audio.src.includes('alla-turca.mp3')) {
-          audio.src = 'assets/alla-turca.mp3';
-        }
-
-        if (audio.paused) {
-          audio.play().then(() => {
-            updateMusicButton(true);
-            events.forEach(evt => document.removeEventListener(evt, playOnFirstInteraction));
-          }).catch(() => {});
-        } else {
-          updateMusicButton(true);
-          events.forEach(evt => document.removeEventListener(evt, playOnFirstInteraction));
-        }
-      };
-
-      events.forEach(event => document.addEventListener(event, playOnFirstInteraction, { passive: true }));
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => setTimeout(initMusicPlayer, 500));
-    } else {
-      setTimeout(initMusicPlayer, 500);
     }
   </script>
 </body>
