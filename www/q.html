@@ -17,7 +17,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"
     onload="if(typeof triggerKaTeX==='function'){triggerKaTeX(document.body);}else if(typeof renderMathInElement==='function'){renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],throwOnError:false});}"></script>
-  <link rel="stylesheet" href="assets/css/pinui.css?v=20261118_feat2">
+  <link rel="stylesheet" href="assets/css/pinui.css?v=20261125_fontfix">
   <script src="assets/js/pinui.js?v=20261118_arial"></script>
   <script>PinUI.initTheme('light');</script>
 
@@ -84,6 +84,11 @@
       line-height: 1.55;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+    }
+
+    b,
+    strong {
+      font-weight: 700;
     }
 
     .app {
@@ -1182,6 +1187,7 @@
 
     .hw-part-banner strong {
       color: var(--accent);
+      font-weight: 700;
     }
 
     .hw-card-actions {
@@ -1189,27 +1195,9 @@
       border-top: 1px solid var(--border);
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 12px;
       flex-wrap: wrap;
-    }
-
-    .hw-action-note {
-      font-size: 12.5px;
-      color: var(--text-secondary);
-      line-height: 1.45;
-      flex: 1;
-      min-width: 180px;
-    }
-
-    .hw-action-note.is-correct {
-      color: var(--correct);
-      font-weight: 600;
-    }
-
-    .hw-action-note.is-wrong {
-      color: var(--wrong);
-      font-weight: 600;
     }
 
     .hw-btn-row {
@@ -1897,10 +1885,6 @@
         padding: 12px 16px 16px;
         flex-direction: column;
         align-items: stretch;
-      }
-
-      .hw-action-note {
-        min-width: 0;
       }
 
       .hw-btn-row {
@@ -3348,6 +3332,76 @@
       return out;
     }
 
+    const SI_UNIT_TOKEN_RE = /^(?:kg|mg|g|km|dm|cm|mm|µm|um|nm|pm|m|ms|µs|us|ns|min|h|s|kA|mA|µA|uA|nA|A|K|mol|cd|kN|mN|N|MJ|kJ|mJ|J|MW|kW|mW|W|kV|mV|V|mC|µC|uC|nC|pC|C|mF|µF|uF|nF|pF|F|mH|µH|uH|H|Wb|T|MPa|kPa|Pa|GHz|MHz|kHz|Hz|Ω|rad|sr|lm|lx|Bq|Gy|Sv|kat|MeV|keV|eV|kcal|cal|l|L)(?:\^(?:\{[+-]?[a-zA-Z0-9]+\}|[+-]?\d+))?$/;
+
+    function normalizeBareSuperSub(expr) {
+      return expr.replace(/(^|[^\\])(\^|_)(?!\{)([+-]\d+|[+-][a-zA-Z]|\d{2,})/g, '$1$2{$3}');
+    }
+
+    function isSiUnitExpression(expr) {
+      if (!expr || !/[a-zA-Z]/.test(expr)) return false;
+      if (!expr.includes('^') && !/\//.test(expr)) return false;
+      if (/[=+<>_\\]/.test(expr)) return false;
+      const stripped = expr.replace(/[()]/g, '');
+      if (!stripped) return false;
+      const parts = stripped.split(/[.*\/]/).filter(Boolean);
+      return parts.length > 0 && parts.every(part => SI_UNIT_TOKEN_RE.test(part));
+    }
+
+    function formatBareMathExpr(expr) {
+      let out = normalizeBareSuperSub(expr);
+      if (isSiUnitExpression(expr)) {
+        return '$\\mathrm{' + out.replace(/\./g, ' \\cdot ') + '}$';
+      }
+      out = out
+        .replace(/\.10\^/g, ' \\cdot 10^')
+        .replace(/([a-zA-Z}])\.(?=[a-zA-Z])/g, '$1 \\cdot ');
+      return '$' + out + '$';
+    }
+
+    function hasValidMathSubOrSuper(tok) {
+      if (tok.includes('^')) {
+        return /\^(?:\{[^{}]+\}|[+-]?[a-zA-Z0-9đĐ])/.test(tok);
+      }
+      if (tok.includes('_') && !tok.includes('__')) {
+        return /(?:^|[^a-zA-Z0-9_])[a-zA-Z0-9\)\]}]{1,4}_(?:\{[^{}]+\}|[+-]?\d+|[a-zA-ZđĐ]{1,3})(?![a-zA-Z0-9_])/.test(tok);
+      }
+      return false;
+    }
+
+    function wrapBareMathTokens(segment) {
+      return segment.replace(/\S+/g, (rawTok) => {
+        if (rawTok.includes('$') || rawTok.includes('\u0000')) return rawTok;
+        let lead = '';
+        let trail = '';
+        let core = rawTok;
+
+        const leadMatch = core.match(/^["'«“:]+/);
+        if (leadMatch) {
+          lead = leadMatch[0];
+          core = core.slice(lead.length);
+        }
+        const trailMatch = core.match(/[.,;:?!"'»”]+$/);
+        if (trailMatch) {
+          trail = trailMatch[0];
+          core = core.slice(0, core.length - trail.length);
+        }
+        while (core.startsWith('(') && (core.match(/\(/g) || []).length > (core.match(/\)/g) || []).length) {
+          lead += '(';
+          core = core.slice(1);
+        }
+        while (core.endsWith(')') && (core.match(/\)/g) || []).length > (core.match(/\(/g) || []).length) {
+          trail = ')' + trail;
+          core = core.slice(0, -1);
+        }
+        if (!core || /^https?:\/\//i.test(core) || !hasValidMathSubOrSuper(core)) return rawTok;
+        if (/[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹ]/i.test(core)) {
+          return rawTok;
+        }
+        return lead + formatBareMathExpr(core) + trail;
+      });
+    }
+
     function preprocessMath(text) {
       if (!text) return '';
 
@@ -3370,7 +3424,7 @@
 
       for (let i = 0; i < parts.length; i++) {
         if (i % 2 === 1) {
-          tokens.push(parts[i]);
+          tokens.push(normalizeBareSuperSub(parts[i]));
           continue;
         }
 
@@ -3387,14 +3441,19 @@
               endPunct = clean.slice(-1);
               clean = clean.slice(0, -1).trim();
             }
-            tokens.push('$' + clean + '$' + endPunct);
-          } else {
-            let replaced = p.replace(/(\\(?:overline|bar|hat|vec|dot|ddot|frac|sqrt)\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}|\\(?:Delta|delta|alpha|beta|gamma|lambda|mu|omega|Omega|pi|theta|sigma|rho|tau|phi|varphi|pm|approx|le|ge|times|cdot|ne|neq|Rightarrow|to)(?:\s+[a-zA-Z0-9_]+)?)/g, (m, g1) => '$' + g1.trim() + '$');
-            tokens.push(replaced);
+            tokens.push('$' + normalizeBareSuperSub(clean) + '$' + endPunct);
+            continue;
           }
-        } else {
-          tokens.push(p);
+          p = p.replace(/(\\(?:overline|bar|hat|vec|dot|ddot|frac|sqrt)\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}|\\(?:Delta|delta|alpha|beta|gamma|lambda|mu|omega|Omega|pi|theta|sigma|rho|tau|phi|varphi|pm|approx|le|ge|times|cdot|ne|neq|Rightarrow|to)(?:\s+[a-zA-Z0-9_]+)?)/g, (m, g1) => '$' + normalizeBareSuperSub(g1.trim()) + '$');
         }
+
+        const subParts = p.split(mathRegex);
+        const subOut = subParts.map((sp, idx) => {
+          if (!sp) return '';
+          if (idx % 2 === 1) return sp;
+          return wrapBareMathTokens(sp);
+        }).join('');
+        tokens.push(subOut);
       }
       return tokens.join('');
     }
@@ -3454,7 +3513,6 @@
 
     function formatText(text) {
       if (!text) return '';
-      const processed = preprocessMath(String(text));
       const safeImages = [];
 
       const stashImage = (rawUrl) => {
@@ -3462,12 +3520,13 @@
         if (!safeUrl) return '';
         const idx = safeImages.length;
         safeImages.push(safeUrl);
-        return `\n\u0000ZPIMG_${idx}\u0000\n`;
+        return `\n\u0000ZPIMG:${idx}\u0000\n`;
       };
 
-      let work = processed.replace(/\[img\](.*?)\[\/img\]/gi, (_, url) => stashImage(url));
+      let work = String(text).replace(/\[img\](.*?)\[\/img\]/gi, (_, url) => stashImage(url));
       const imgUrlRegex = /(https?:\/\/[^\s<>"]+?(?:\.(?:jpg|jpeg|png|gif|webp|svg|bmp)(?:[?#][^\s<>"]*)?|(?:drive\.google\.com\/(?:file\/d\/[^/\s]+\/view|uc\?[^\s<>"]*export=download[^\s<>"]*|uc\?[^\s<>"]*id=[^\s<>"]+)|i\.imgur\.com\/[^\s<>"]+|ibb\.co\/[^\s<>"]+|postimg\.cc\/[^\s<>"]+|i\.postimg\.cc\/[^\s<>"]+)))/gi;
       work = work.replace(imgUrlRegex, (url) => stashImage(url));
+      work = preprocessMath(work);
 
       const mathProtectRegex = /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$[^\$\n]+?\$)/g;
       const segs = work.split(mathProtectRegex);
@@ -3477,7 +3536,7 @@
         return (i % 2 === 1) ? escapedSeg : escapedSeg.replace(/\n/g, '<br>');
       }).join('');
       html = html.replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>');
-      html = html.replace(/\u0000ZPIMG_(\d+)\u0000/g, (_, idx) => {
+      html = html.replace(/\u0000ZPIMG:(\d+)\u0000/g, (_, idx) => {
         const u = safeImages[parseInt(idx, 10)];
         if (!u) return '';
         return `<br><img src="${escapeQuizHtml(u)}" onerror="this.style.display='none'" loading="lazy"><br>`;
@@ -3589,6 +3648,11 @@
         badge.style.display = 'none';
         badge.className = 'hw-status-badge';
         badge.textContent = '';
+      }
+      const scoreVal = document.getElementById('scoreValue');
+      if (scoreVal) {
+        scoreVal.style.display = '';
+        scoreVal.textContent = '';
       }
       const label = document.getElementById('scoreLabel');
       if (label) label.textContent = 'Tổng điểm';
@@ -3794,7 +3858,6 @@
       card.dataset.id = q.id;
 
       let answersHTML = '';
-      let helperNote = '';
 
       const qIdSafe = escapeQuizHtml(q.id);
       if (q.type === 'đs' && validAnswers.length > 0) {
@@ -3811,7 +3874,6 @@
           </div>
         `;
         }).join('');
-        helperNote = `Chọn đủ Đúng/Sai cho cả ${validAnswers.length} ý. Phải đúng cả ${validAnswers.length}/${validAnswers.length} ý mới giữ mạng.`;
       } else if (q.type === 'cauhoi' && validAnswers.length > 0) {
         answersHTML = validAnswers.map(a => {
           const aKeySafe = escapeQuizHtml(a.key);
@@ -3822,14 +3884,12 @@
           </label>
         `;
         }).join('');
-        helperNote = 'Chọn 1 đáp án rồi bấm Kiểm tra đáp án (hoặc phím A–D và Enter).';
       } else {
         answersHTML = `
           <div>
             <input type="text" class="student-input" id="short-answer-${qIdSafe}" placeholder="Nhập câu trả lời" oninput="onHomeworkInputChange()" onkeydown="if(event.key==='Enter'){ event.preventDefault(); checkHomeworkCurrentQuestion(); }">
           </div>
         `;
-        helperNote = 'Nhập đáp án rồi bấm Kiểm tra đáp án (hoặc nhấn Enter).';
       }
 
       card.innerHTML = `
@@ -3843,7 +3903,6 @@
           ${answersHTML}
         </div>
         <div class="hw-card-actions" id="hwActions-${qIdSafe}">
-          <span class="hw-action-note" id="hwActionNote">${helperNote}</span>
           <div class="hw-btn-row" id="hwBtnRow">
             <button type="button" class="hw-primary-btn" id="hwCheckBtn" disabled onclick="checkHomeworkCurrentQuestion()">Kiểm tra đáp án</button>
           </div>
@@ -3973,7 +4032,7 @@
         if (actionsEl) actionsEl.style.display = 'none';
         renderQuestionFeedbackPanel(lastQuestion, {
           isCorrect: false,
-          ctaText: `LÀM LẠI BÀI (${quizData.length} CÂU MỚI)`,
+          ctaText: 'Làm lại',
           ctaOnClick: 'retryQuiz()'
         });
       }
@@ -4000,11 +4059,11 @@
       if (badge) {
         badge.className = 'hw-status-badge is-failed';
         badge.style.display = 'inline-flex';
-        badge.innerHTML = `${SVG_X} Chưa đạt · Trượt bài tập`;
+        badge.innerHTML = `${SVG_X} Chưa hoàn thành`;
       }
       if (scoreValueEl) {
-        scoreValueEl.textContent = `Sai ${hwWrongCount} / ${HW_MAX_LIVES}`;
-        scoreValueEl.style.color = 'var(--wrong)';
+        scoreValueEl.style.display = 'none';
+        scoreValueEl.textContent = '';
       }
       if (scoreLabelEl) {
         scoreLabelEl.textContent = `Dừng ở câu ${Math.min(hwIndex + 1, quizData.length)} / ${quizData.length} · Kết quả chưa được ghi nhận`;
@@ -4025,7 +4084,7 @@
       if (actionsEl) {
         actionsEl.style.display = 'flex';
         actionsEl.innerHTML = `
-          <button type="button" class="hw-primary-btn is-danger" onclick="retryQuiz()">Làm lại bài (${quizData.length} câu mới)</button>
+          <button type="button" class="hw-primary-btn is-danger" onclick="retryQuiz()">Làm lại</button>
         `;
       }
 
@@ -4090,6 +4149,7 @@
         badge.innerHTML = `${SVG_CHECK} Đạt yêu cầu · Hoàn thành ${quizData.length}/${quizData.length} câu`;
       }
       if (scoreValueEl) {
+        scoreValueEl.style.display = '';
         scoreValueEl.textContent = `${finalScore} / ${maxScore}`;
         scoreValueEl.style.color = 'var(--correct)';
       }
@@ -4996,8 +5056,10 @@
       container.innerHTML = '';
 
       const banner = document.getElementById('scoreBanner');
-      document.getElementById('scoreValue').textContent = `${finalScore} / ${maxScore}`;
-      document.getElementById('scoreValue').style.color =
+      const scoreValueEl = document.getElementById('scoreValue');
+      scoreValueEl.style.display = '';
+      scoreValueEl.textContent = `${finalScore} / ${maxScore}`;
+      scoreValueEl.style.color =
         pct >= 70 ? 'var(--correct)' : pct >= 40 ? 'var(--warning)' : 'var(--wrong)';
 
       let msg = `Hoàn thành ${answeredCount} câu (Đúng ${rvCorrect}, Sai ${rvWrong}, Bỏ qua ${rvSkipped}). `;
@@ -5140,8 +5202,10 @@
       const pct = Math.round((finalScore / maxScore) * 100);
       playAnswerFeedbackSound(pct >= 50);
 
-      document.getElementById('scoreValue').textContent = `${finalScore} / ${maxScore}`;
-      document.getElementById('scoreValue').style.color =
+      const scoreValueEl = document.getElementById('scoreValue');
+      scoreValueEl.style.display = '';
+      scoreValueEl.textContent = `${finalScore} / ${maxScore}`;
+      scoreValueEl.style.color =
         pct >= 70 ? 'var(--correct)' : pct >= 40 ? 'var(--warning)' : 'var(--wrong)';
 
       let msg = '';

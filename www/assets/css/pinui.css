@@ -1,5 +1,11 @@
 /* ── PinUI Theme Switch & Segmented Control System ── */
 
+/* Prevent UA `bolder` inside font-weight: 600/700 from resolving to weight 900 (Arial Black), which lacks Vietnamese glyphs */
+b,
+strong {
+  font-weight: 700;
+}
+
 /* View Transitions radial reveal (Chrome / Edge / modern browsers) */
 ::view-transition-old(root),
 ::view-transition-new(root) {
