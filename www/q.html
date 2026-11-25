@@ -5247,7 +5247,12 @@
 
   <script>
     const SFX_STORAGE_KEY = 'zphysics_sfx_muted';
+    const CORRECT_SFX_URL = 'assets/correct.wav';
     let sfxAudioCtx = null;
+    let correctSfxRawBuffer = null;
+    let correctSfxBuffer = null;
+    let correctSfxLoadPromise = null;
+    let correctSfxDecodePromise = null;
 
     function isSfxMuted() {
       try {
@@ -5323,11 +5328,68 @@
       osc.stop(start + dur + 0.02);
     }
 
-    /**
-     * Simulates Duolingo "Correct" chime: ascending Major Third (F# -> A#)
-     * with layered marimba/celesta harmonics and percussive exponential decay.
-     */
-    function playDuolingoCorrectSound() {
+    function decodeAudioBufferData(ctx, arrayBuffer) {
+      return new Promise((resolve, reject) => {
+        try {
+          const maybePromise = ctx.decodeAudioData(arrayBuffer, resolve, reject);
+          if (maybePromise && typeof maybePromise.then === 'function') {
+            maybePromise.then(resolve, reject);
+          }
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+
+    function fetchCorrectSfxRaw() {
+      if (correctSfxRawBuffer) return Promise.resolve(correctSfxRawBuffer);
+      if (!correctSfxLoadPromise) {
+        correctSfxLoadPromise = fetch(CORRECT_SFX_URL)
+          .then((res) => {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.arrayBuffer();
+          })
+          .then((buf) => {
+            correctSfxRawBuffer = buf;
+            return buf;
+          })
+          .catch(() => {
+            correctSfxLoadPromise = null;
+            return null;
+          });
+      }
+      return correctSfxLoadPromise;
+    }
+
+    function ensureCorrectSfxBuffer(ctx) {
+      if (!ctx) return Promise.resolve(null);
+      if (correctSfxBuffer) return Promise.resolve(correctSfxBuffer);
+      if (!correctSfxDecodePromise) {
+        correctSfxDecodePromise = fetchCorrectSfxRaw()
+          .then((raw) => {
+            if (!raw) return null;
+            return decodeAudioBufferData(ctx, raw.slice(0));
+          })
+          .then((decoded) => {
+            if (decoded) correctSfxBuffer = decoded;
+            return decoded || null;
+          })
+          .catch(() => null)
+          .finally(() => {
+            correctSfxDecodePromise = null;
+          });
+      }
+      return correctSfxDecodePromise;
+    }
+
+    function playCorrectBuffer(ctx, buffer) {
+      const src = ctx.createBufferSource();
+      src.buffer = buffer;
+      src.connect(ctx.destination);
+      src.start(0);
+    }
+
+    function playCorrectSynthFallback() {
       withSfxContext((ctx) => {
         const filter = ctx.createBiquadFilter();
         filter.type = 'lowpass';
@@ -5366,6 +5428,39 @@
             attack: 0.004,
             peakGain: n.peak * n.shimmerScale
           });
+        });
+      });
+    }
+
+    function playCorrectFallback() {
+      try {
+        const audio = new Audio(CORRECT_SFX_URL);
+        audio.play().catch(() => playCorrectSynthFallback());
+      } catch (e) {
+        playCorrectSynthFallback();
+      }
+    }
+
+    /**
+     * Plays the extracted "Correct" audio clip (pre-decoded via Web Audio for zero-latency playback).
+     */
+    function playDuolingoCorrectSound() {
+      const ctx = getSfxAudioContext();
+      if (!ctx) {
+        playCorrectFallback();
+        return;
+      }
+      withSfxContext((activeCtx) => {
+        if (correctSfxBuffer) {
+          playCorrectBuffer(activeCtx, correctSfxBuffer);
+          return;
+        }
+        ensureCorrectSfxBuffer(activeCtx).then((decoded) => {
+          if (decoded) {
+            playCorrectBuffer(activeCtx, decoded);
+          } else {
+            playCorrectFallback();
+          }
         });
       });
     }
@@ -5442,12 +5537,17 @@
 
     function initSfxControls() {
       updateSfxButton(!isSfxMuted());
+      fetchCorrectSfxRaw();
 
       const unlockEvents = ['pointerdown', 'keydown'];
       const unlockAudio = () => {
         const ctx = getSfxAudioContext();
-        if (ctx && ctx.state === 'suspended') {
-          ctx.resume().catch(() => {});
+        if (ctx) {
+          if (ctx.state === 'suspended') {
+            ctx.resume().then(() => ensureCorrectSfxBuffer(ctx)).catch(() => {});
+          } else {
+            ensureCorrectSfxBuffer(ctx);
+          }
         }
         unlockEvents.forEach(evt => document.removeEventListener(evt, unlockAudio));
       };
